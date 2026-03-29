@@ -3,107 +3,161 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { supabase } from "../../lib/supabaseClient";
 
-export default function FundsGot() {
-  const [funds, setFunds] = useState([]);
-  const [user, setUser] = useState(null);
+export default function CreatorPayments() {
   const [loading, setLoading] = useState(true);
-  const [total, setTotal] = useState(0);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const [keyId, setKeyId] = useState("");
+  const [keySecret, setKeySecret] = useState("");
+  const [configured, setConfigured] = useState(false);
 
-  /* ---------------- LOAD USER ---------------- */
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data?.user || null);
-    });
+    loadConfig();
   }, []);
 
-  /* ---------------- LOAD FUNDS ---------------- */
-  useEffect(() => {
-    if (!user) return;
-
-    loadFunds();
-  }, [user]);
-
-  async function loadFunds() {
+  async function loadConfig() {
     setLoading(true);
+    setMessage("");
 
-    const { data, error } = await supabase
-      .from("public_donations")
-      .select(
-        `
-        id,
-        amount,
-        status,
-        created_at,
-        projects!inner (
-          id,
-          title,
-          owner_id
-        )
-      `
-      )
-      .eq("projects.owner_id", user.id)
-      .order("created_at", { ascending: false });
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
-    if (error) {
-      console.error("Funds Got error:", error);
-      setFunds([]);
-      setTotal(0);
+    if (!session?.access_token) {
+      setLoading(false);
+      setMessage("Please login first.");
+      return;
+    }
+
+    const res = await fetch("/api/creator/razorpay-config", {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setMessage(data?.error || "Failed to load config");
       setLoading(false);
       return;
     }
 
-    setFunds(data || []);
-    setTotal((data || []).reduce((sum, f) => sum + f.amount, 0));
+    setConfigured(Boolean(data?.configured));
+    setKeyId(data?.keyId || "");
     setLoading(false);
   }
 
+  async function handleSave(e) {
+    e.preventDefault();
+
+    if (!keyId.trim() || !keySecret.trim()) {
+      setMessage("Enter both Razorpay Key ID and Key Secret.");
+      return;
+    }
+
+    setSaving(true);
+    setMessage("");
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.access_token) {
+      setSaving(false);
+      setMessage("Please login first.");
+      return;
+    }
+
+    const res = await fetch("/api/creator/razorpay-config", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({
+        keyId: keyId.trim(),
+        keySecret: keySecret.trim(),
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setSaving(false);
+      setMessage(data?.error || "Failed to save config");
+      return;
+    }
+
+    setConfigured(true);
+    setKeySecret("");
+    setSaving(false);
+    setMessage(
+      "Saved. This Razorpay account will be used for all your projects.",
+    );
+  }
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-slate-950">
       <Navbar />
 
-      <main className="flex-1 max-w-4xl mx-auto p-6">
+      <main className="flex-1 max-w-2xl mx-auto w-full p-6">
         <h1 className="text-2xl font-bold text-white mb-2">
-          Funds Got
+          Payment Management
         </h1>
-
-        <p className="text-green-400 font-semibold mb-6">
-          Total Earned: ₹{total}
+        <p className="text-slate-400 mb-8">
+          Add Razorpay credentials once. The same account will be used for
+          funding on all projects created by you.
         </p>
 
-        {loading && (
-          <p className="text-slate-400">Loading funds...</p>
-        )}
+        <form
+          onSubmit={handleSave}
+          className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4"
+        >
+          <div>
+            <label className="block text-sm text-slate-300 mb-1">
+              Razorpay Key ID
+            </label>
+            <input
+              type="text"
+              value={keyId}
+              onChange={(e) => setKeyId(e.target.value)}
+              placeholder="rzp_live_xxxxxxxxxx"
+              className="input"
+              autoComplete="off"
+            />
+          </div>
 
-        {!loading && funds.length === 0 && (
-          <p className="text-slate-400">No funds received yet.</p>
-        )}
+          <div>
+            <label className="block text-sm text-slate-300 mb-1">
+              Razorpay Key Secret
+            </label>
+            <input
+              type="password"
+              value={keySecret}
+              onChange={(e) => setKeySecret(e.target.value)}
+              placeholder="Enter key secret"
+              className="input"
+              autoComplete="new-password"
+            />
+          </div>
 
-        <div className="space-y-4">
-          {funds.map((f) => (
-            <div
-              key={f.id}
-              className="bg-slate-900 border border-slate-700 rounded-xl p-5 flex justify-between"
-            >
-              <div>
-                <p className="text-white font-semibold">
-                  {f.projects?.title}
-                </p>
-                <p className="text-slate-400 text-sm">
-                  {new Date(f.created_at).toLocaleString()}
-                </p>
-              </div>
+          <button
+            type="submit"
+            disabled={loading || saving}
+            className="btn-primary w-full disabled:opacity-60"
+          >
+            {loading
+              ? "Loading..."
+              : saving
+                ? "Saving..."
+                : configured
+                  ? "Update Razorpay Credentials"
+                  : "Save Razorpay Credentials"}
+          </button>
 
-              <div className="text-right">
-                <p className="text-green-400 font-semibold">
-                  ₹{f.amount}
-                </p>
-                <p className="text-xs text-slate-400 capitalize">
-                  {f.status}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+          {message ? <p className="text-sm text-slate-300">{message}</p> : null}
+        </form>
       </main>
 
       <Footer />

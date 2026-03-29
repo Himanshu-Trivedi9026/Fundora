@@ -38,7 +38,7 @@ export default function FundProject() {
         },
         (payload) => {
           setProject(payload.new);
-        }
+        },
       )
       .subscribe();
 
@@ -113,7 +113,7 @@ export default function FundProject() {
 
       /* 2️⃣ Open Razorpay Checkout */
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // ✅ FRONTEND KEY ONLY
+        key: orderData.key,
         amount: orderData.amount,
         currency: orderData.currency,
         name: project?.title || "Fundora",
@@ -215,8 +215,8 @@ export default function FundProject() {
               {!razorpayLoaded
                 ? "Loading Payment System..."
                 : loading
-                ? "Processing..."
-                : "Pay with Razorpay"}
+                  ? "Processing..."
+                  : "Pay with Razorpay"}
             </button>
           </div>
 

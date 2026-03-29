@@ -221,7 +221,7 @@ export default function Navbar({ onToggleFilters }) {
                     <div className="py-2">
                       <MenuItem href={`/creator/${user.id}`} label="View Profile" />
                       <MenuItem href="/creator/analytics" label="Analytics" />
-                      <MenuItem onClick={() => router.push("/creator/payments")} label="Funds-Got" />
+                      <MenuItem href="/creator/payments" label="Razorpay Setup" />
                       <MenuItem href="/payments" label="My Payments" />
                       <MenuItem href="/creator/profile" label="Edit Payment Portal" />
                       <MenuItem href="/followers" label="Followers" />
