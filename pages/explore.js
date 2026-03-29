@@ -1,4 +1,3 @@
-// pages/explore.js
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -7,14 +6,13 @@ import FiltersSidebar from "../components/FiltersSidebar";
 import { useRouter } from "next/router";
 import { supabase } from "../lib/supabaseClient";
 import FloatingAIChat from "@/components/FloatingAIChat";
+
 export default function Home() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 🔹 Sidebar toggle
   const [showFilters, setShowFilters] = useState(false);
 
-  // 🔹 Filters
   const [filters, setFilters] = useState({
     categories: [],
     minGoal: "",
@@ -22,7 +20,6 @@ export default function Home() {
     sort: "recent",
   });
 
-  // 🔹 Search
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
 
@@ -34,7 +31,6 @@ export default function Home() {
 
     let q = supabase.from("projects").select("*");
 
-    // SORT
     switch (filters.sort) {
       case "trending":
         q = q.order("pledged", { ascending: false });
@@ -49,12 +45,10 @@ export default function Home() {
         q = q.order("created_at", { ascending: false });
     }
 
-    // CATEGORY FILTER
     if (filters.categories.length > 0) {
       q = q.contains("categories", filters.categories);
     }
 
-    // GOAL RANGE
     if (filters.minGoal) q = q.gte("goal", filters.minGoal);
     if (filters.maxGoal) q = q.lte("goal", filters.maxGoal);
 
@@ -63,12 +57,11 @@ export default function Home() {
     setLoading(false);
   }
 
-  /* ================= INITIAL LOAD ================= */
   useEffect(() => {
     loadProjects();
   }, [filters]);
 
-  /* ================= 🔥 REALTIME FUNDING UPDATES ================= */
+  /* ================= REALTIME ================= */
   useEffect(() => {
     const channel = supabase
       .channel("projects-live-updates")
@@ -83,21 +76,20 @@ export default function Home() {
           setProjects((prev) =>
             prev.map((p) =>
               p.id === payload.new.id
-                ? { ...p, ...payload.new } // ✅ MERGE (IMPORTANT FIX)
+                ? { ...p, ...payload.new }
                 : p
             )
           );
         }
       )
       .subscribe();
-      
 
     return () => {
       supabase.removeChannel(channel);
     };
   }, []);
 
-  /* ================= SEARCH SUGGESTIONS ================= */
+  /* ================= SEARCH ================= */
   useEffect(() => {
     if (!query.trim()) {
       setSuggestions([]);
@@ -132,33 +124,37 @@ export default function Home() {
       <Navbar onToggleFilters={() => setShowFilters(true)} />
 
       <main className="flex-1 w-full px-6 relative">
+
         {/* HEADER */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-white">
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold text-white">
             Explore projects
           </h1>
 
-          <button onClick={handleStartProject} className="btn-primary">
-            Start a project
+          <button
+            onClick={handleStartProject}
+            className="bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-2 rounded-lg font-medium hover:scale-105 transition"
+          >
+            🚀 Start a project
           </button>
         </div>
-         
+
         {/* SEARCH */}
-        <div className="relative mb-6">
+        <div className="relative mb-8">
           <input
-            className="w-full px-4 py-3 rounded bg-slate-900 border border-slate-700 text-white"
+            className="w-full px-5 py-3 rounded-xl bg-slate-900/70 backdrop-blur border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             placeholder="Search projects..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
 
           {query && suggestions.length > 0 && (
-            <div className="absolute left-0 right-0 mt-1 bg-slate-900 border border-slate-700 rounded-lg z-20">
+            <div className="absolute left-0 right-0 mt-2 bg-slate-900 border border-slate-700 rounded-xl z-20 shadow-xl">
               {suggestions.map((s) => (
                 <a
                   key={s.id}
                   href={`/projects/${s.id}`}
-                  className="block px-4 py-2 hover:bg-slate-800 text-white border-b border-slate-800"
+                  className="block px-4 py-3 hover:bg-slate-800 text-white border-b border-slate-800"
                 >
                   <div className="font-semibold text-blue-300">
                     {s.title}
@@ -172,16 +168,29 @@ export default function Home() {
           )}
         </div>
 
-        {/* GRID */}
-        {loading ? (
-          <p className="text-slate-400">Loading...</p>
-        ) : (
-          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {projects.map((p) => (
-              <ProjectCard key={p.id} project={p} />
-            ))}
+        {/* 🔥 PREMIUM LAYOUT */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+
+          {/* PROJECT GRID */}
+          <div className="lg:col-span-3">
+            {loading ? (
+              <p className="text-slate-400">Loading...</p>
+            ) : (
+              <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
+                {projects.map((p) => (
+                  <ProjectCard key={p.id} project={p} />
+                ))}
+              </div>
+            )}
           </div>
-        )}
+
+          {/* AI SIDEBAR */}
+          <div className="hidden lg:block">
+            <div className="sticky top-24">
+              <FloatingAIChat />
+            </div>
+          </div>
+        </div>
 
         {/* BACKDROP */}
         {showFilters && (
@@ -202,7 +211,6 @@ export default function Home() {
       </main>
 
       <Footer />
-      <FloatingAIChat />
     </div>
   );
 }

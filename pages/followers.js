@@ -11,19 +11,16 @@ export default function FollowersPage() {
   const [loading, setLoading] = useState(true);
   const [followingIds, setFollowingIds] = useState([]);
 
-  /* 🔹 SEARCH STATE */
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
 
-  /* ---------------- AUTH (MISSING BEFORE) ---------------- */
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setUser(data?.user || null);
     });
   }, []);
 
-  /* ---------------- LOAD FOLLOWING IDS ---------------- */
   useEffect(() => {
     if (!user) return;
 
@@ -36,7 +33,6 @@ export default function FollowersPage() {
       });
   }, [user]);
 
-  /* ---------------- LOAD CONNECTIONS ---------------- */
   useEffect(() => {
     if (!user || search) return;
     loadConnections();
@@ -72,7 +68,6 @@ export default function FollowersPage() {
     setLoading(false);
   }
 
-  /* ---------------- 🔍 SEARCH USERS ---------------- */
   useEffect(() => {
     if (!search.trim()) {
       setSearchResults([]);
@@ -95,7 +90,6 @@ export default function FollowersPage() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  /* ---------------- FOLLOW / UNFOLLOW (MISSING BEFORE) ---------------- */
   async function toggleFollow(targetId) {
     if (!user) return;
 
@@ -125,142 +119,148 @@ export default function FollowersPage() {
     <div className="min-h-screen flex flex-col bg-slate-900">
       <Navbar />
 
-      <main className="flex-1 max-w-3xl mx-auto px-6 py-14">
-        <h1 className="text-2xl font-bold text-white text-center mb-6">
-          Connections
-        </h1>
+      {/* 🔥 PREMIUM LAYOUT */}
+      <main className="flex-1 px-6 py-12">
+        <div className="max-w-6xl mx-auto">
 
-        {/* TABS */}
-        <div className="flex justify-center gap-4 mb-6">
-          <button
-            onClick={() => setTab("followers")}
-            className={`px-4 py-2 rounded-lg text-sm ${
-              tab === "followers"
-                ? "bg-cyan-600 text-white"
-                : "bg-slate-800 text-slate-300"
-            }`}
-          >
-            Followers
-          </button>
+          {/* TITLE */}
+          <h1 className="text-3xl font-bold text-white text-center mb-8">
+            Connections
+          </h1>
 
-          <button
-            onClick={() => setTab("following")}
-            className={`px-4 py-2 rounded-lg text-sm ${
-              tab === "following"
-                ? "bg-cyan-600 text-white"
-                : "bg-slate-800 text-slate-300"
-            }`}
-          >
-            Following
-          </button>
-        </div>
+          {/* TABS */}
+          <div className="flex justify-center gap-3 mb-8">
+            <button
+              onClick={() => setTab("followers")}
+              className={`px-5 py-2 rounded-full text-sm transition ${
+                tab === "followers"
+                  ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow"
+                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+              }`}
+            >
+              Followers
+            </button>
 
-        {/* SEARCH BAR */}
-        <div className="mb-8">
-          <input
-            type="text"
-            placeholder="Search users by name..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700
-                       text-white placeholder-slate-400 focus:outline-none
-                       focus:ring-2 focus:ring-cyan-500 transition"
-          />
-        </div>
-
-        {/* SEARCH RESULTS */}
-        {search && (
-          <div className="space-y-4 mb-10">
-            {searching && (
-              <p className="text-center text-slate-400">Searching...</p>
-            )}
-
-            {!searching && searchResults.length === 0 && (
-              <p className="text-center text-slate-400">
-                No users found.
-              </p>
-            )}
-
-            {searchResults.map((p) => (
-              <Link
-                key={p.id}
-                href={`/creator/${p.id}`}
-                className="flex items-center gap-4 bg-slate-800/70 border border-slate-700
-                           rounded-lg p-4 hover:bg-slate-700 transition"
-              >
-                <img
-                  src={
-                    p.avatar_url ||
-                    `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                      p.full_name || "User"
-                    )}&background=0D8ABC&color=fff`
-                  }
-                  className="w-12 h-12 rounded-full border border-slate-600"
-                />
-
-                <div className="flex-1">
-                  <p className="text-white font-medium">
-                    {p.full_name || "Unnamed User"}
-                  </p>
-                </div>
-
-                {user?.id !== p.id && (
-  <button
-    onClick={(e) => {
-      e.preventDefault();
-      toggleFollow(p.id);
-    }}
-    className={`px-3 py-1 rounded text-xs ${
-      followingIds.includes(p.id)
-        ? "bg-slate-700 text-slate-300"
-        : "bg-blue-600 text-white"
-    }`}
-  >
-    {followingIds.includes(p.id)
-      ? "Unfollow"
-      : "+ Follow"}
-  </button>
-)}
-
-              </Link>
-            ))}
+            <button
+              onClick={() => setTab("following")}
+              className={`px-5 py-2 rounded-full text-sm transition ${
+                tab === "following"
+                  ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow"
+                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+              }`}
+            >
+              Following
+            </button>
           </div>
-        )}
 
-        {/* ORIGINAL LIST */}
-        {!search && (
-          <>
-            {loading ? (
-              <p className="text-center text-slate-400">Loading...</p>
-            ) : list.length === 0 ? (
-              <p className="text-center text-slate-400">No users found.</p>
-            ) : (
-              <div className="space-y-4">
-                {list.map((p) => (
-                  <Link
-                    key={p.id}
-                    href={`/creator/${p.id}`}
-                    className="flex items-center gap-4 bg-slate-800/70 border border-slate-700
-                               rounded-lg p-4 hover:bg-slate-700 transition"
-                  >
-                    <img
-                      src={
-                        p.avatar_url ||
-                        `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                          p.full_name || "User"
-                        )}&background=0D8ABC&color=fff`
-                      }
-                      className="w-12 h-12 rounded-full border border-slate-600"
-                    />
-                    <span className="text-white font-medium">
-                      {p.full_name || "Unnamed User"}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </>
-        )}
+          {/* SEARCH */}
+          <div className="max-w-md mx-auto mb-10">
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            />
+          </div>
+
+          {/* 🔍 SEARCH RESULTS */}
+          {search && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+
+              {searching && (
+                <p className="text-center text-slate-400 col-span-full">
+                  Searching...
+                </p>
+              )}
+
+              {!searching && searchResults.length === 0 && (
+                <p className="text-center text-slate-400 col-span-full">
+                  No users found.
+                </p>
+              )}
+
+              {searchResults.map((p) => (
+                <div
+                  key={p.id}
+                  className="bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-5 flex items-center gap-4 hover:scale-[1.02] transition"
+                >
+                  <img
+                    src={
+                      p.avatar_url ||
+                      `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        p.full_name || "User"
+                      )}`
+                    }
+                    className="w-14 h-14 rounded-full border border-slate-600"
+                  />
+
+                  <div className="flex-1">
+                    <p className="text-white font-medium">
+                      {p.full_name || "User"}
+                    </p>
+                  </div>
+
+                  {user?.id !== p.id && (
+                    <button
+                      onClick={() => toggleFollow(p.id)}
+                      className={`px-3 py-1 rounded text-xs ${
+                        followingIds.includes(p.id)
+                          ? "bg-slate-700 text-slate-300"
+                          : "bg-blue-600 text-white"
+                      }`}
+                    >
+                      {followingIds.includes(p.id)
+                        ? "Unfollow"
+                        : "+ Follow"}
+                    </button>
+                  )}
+                </div>
+              ))}
+
+            </div>
+          )}
+
+          {/* 👥 NORMAL LIST */}
+          {!search && (
+            <>
+              {loading ? (
+                <p className="text-center text-slate-400">Loading...</p>
+              ) : list.length === 0 ? (
+                <p className="text-center text-slate-400">No users found.</p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                  {list.map((p) => (
+                    <Link key={p.id} href={`/creator/${p.id}`}>
+                      <div className="cursor-pointer bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-5 flex items-center gap-4 hover:scale-[1.02] transition">
+
+                        <img
+                          src={
+                            p.avatar_url ||
+                            `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                              p.full_name || "User"
+                            )}`
+                          }
+                          className="w-14 h-14 rounded-full border border-slate-600"
+                        />
+
+                        <div className="flex-1">
+                          <p className="text-white font-medium">
+                            {p.full_name || "User"}
+                          </p>
+                        </div>
+
+                      </div>
+                    </Link>
+                  ))}
+
+                </div>
+              )}
+            </>
+          )}
+
+        </div>
       </main>
 
       <Footer />

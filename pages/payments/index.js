@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { supabase } from "../../lib/supabaseClient";
+import { generateReceipt } from "../../lib/generateReceipt";
 
 export default function MyPayments() {
   const [payments, setPayments] = useState([]);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedPayment, setSelectedPayment] = useState(null);
 
   /* ---------------- LOAD USER ---------------- */
   useEffect(() => {
@@ -18,7 +20,6 @@ export default function MyPayments() {
   /* ---------------- LOAD PAYMENTS ---------------- */
   useEffect(() => {
     if (!user) return;
-
     loadPayments();
   }, [user]);
 
@@ -27,18 +28,17 @@ export default function MyPayments() {
 
     const { data, error } = await supabase
       .from("public_donations")
-      .select(
-        `
+      .select(`
         id,
         amount,
         status,
         created_at,
+        payer_id,
         projects (
           id,
           title
         )
-      `
-      )
+      `)
       .eq("payer_id", user.id)
       .order("created_at", { ascending: false });
 
@@ -53,14 +53,67 @@ export default function MyPayments() {
     setLoading(false);
   }
 
+  /* 🔥 FIXED DOWNLOAD RECEIPT FUNCTION */
+  async function downloadReceipt(payment) {
+    try {
+      const res = await fetch("/api/receipts/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          donationId: payment.id,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!data?.receipt) {
+        alert("Failed to generate receipt");
+        return;
+      }
+
+      const blob = await generateReceipt(data.receipt);
+
+      if (!(blob instanceof Blob)) {
+        throw new Error("Invalid PDF blob");
+      }
+
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Fundora_Receipt_${data.receipt.receiptId}.pdf`;
+
+      document.body.appendChild(a);
+      a.click();
+
+      a.remove();
+      window.URL.revokeObjectURL(url);
+
+    } catch (err) {
+      console.error("Receipt error:", err);
+      alert("Error downloading receipt");
+    }
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-1 max-w-4xl mx-auto p-6">
-        <h1 className="text-2xl font-bold text-white mb-6">
-          My Payments
-        </h1>
+      {/* ✅ FULL WIDTH CONTAINER */}
+      <main className="flex-1 px-8 py-10">
+
+        {/* ✅ HEADER UPGRADE */}
+        <div className="mb-8 flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-white">
+            My Payments
+          </h1>
+
+          <div className="text-sm text-slate-400">
+            Total Payments: {payments.length}
+          </div>
+        </div>
 
         {loading && (
           <p className="text-slate-400">Loading payments...</p>
@@ -70,33 +123,104 @@ export default function MyPayments() {
           <p className="text-slate-400">No payments made yet.</p>
         )}
 
-        <div className="space-y-4">
+        {/* ✅ RESPONSIVE GRID (4–5 CARDS PER ROW) */}
+        <div className="grid gap-6 
+          grid-cols-1 
+          sm:grid-cols-2 
+          md:grid-cols-3 
+          lg:grid-cols-4 
+          xl:grid-cols-5">
+
           {payments.map((p) => (
             <div
               key={p.id}
-              className="bg-slate-900 border border-slate-700 rounded-xl p-5"
+              onClick={() => setSelectedPayment(p)}
+              className="bg-slate-900/70 backdrop-blur-xl border border-slate-700/50 
+              rounded-2xl p-6 min-h-[180px] flex flex-col justify-between
+              hover:scale-[1.03] hover:shadow-xl transition-all duration-300 cursor-pointer"
             >
-              <p className="text-white text-lg font-semibold">
-                ₹{p.amount}
-              </p>
+              <div>
+                {/* ✅ BIG AMOUNT */}
+                <p className="text-white text-2xl font-bold tracking-wide">
+                  ₹{p.amount}
+                </p>
 
-              <p className="text-slate-400 text-sm">
-                Project: {p.projects?.title || "Unknown"}
-              </p>
+                <p className="text-slate-400 text-sm mt-1">
+                  Project: {p.projects?.title || "Unknown"}
+                </p>
 
-              <p className="text-xs text-slate-500 mt-1">
-                {new Date(p.created_at).toLocaleString()}
-              </p>
+                <p className="text-xs text-slate-500 mt-1">
+                  {new Date(p.created_at).toLocaleString()}
+                </p>
 
-              <p className="text-xs mt-1">
-                Status:{" "}
-                <span className="text-green-400 capitalize">
-                  {p.status}
-                </span>
-              </p>
+                <p className="text-xs mt-1">
+                  Status:{" "}
+                  <span className="text-green-400 capitalize">
+                    {p.status}
+                  </span>
+                </p>
+              </div>
+
+              {/* ✅ BUTTON IMPROVED */}
+              {(p.status === "success" || p.status === "paid") && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    downloadReceipt(p);
+                  }}
+                  className="mt-4 w-full bg-gradient-to-r from-purple-600 to-pink-500 
+                  py-2 rounded-lg text-sm font-medium hover:scale-105 transition shadow-md"
+                >
+                  🧾 Download Receipt
+                </button>
+              )}
             </div>
           ))}
         </div>
+
+        {/* MODAL */}
+        {selectedPayment && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+            
+            <div className="bg-slate-900 p-6 rounded-2xl w-[90%] max-w-md shadow-2xl relative">
+
+              <button
+                onClick={() => setSelectedPayment(null)}
+                className="absolute top-3 right-3 text-gray-400 hover:text-white"
+              >
+                ✖
+              </button>
+
+              <h2 className="text-xl font-bold text-white mb-4">
+                Payment Details
+              </h2>
+
+              <p className="text-gray-300 mb-2">
+                💰 Amount: ₹{selectedPayment.amount}
+              </p>
+
+              <p className="text-gray-300 mb-2">
+                📁 Project: {selectedPayment.projects?.title}
+              </p>
+
+              <p className="text-gray-300 mb-2">
+                📅 Date: {new Date(selectedPayment.created_at).toLocaleString()}
+              </p>
+
+              <p className="text-green-400 mb-4">
+                ✅ Status: {selectedPayment.status}
+              </p>
+
+              <button
+                onClick={() => downloadReceipt(selectedPayment)}
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-500 py-2 rounded-lg"
+              >
+                🧾 Download Receipt
+              </button>
+
+            </div>
+          </div>
+        )}
       </main>
 
       <Footer />

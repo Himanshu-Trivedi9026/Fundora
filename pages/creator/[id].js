@@ -1,4 +1,3 @@
-// pages/creator/[id].js
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import Navbar from "../../components/Navbar";
@@ -184,106 +183,128 @@ export default function CreatorProfile() {
     <div className="min-h-screen flex flex-col bg-slate-900">
       <Navbar />
 
-      {/* Banner */}
-      <div
-        className="w-full h-56 relative"
-        style={{
-          backgroundImage: `url(${banner})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="absolute inset-0 bg-black/40"></div>
+      {/* 🔥 PREMIUM HERO BANNER */}
+      <div className="relative h-64 w-full overflow-hidden">
+        <img
+          src={banner}
+          className="w-full h-full object-cover opacity-40"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-slate-900" />
       </div>
 
-      <main className="flex-1 max-w-5xl mx-auto px-6 -mt-20 relative">
-        <div className="flex gap-6 items-center">
-          <img
-            src={avatar}
-            className="w-32 h-32 rounded-full border-4 border-slate-900 shadow-xl object-cover"
-          />
+      {/* 🔥 MAIN CONTENT */}
+      <main className="flex-1 pb-20">
 
-          <div>
-            <h1 className="text-3xl font-bold text-white">
-              {profile.full_name}
-            </h1>
+        <div className="max-w-6xl mx-auto px-6 -mt-24 relative z-10">
 
-            {/* 🔥 PROFILE ACTIONS */}
-{currentUserId === profile.id ? (
-  /* OWN PROFILE */
-  <div className="flex gap-3 mt-2">
-    <button
-      onClick={() => router.push("/edit-profile")}
-      className="px-4 py-2 bg-cyan-600 text-white rounded-lg text-sm hover:bg-cyan-700"
-    >
-      Edit Profile
-    </button>
-  </div>
-) : currentUserId ? (
-  /* OTHER USER PROFILE */
-  <div className="flex gap-3 mt-2">
-    <button
-      onClick={() => router.push(`/dm/${profile.id}`)}
-      className="px-4 py-2 bg-slate-700 text-white rounded-lg text-sm hover:bg-slate-600"
-    >
-      Message
-    </button>
+          {/* 🔥 GLASS PANEL */}
+          <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-xl">
 
-    {isFollowing ? (
-      <button
-        onClick={unfollowUser}
-        className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm"
-      >
-        Unfollow
-      </button>
-    ) : (
-      <button
-        onClick={followUser}
-        className="px-4 py-2 bg-cyan-600 text-white rounded-lg text-sm"
-      >
-        Follow
-      </button>
-    )}
-  </div>
-) : null}
+            {/* PROFILE HEADER */}
+            <div className="flex flex-col md:flex-row items-center md:items-end gap-6">
 
+              <img
+                src={avatar}
+                className="w-28 h-28 rounded-full border-4 border-slate-900 shadow-xl object-cover"
+              />
 
-            <p className="text-slate-300 text-sm mt-3">{profile.bio}</p>
+              <div className="text-center md:text-left">
 
-            <div className="flex gap-4 text-2xl text-slate-300 mt-3">
-              {profile.twitter && <a href={cleanUrl(profile.twitter)} target="_blank"><FaTwitter /></a>}
-              {profile.linkedin && <a href={cleanUrl(profile.linkedin)} target="_blank"><FaLinkedin /></a>}
-              {profile.github && <a href={cleanUrl(profile.github)} target="_blank"><FaGithub /></a>}
-              {profile.instagram && <a href={cleanUrl(profile.instagram)} target="_blank"><FaInstagram /></a>}
-              {profile.youtube && <a href={cleanUrl(profile.youtube)} target="_blank"><FaYoutube /></a>}
-              {profile.website && <a href={cleanUrl(profile.website)} target="_blank"><FaGlobe /></a>}
+                <h1 className="text-2xl font-bold text-white">
+                  {profile.full_name}
+                </h1>
+
+                <p className="text-slate-400 mt-1">
+                  {profile.bio || "Creator"}
+                </p>
+
+                {/* ACTION BUTTONS */}
+                <div className="flex gap-3 mt-3 justify-center md:justify-start">
+
+                  {currentUserId === profile.id ? (
+                    <button
+                      onClick={() => router.push("/edit-profile")}
+                      className="px-4 py-2 bg-cyan-600 text-white rounded-lg text-sm hover:bg-cyan-700"
+                    >
+                      Edit Profile
+                    </button>
+                  ) : currentUserId ? (
+                    <>
+                      <button
+                        onClick={() => router.push(`/dm/${profile.id}`)}
+                        className="px-4 py-2 bg-slate-700 text-white rounded-lg text-sm hover:bg-slate-600"
+                      >
+                        Message
+                      </button>
+
+                      {isFollowing ? (
+                        <button
+                          onClick={unfollowUser}
+                          className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm"
+                        >
+                          Unfollow
+                        </button>
+                      ) : (
+                        <button
+                          onClick={followUser}
+                          className="px-4 py-2 bg-cyan-600 text-white rounded-lg text-sm"
+                        >
+                          Follow
+                        </button>
+                      )}
+                    </>
+                  ) : null}
+
+                </div>
+
+                {/* SOCIAL */}
+                <div className="flex gap-4 text-xl text-slate-400 mt-4 justify-center md:justify-start">
+                  {profile.twitter && <a href={cleanUrl(profile.twitter)} target="_blank"><FaTwitter /></a>}
+                  {profile.linkedin && <a href={cleanUrl(profile.linkedin)} target="_blank"><FaLinkedin /></a>}
+                  {profile.github && <a href={cleanUrl(profile.github)} target="_blank"><FaGithub /></a>}
+                  {profile.instagram && <a href={cleanUrl(profile.instagram)} target="_blank"><FaInstagram /></a>}
+                  {profile.youtube && <a href={cleanUrl(profile.youtube)} target="_blank"><FaYoutube /></a>}
+                  {profile.website && <a href={cleanUrl(profile.website)} target="_blank"><FaGlobe /></a>}
+                </div>
+
+              </div>
             </div>
+
+            {/* 🔥 STATS */}
+            <div className="flex justify-center md:justify-start gap-12 mt-8 text-center">
+              <div>
+                <p className="text-xl font-bold text-white">{projects.length}</p>
+                <p className="text-sm text-slate-400">Projects</p>
+              </div>
+              <div>
+                <p className="text-xl font-bold text-white">{profile.followers_count}</p>
+                <p className="text-sm text-slate-400">Followers</p>
+              </div>
+              <div>
+                <p className="text-xl font-bold text-white">{profile.following_count}</p>
+                <p className="text-sm text-slate-400">Following</p>
+              </div>
+            </div>
+
           </div>
+
+          {/* 🔥 PROJECT SECTION */}
+          <div className="mt-10">
+
+            <h2 className="text-xl font-semibold text-white mb-6">
+              Projects
+            </h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {projects.map((p) => (
+                <ProjectCard key={p.id} project={p} />
+              ))}
+            </div>
+
+          </div>
+
         </div>
 
-        {/* STATS */}
-        <div className="mt-10 flex gap-12 text-center">
-          <div>
-            <p className="text-white text-xl font-semibold">{projects.length}</p>
-            <p className="text-slate-400 text-sm">Projects</p>
-          </div>
-          <div>
-            <p className="text-white text-xl font-semibold">{profile.followers_count}</p>
-            <p className="text-slate-400 text-sm">Followers</p>
-          </div>
-          <div>
-            <p className="text-white text-xl font-semibold">{profile.following_count}</p>
-            <p className="text-slate-400 text-sm">Following</p>
-          </div>
-        </div>
-
-        <h2 className="text-xl text-white mt-10 mb-4">Projects</h2>
-
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {projects.map((p) => (
-            <ProjectCard key={p.id} project={p} />
-          ))}
-        </div>
       </main>
 
       <Footer />

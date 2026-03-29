@@ -1,3 +1,5 @@
+//pages/projects/[id]/fund.js
+import { generateReceipt } from "../../../lib/generateReceipt";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Script from "next/script";
@@ -12,6 +14,10 @@ export default function FundProject() {
   const [project, setProject] = useState(null);
   const [creator, setCreator] = useState(null);
   const [donors, setDonors] = useState([]);
+  // 🔥 FUNDING STATS
+  const totalRaised = donors.reduce((sum, d) => sum + (d.amount || 0), 0);
+  const goal = project?.goal || 10000;
+  const progress = Math.min((totalRaised / goal) * 100, 100);
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
@@ -138,10 +144,54 @@ export default function FundProject() {
           const verifyData = await verifyRes.json();
 
           if (verifyData?.success) {
-            alert("Payment successful 🎉");
-            setAmount("");
-            loadData();
-          } else {
+  try {
+    // 🔥 STEP 1: Get latest donation (just created)
+    const { data: latestDonation } = await supabase
+      .from("public_donations")
+      .select("id")
+      .eq("project_id", id)
+      .eq("payer_id", auth.user.id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single();
+
+    if (!latestDonation?.id) {
+      alert("Payment done but receipt failed");
+      return;
+    }
+
+    // 🔥 STEP 2: Call receipt API
+    const receiptRes = await fetch("/api/receipts/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        donationId: latestDonation.id,
+      }),
+    });
+
+    const receiptData = await receiptRes.json();
+
+    if (!receiptData?.receipt) {
+      console.error("Receipt error:", receiptData);
+      alert("Payment done, but receipt failed");
+      return;
+    }
+
+    // 🔥 STEP 3: Generate PDF
+    generateReceipt(receiptData.receipt);
+
+    alert("✅ Payment successful & receipt downloaded!");
+
+    setAmount("");
+    loadData();
+
+  } catch (err) {
+    console.error("Receipt flow error:", err);
+    alert("Payment done but receipt failed");
+  }
+} else {
             alert("Payment verification failed");
           }
         },
@@ -173,11 +223,47 @@ export default function FundProject() {
         <Navbar />
 
         <main className="flex-1 max-w-4xl mx-auto p-6 space-y-6">
-          {/* PROJECT INFO */}
-          <div className="bg-slate-900 p-6 rounded-xl border border-slate-800">
-            <h1 className="text-2xl font-bold text-white">{project?.title}</h1>
-            <p className="text-slate-400">{project?.short}</p>
-          </div>
+          {/* 🚀 PREMIUM PROJECT CARD */}
+<div className="bg-gradient-to-br from-slate-900 to-slate-800 p-6 rounded-xl border border-slate-700 shadow-xl space-y-4">
+
+  <h1 className="text-3xl font-bold text-white">
+    {project?.title}
+  </h1>
+
+  <p className="text-slate-400">{project?.short}</p>
+
+  {/* 🔥 FUNDING STATS */}
+  <div className="grid grid-cols-3 gap-4 mt-4 text-center">
+    <div>
+      <p className="text-green-400 text-xl font-bold">
+        ₹{totalRaised}
+      </p>
+      <p className="text-xs text-slate-400">Raised</p>
+    </div>
+
+    <div>
+      <p className="text-blue-400 text-xl font-bold">
+        ₹{goal}
+      </p>
+      <p className="text-xs text-slate-400">Goal</p>
+    </div>
+
+    <div>
+      <p className="text-purple-400 text-xl font-bold">
+        {donors.length}
+      </p>
+      <p className="text-xs text-slate-400">Backers</p>
+    </div>
+  </div>
+
+  {/* 🔥 PROGRESS BAR */}
+  <div className="w-full bg-slate-700 h-2 rounded-full mt-2">
+    <div
+      className="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full transition-all duration-500"
+      style={{ width: `${progress}%` }}
+    />
+  </div>
+</div>
 
           {/* CREATOR */}
           {creator && (
@@ -195,30 +281,74 @@ export default function FundProject() {
             </div>
           )}
 
-          {/* PAYMENT */}
-          <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 space-y-4">
-            <h2 className="text-white font-semibold">Support this project</h2>
+          {/* 💎 FUNDING TIERS */}
+<div className="grid md:grid-cols-3 gap-4">
 
-            <input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="Enter amount"
-              className="input"
-            />
+  {[
+    { amount: 100, title: "Supporter", desc: "Basic support ❤️" },
+    { amount: 500, title: "Backer", desc: "Special thanks + shoutout 🚀" },
+    { amount: 1000, title: "Sponsor", desc: "Premium supporter badge 💎" },
+  ].map((tier) => (
 
-            <button
-              onClick={handlePayment}
-              disabled={!razorpayLoaded || loading || Number(amount) <= 0}
-              className="btn-primary w-full disabled:opacity-50"
-            >
-              {!razorpayLoaded
-                ? "Loading Payment System..."
-                : loading
-                  ? "Processing..."
-                  : "Pay with Razorpay"}
-            </button>
-          </div>
+    <div
+      key={tier.amount}
+      onClick={() => setAmount(tier.amount)}
+      className="cursor-pointer bg-slate-900 border border-slate-700 p-4 rounded-xl hover:scale-105 transition"
+    >
+      <h3 className="text-white font-semibold">{tier.title}</h3>
+      <p className="text-slate-400 text-sm">{tier.desc}</p>
+
+      <p className="text-green-400 text-lg font-bold mt-2">
+        ₹{tier.amount}
+      </p>
+    </div>
+
+  ))}
+</div>
+
+          {/* 💖 PREMIUM PAYMENT */}
+<div className="bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 rounded-xl p-6 shadow-xl space-y-4">
+
+  <h2 className="text-lg font-semibold text-white">
+    💖 Fund this project
+  </h2>
+
+  {/* INPUT */}
+  <div className="relative">
+    <span className="absolute left-3 top-2 text-slate-400">₹</span>
+    <input
+      type="number"
+      value={amount}
+      onChange={(e) => setAmount(e.target.value)}
+      placeholder="Enter amount"
+      className="w-full pl-8 pr-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white focus:ring-2 focus:ring-purple-500 outline-none"
+    />
+  </div>
+
+  {/* VALIDATION */}
+  {amount && Number(amount) < 10 && (
+    <p className="text-red-400 text-xs">
+      Minimum amount is ₹10
+    </p>
+  )}
+
+  {/* PAY BUTTON */}
+  <button
+    onClick={handlePayment}
+    disabled={!razorpayLoaded || loading || Number(amount) < 10}
+    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-3 rounded-lg font-semibold hover:scale-105 transition disabled:opacity-50"
+  >
+    {!razorpayLoaded
+      ? "Loading..."
+      : loading
+        ? "Processing..."
+        : "🚀 Fund Now"}
+  </button>
+
+  <p className="text-xs text-slate-400 text-center">
+    🔒 Secure payments via Razorpay
+  </p>
+</div>
 
           {/* DONORS */}
           {donors.length > 0 && (
@@ -228,7 +358,12 @@ export default function FundProject() {
               </h3>
               {donors.map((d) => (
                 <div key={d.id} className="flex justify-between text-slate-300">
-                  <span>{d.payer_id ? "User" : "Anonymous"}</span>
+                  <span className="flex items-center gap-2">
+  <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-xs">
+    {d.payer_id ? "U" : "A"}
+  </div>
+  {d.payer_id ? "Supporter" : "Anonymous"}
+</span>
                   <span className="text-green-400">₹{d.amount}</span>
                 </div>
               ))}
