@@ -1,15 +1,22 @@
 import Razorpay from "razorpay";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
+import { withAuth } from "../../../lib/withAuth";
+import { rateLimit } from "../../../lib/rateLimit";
 
-export default async function handler(req, res) {
+const rl = rateLimit({ windowMs: 60_000, max: 10 });
+
+export default withAuth(async function handler(req, res, user) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  if (!rl(req, res)) return;
+
   try {
     const { amount, projectId } = req.body;
 
-    if (!amount || amount <= 0) {
+    const parsedAmount = Number(amount);
+    if (!parsedAmount || parsedAmount <= 0 || !Number.isFinite(parsedAmount)) {
       return res.status(400).json({ error: "Invalid amount" });
     }
 
@@ -51,7 +58,7 @@ export default async function handler(req, res) {
     });
 
     const order = await razorpay.orders.create({
-      amount: amount * 100, // rupees → paise
+      amount: parsedAmount * 100, // rupees → paise
       currency: "INR",
       receipt: `p_${Date.now()}`,
     });
@@ -67,4 +74,4 @@ export default async function handler(req, res) {
     console.error("Razorpay order error:", err);
     return res.status(500).json({ error: "Order creation failed" });
   }
-}
+});

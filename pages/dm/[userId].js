@@ -22,6 +22,8 @@ export default function DMChat() {
 
   const typingTimeout = useRef(null);
   const bottomRef = useRef(null);
+  const cleanupMessages = useRef(null);
+  const cleanupTyping = useRef(null);
 
   /* ---------------- AUTH ---------------- */
   useEffect(() => {
@@ -34,9 +36,19 @@ export default function DMChat() {
   /* ---------------- INIT CONVERSATION ---------------- */
   useEffect(() => {
     if (currentUserId && otherUserId) initConversation();
+
+    return () => {
+      // Clean up subscriptions on unmount or dependency change
+      cleanupMessages.current?.();
+      cleanupTyping.current?.();
+      clearTimeout(typingTimeout.current);
+    };
   }, [currentUserId, otherUserId]);
 
   async function initConversation() {
+    // Clean up previous subscriptions before creating new ones
+    cleanupMessages.current?.();
+    cleanupTyping.current?.();
     const u1 = [currentUserId, otherUserId].sort()[0];
     const u2 = [currentUserId, otherUserId].sort()[1];
 
@@ -58,8 +70,8 @@ export default function DMChat() {
 
     setConversationId(convo.id);
     loadMessages(convo.id);
-    subscribeMessages(convo.id);
-    subscribeTyping(convo.id);
+    cleanupMessages.current = subscribeMessages(convo.id);
+    cleanupTyping.current = subscribeTyping(convo.id);
   }
 
   /* ---------------- LOAD MESSAGES ---------------- */

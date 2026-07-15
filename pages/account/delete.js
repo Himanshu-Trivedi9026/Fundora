@@ -6,6 +6,7 @@ import { supabase } from "../../lib/supabaseClient";
 export default function DeleteAccount() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -19,32 +20,43 @@ export default function DeleteAccount() {
     }
 
     setLoading(true);
+    setError("");
 
-    const userId = user.id;
+    try {
+      // Get fresh session token
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-    // Delete profile
-    await supabase.from("profiles").delete().eq("id", userId);
+      if (!session?.access_token) {
+        setError("Session expired. Please log in again.");
+        setLoading(false);
+        return;
+      }
 
-    // Delete projects owned by user
-    await supabase.from("projects").delete().eq("owner_id", userId);
+      const res = await fetch("/api/account/delete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
 
-    // Delete saved projects
-    await supabase.from("saved_projects").delete().eq("user_id", userId);
+      const data = await res.json();
 
-    // Delete team entries
-    await supabase.from("team_members").delete().eq("creator_id", userId);
+      if (!res.ok) {
+        setError(data.error || "Deletion failed");
+        setLoading(false);
+        return;
+      }
 
-    // Call serverless function to delete user from auth.users
-    await fetch("/api/deleteUser", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId }),
-    });
-
-    await supabase.auth.signOut();
-
-    alert("Your account has been deleted.");
-    window.location.href = "/";
+      await supabase.auth.signOut();
+      window.location.href = "/";
+    } catch (err) {
+      console.error("Delete error:", err);
+      setError("An error occurred. Please try again.");
+      setLoading(false);
+    }
   }
 
   if (!user)
@@ -66,10 +78,16 @@ export default function DeleteAccount() {
           account will be removed forever and cannot be restored.
         </p>
 
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/30 text-red-300 px-4 py-3 rounded-lg mb-4">
+            {error}
+          </div>
+        )}
+
         <button
           onClick={handleDelete}
           disabled={loading}
-          className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg text-lg font-semibold transition"
+          className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg text-lg font-semibold transition disabled:opacity-50"
         >
           {loading ? "Deleting..." : "Delete My Account"}
         </button>

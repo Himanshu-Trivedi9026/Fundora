@@ -1,6 +1,7 @@
-import { supabase } from "../../../lib/supabaseClient";
+import { supabaseAdmin } from "../../../lib/supabaseAdmin";
+import { withAuth } from "../../../lib/withAuth";
 
-export default async function handler(req, res) {
+export default withAuth(async function handler(req, res, user) {
 
   try {
 
@@ -8,11 +9,11 @@ export default async function handler(req, res) {
 
     /* ---------------- ALL PROJECTS ---------------- */
 
-    const { data: projects } = await supabase
+    const { data: projects } = await supabaseAdmin
       .from("projects")
       .select("*");
 
-    const { data: donations } = await supabase
+    const { data: donations } = await supabaseAdmin
       .from("public_donations")
       .select("*");
 
@@ -36,7 +37,7 @@ export default async function handler(req, res) {
 
       categoryStats[cat].totalProjects++;
       categoryStats[cat].totalFunding += p.pledged || 0;
-      categoryStats[cat].totalGoal += p.goal_amount || 1;
+      categoryStats[cat].totalGoal += p.goal || 1;
       categoryStats[cat].likes += p.likes || 0;
       categoryStats[cat].dislikes += p.dislikes || 0;
 
@@ -123,4 +124,4 @@ export default async function handler(req, res) {
     console.error(err);
     res.status(500).json({ error: "AI failed" });
   }
-}
+});

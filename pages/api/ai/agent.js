@@ -1,10 +1,16 @@
-import { supabase } from "@/lib/supabaseClient";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { withAuth } from "@/lib/withAuth";
+import { rateLimit } from "@/lib/rateLimit";
 
-export default async function handler(req, res) {
+const rl = rateLimit({ windowMs: 60_000, max: 20 });
+
+export default withAuth(async function handler(req, res, user) {
   try {
     if (req.method !== "POST") {
       return res.status(405).json({ error: "Method not allowed" });
     }
+
+    if (!rl(req, res)) return;
 
     const { message, history = [] } = req.body;
 
@@ -15,7 +21,7 @@ export default async function handler(req, res) {
     }));
 
     // 🔥 NEW: Fetch real project data
-    const { data: projects } = await supabase
+    const { data: projects } = await supabaseAdmin
       .from("projects")
       .select("title, goal, pledged, created_at")
       .limit(5);
@@ -104,7 +110,6 @@ Be concise and structured.`,
     });
 
     const text = await response.text();
-    console.log("OPENROUTER RAW:", text);
 
     let data;
 
@@ -123,11 +128,10 @@ Be concise and structured.`,
     return res.status(200).json({ reply });
 
   } catch (err) {
-    console.error("SERVER ERROR:", err);
+    console.error("AI agent error:", err);
 
     return res.status(500).json({
       error: "AI failed",
-      details: err.message,
     });
   }
-}
+});

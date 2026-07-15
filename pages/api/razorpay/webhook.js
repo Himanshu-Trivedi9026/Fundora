@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { supabase } from "../../../lib/supabaseClient";
+import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 
 export const config = {
   api: {
@@ -24,11 +24,18 @@ export default async function handler(req, res) {
     .update(rawBody)
     .digest("hex");
 
-  if (signature !== expectedSignature) {
+  const sigBuf = Buffer.from(expectedSignature, "utf8");
+  const receivedBuf = Buffer.from(signature || "", "utf8");
+  if (sigBuf.length !== receivedBuf.length || !crypto.timingSafeEqual(sigBuf, receivedBuf)) {
     return res.status(400).json({ error: "Invalid signature" });
   }
 
-  const event = JSON.parse(rawBody);
+  let event;
+  try {
+    event = JSON.parse(rawBody);
+  } catch {
+    return res.status(400).json({ error: "Invalid JSON payload" });
+  }
 
   /* ---------------- PAYMENT CAPTURED ---------------- */
   if (event.event === "payment.captured") {
@@ -41,19 +48,34 @@ export default async function handler(req, res) {
     if (!projectId) return res.json({ ok: true });
 
     // 1️⃣ Insert donation
-    await supabase.from("public_donations").insert({
-      project_id: projectId,
-      amount,
-      payer_email: payerEmail,
-      payment_id: payment.id,
-      status: "success",
-    });
+    const { error: insertError } = await supabaseAdmin
+      .from("public_donations")
+      .insert({
+        project_id: projectId,
+        amount,
+        payer_email: payerEmail,
+        payment_id: payment.id,
+        status: "success",
+      });
+
+    if (insertError) {
+      console.error("Webhook insert error:", insertError);
+      return res.status(500).json({ error: "Donation insert failed" });
+    }
 
     // 2️⃣ Update pledged amount
-    await supabase.rpc("increment_project_funding", {
-      project_id: projectId,
-      amount,
-    });
+    const { error: rpcError } = await supabaseAdmin.rpc(
+      "increment_project_funding",
+      {
+        project_id: projectId,
+        amount,
+      },
+    );
+
+    if (rpcError) {
+      console.error("Webhook RPC error:", rpcError);
+      return res.status(500).json({ error: "Funding update failed" });
+    }
   }
 
   /* ---------------- PAYMENT FAILED ---------------- */

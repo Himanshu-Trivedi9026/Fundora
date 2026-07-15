@@ -65,7 +65,7 @@ export default function HomeHero() {
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/explore")}
           className="px-12 py-4 rounded-full text-lg font-semibold
                      bg-gradient-to-r from-blue-600 to-purple-600
                      shadow-[0_0_35px_rgba(99,102,241,0.7)]

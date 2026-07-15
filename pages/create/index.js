@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import MediaUploader from "../../components/MediaUploader";
@@ -23,6 +23,19 @@ export default function CreateProject() {
   const [team, setTeam] = useState([]);
 
   const [loading, setLoading] = useState(false);
+
+  // Memoize thumbnail preview URL to prevent blob URL leak on re-render
+  const thumbnailPreview = useMemo(
+    () => (thumbnailFile ? URL.createObjectURL(thumbnailFile) : null),
+    [thumbnailFile]
+  );
+
+  // Revoke blob URL on cleanup
+  useEffect(() => {
+    return () => {
+      if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
+    };
+  }, [thumbnailPreview]);
 
   async function handleCreate() {
     try {
@@ -207,7 +220,7 @@ export default function CreateProject() {
 
             {thumbnailFile && (
               <img
-                src={URL.createObjectURL(thumbnailFile)}
+                src={thumbnailPreview}
                 className="max-w-xs rounded border"
                 alt="Thumbnail preview"
               />

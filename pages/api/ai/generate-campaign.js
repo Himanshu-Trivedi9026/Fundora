@@ -1,11 +1,16 @@
 import OpenAI from "openai";
+import { withAuth } from "@/lib/withAuth";
+import { rateLimit } from "@/lib/rateLimit";
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export default async function handler(req, res) {
+const rl = rateLimit({ windowMs: 60_000, max: 5 });
+
+export default withAuth(async function handler(req, res, user) {
   try {
+    if (!rl(req, res)) return;
     const { title, category, goal } = req.body;
 
     if (!title || !category || !goal) {
@@ -50,4 +55,4 @@ Write a persuasive crowdfunding campaign description.
       error: "AI generation failed",
     });
   }
-}
+});

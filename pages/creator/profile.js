@@ -27,6 +27,15 @@ export default function CreatorProfile() {
     loadProfile();
   }, []);
 
+  // Clean up blob URLs when values change or component unmounts
+  useEffect(() => {
+    return () => { if (photoPreview) URL.revokeObjectURL(photoPreview); };
+  }, [photoPreview]);
+
+  useEffect(() => {
+    return () => { if (qrPreview) URL.revokeObjectURL(qrPreview); };
+  }, [qrPreview]);
+
   async function loadProfile() {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth?.user) return;
@@ -158,6 +167,7 @@ export default function CreatorProfile() {
                     return;
                   }
 
+                  if (photoPreview) URL.revokeObjectURL(photoPreview);
                   setPhoto(file);
                   setPhotoPreview(URL.createObjectURL(file));
                 }}
@@ -190,6 +200,7 @@ export default function CreatorProfile() {
                 onChange={(e) => {
                   const file = e.target.files[0];
                   if (!file) return;
+                  if (qrPreview) URL.revokeObjectURL(qrPreview);
                   setQr(file);
                   setQrPreview(URL.createObjectURL(file));
                 }}

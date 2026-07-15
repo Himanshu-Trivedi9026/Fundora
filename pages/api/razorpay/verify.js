@@ -1,10 +1,16 @@
 import crypto from "crypto";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
+import { withAuth } from "../../../lib/withAuth";
+import { rateLimit } from "../../../lib/rateLimit";
 
-export default async function handler(req, res) {
+const rl = rateLimit({ windowMs: 60_000, max: 10 });
+
+export default withAuth(async function handler(req, res, user) {
   if (req.method !== "POST") {
     return res.status(405).json({ success: false });
   }
+
+  if (!rl(req, res)) return;
 
   try {
     const {
@@ -13,8 +19,9 @@ export default async function handler(req, res) {
       razorpay_signature,
       projectId,
       amount,
-      payerId, // ✅ coming from frontend
     } = req.body;
+
+    const payerId = user.id;
 
     const { data: project, error: projectError } = await supabaseAdmin
       .from("projects")
@@ -50,15 +57,17 @@ export default async function handler(req, res) {
       .update(body)
       .digest("hex");
 
-    if (expectedSignature !== razorpay_signature) {
+    const sigBuf = Buffer.from(expectedSignature, "utf8");
+    const receivedBuf = Buffer.from(razorpay_signature || "", "utf8");
+    if (sigBuf.length !== receivedBuf.length || !crypto.timingSafeEqual(sigBuf, receivedBuf)) {
       return res.status(400).json({ success: false });
     }
 
-    /* ✅ Store donation */
+    /* Store donation */
     await supabaseAdmin.from("public_donations").insert({
       project_id: projectId,
       amount,
-      payer_id: payerId, // ✅ FIXED
+      payer_id: payerId,
       razorpay_payment_id,
       razorpay_order_id,
       status: "paid",
@@ -75,4 +84,4 @@ export default async function handler(req, res) {
     console.error("Verify error:", err);
     return res.status(500).json({ success: false });
   }
-}
+});

@@ -9,9 +9,19 @@ export function FollowProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Get initial user
     supabase.auth.getUser().then(({ data }) => {
       setCurrentUser(data?.user || null);
     });
+
+    // Listen for auth state changes (login/logout)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setCurrentUser(session?.user || null);
+      }
+    );
+
+    return () => subscription?.unsubscribe();
   }, []);
 
   useEffect(() => {

@@ -1,6 +1,7 @@
-import { supabase } from "@/lib/supabaseClient";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { withAuth } from "@/lib/withAuth";
 
-export default async function handler(req, res) {
+export default withAuth(async function handler(req, res, user) {
   try {
     /* ---------- METHOD CHECK ---------- */
     if (req.method !== "POST") {
@@ -19,7 +20,7 @@ export default async function handler(req, res) {
     }
 
     /* ---------- FETCH DONATION ---------- */
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from("public_donations")
       .select(`
         id,
@@ -31,6 +32,7 @@ export default async function handler(req, res) {
         )
       `)
       .eq("id", donationId)
+      .eq("payer_id", user.id)
       .single();
 
     if (error) {
@@ -66,7 +68,6 @@ export default async function handler(req, res) {
 
     return res.status(500).json({
       error: "Receipt generation failed",
-      details: err.message,
     });
   }
-}
+});

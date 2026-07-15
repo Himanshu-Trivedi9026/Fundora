@@ -5,8 +5,9 @@ import {
   generateLineChart,
   generateBarChart,
 } from "../../lib/pdfCharts";
+import { withAuth } from "../../lib/withAuth";
 
-export default async function handler(req, res) {
+export default withAuth(async function handler(req, res, user) {
   if (req.method !== "POST")
     return res.status(405).json({ error: "Method not allowed" });
 
@@ -120,4 +121,4 @@ export default async function handler(req, res) {
     console.error(err);
     res.status(500).json({ error: "PDF failed" });
   }
-}
+});

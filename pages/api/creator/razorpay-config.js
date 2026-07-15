@@ -1,21 +1,7 @@
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
+import { withAuth } from "../../../lib/withAuth";
 
-async function getAuthedUser(req) {
-  const authHeader = req.headers.authorization || "";
-  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
-
-  if (!token) return null;
-
-  const { data, error } = await supabaseAdmin.auth.getUser(token);
-  if (error || !data?.user) return null;
-  return data.user;
-}
-
-export default async function handler(req, res) {
-  const user = await getAuthedUser(req);
-  if (!user) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
+export default withAuth(async function handler(req, res, user) {
 
   if (req.method === "GET") {
     const { data, error } = await supabaseAdmin
@@ -25,16 +11,9 @@ export default async function handler(req, res) {
       .maybeSingle();
 
     if (error) {
-      if (String(error.message || "").includes("creator_payment_configs")) {
-        return res.status(500).json({
-          error:
-            "Database table creator_payment_configs is missing. Run supabase/creator_payment_configs.sql once.",
-        });
-      }
-
+      console.error("Razorpay config load error:", error);
       return res.status(500).json({
         error: "Failed to load Razorpay config",
-        details: error.message,
       });
     }
 
@@ -66,16 +45,9 @@ export default async function handler(req, res) {
       );
 
     if (error) {
-      if (String(error.message || "").includes("creator_payment_configs")) {
-        return res.status(500).json({
-          error:
-            "Database table creator_payment_configs is missing. Run supabase/creator_payment_configs.sql once.",
-        });
-      }
-
+      console.error("Razorpay config save error:", error);
       return res.status(500).json({
         error: "Failed to save Razorpay config",
-        details: error.message,
       });
     }
 
@@ -83,4 +55,4 @@ export default async function handler(req, res) {
   }
 
   return res.status(405).json({ error: "Method not allowed" });
-}
+});
