@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { supabase } from "../lib/supabaseClient";
 
 export default function CampaignAIGenerator({ setDescription }) {
 
@@ -11,11 +12,17 @@ export default function CampaignAIGenerator({ setDescription }) {
     try {
       setLoading(true);
 
+      const { data: { session } } = await supabase.auth.getSession();
+      const headers = {
+        "Content-Type": "application/json",
+      };
+      if (session?.access_token) {
+        headers.Authorization = `Bearer ${session.access_token}`;
+      }
+
       const res = await fetch("/api/ai/generate-campaign", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
         body: JSON.stringify({
           title,
           category,
@@ -24,8 +31,6 @@ export default function CampaignAIGenerator({ setDescription }) {
       });
 
       const data = await res.json();
-
-      console.log("AI Response:", data); // ⭐ DEBUG
 
       if (!data?.content) {
         alert("AI failed to generate campaign");

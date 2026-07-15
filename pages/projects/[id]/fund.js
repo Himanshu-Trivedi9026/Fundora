@@ -2,7 +2,6 @@
 import { generateReceipt } from "../../../lib/generateReceipt";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import Script from "next/script";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import { supabase } from "../../../lib/supabaseClient";
@@ -20,7 +19,6 @@ export default function FundProject() {
   const progress = Math.min((totalRaised / goal) * 100, 100);
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
-  const [razorpayLoaded, setRazorpayLoaded] = useState(false);
 
   /* ---------------- LOAD DATA ---------------- */
   useEffect(() => {
@@ -85,7 +83,7 @@ export default function FundProject() {
       return;
     }
 
-    if (!razorpayLoaded || !window.Razorpay) {
+    if (!window.Razorpay) {
       alert("Payment system is loading. Please wait.");
       return;
     }
@@ -93,18 +91,23 @@ export default function FundProject() {
     setLoading(true);
 
     try {
-      // 🔐 Get logged-in user
-      const { data: auth } = await supabase.auth.getUser();
-      if (!auth?.user) {
+      // Get session with access token for authenticated API calls
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
         alert("Please login to continue");
         setLoading(false);
         return;
       }
 
+      const authHeaders = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      };
+
       /* 1️⃣ Create Razorpay Order */
       const res = await fetch("/api/razorpay/create-order", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders,
         body: JSON.stringify({
           amount: Number(amount),
           projectId: id,
@@ -130,14 +133,13 @@ export default function FundProject() {
           /* 3️⃣ Verify Payment */
           const verifyRes = await fetch("/api/razorpay/verify", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: authHeaders,
             body: JSON.stringify({
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_order_id: response.razorpay_order_id,
               razorpay_signature: response.razorpay_signature,
               projectId: id,
               amount: Number(amount),
-              payerId: auth.user.id, // ✅ CRITICAL FIX
             }),
           });
 
@@ -145,29 +147,20 @@ export default function FundProject() {
 
           if (verifyData?.success) {
   try {
-    // 🔥 STEP 1: Get latest donation (just created)
-    const { data: latestDonation } = await supabase
-      .from("public_donations")
-      .select("id")
-      .eq("project_id", id)
-      .eq("payer_id", auth.user.id)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .single();
+    // Use donationId from verify response (no race condition with webhook)
+    const donationId = verifyData.donationId;
 
-    if (!latestDonation?.id) {
+    if (!donationId) {
       alert("Payment done but receipt failed");
       return;
     }
 
-    // 🔥 STEP 2: Call receipt API
+    // Call receipt API
     const receiptRes = await fetch("/api/receipts/generate", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: authHeaders,
       body: JSON.stringify({
-        donationId: latestDonation.id,
+        donationId: donationId,
       }),
     });
 
@@ -211,14 +204,6 @@ export default function FundProject() {
 
   return (
     <>
-      {/* ✅ Razorpay SDK */}
-      <Script
-        src="https://checkout.razorpay.com/v1/checkout.js"
-        strategy="afterInteractive"
-        onLoad={() => setRazorpayLoaded(true)}
-        onError={() => setRazorpayLoaded(false)}
-      />
-
       <div className="min-h-screen flex flex-col">
         <Navbar />
 
@@ -335,14 +320,10 @@ export default function FundProject() {
   {/* PAY BUTTON */}
   <button
     onClick={handlePayment}
-    disabled={!razorpayLoaded || loading || Number(amount) < 10}
+    disabled={loading || Number(amount) < 10}
     className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-3 rounded-lg font-semibold hover:scale-105 transition disabled:opacity-50"
   >
-    {!razorpayLoaded
-      ? "Loading..."
-      : loading
-        ? "Processing..."
-        : "🚀 Fund Now"}
+    {loading ? "Processing..." : "🚀 Fund Now"}
   </button>
 
   <p className="text-xs text-slate-400 text-center">

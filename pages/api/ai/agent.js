@@ -14,6 +14,10 @@ export default withAuth(async function handler(req, res, user) {
 
     const { message, history = [] } = req.body;
 
+    if (!message || typeof message !== "string" || !message.trim()) {
+      return res.status(400).json({ error: "Message is required" });
+    }
+
     // 🔥 Convert history
     const formattedHistory = history.map((msg) => ({
       role: msg.role === "ai" ? "assistant" : "user",
@@ -103,7 +107,7 @@ Be concise and structured.`,
 
           {
             role: "user",
-            content: message,
+            content: message.trim(),
           },
         ],
       }),

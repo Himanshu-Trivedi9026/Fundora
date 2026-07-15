@@ -5,7 +5,7 @@ export default function Footer() {
         <p>
           © {new Date().getFullYear()}{" "}
           <span className="font-semibold text-slate-700 dark:text-slate-200">
-            CrowdfundHub
+            Fundora
           </span>
           . Built for helping makers, startups & local businesses.
         </p>

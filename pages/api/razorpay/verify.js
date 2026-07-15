@@ -7,7 +7,7 @@ const rl = rateLimit({ windowMs: 60_000, max: 10 });
 
 export default withAuth(async function handler(req, res, user) {
   if (req.method !== "POST") {
-    return res.status(405).json({ success: false });
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   if (!rl(req, res)) return;
@@ -21,6 +21,24 @@ export default withAuth(async function handler(req, res, user) {
       amount,
     } = req.body;
 
+    /* ---------- INPUT VALIDATION ---------- */
+    if (!razorpay_payment_id || typeof razorpay_payment_id !== "string") {
+      return res.status(400).json({ error: "razorpay_payment_id is required" });
+    }
+    if (!razorpay_order_id || typeof razorpay_order_id !== "string") {
+      return res.status(400).json({ error: "razorpay_order_id is required" });
+    }
+    if (!razorpay_signature || typeof razorpay_signature !== "string") {
+      return res.status(400).json({ error: "razorpay_signature is required" });
+    }
+    if (!projectId || typeof projectId !== "string") {
+      return res.status(400).json({ error: "projectId is required" });
+    }
+    const parsedAmount = Number(amount);
+    if (!parsedAmount || parsedAmount <= 0 || !Number.isFinite(parsedAmount)) {
+      return res.status(400).json({ error: "Valid amount is required" });
+    }
+
     const payerId = user.id;
 
     const { data: project, error: projectError } = await supabaseAdmin
@@ -30,9 +48,7 @@ export default withAuth(async function handler(req, res, user) {
       .single();
 
     if (projectError || !project?.owner_id) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Project not found" });
+      return res.status(404).json({ error: "Project not found" });
     }
 
     const { data: creatorConfig } = await supabaseAdmin
@@ -45,9 +61,7 @@ export default withAuth(async function handler(req, res, user) {
       creatorConfig?.razorpay_key_secret || process.env.RAZORPAY_KEY_SECRET;
 
     if (!keySecret) {
-      return res
-        .status(500)
-        .json({ success: false, error: "Payment system not configured" });
+      return res.status(500).json({ error: "Payment system not configured" });
     }
 
     const body = `${razorpay_order_id}|${razorpay_payment_id}`;
@@ -60,28 +74,42 @@ export default withAuth(async function handler(req, res, user) {
     const sigBuf = Buffer.from(expectedSignature, "utf8");
     const receivedBuf = Buffer.from(razorpay_signature || "", "utf8");
     if (sigBuf.length !== receivedBuf.length || !crypto.timingSafeEqual(sigBuf, receivedBuf)) {
-      return res.status(400).json({ success: false });
+      return res.status(400).json({ error: "Invalid payment signature" });
     }
 
     /* Store donation */
-    await supabaseAdmin.from("public_donations").insert({
+    const { data: donation, error: insertError } = await supabaseAdmin
+      .from("public_donations")
+      .insert({
+        project_id: projectId,
+        amount: parsedAmount,
+        payer_id: payerId,
+        razorpay_payment_id,
+        razorpay_order_id,
+        status: "paid",
+      })
+      .select("id")
+      .single();
+
+    if (insertError) {
+      console.error("Verify insert error:", insertError);
+      return res.status(500).json({ error: "Failed to record donation" });
+    }
+
+    /* Update project funding */
+    const { error: rpcError } = await supabaseAdmin.rpc("increment_project_funding", {
       project_id: projectId,
-      amount,
-      payer_id: payerId,
-      razorpay_payment_id,
-      razorpay_order_id,
-      status: "paid",
+      amount: parsedAmount,
     });
 
-    /* ✅ Update project funding */
-    await supabaseAdmin.rpc("increment_project_funding", {
-      project_id: projectId,
-      amount,
-    });
+    if (rpcError) {
+      console.error("Verify funding update error:", rpcError);
+      // Donation was recorded; log funding error but don't fail the response
+    }
 
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ success: true, donationId: donation.id });
   } catch (err) {
     console.error("Verify error:", err);
-    return res.status(500).json({ success: false });
+    return res.status(500).json({ error: "Payment verification failed" });
   }
 });

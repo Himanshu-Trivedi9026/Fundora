@@ -3,9 +3,17 @@ import { withAuth } from "../../../lib/withAuth";
 
 export default withAuth(async function handler(req, res, user) {
 
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
   try {
 
     const { creatorId } = req.body;
+
+    if (!creatorId || typeof creatorId !== "string") {
+      return res.status(400).json({ error: "creatorId is required" });
+    }
 
     /* ---------------- ALL PROJECTS ---------------- */
 

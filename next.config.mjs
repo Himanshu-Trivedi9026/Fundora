@@ -50,16 +50,16 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              // Razorpay checkout + Supabase; 'unsafe-inline' needed for Razorpay dynamic scripts
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://js.cx",
+              // Razorpay checkout + risk detection + Supabase; 'unsafe-inline' needed for Razorpay dynamic scripts
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://rzp.razorpay.com https://cdn.razorpay.com https://js.cx",
               // Fonts
               "font-src 'self' https://fonts.gstatic.com",
-              // Images: self + Supabase storage + Razorpay logos
-              "img-src 'self' data: blob: https://*.supabase.co https://checkout.razorpay.com",
-              // API connections: Supabase + Razorpay + OpenRouter + OpenAI
-              "connect-src 'self' https://*.supabase.co https://api.openrouter.ai https://api.openai.com https://checkout.razorpay.com",
-              // Frames: Razorpay checkout
-              "frame-src https://checkout.razorpay.com",
+              // Images: self + Supabase storage + Razorpay logos + tracking pixels + avatar service
+              "img-src 'self' data: blob: https://*.supabase.co https://checkout.razorpay.com https://lumberjack.razorpay.com https://ui-avatars.com",
+              // API connections: Supabase (HTTPS + WSS realtime) + Razorpay + OpenRouter + OpenAI
+              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openrouter.ai https://api.openai.com https://checkout.razorpay.com https://lumberjack.razorpay.com https://api.razorpay.com https://rzp.razorpay.com",
+              // Frames: Razorpay checkout + payment verification iframe
+              "frame-src https://checkout.razorpay.com https://api.razorpay.com",
               // Styles
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
             ].join("; "),

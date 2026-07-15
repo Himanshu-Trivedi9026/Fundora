@@ -22,6 +22,29 @@ export default withAuth(async function handler(req, res, user) {
       donorsByProject,
     } = req.body;
 
+    /* ---------- INPUT VALIDATION ---------- */
+    if (typeof totalEarnings === "undefined") {
+      return res.status(400).json({ error: "totalEarnings is required" });
+    }
+    if (typeof totalDonations === "undefined") {
+      return res.status(400).json({ error: "totalDonations is required" });
+    }
+    if (typeof projectCount === "undefined") {
+      return res.status(400).json({ error: "projectCount is required" });
+    }
+    if (!topProject && topProject !== "") {
+      return res.status(400).json({ error: "topProject is required" });
+    }
+    if (!Array.isArray(earningsByDate)) {
+      return res.status(400).json({ error: "earningsByDate must be an array" });
+    }
+    if (!Array.isArray(fundingByProject)) {
+      return res.status(400).json({ error: "fundingByProject must be an array" });
+    }
+    if (!Array.isArray(donorsByProject)) {
+      return res.status(400).json({ error: "donorsByProject must be an array" });
+    }
+
     const doc = new PDFDocument({ margin: 50 });
 
     res.setHeader("Content-Type", "application/pdf");

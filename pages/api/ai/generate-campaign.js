@@ -9,6 +9,10 @@ const client = new OpenAI({
 const rl = rateLimit({ windowMs: 60_000, max: 5 });
 
 export default withAuth(async function handler(req, res, user) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
   try {
     if (!rl(req, res)) return;
     const { title, category, goal } = req.body;
