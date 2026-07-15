@@ -187,6 +187,7 @@ export default function CreatorProfile() {
       <div className="relative h-64 w-full overflow-hidden">
         <img
           src={banner}
+          alt="Creator banner"
           className="w-full h-full object-cover opacity-40"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-slate-900" />
@@ -205,6 +206,7 @@ export default function CreatorProfile() {
 
               <img
                 src={avatar}
+                alt={profile.full_name || "Creator avatar"}
                 className="w-28 h-28 rounded-full border-4 border-slate-900 shadow-xl object-cover"
               />
 
@@ -259,12 +261,12 @@ export default function CreatorProfile() {
 
                 {/* SOCIAL */}
                 <div className="flex gap-4 text-xl text-slate-400 mt-4 justify-center md:justify-start">
-                  {profile.twitter && <a href={cleanUrl(profile.twitter)} target="_blank"><FaTwitter /></a>}
-                  {profile.linkedin && <a href={cleanUrl(profile.linkedin)} target="_blank"><FaLinkedin /></a>}
-                  {profile.github && <a href={cleanUrl(profile.github)} target="_blank"><FaGithub /></a>}
-                  {profile.instagram && <a href={cleanUrl(profile.instagram)} target="_blank"><FaInstagram /></a>}
-                  {profile.youtube && <a href={cleanUrl(profile.youtube)} target="_blank"><FaYoutube /></a>}
-                  {profile.website && <a href={cleanUrl(profile.website)} target="_blank"><FaGlobe /></a>}
+                  {profile.twitter && <a href={cleanUrl(profile.twitter)} target="_blank" rel="noopener noreferrer" aria-label="Twitter"><FaTwitter /></a>}
+                  {profile.linkedin && <a href={cleanUrl(profile.linkedin)} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><FaLinkedin /></a>}
+                  {profile.github && <a href={cleanUrl(profile.github)} target="_blank" rel="noopener noreferrer" aria-label="GitHub"><FaGithub /></a>}
+                  {profile.instagram && <a href={cleanUrl(profile.instagram)} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><FaInstagram /></a>}
+                  {profile.youtube && <a href={cleanUrl(profile.youtube)} target="_blank" rel="noopener noreferrer" aria-label="YouTube"><FaYoutube /></a>}
+                  {profile.website && <a href={cleanUrl(profile.website)} target="_blank" rel="noopener noreferrer" aria-label="Website"><FaGlobe /></a>}
                 </div>
 
               </div>

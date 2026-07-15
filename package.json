@@ -35,8 +35,10 @@
     "@testing-library/user-event": "^14.6.1",
     "@vitejs/plugin-react": "^6.0.3",
     "@vitest/coverage-v8": "^4.1.10",
+    "axe-core": "^4.12.1",
     "eslint": "^9",
     "eslint-config-next": "16.0.4",
+    "jest-axe": "^10.0.0",
     "jsdom": "^29.1.1",
     "tailwindcss": "^4",
     "vitest": "^4.1.10"

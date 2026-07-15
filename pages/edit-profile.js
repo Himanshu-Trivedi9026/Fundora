@@ -136,8 +136,9 @@ export default function EditProfile() {
 
           {/* Avatar Upload */}
           <div>
-            <label className="block text-sm mb-1">Avatar</label>
+            <label htmlFor="ep-avatar" className="block text-sm mb-1">Avatar</label>
             <input
+              id="ep-avatar"
               type="file"
               onChange={(e) => setAvatarFile(e.target.files[0])}
               className="text-sm"
@@ -146,8 +147,9 @@ export default function EditProfile() {
 
           {/* Banner Upload */}
           <div>
-            <label className="block text-sm mb-1">Banner Image</label>
+            <label htmlFor="ep-banner" className="block text-sm mb-1">Banner Image</label>
             <input
+              id="ep-banner"
               type="file"
               onChange={(e) => setBannerFile(e.target.files[0])}
               className="text-sm"
@@ -155,8 +157,9 @@ export default function EditProfile() {
           </div>
 
           <div>
-            <label className="block">Full Name</label>
+            <label htmlFor="ep-name" className="block">Full Name</label>
             <input
+              id="ep-name"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               className="input w-full"
@@ -164,8 +167,9 @@ export default function EditProfile() {
           </div>
 
           <div>
-            <label className="block">Bio</label>
+            <label htmlFor="ep-bio" className="block">Bio</label>
             <textarea
+              id="ep-bio"
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               className="input w-full h-24"
@@ -173,8 +177,9 @@ export default function EditProfile() {
           </div>
 
           <div>
-            <label className="block">Website</label>
+            <label htmlFor="ep-website" className="block">Website</label>
             <input
+              id="ep-website"
               value={website}
               onChange={(e) => setWebsite(e.target.value)}
               className="input w-full"
@@ -185,8 +190,9 @@ export default function EditProfile() {
           <h2 className="text-xl font-semibold mt-6">Social Links</h2>
 
           <div>
-            <label className="block">Twitter URL</label>
+            <label htmlFor="ep-twitter" className="block">Twitter URL</label>
             <input
+              id="ep-twitter"
               value={twitter}
               onChange={(e) => setTwitter(e.target.value)}
               className="input w-full"
@@ -194,8 +200,9 @@ export default function EditProfile() {
           </div>
 
           <div>
-            <label className="block">LinkedIn URL</label>
+            <label htmlFor="ep-linkedin" className="block">LinkedIn URL</label>
             <input
+              id="ep-linkedin"
               value={linkedin}
               onChange={(e) => setLinkedin(e.target.value)}
               className="input w-full"
@@ -203,8 +210,9 @@ export default function EditProfile() {
           </div>
 
           <div>
-            <label className="block">GitHub URL</label>
+            <label htmlFor="ep-github" className="block">GitHub URL</label>
             <input
+              id="ep-github"
               value={github}
               onChange={(e) => setGithub(e.target.value)}
               className="input w-full"
@@ -212,8 +220,9 @@ export default function EditProfile() {
           </div>
 
           <div>
-            <label className="block">Instagram URL</label>
+            <label htmlFor="ep-instagram" className="block">Instagram URL</label>
             <input
+              id="ep-instagram"
               value={instagram}
               onChange={(e) => setInstagram(e.target.value)}
               className="input w-full"
@@ -221,8 +230,9 @@ export default function EditProfile() {
           </div>
 
           <div>
-            <label className="block">YouTube URL</label>
+            <label htmlFor="ep-youtube" className="block">YouTube URL</label>
             <input
+              id="ep-youtube"
               value={youtube}
               onChange={(e) => setYoutube(e.target.value)}
               className="input w-full"

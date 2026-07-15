@@ -27,7 +27,7 @@ export default function CategorySelector({ selected, setSelected }) {
     <div className="space-y-2">
       <label className="text-sm text-slate-300">Project Categories</label>
 
-      <div className="flex flex-wrap gap-2 mt-1">
+      <div className="flex flex-wrap gap-2 mt-1" role="group" aria-label="Project categories">
         {categories.map((cat) => {
           const active = selected.includes(cat);
 

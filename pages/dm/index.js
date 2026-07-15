@@ -64,7 +64,7 @@ export default function DMInbox() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-white">
+      <div role="status" aria-label="Loading conversations" className="min-h-screen flex items-center justify-center text-white">
         Loading inbox...
       </div>
     );
@@ -85,6 +85,9 @@ export default function DMInbox() {
               <div
                 key={t.id}
                 onClick={() => openThread(t)}
+                tabIndex={0}
+                role="button"
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openThread(t); } }}
                 className="p-4 bg-slate-800 rounded-lg cursor-pointer hover:bg-slate-700"
               >
                 <p className="text-white text-sm truncate">

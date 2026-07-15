@@ -89,8 +89,9 @@ export default function EditProfile() {
 
           {/* Full Name */}
           <div>
-            <label className="text-sm text-slate-300">Full Name</label>
+            <label htmlFor="edit-name" className="text-sm text-slate-300">Full Name</label>
             <input
+              id="edit-name"
               className="input"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
@@ -99,8 +100,9 @@ export default function EditProfile() {
 
           {/* Bio */}
           <div>
-            <label className="text-sm text-slate-300">Bio</label>
+            <label htmlFor="edit-bio" className="text-sm text-slate-300">Bio</label>
             <textarea
+              id="edit-bio"
               className="input"
               rows={4}
               value={bio}
@@ -110,8 +112,9 @@ export default function EditProfile() {
 
           {/* Website */}
           <div>
-            <label className="text-sm text-slate-300">Website</label>
+            <label htmlFor="edit-website" className="text-sm text-slate-300">Website</label>
             <input
+              id="edit-website"
               className="input"
               value={website}
               onChange={(e) => setWebsite(e.target.value)}
@@ -120,12 +123,13 @@ export default function EditProfile() {
 
           {/* Avatar Upload */}
           <div>
-            <label className="text-sm text-slate-300">Avatar</label>
-            <input type="file" onChange={uploadAvatar} className="mt-2" />
+            <label htmlFor="edit-avatar" className="text-sm text-slate-300">Avatar</label>
+            <input id="edit-avatar" type="file" onChange={uploadAvatar} className="mt-2" />
 
             {avatarUrl && (
               <img
                 src={avatarUrl}
+                alt="Creator avatar"
                 className="mt-3 w-24 h-24 rounded-full border border-slate-700 object-cover"
               />
             )}

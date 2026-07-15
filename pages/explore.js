@@ -144,16 +144,22 @@ export default function Home() {
           <input
             className="w-full px-5 py-3 rounded-xl bg-slate-900/70 backdrop-blur border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             placeholder="Search projects..."
+            aria-label="Search projects"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
 
           {query && suggestions.length > 0 && (
-            <div className="absolute left-0 right-0 mt-2 bg-slate-900 border border-slate-700 rounded-xl z-20 shadow-xl">
+            <div
+              role="listbox"
+              aria-label="Search suggestions"
+              className="absolute left-0 right-0 mt-2 bg-slate-900 border border-slate-700 rounded-xl z-20 shadow-xl"
+            >
               {suggestions.map((s) => (
                 <a
                   key={s.id}
                   href={`/projects/${s.id}`}
+                  role="option"
                   className="block px-4 py-3 hover:bg-slate-800 text-white border-b border-slate-800"
                 >
                   <div className="font-semibold text-blue-300">

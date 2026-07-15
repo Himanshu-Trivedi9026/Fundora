@@ -17,13 +17,13 @@ export default function MediaUploader({ mediaFiles, setMediaFiles }) {
 
   return (
     <div>
-      <label className="text-sm text-slate-300">Upload Media</label>
+      <label htmlFor="media-upload" className="text-sm text-slate-300">Upload Media</label>
 
       <div
         {...getRootProps()}
         className="mt-2 border border-slate-700 rounded-lg p-6 bg-slate-800 cursor-pointer"
       >
-        <input {...getInputProps()} />
+        <input id="media-upload" {...getInputProps()} />
 
         {isDragActive ? (
           <p className="text-slate-300 text-sm">Drop files here...</p>

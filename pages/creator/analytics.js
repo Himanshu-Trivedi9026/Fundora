@@ -493,7 +493,7 @@ const churnPredictions = useMemo(() => {
   🚀 Your Growth Dashboard
 </h1>
 
-        {loading && <p className="text-slate-400">Loading...</p>}
+        {loading && <p className="text-slate-400" aria-label="Loading analytics">Loading...</p>}
 
 {/* 🔥 AI INSIGHTS */}
 {!loading && (
@@ -572,6 +572,11 @@ const churnPredictions = useMemo(() => {
           : "bg-red-400"
       }`}
       style={{ width: `${growthEngine.growthScore}%` }}
+      role="progressbar"
+      aria-valuenow={growthEngine.growthScore}
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-label="Growth score progress"
     />
   </div>
 </div>

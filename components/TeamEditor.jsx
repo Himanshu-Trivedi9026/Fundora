@@ -23,18 +23,21 @@ export default function TeamEditor({ team, setTeam }) {
       <div className="mt-2 flex gap-2">
         <input
           placeholder="Name"
+          aria-label="Team member name"
           className="flex-1 p-2 rounded bg-slate-800 text-slate-100 border border-slate-700"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
         <input
           placeholder="Role"
+          aria-label="Team member role"
           className="flex-1 p-2 rounded bg-slate-800 text-slate-100 border border-slate-700"
           value={role}
           onChange={(e) => setRole(e.target.value)}
         />
         <button
           onClick={addMember}
+          aria-label="Add team member"
           className="px-3 rounded bg-blue-600 text-white text-sm"
         >
           Add

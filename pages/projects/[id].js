@@ -207,7 +207,9 @@ useEffect(() => {
                   <img
                     key={img.id}
                     src={img.url}
+                    alt={img.name || "Project media"}
                     onClick={() => setPreview({ type: "image", url: img.url })}
+                    aria-label="Preview image"
                     className="cursor-pointer w-full h-28 object-cover rounded-lg border border-slate-700"
                   />
                 ))}
@@ -287,6 +289,10 @@ useEffect(() => {
         <div
           className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center"
           onClick={() => setPreview(null)}
+          aria-label="Close preview"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setPreview(null); } }}
         >
           {preview.type === "image" ? (
             <img src={preview.url} className="max-w-full max-h-full" />

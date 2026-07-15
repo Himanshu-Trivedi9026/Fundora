@@ -23,6 +23,7 @@ function MenuItem({ href, onClick, label, danger }) {
     return (
       <Link
         href={href}
+        role="menuitem"
         className={`${base} ${danger ? dangerStyle : normal}`}
       >
         {label}
@@ -33,6 +34,7 @@ function MenuItem({ href, onClick, label, danger }) {
   return (
     <button
       onClick={onClick}
+      role="menuitem"
       className={`${base} ${danger ? dangerStyle : normal} text-left`}
     >
       {label}
@@ -185,11 +187,12 @@ export default function Navbar({ onToggleFilters }) {
               <Link
                 href="/dm"
                 className="relative text-slate-300 hover:text-white"
+                aria-label={`Messages${unreadCount > 0 ? `, ${unreadCount} unread` : ""}`}
               >
                 <FaEnvelope size={18} />
                 {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-red-600 text-white
-                    text-[10px] w-5 h-5 rounded-full flex items-center justify-center">
+                    text-[10px] w-5 h-5 rounded-full flex items-center justify-center" aria-hidden="true">
                     {unreadCount}
                   </span>
                 )}
@@ -197,15 +200,27 @@ export default function Navbar({ onToggleFilters }) {
 
               {/* AVATAR + MENU */}
               <div className="relative">
-                <img
-                  src={avatarSrc}
+                <button
                   onClick={() => setMenuOpen(!menuOpen)}
-                  className="w-9 h-9 rounded-full cursor-pointer border border-slate-600"
-                />
+                  aria-label="Account menu"
+                  aria-expanded={menuOpen}
+                  aria-haspopup="true"
+                  className="w-9 h-9 rounded-full cursor-pointer border border-slate-600 overflow-hidden"
+                >
+                  <img
+                    src={avatarSrc}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
+                </button>
 
                 {menuOpen && (
-                  <div className="absolute right-0 mt-3 w-60 rounded-2xl bg-slate-900/95 backdrop-blur
-                                  border border-slate-700 shadow-2xl overflow-hidden z-50">
+                  <div
+                    role="menu"
+                    aria-label="Account menu"
+                    className="absolute right-0 mt-3 w-60 rounded-2xl bg-slate-900/95 backdrop-blur
+                                  border border-slate-700 shadow-2xl overflow-hidden z-50"
+                  >
 
                     {/* PROFILE HEADER */}
                     <div className="px-4 py-3 border-b border-slate-700">

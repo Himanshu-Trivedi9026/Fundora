@@ -142,7 +142,10 @@ export default function MyPayments() {
             <div
               key={p.id}
               onClick={() => setSelectedPayment(p)}
-              className="bg-slate-900/70 backdrop-blur-xl border border-slate-700/50 
+              tabIndex={0}
+              role="button"
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedPayment(p); } }}
+              className="bg-slate-900/70 backdrop-blur-xl border border-slate-700/50
               rounded-2xl p-6 min-h-[180px] flex flex-col justify-between
               hover:scale-[1.03] hover:shadow-xl transition-all duration-300 cursor-pointer"
             >
@@ -188,11 +191,12 @@ export default function MyPayments() {
         {/* MODAL */}
         {selectedPayment && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-            
-            <div className="bg-slate-900 p-6 rounded-2xl w-[90%] max-w-md shadow-2xl relative">
+
+            <div role="dialog" aria-modal="true" aria-label="Payment details" className="bg-slate-900 p-6 rounded-2xl w-[90%] max-w-md shadow-2xl relative">
 
               <button
                 onClick={() => setSelectedPayment(null)}
+                aria-label="Close payment details"
                 className="absolute top-3 right-3 text-gray-400 hover:text-white"
               >
                 ✖

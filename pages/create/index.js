@@ -145,6 +145,7 @@ export default function CreateProject() {
           <input
             className="input"
             placeholder="Project Title"
+            aria-label="Project Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
@@ -153,6 +154,7 @@ export default function CreateProject() {
           <input
             className="input"
             placeholder="Short Description"
+            aria-label="Short Description"
             value={short}
             onChange={(e) => setShort(e.target.value)}
           />
@@ -164,6 +166,7 @@ export default function CreateProject() {
           <textarea
             className="input"
             placeholder="Full Description"
+            aria-label="Full Description"
             rows="4"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -174,6 +177,7 @@ export default function CreateProject() {
               className="input"
               type="number"
               placeholder="Goal ₹"
+              aria-label="Funding goal in rupees"
               value={goal}
               onChange={(e) => setGoal(e.target.value)}
             />
@@ -181,6 +185,7 @@ export default function CreateProject() {
             <input
               className="input"
               type="date"
+              aria-label="Campaign deadline"
               value={deadline}
               onChange={(e) => setDeadline(e.target.value)}
             />
@@ -189,6 +194,7 @@ export default function CreateProject() {
           <input
             className="input"
             placeholder="Prototype URL (optional)"
+            aria-label="Prototype URL"
             value={prototypeUrl}
             onChange={(e) => setPrototypeUrl(e.target.value)}
           />

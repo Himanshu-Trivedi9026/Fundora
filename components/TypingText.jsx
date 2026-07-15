@@ -15,7 +15,7 @@ export default function TypingText({ text, speed = 35 }) {
   }, [index, text, speed]);
 
   return (
-    <span className="border-r-2 border-blue-400 pr-1 animate-pulse">
+    <span className="border-r-2 border-blue-400 pr-1 animate-pulse" aria-live="polite">
       {displayed}
     </span>
   );

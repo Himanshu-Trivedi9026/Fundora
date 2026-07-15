@@ -1,5 +1,15 @@
 // components/FiltersSidebar.jsx
+import { useEffect } from "react";
+
 export default function FiltersSidebar({ filters, setFilters, onClose }) {
+  // Close on Escape key
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
   const categories = [
     "Artificial Intelligence",
     "Technology",
@@ -29,6 +39,7 @@ export default function FiltersSidebar({ filters, setFilters, onClose }) {
           <h2 className="text-lg font-semibold text-white">Filters</h2>
           <button
             onClick={onClose}
+            aria-label="Close filters"
             className="text-slate-400 hover:text-white"
           >
             ✕
@@ -41,7 +52,7 @@ export default function FiltersSidebar({ filters, setFilters, onClose }) {
             Categories
           </h3>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Filter categories">
             {categories.map((c) => {
               const active = filters.categories.includes(c);
               return (
@@ -77,6 +88,7 @@ export default function FiltersSidebar({ filters, setFilters, onClose }) {
           <input
             type="number"
             placeholder="Min"
+            aria-label="Minimum goal"
             className="w-full p-2 mb-2 rounded bg-slate-800 text-slate-200 border border-slate-700"
             value={filters.minGoal}
             onChange={(e) =>
@@ -86,6 +98,7 @@ export default function FiltersSidebar({ filters, setFilters, onClose }) {
           <input
             type="number"
             placeholder="Max"
+            aria-label="Maximum goal"
             className="w-full p-2 rounded bg-slate-800 text-slate-200 border border-slate-700"
             value={filters.maxGoal}
             onChange={(e) =>
@@ -100,6 +113,7 @@ export default function FiltersSidebar({ filters, setFilters, onClose }) {
             Sort By
           </h3>
           <select
+            aria-label="Sort projects by"
             className="w-full p-2 rounded bg-slate-800 text-slate-200 border border-slate-700"
             value={filters.sort}
             onChange={(e) =>

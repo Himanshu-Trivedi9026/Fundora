@@ -16,7 +16,14 @@ export default function ProgressBar({ pledged = 0, goal = 100 }) {
   return (
     <div className="space-y-1">
       {/* BAR CONTAINER */}
-      <div className="relative w-full h-3 rounded-full overflow-hidden bg-slate-700">
+      <div
+        className="relative w-full h-3 rounded-full overflow-hidden bg-slate-700"
+        role="progressbar"
+        aria-valuenow={percent}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={`Funding progress: ${percent}%`}
+      >
 
         {/* GLOW BACKDROP */}
         <div

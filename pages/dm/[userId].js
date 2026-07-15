@@ -252,6 +252,7 @@ export default function DMChat() {
                 m.attachment_type === "image" ? (
                   <img
                     src={m.attachment_url}
+                    alt="Chat attachment"
                     className="rounded-lg max-w-full"
                   />
                 ) : (
@@ -292,11 +293,12 @@ export default function DMChat() {
             type="button"
             onClick={() => setShowEmoji((s) => !s)}
             className="text-white"
+            aria-label="Toggle emoji picker"
           >
             <FiSmile />
           </button>
 
-          <label className="cursor-pointer text-white">
+          <label className="cursor-pointer text-white" aria-label="Attach file">
             <FiPaperclip />
             <input type="file" hidden onChange={uploadFile} />
           </label>
@@ -313,6 +315,7 @@ export default function DMChat() {
               );
             }}
             placeholder="Message..."
+            aria-label="Type a message"
             className="flex-1 px-4 py-2 rounded-lg bg-slate-800 text-white outline-none"
           />
 

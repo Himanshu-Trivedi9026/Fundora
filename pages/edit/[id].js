@@ -166,16 +166,16 @@ export default function EditProject() {
 
         <div className="bg-slate-900/70 border border-slate-700 rounded-xl p-6 space-y-6">
 
-          <input className="input" value={title} onChange={(e)=>setTitle(e.target.value)} placeholder="Title" />
-          <input className="input" value={short} onChange={(e)=>setShort(e.target.value)} placeholder="Short Description" />
-          <textarea className="input" rows="5" value={description} onChange={(e)=>setDescription(e.target.value)} placeholder="Full Description" />
+          <input className="input" value={title} onChange={(e)=>setTitle(e.target.value)} placeholder="Title" aria-label="Project title" />
+          <input className="input" value={short} onChange={(e)=>setShort(e.target.value)} placeholder="Short Description" aria-label="Short description" />
+          <textarea className="input" rows="5" value={description} onChange={(e)=>setDescription(e.target.value)} placeholder="Full Description" aria-label="Full description" />
 
           <div className="grid grid-cols-2 gap-4">
-            <input className="input" type="number" value={goal} onChange={(e)=>setGoal(e.target.value)} placeholder="Goal ₹" />
-            <input className="input" type="date" value={deadline} onChange={(e)=>setDeadline(e.target.value)} />
+            <input className="input" type="number" value={goal} onChange={(e)=>setGoal(e.target.value)} placeholder="Goal ₹" aria-label="Funding goal in rupees" />
+            <input className="input" type="date" value={deadline} onChange={(e)=>setDeadline(e.target.value)} aria-label="Campaign deadline" />
           </div>
 
-          <input className="input" value={prototypeUrl} onChange={(e)=>setPrototypeUrl(e.target.value)} placeholder="Prototype URL" />
+          <input className="input" value={prototypeUrl} onChange={(e)=>setPrototypeUrl(e.target.value)} placeholder="Prototype URL" aria-label="Prototype URL" />
 
           <CategorySelector selected={categories} setSelected={setCategories} />
 
@@ -187,7 +187,7 @@ export default function EditProject() {
               {media.map((m) => (
                 <div key={m.id} className="relative">
                   {m.type === "image" ? (
-                    <img src={m.url} className="rounded-lg border border-slate-700" />
+                    <img src={m.url} alt={m.name || "Project media"} className="rounded-lg border border-slate-700" />
                   ) : (
                     <div className="p-3 bg-slate-800 rounded text-xs text-white">
                       {m.type.toUpperCase()}

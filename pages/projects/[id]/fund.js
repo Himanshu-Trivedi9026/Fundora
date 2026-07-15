@@ -246,6 +246,11 @@ export default function FundProject() {
     <div
       className="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full transition-all duration-500"
       style={{ width: `${progress}%` }}
+      role="progressbar"
+      aria-valuenow={Math.round(progress)}
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-label="Funding progress"
     />
   </div>
 </div>
@@ -256,6 +261,7 @@ export default function FundProject() {
               {creator.photo && (
                 <img
                   src={creator.photo}
+                  alt={creator.full_name || "Creator"}
                   className="w-20 h-20 rounded object-cover"
                 />
               )}
@@ -278,6 +284,9 @@ export default function FundProject() {
     <div
       key={tier.amount}
       onClick={() => setAmount(tier.amount)}
+      tabIndex={0}
+      role="button"
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setAmount(tier.amount); } }}
       className="cursor-pointer bg-slate-900 border border-slate-700 p-4 rounded-xl hover:scale-105 transition"
     >
       <h3 className="text-white font-semibold">{tier.title}</h3>
@@ -306,6 +315,7 @@ export default function FundProject() {
       value={amount}
       onChange={(e) => setAmount(e.target.value)}
       placeholder="Enter amount"
+      aria-label="Funding amount in rupees"
       className="w-full pl-8 pr-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white focus:ring-2 focus:ring-purple-500 outline-none"
     />
   </div>

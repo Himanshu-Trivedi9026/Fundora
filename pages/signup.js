@@ -83,8 +83,9 @@ export default function SignupPage() {
               </p>
             )}
 
-            <label className="text-slate-300 text-sm">Full Name</label>
+            <label htmlFor="signup-name" className="text-slate-300 text-sm">Full Name</label>
             <input
+              id="signup-name"
               type="text"
               className="w-full mt-1 mb-3 px-3 py-2 rounded bg-slate-800 text-white border border-slate-600"
               value={fullName}
@@ -92,8 +93,9 @@ export default function SignupPage() {
               required
             />
 
-            <label className="text-slate-300 text-sm">Email</label>
+            <label htmlFor="signup-email" className="text-slate-300 text-sm">Email</label>
             <input
+              id="signup-email"
               type="email"
               className="w-full mt-1 mb-3 px-3 py-2 rounded bg-slate-800 text-white border border-slate-600"
               value={email}
@@ -101,8 +103,9 @@ export default function SignupPage() {
               required
             />
 
-            <label className="text-slate-300 text-sm">Password</label>
+            <label htmlFor="signup-password" className="text-slate-300 text-sm">Password</label>
             <input
+              id="signup-password"
               type="password"
               className="w-full mt-1 mb-4 px-3 py-2 rounded bg-slate-800 text-white border border-slate-600"
               value={password}

@@ -56,14 +56,20 @@ export default function ProjectCard({ project }) {
   const thumbnail = project.thumbnail || null;
 
   return (
-    <div
+    <article
       onClick={() => router.push(`/projects/${project.id}`)}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); router.push(`/projects/${project.id}`); } }}
+      tabIndex={0}
+      role="link"
+      aria-label={`View project: ${project.title}`}
       className="cursor-pointer bg-slate-900/80 border border-slate-800 rounded-xl
-                 shadow hover:shadow-xl hover:-translate-y-1 transition p-4 relative"
+                 shadow hover:shadow-xl hover:-translate-y-1 transition p-4 relative
+                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900"
     >
       {/* SAVE */}
       <button
         onClick={handleSave}
+        aria-label={saved ? "Unsave project" : "Save project"}
         className="absolute top-3 right-3 text-white/80 hover:text-white text-xl z-10"
       >
         {saved ? "🔖" : "📑"}
@@ -153,6 +159,6 @@ export default function ProjectCard({ project }) {
           </button>
         )}
       </div>
-    </div>
+    </article>
   );
 }

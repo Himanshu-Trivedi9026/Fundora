@@ -53,6 +53,8 @@ export default function FloatingProjectChat({ projectId }) {
       {/* CHAT WINDOW */}
       {open && (
         <div
+          role="dialog"
+          aria-label="Project chat"
           style={{
             position: "fixed",
             bottom: "96px",
@@ -70,6 +72,8 @@ export default function FloatingProjectChat({ projectId }) {
       {/* FLOATING BUTTON */}
       <button
         onClick={toggleChat}
+        aria-label={open ? "Close project chat" : "Open project chat"}
+        aria-expanded={open}
         style={{
           position: "fixed",
           bottom: "24px",

@@ -11,24 +11,9 @@ export default function Footer() {
         </p>
 
         <div className="flex flex-wrap items-center gap-3">
-          <a
-            href="#"
-            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-          >
-            Terms
-          </a>
-          <a
-            href="#"
-            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-          >
-            Privacy
-          </a>
-          <a
-            href="#"
-            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-          >
-            Support
-          </a>
+          <span>Terms</span>
+          <span>Privacy</span>
+          <span>Support</span>
         </div>
       </div>
     </footer>

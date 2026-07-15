@@ -2,7 +2,7 @@
 
 export default function AnimatedBackground() {
   return (
-    <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-[#020617]">
+    <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-[#020617]" aria-hidden="true">
       {/* Base dark background */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#020617] via-[#030817] to-black" />
 

@@ -115,10 +115,11 @@ export default function CreatorPayments() {
           className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4"
         >
           <div>
-            <label className="block text-sm text-slate-300 mb-1">
+            <label htmlFor="rp-key-id" className="block text-sm text-slate-300 mb-1">
               Razorpay Key ID
             </label>
             <input
+              id="rp-key-id"
               type="text"
               value={keyId}
               onChange={(e) => setKeyId(e.target.value)}
@@ -129,10 +130,11 @@ export default function CreatorPayments() {
           </div>
 
           <div>
-            <label className="block text-sm text-slate-300 mb-1">
+            <label htmlFor="rp-key-secret" className="block text-sm text-slate-300 mb-1">
               Razorpay Key Secret
             </label>
             <input
+              id="rp-key-secret"
               type="password"
               value={keySecret}
               onChange={(e) => setKeySecret(e.target.value)}

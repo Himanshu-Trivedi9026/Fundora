@@ -60,6 +60,8 @@ export default function FloatingAIChat() {
       <div className="fixed bottom-6 right-6 z-50">
         <button
           onClick={() => setOpen(!open)}
+          aria-label={open ? "Close AI chat" : "Open AI chat"}
+          aria-expanded={open}
           className="bg-gradient-to-r from-purple-600 to-pink-500 hover:scale-110 transition-all text-white px-4 py-3 rounded-full shadow-xl animate-pulse"
         >
           💡
@@ -67,7 +69,11 @@ export default function FloatingAIChat() {
       </div>
 
       {open && (
-        <div className="fixed bottom-20 right-6 w-80 h-[520px] bg-slate-900/80 backdrop-blur-xl text-white rounded-2xl shadow-2xl flex flex-col z-50 border border-slate-700 overflow-hidden">
+        <div
+          role="dialog"
+          aria-label="Fundora AI Chat"
+          className="fixed bottom-20 right-6 w-80 h-[520px] bg-slate-900/80 backdrop-blur-xl text-white rounded-2xl shadow-2xl flex flex-col z-50 border border-slate-700 overflow-hidden"
+        >
 
           {/* HEADER */}
           <div className="p-4 border-b border-slate-700 flex justify-between items-center bg-gradient-to-r from-purple-600/20 to-pink-500/20">
@@ -128,6 +134,7 @@ export default function FloatingAIChat() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask Fundora AI..."
+              aria-label="Ask Fundora AI"
               className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
             <button

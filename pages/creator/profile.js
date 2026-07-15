@@ -115,6 +115,7 @@ export default function CreatorProfile() {
             <input
               className="input"
               placeholder="Name"
+              aria-label="Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -123,6 +124,7 @@ export default function CreatorProfile() {
               className="input"
               type="number"
               placeholder="Age"
+              aria-label="Age"
               value={age}
               onChange={(e) => setAge(e.target.value)}
             />
@@ -130,6 +132,7 @@ export default function CreatorProfile() {
             <input
               className="input"
               placeholder="Email"
+              aria-label="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -137,13 +140,14 @@ export default function CreatorProfile() {
             <input
               className="input"
               placeholder="Mobile"
+              aria-label="Mobile"
               value={mobile}
               onChange={(e) => setMobile(e.target.value)}
             />
 
             {/* PROFILE PHOTO */}
             <div>
-              <label className="block text-sm text-slate-300 mb-1">
+              <label htmlFor="cp-photo" className="block text-sm text-slate-300 mb-1">
                 Profile Photo
               </label>
 
@@ -156,6 +160,7 @@ export default function CreatorProfile() {
               )}
 
               <input
+                id="cp-photo"
                 type="file"
                 accept="image/*"
                 onChange={(e) => {
@@ -182,7 +187,7 @@ export default function CreatorProfile() {
 
             {/* UPI QR */}
             <div>
-              <label className="block text-sm text-slate-300 mb-1">
+              <label htmlFor="cp-qr" className="block text-sm text-slate-300 mb-1">
                 UPI QR Code
               </label>
 
@@ -195,6 +200,7 @@ export default function CreatorProfile() {
               )}
 
               <input
+                id="cp-qr"
                 type="file"
                 accept="image/*"
                 onChange={(e) => {
