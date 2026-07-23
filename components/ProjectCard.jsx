@@ -1,23 +1,13 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { isSaved, toggleSave, getSaveCounts } from "../lib/saved";
-import { supabase } from "../lib/supabaseClient";
 
-export default function ProjectCard({ project }) {
+export default function ProjectCard({ project, currentUserId, creatorName }) {
   const router = useRouter();
   if (!project) return null;
 
   const [saved, setSaved] = useState(false);
   const [saveCount, setSaveCount] = useState(0);
-  const [creator, setCreator] = useState(null);
-  const [user, setUser] = useState(null);
-
-  /* ---------------- CURRENT USER ---------------- */
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data?.user || null);
-    });
-  }, []);
 
   /* ---------------- SAVE STATE ---------------- */
   useEffect(() => {
@@ -32,18 +22,6 @@ export default function ProjectCard({ project }) {
     setSaved(toggleSave(project.id));
   }
 
-  /* ---------------- LOAD CREATOR ---------------- */
-  useEffect(() => {
-    if (!project?.owner_id) return;
-
-    supabase
-      .from("profiles")
-      .select("id, full_name")
-      .eq("id", project.owner_id)
-      .single()
-      .then(({ data }) => setCreator(data));
-  }, [project?.owner_id]);
-
   /* ---------------- CALCULATIONS ---------------- */
   const fundedPercent = project.goal
     ? Math.min(
@@ -52,7 +30,7 @@ export default function ProjectCard({ project }) {
       )
     : 0;
 
-  const isOwner = user?.id === project.owner_id;
+  const isOwner = currentUserId === project.owner_id;
   const thumbnail = project.thumbnail || null;
 
   return (
@@ -116,17 +94,17 @@ export default function ProjectCard({ project }) {
         ❤️ {saveCount} people saved this
       </p>
 
-      {/* CREATOR */}
-      {creator && (
+      {/* CREATOR — batch-fetched from parent */}
+      {creatorName && (
         <div
           className="mt-4 pt-3 border-t border-slate-700"
           onClick={(e) => {
             e.stopPropagation();
-            router.push(`/creator/${creator.id}`);
+            router.push(`/creator/${project.owner_id}`);
           }}
         >
           <p className="text-sm text-slate-300 mb-2">
-            By: {creator.full_name}
+            By: {creatorName}
           </p>
 
           <button className="w-full text-center px-3 py-1.5 bg-slate-700 text-white rounded-lg text-xs hover:bg-slate-600 transition">

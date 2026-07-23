@@ -1,18 +1,16 @@
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { supabase } from "../../lib/supabaseClient";
-import ProjectCard from "../../components/ProjectCard";
-
-import {
-  FaTwitter,
-  FaLinkedin,
-  FaGithub,
-  FaInstagram,
-  FaYoutube,
-  FaGlobe,
-} from "react-icons/fa";
+import ProfileActions from "../../components/creator/ProfileActions";
+import ProfileHeader from "../../components/creator/ProfileHeader";
+import DashboardLayout from "../../components/creator/DashboardLayout";
+import SidebarAbout from "../../components/creator/SidebarAbout";
+import SidebarConnect from "../../components/creator/SidebarConnect";
+import StatsGrid from "../../components/creator/StatsGrid";
+import ProjectTabs from "../../components/creator/ProjectTabs";
+import AchievementsBento from "../../components/creator/AchievementsBento";
 
 function cleanUrl(url) {
   if (!url) return null;
@@ -152,19 +150,65 @@ export default function CreatorProfile() {
     }
   }
 
+  /* ─── DERIVED DATA ─── */
+  const totalRaised = useMemo(
+    () => projects.reduce((sum, p) => sum + (p.pledged || 0), 0),
+    [projects]
+  );
+
+  const achievements = useMemo(() => {
+    const list = [];
+    if (!profile) return list;
+    if (projects.length >= 1)
+      list.push({ icon: "rocket_launch", title: "First Launch",
+        description: "Successfully launched their first project on Fundora." });
+    if (projects.length >= 5)
+      list.push({ icon: "emoji_events", title: "Impact Leader",
+        description: "Launched 5+ projects, driving innovation forward." });
+    if (profile.followers_count >= 100)
+      list.push({ icon: "workspace_premium", title: "Top 1% Creator",
+        description: "Recognized among the most followed creators on Fundora." });
+    if (profile.followers_count >= 50)
+      list.push({ icon: "favorite", title: "Community Favorite",
+        description: "Beloved by 50+ backers and community members." });
+    if (totalRaised >= 10000)
+      list.push({ icon: "payments", title: "Legacy Milestone",
+        description: "Raised over ₹10,000 across all projects." });
+    if (projects.some((p) => p.pledged >= p.goal && p.goal > 0))
+      list.push({ icon: "emoji_events", title: "Fully Funded",
+        description: "Achieved 100% funding on at least one project." });
+    if (projects.length >= 3)
+      list.push({ icon: "public", title: "Global Architect",
+        description: "Created 3+ projects impacting diverse communities." });
+    return list;
+  }, [projects, profile, totalRaised]);
+
   /* ---------------- UI STATES ---------------- */
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-white">
-        Loading profile...
+      <div className="min-h-screen flex flex-col bg-surface-dim">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
+          <span
+            className="material-symbols-outlined animate-spin text-primary text-4xl"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >
+            progress_activity
+          </span>
+        </div>
+        <Footer />
       </div>
     );
   }
 
   if (!profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-white">
-        Profile not found.
+      <div className="min-h-screen flex flex-col bg-surface-dim">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-on-surface-variant font-inter text-lg">Profile not found.</p>
+        </div>
+        <Footer />
       </div>
     );
   }
@@ -180,133 +224,47 @@ export default function CreatorProfile() {
     "https://images.unsplash.com/photo-1503264116251-35a269479413";
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-900">
+    <div className="min-h-screen flex flex-col bg-surface-dim">
       <Navbar />
 
-      {/* 🔥 PREMIUM HERO BANNER */}
-      <div className="relative h-64 w-full overflow-hidden">
-        <img
-          src={banner}
-          alt="Creator banner"
-          className="w-full h-full object-cover opacity-40"
+      {/* ── HERO ── */}
+      <ProfileHeader banner={banner} avatar={avatar} fullName={profile.full_name} bio={profile.bio}>
+        <ProfileActions
+          isOwner={currentUserId === profile.id}
+          isFollowing={isFollowing}
+          onEdit={() => router.push("/edit-profile")}
+          onMessage={() => router.push(`/dm/${profile.id}`)}
+          onFollow={followUser}
+          onUnfollow={unfollowUser}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-slate-900" />
-      </div>
+      </ProfileHeader>
 
-      {/* 🔥 MAIN CONTENT */}
+      {/* ── DASHBOARD ── */}
       <main className="flex-1 pb-20">
+        <DashboardLayout
+          sidebar={
+            <>
+              <SidebarAbout bio={profile.bio} achievements={achievements} />
+              <SidebarConnect profile={profile} />
+            </>
+          }
+        >
+          <StatsGrid
+            totalRaised={totalRaised}
+            projectCount={projects.length}
+            backersCount={profile.followers_count}
+          />
 
-        <div className="max-w-6xl mx-auto px-6 -mt-24 relative z-10">
+          <ProjectTabs
+            projects={projects}
+            currentUserId={currentUserId}
+            creatorName={profile.full_name}
+          />
 
-          {/* 🔥 GLASS PANEL */}
-          <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-xl">
-
-            {/* PROFILE HEADER */}
-            <div className="flex flex-col md:flex-row items-center md:items-end gap-6">
-
-              <img
-                src={avatar}
-                alt={profile.full_name || "Creator avatar"}
-                className="w-28 h-28 rounded-full border-4 border-slate-900 shadow-xl object-cover"
-              />
-
-              <div className="text-center md:text-left">
-
-                <h1 className="text-2xl font-bold text-white">
-                  {profile.full_name}
-                </h1>
-
-                <p className="text-slate-400 mt-1">
-                  {profile.bio || "Creator"}
-                </p>
-
-                {/* ACTION BUTTONS */}
-                <div className="flex gap-3 mt-3 justify-center md:justify-start">
-
-                  {currentUserId === profile.id ? (
-                    <button
-                      onClick={() => router.push("/edit-profile")}
-                      className="px-4 py-2 bg-cyan-600 text-white rounded-lg text-sm hover:bg-cyan-700"
-                    >
-                      Edit Profile
-                    </button>
-                  ) : currentUserId ? (
-                    <>
-                      <button
-                        onClick={() => router.push(`/dm/${profile.id}`)}
-                        className="px-4 py-2 bg-slate-700 text-white rounded-lg text-sm hover:bg-slate-600"
-                      >
-                        Message
-                      </button>
-
-                      {isFollowing ? (
-                        <button
-                          onClick={unfollowUser}
-                          className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm"
-                        >
-                          Unfollow
-                        </button>
-                      ) : (
-                        <button
-                          onClick={followUser}
-                          className="px-4 py-2 bg-cyan-600 text-white rounded-lg text-sm"
-                        >
-                          Follow
-                        </button>
-                      )}
-                    </>
-                  ) : null}
-
-                </div>
-
-                {/* SOCIAL */}
-                <div className="flex gap-4 text-xl text-slate-400 mt-4 justify-center md:justify-start">
-                  {profile.twitter && <a href={cleanUrl(profile.twitter)} target="_blank" rel="noopener noreferrer" aria-label="Twitter"><FaTwitter /></a>}
-                  {profile.linkedin && <a href={cleanUrl(profile.linkedin)} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><FaLinkedin /></a>}
-                  {profile.github && <a href={cleanUrl(profile.github)} target="_blank" rel="noopener noreferrer" aria-label="GitHub"><FaGithub /></a>}
-                  {profile.instagram && <a href={cleanUrl(profile.instagram)} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><FaInstagram /></a>}
-                  {profile.youtube && <a href={cleanUrl(profile.youtube)} target="_blank" rel="noopener noreferrer" aria-label="YouTube"><FaYoutube /></a>}
-                  {profile.website && <a href={cleanUrl(profile.website)} target="_blank" rel="noopener noreferrer" aria-label="Website"><FaGlobe /></a>}
-                </div>
-
-              </div>
-            </div>
-
-            {/* 🔥 STATS */}
-            <div className="flex justify-center md:justify-start gap-12 mt-8 text-center">
-              <div>
-                <p className="text-xl font-bold text-white">{projects.length}</p>
-                <p className="text-sm text-slate-400">Projects</p>
-              </div>
-              <div>
-                <p className="text-xl font-bold text-white">{profile.followers_count}</p>
-                <p className="text-sm text-slate-400">Followers</p>
-              </div>
-              <div>
-                <p className="text-xl font-bold text-white">{profile.following_count}</p>
-                <p className="text-sm text-slate-400">Following</p>
-              </div>
-            </div>
-
-          </div>
-
-          {/* 🔥 PROJECT SECTION */}
-          <div className="mt-10">
-
-            <h2 className="text-xl font-semibold text-white mb-6">
-              Projects
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {projects.map((p) => (
-                <ProjectCard key={p.id} project={p} />
-              ))}
-            </div>
-
-          </div>
-
-        </div>
-
+          {achievements.length > 0 && (
+            <AchievementsBento achievements={achievements} />
+          )}
+        </DashboardLayout>
       </main>
 
       <Footer />

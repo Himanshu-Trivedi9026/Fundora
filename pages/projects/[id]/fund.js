@@ -1,10 +1,22 @@
 //pages/projects/[id]/fund.js
-import { generateReceipt } from "../../../lib/generateReceipt";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import { supabase } from "../../../lib/supabaseClient";
+import ProjectSummary from "../../../components/fund/ProjectSummary";
+import FundingProgress from "../../../components/fund/FundingProgress";
+import RewardTierCard from "../../../components/fund/RewardTierCard";
+import CustomContribution from "../../../components/fund/CustomContribution";
+import PaymentSummary from "../../../components/fund/PaymentSummary";
+import TrustIndicators from "../../../components/fund/TrustIndicators";
+
+const REWARD_TIERS = [
+  { amount: 100,  title: "Supporter",   desc: "Basic support ❤️",               icon: "favorite",          badge: null,       deliveryDate: "Mar 2025", backers: 45 },
+  { amount: 500,  title: "Backer",      desc: "Special thanks + shoutout 🚀",   icon: "rocket_launch",     badge: "Popular",  deliveryDate: "Jun 2025", backers: 23 },
+  { amount: 1000, title: "Sponsor",     desc: "Premium supporter badge 💎",     icon: "workspace_premium", badge: "Premium",  deliveryDate: "Sep 2025", backers: 8 },
+];
 
 export default function FundProject() {
   const router = useRouter();
@@ -19,6 +31,9 @@ export default function FundProject() {
   const progress = Math.min((totalRaised / goal) * 100, 100);
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Tier selection state
+  const [selectedTier, setSelectedTier] = useState(null); // null | tier index | "custom"
 
   /* ---------------- LOAD DATA ---------------- */
   useEffect(() => {
@@ -74,6 +89,25 @@ export default function FundProject() {
       .order("created_at", { ascending: false });
 
     setDonors(donorList || []);
+  }
+
+  /* ---------------- TIER SELECTION ---------------- */
+  function selectTier(index) {
+    setSelectedTier(index);
+    setAmount(REWARD_TIERS[index].amount);
+  }
+
+  function selectCustom() {
+    setSelectedTier("custom");
+  }
+
+  function handleCustomAmountChange(value) {
+    setAmount(value);
+    if (Number(value) > 0) {
+      setSelectedTier("custom");
+    } else {
+      setSelectedTier(null);
+    }
   }
 
   /* ---------------- RAZORPAY PAYMENT ---------------- */
@@ -172,12 +206,14 @@ export default function FundProject() {
       return;
     }
 
-    // 🔥 STEP 3: Generate PDF
+    // 🔥 STEP 3: Generate PDF (dynamic import — jspdf is ~29MB)
+    const { generateReceipt } = await import("../../../lib/generateReceipt");
     generateReceipt(receiptData.receipt);
 
     alert("✅ Payment successful & receipt downloaded!");
 
     setAmount("");
+    setSelectedTier(null);
     loadData();
 
   } catch (err) {
@@ -189,7 +225,7 @@ export default function FundProject() {
           }
         },
 
-        theme: { color: "#2563eb" },
+        theme: { color: "#8b5cf6" },
       };
 
       const rzp = new window.Razorpay(options);
@@ -202,168 +238,86 @@ export default function FundProject() {
     }
   }
 
+  /* ---------------- DERIVED ---------------- */
+  const currentTierName = selectedTier === "custom"
+    ? "Custom Donation"
+    : selectedTier !== null
+      ? REWARD_TIERS[selectedTier].title
+      : "No Selection";
+
   return (
-    <>
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
+    <div className="min-h-screen flex flex-col bg-surface-dim">
+      <Navbar />
 
-        <main className="flex-1 max-w-4xl mx-auto p-6 space-y-6">
-          {/* 🚀 PREMIUM PROJECT CARD */}
-<div className="bg-gradient-to-br from-slate-900 to-slate-800 p-6 rounded-xl border border-slate-700 shadow-xl space-y-4">
+      <main className="flex-1 pt-24 pb-20 px-4 md:px-6 max-w-6xl mx-auto">
+        <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-8">
 
-  <h1 className="text-3xl font-bold text-white">
-    {project?.title}
-  </h1>
+          {/* ── LEFT COLUMN ── */}
+          <div className="lg:col-span-8 space-y-6">
+            {/* Project Summary */}
+            <ProjectSummary
+              project={project}
+              creator={creator}
+              onBack={() => router.push(`/projects/${id}`)}
+            />
 
-  <p className="text-slate-400">{project?.short}</p>
+            {/* Funding Progress */}
+            <FundingProgress
+              totalRaised={totalRaised}
+              goal={goal}
+              progress={progress}
+              donorCount={donors.length}
+            />
 
-  {/* 🔥 FUNDING STATS */}
-  <div className="grid grid-cols-3 gap-4 mt-4 text-center">
-    <div>
-      <p className="text-green-400 text-xl font-bold">
-        ₹{totalRaised}
-      </p>
-      <p className="text-xs text-slate-400">Raised</p>
-    </div>
+            {/* Reward Tiers */}
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="space-y-4"
+            >
+              <h2 className="font-geist text-xl font-semibold text-on-surface">
+                Select Your Reward Tier
+              </h2>
 
-    <div>
-      <p className="text-blue-400 text-xl font-bold">
-        ₹{goal}
-      </p>
-      <p className="text-xs text-slate-400">Goal</p>
-    </div>
+              <div className="grid grid-cols-1 gap-4">
+                {REWARD_TIERS.map((tier, i) => (
+                  <RewardTierCard
+                    key={tier.amount}
+                    tier={tier}
+                    selected={selectedTier === i}
+                    onSelect={() => selectTier(i)}
+                  />
+                ))}
 
-    <div>
-      <p className="text-purple-400 text-xl font-bold">
-        {donors.length}
-      </p>
-      <p className="text-xs text-slate-400">Backers</p>
-    </div>
-  </div>
-
-  {/* 🔥 PROGRESS BAR */}
-  <div className="w-full bg-slate-700 h-2 rounded-full mt-2">
-    <div
-      className="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full transition-all duration-500"
-      style={{ width: `${progress}%` }}
-      role="progressbar"
-      aria-valuenow={Math.round(progress)}
-      aria-valuemin="0"
-      aria-valuemax="100"
-      aria-label="Funding progress"
-    />
-  </div>
-</div>
-
-          {/* CREATOR */}
-          {creator && (
-            <div className="flex gap-4 border border-slate-800 p-4 rounded-lg">
-              {creator.photo && (
-                <img
-                  src={creator.photo}
-                  alt={creator.full_name || "Creator"}
-                  className="w-20 h-20 rounded object-cover"
+                <CustomContribution
+                  value={selectedTier === "custom" ? amount : ""}
+                  onChange={handleCustomAmountChange}
+                  selected={selectedTier === "custom"}
+                  onSelect={selectCustom}
                 />
-              )}
-              <div>
-                <p className="text-white font-semibold">{creator.name}</p>
-                <p className="text-slate-400">{creator.email}</p>
               </div>
+            </motion.section>
+          </div>
+
+          {/* ── RIGHT COLUMN (Sticky Sidebar) ── */}
+          <div className="lg:col-span-4">
+            <div className="sticky top-24 space-y-6">
+              <PaymentSummary
+                tierName={currentTierName}
+                amount={amount}
+                loading={loading}
+                onPay={handlePayment}
+                disabled={!amount || Number(amount) < 10}
+              />
+
+              <TrustIndicators />
             </div>
-          )}
+          </div>
+        </div>
+      </main>
 
-          {/* 💎 FUNDING TIERS */}
-<div className="grid md:grid-cols-3 gap-4">
-
-  {[
-    { amount: 100, title: "Supporter", desc: "Basic support ❤️" },
-    { amount: 500, title: "Backer", desc: "Special thanks + shoutout 🚀" },
-    { amount: 1000, title: "Sponsor", desc: "Premium supporter badge 💎" },
-  ].map((tier) => (
-
-    <div
-      key={tier.amount}
-      onClick={() => setAmount(tier.amount)}
-      tabIndex={0}
-      role="button"
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setAmount(tier.amount); } }}
-      className="cursor-pointer bg-slate-900 border border-slate-700 p-4 rounded-xl hover:scale-105 transition"
-    >
-      <h3 className="text-white font-semibold">{tier.title}</h3>
-      <p className="text-slate-400 text-sm">{tier.desc}</p>
-
-      <p className="text-green-400 text-lg font-bold mt-2">
-        ₹{tier.amount}
-      </p>
+      <Footer />
     </div>
-
-  ))}
-</div>
-
-          {/* 💖 PREMIUM PAYMENT */}
-<div className="bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 rounded-xl p-6 shadow-xl space-y-4">
-
-  <h2 className="text-lg font-semibold text-white">
-    💖 Fund this project
-  </h2>
-
-  {/* INPUT */}
-  <div className="relative">
-    <span className="absolute left-3 top-2 text-slate-400">₹</span>
-    <input
-      type="number"
-      value={amount}
-      onChange={(e) => setAmount(e.target.value)}
-      placeholder="Enter amount"
-      aria-label="Funding amount in rupees"
-      className="w-full pl-8 pr-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white focus:ring-2 focus:ring-purple-500 outline-none"
-    />
-  </div>
-
-  {/* VALIDATION */}
-  {amount && Number(amount) < 10 && (
-    <p className="text-red-400 text-xs">
-      Minimum amount is ₹10
-    </p>
-  )}
-
-  {/* PAY BUTTON */}
-  <button
-    onClick={handlePayment}
-    disabled={loading || Number(amount) < 10}
-    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-3 rounded-lg font-semibold hover:scale-105 transition disabled:opacity-50"
-  >
-    {loading ? "Processing..." : "🚀 Fund Now"}
-  </button>
-
-  <p className="text-xs text-slate-400 text-center">
-    🔒 Secure payments via Razorpay
-  </p>
-</div>
-
-          {/* DONORS */}
-          {donors.length > 0 && (
-            <div className="bg-slate-900 p-6 rounded-xl border border-slate-800">
-              <h3 className="text-white font-semibold mb-3">
-                Recent Supporters
-              </h3>
-              {donors.map((d) => (
-                <div key={d.id} className="flex justify-between text-slate-300">
-                  <span className="flex items-center gap-2">
-  <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-xs">
-    {d.payer_id ? "U" : "A"}
-  </div>
-  {d.payer_id ? "Supporter" : "Anonymous"}
-</span>
-                  <span className="text-green-400">₹{d.amount}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </main>
-
-        <Footer />
-      </div>
-    </>
   );
 }

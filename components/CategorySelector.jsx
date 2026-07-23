@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Badge } from "./ui";
 
 export default function CategorySelector({ selected, setSelected }) {
   const categories = [
@@ -25,31 +25,25 @@ export default function CategorySelector({ selected, setSelected }) {
 
   return (
     <div className="space-y-2">
-      <label className="text-sm text-slate-300">Project Categories</label>
-
-      <div className="flex flex-wrap gap-2 mt-1" role="group" aria-label="Project categories">
-        {categories.map((cat) => {
-          const active = selected.includes(cat);
-
-          return (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => toggleCategory(cat)}
-              className={`px-3 py-1 text-xs rounded-full border transition ${
-                active
-                  ? "bg-blue-600 text-white border-blue-500"
-                  : "bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700"
-              }`}
-            >
-              {cat}
-            </button>
-          );
-        })}
+      <div
+        className="flex flex-wrap gap-2"
+        role="group"
+        aria-label="Project categories"
+      >
+        {categories.map((cat) => (
+          <Badge
+            key={cat}
+            active={selected.includes(cat)}
+            onClick={() => toggleCategory(cat)}
+            aria-pressed={selected.includes(cat)}
+          >
+            {cat}
+          </Badge>
+        ))}
       </div>
 
       {selected.length > 0 && (
-        <p className="text-[11px] text-slate-400 mt-1">
+        <p className="text-[11px] text-on-surface-variant/60 font-inter mt-1">
           Selected: {selected.join(", ")}
         </p>
       )}

@@ -1,5 +1,6 @@
-// components/TeamEditor.jsx
 import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
+import { Input, Button } from "./ui";
 
 export default function TeamEditor({ team, setTeam }) {
   const [name, setName] = useState("");
@@ -12,56 +13,79 @@ export default function TeamEditor({ team, setTeam }) {
     setRole("");
   }
 
+  function handleKeyDown(e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addMember();
+    }
+  }
+
   function removeMember(index) {
     setTeam(team.filter((_, i) => i !== index));
   }
 
   return (
-    <div>
-      <label className="text-sm text-slate-300">Team Members</label>
-
-      <div className="mt-2 flex gap-2">
-        <input
+    <div className="space-y-4">
+      {/* Add Member Form */}
+      <div className="flex flex-col sm:flex-row gap-2">
+        <Input
           placeholder="Name"
           aria-label="Team member name"
-          className="flex-1 p-2 rounded bg-slate-800 text-slate-100 border border-slate-700"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
-        <input
+        <Input
           placeholder="Role"
           aria-label="Team member role"
-          className="flex-1 p-2 rounded bg-slate-800 text-slate-100 border border-slate-700"
           value={role}
           onChange={(e) => setRole(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
-        <button
+        <Button
+          variant="primary"
           onClick={addMember}
           aria-label="Add team member"
-          className="px-3 rounded bg-blue-600 text-white text-sm"
         >
           Add
-        </button>
+        </Button>
       </div>
 
-      <ul className="mt-3 space-y-2">
+      {/* Team Members List */}
+      <AnimatePresence mode="popLayout">
         {team.map((m, idx) => (
-          <li
-            key={idx}
-            className="flex justify-between items-center bg-slate-800 p-2 rounded border border-slate-700"
+          <div
+            key={`${m.name}-${idx}`}
+            className="flex justify-between items-center bg-surface-container-low p-3 rounded-lg border border-outline-variant/50"
           >
-            <span className="text-sm text-slate-200">
-              {m.name} — {m.role}
-            </span>
-            <button
+            <div className="flex items-center gap-3">
+              <span className="material-symbols-outlined text-[18px] text-on-surface-variant">
+                person
+              </span>
+              <div>
+                <span className="text-sm text-on-surface font-inter font-medium">
+                  {m.name}
+                </span>
+                {m.role && (
+                  <span className="text-xs text-on-surface-variant font-inter ml-2">
+                    — {m.role}
+                  </span>
+                )}
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => removeMember(idx)}
-              className="text-xs text-red-400"
+              aria-label={`Remove ${m.name}`}
             >
-              Remove
-            </button>
-          </li>
+              <span className="material-symbols-outlined text-[16px]">
+                close
+              </span>
+            </Button>
+          </div>
         ))}
-      </ul>
+      </AnimatePresence>
     </div>
   );
 }

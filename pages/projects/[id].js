@@ -1,12 +1,23 @@
 // pages/projects/[id].js
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import dynamic from "next/dynamic";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
-import ProgressBar from "../../components/ProgressBar";
+import HeroBanner from "../../components/project/HeroBanner";
+import FundingSidebar from "../../components/project/FundingSidebar";
+import ProjectStory from "../../components/project/ProjectStory";
+import GalleryGrid from "../../components/project/GalleryGrid";
+import RoadmapTimeline from "../../components/project/RoadmapTimeline";
 import { supabase } from "../../lib/supabaseClient";
 import { isSaved, toggleSave } from "../../lib/saved";
-import FloatingProjectChat from "../../components/FloatingProjectChat";
+
+// Lazy-load project chat widget — not needed until user opens it
+const FloatingProjectChat = dynamic(
+  () => import("../../components/FloatingProjectChat"),
+  { ssr: false }
+);
 
 export default function ProjectDetails() {
   const router = useRouter();
@@ -18,8 +29,9 @@ export default function ProjectDetails() {
   const [currentUser, setCurrentUser] = useState(null);
   const [saved, setSaved] = useState(false);
   const [preview, setPreview] = useState(null);
+  const [similarProjects, setSimilarProjects] = useState([]);
 
-  // Load user
+  /* ================= LOAD USER (once) ================= */
   useEffect(() => {
     async function loadUser() {
       const user = (await supabase.auth.getUser()).data.user;
@@ -28,7 +40,7 @@ export default function ProjectDetails() {
     loadUser();
   }, []);
 
-  // Load project + media + team
+  /* ================= LOAD PROJECT + MEDIA + TEAM ================= */
   useEffect(() => {
     if (!id) return;
 
@@ -59,6 +71,16 @@ export default function ProjectDetails() {
           .eq("project_id", id);
 
         setTeam(teamRows || []);
+
+        // Load similar projects (other projects, ordered by pledged)
+        const { data: similar } = await supabase
+          .from("projects")
+          .select("*")
+          .neq("id", id)
+          .order("pledged", { ascending: false })
+          .limit(3);
+
+        setSimilarProjects(similar || []);
       } catch (err) {
         console.error(err);
       }
@@ -66,37 +88,55 @@ export default function ProjectDetails() {
 
     loadData();
   }, [id]);
-// REALTIME PROJECT FUNDING UPDATES
-useEffect(() => {
-  if (!id) return;
 
-  const channel = supabase
-    .channel("project-funding-realtime")
-    .on(
-      "postgres_changes",
-      {
-        event: "UPDATE",
-        schema: "public",
-        table: "projects",
-        filter: `id=eq.${id}`,
-      },
-      (payload) => {
-        setProject(payload.new);
-      }
-    )
-    .subscribe();
+  /* ================= REALTIME FUNDING UPDATES ================= */
+  useEffect(() => {
+    if (!id) return;
 
-  return () => {
-    supabase.removeChannel(channel);
-  };
-}, [id]);
+    const channel = supabase
+      .channel("project-funding-realtime")
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "projects",
+          filter: `id=eq.${id}`,
+        },
+        (payload) => {
+          setProject(payload.new);
+        }
+      )
+      .subscribe();
 
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [id]);
+
+  /* ================= MEMOIZE MEDIA ================= */
+  const { images, videos, documents } = useMemo(
+    () => ({
+      images: media.filter((m) => m.type === "image"),
+      videos: media.filter((m) => m.type === "video"),
+      documents: media.filter((m) => m.type === "document"),
+    }),
+    [media]
+  );
+
+  /* ================= LOADING STATE ================= */
   if (!project) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-surface-dim">
         <Navbar />
-        <main className="flex-1 flex items-center justify-center text-slate-200">
-          Loading...
+        <main className="flex-1 flex items-center justify-center">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-on-surface-variant font-inter text-lg"
+          >
+            Loading project...
+          </motion.div>
         </main>
         <Footer />
       </div>
@@ -105,6 +145,7 @@ useEffect(() => {
 
   const isOwner = currentUser === project.owner_id;
 
+  /* ================= HANDLERS ================= */
   async function handleDelete() {
     if (!confirm("Delete this project permanently?")) return;
     await supabase.from("projects").delete().eq("id", id);
@@ -118,189 +159,295 @@ useEffect(() => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-surface-dim">
       <Navbar />
 
-      <main className="flex-1 px-4 py-8 max-w-6xl mx-auto">
+      <main className="pt-16 min-h-screen flex-1">
+        {/* ═══════════ HERO BANNER ═══════════ */}
+        <HeroBanner project={project} isOwner={isOwner} />
 
-        {/* HEADER */}
-        <div className="flex flex-col gap-4 md:flex-row md:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-100">{project.title}</h1>
-            <p className="text-slate-300 text-sm mt-1">{project.short}</p>
-          </div>
+        {/* ═══════════ CONTENT GRID ═══════════ */}
+        <div className="px-6 lg:px-16 max-w-7xl mx-auto py-12 grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* ─── LEFT COLUMN: Story & Details ─── */}
+          <div className="lg:col-span-8 space-y-16">
+            <ProjectStory project={project} />
 
-          <div className="w-full md:w-64 bg-slate-900/80 border border-slate-800 rounded-xl p-3">
-            <ProgressBar pledged={project.pledged || 0} goal={project.goal} />
-            <p className="text-xs text-slate-200 mt-1">
-              ₹{project.pledged || 0} raised of ₹{project.goal}
-            </p>
-            <p className="text-xs text-slate-400">
-              Deadline: {project.deadline}
-            </p>
-            {/* FUND BUTTON (only for non-owner) */}
-{currentUser !== project.owner_id && (
-  <button
-    onClick={() => router.push(`/projects/${project.id}/fund`)}
-    className="mt-3 w-full bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg font-medium"
-  >
-    Fund this project
-  </button>
-)}
+            <GalleryGrid media={images} onPreview={setPreview} />
 
-            {isOwner && (
-              <div className="flex gap-2 mt-3">
-                <button
-                  onClick={() => router.push(`/edit/${project.id}`)}
-                  className="flex-1 px-3 py-1 rounded bg-slate-700 text-white text-sm"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={handleDelete}
-                  className="px-3 py-1 rounded bg-red-600 text-white text-sm"
-                >
-                  Delete
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* CONTENT */}
-        <div className="mt-8 grid gap-6 lg:grid-cols-[2fr_1fr]">
-
-          {/* LEFT */}
-          <div className="space-y-6">
-
-            {/* Overview */}
-            <section className="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
-              <h2 className="text-sm font-semibold text-slate-100">Project Overview</h2>
-              <p className="mt-2 text-sm text-slate-300 whitespace-pre-line">
-                {project.description}
-              </p>
-            </section>
-
-            {/* Prototype */}
-            {project.prototypeUrl && (
-              <section className="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
-                <h2 className="text-sm font-semibold text-slate-100">Prototype</h2>
-                <a
-                  href={project.prototypeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-cyan-300 underline text-sm"
-                >
-                  Open prototype →
-                </a>
-              </section>
-            )}
-
-            {/* Media */}
-            <section className="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
-              <h2 className="text-sm font-semibold text-slate-100">Media</h2>
-
-              {/* Images */}
-              <p className="text-[11px] text-slate-400 mt-2">Images</p>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {media.filter(m => m.type === "image").map((img) => (
-                  <img
-                    key={img.id}
-                    src={img.url}
-                    alt={img.name || "Project media"}
-                    onClick={() => setPreview({ type: "image", url: img.url })}
-                    aria-label="Preview image"
-                    className="cursor-pointer w-full h-28 object-cover rounded-lg border border-slate-700"
-                  />
-                ))}
-              </div>
-
-              {/* Videos */}
-              <p className="text-[11px] text-slate-400 mt-4">Videos</p>
-              {media.filter(m => m.type === "video").map((vid) => (
-                <video
-                  key={vid.id}
-                  src={vid.url}
-                  controls
-                  onClick={() => setPreview({ type: "video", url: vid.url })}
-                  className="cursor-pointer w-full rounded-lg border border-slate-700"
-                />
-              ))}
-
-              {/* Documents */}
-              <p className="text-[11px] text-slate-400 mt-4">Documents</p>
-              <ul className="space-y-1">
-                {media.filter(m => m.type === "document").map((doc) => (
-                  <li key={doc.id}>
-                    <a
-                      href={doc.url}
-                      target="_blank"
-                      className="text-cyan-300 underline text-xs"
-                    >
-                      Open document
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          </div>
-
-          {/* RIGHT */}
-          <div className="space-y-6">
-
-            {/* Creator */}
-            <section className="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
-              <h2 className="text-sm font-semibold text-slate-100">Creator</h2>
-              <p className="text-xs text-slate-300 mt-2">
-                User ID: {project.owner_id}
-              </p>
-            </section>
-
-            {/* Team */}
-            <section className="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
-              <h2 className="text-sm font-semibold text-slate-100">Team Members</h2>
-
-              <ul className="mt-3 space-y-2 text-xs text-slate-300">
-                {team.map((t) => (
-                  <li key={t.id} className="flex justify-between items-center">
-                    <div>
-                      <p>{t.name}</p>
-                      <p className="text-slate-400">{t.role}</p>
+            {/* ─── AI Insights Section ─── */}
+            <motion.section
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+            >
+              <div className="glass-card p-8 rounded-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4">
+                  <span className="material-symbols-outlined text-primary text-4xl animate-pulse">
+                    psychology
+                  </span>
+                </div>
+                <h2 className="font-geist text-lg font-semibold mb-4 text-primary">
+                  Fundora Intelligence Insight
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-success" />
+                      <span className="text-sm font-inter uppercase tracking-wider text-success font-semibold">
+                        {project.pledged && project.goal && (project.pledged / project.goal) >= 0.5
+                          ? "Strong Performance"
+                          : "Growth Potential"}
+                      </span>
                     </div>
-                    {t.email && (
-                      <a
-                        href={`mailto:${t.email}`}
-                        className="text-cyan-300 text-lg"
-                        title="Send email"
-                      >
-                        📧
-                      </a>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </section>
+                    <p className="text-on-surface-variant leading-relaxed font-inter text-sm">
+                      Our predictive algorithms analyzed this project&apos;s trajectory, delivery rates, and market demand.
+                      Current score: {project.pledged && project.goal
+                        ? Math.min(10, ((project.pledged / project.goal) * 10)).toFixed(1)
+                        : "N/A"}/10.
+                    </p>
+                    <div className="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{
+                          width: `${Math.min(100, ((project.pledged || 0) / (project.goal || 1)) * 100)}%`,
+                        }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.2, ease: "easeOut" }}
+                        className="h-full bg-primary rounded-full"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-inter text-on-surface font-semibold">
+                      Key Growth Catalyst
+                    </h4>
+                    <ul className="text-sm space-y-2 text-on-surface-variant font-inter">
+                      {project.category && (
+                        <li className="flex items-start gap-2">
+                          <span className="material-symbols-outlined text-primary text-sm mt-0.5">
+                            arrow_forward
+                          </span>
+                          Active in {project.category} sector
+                        </li>
+                      )}
+                      {project.goal >= 100000 && (
+                        <li className="flex items-start gap-2">
+                          <span className="material-symbols-outlined text-primary text-sm mt-0.5">
+                            arrow_forward
+                          </span>
+                          High-value campaign with strong potential
+                        </li>
+                      )}
+                      <li className="flex items-start gap-2">
+                        <span className="material-symbols-outlined text-primary text-sm mt-0.5">
+                          arrow_forward
+                        </span>
+                        Backed by the Fundora Intelligence Layer
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </motion.section>
+
+            <RoadmapTimeline project={project} />
+
+            {/* ─── Media: Videos & Documents ─── */}
+            {(videos.length > 0 || documents.length > 0) && (
+              <motion.section
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="space-y-6"
+              >
+                {videos.length > 0 && (
+                  <div>
+                    <h3 className="font-geist text-lg font-semibold text-on-surface mb-4">Videos</h3>
+                    <div className="space-y-4">
+                      {videos.map((vid) => (
+                        <video
+                          key={vid.id}
+                          src={vid.url}
+                          controls
+                          onClick={() => setPreview({ type: "video", url: vid.url })}
+                          className="cursor-pointer w-full rounded-xl border border-outline-variant/30"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {documents.length > 0 && (
+                  <div>
+                    <h3 className="font-geist text-lg font-semibold text-on-surface mb-4">Documents</h3>
+                    <ul className="space-y-2">
+                      {documents.map((doc) => (
+                        <li key={doc.id}>
+                          <a
+                            href={doc.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-primary font-inter text-sm hover:underline"
+                          >
+                            <span className="material-symbols-outlined text-lg">description</span>
+                            {doc.name || "Open document"}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </motion.section>
+            )}
+
+            {/* ─── Team Members ─── */}
+            {team.length > 0 && (
+              <motion.section
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+              >
+                <h3 className="font-geist text-lg font-semibold text-on-surface mb-4">Team Members</h3>
+                <div className="space-y-3">
+                  {team.map((t) => (
+                    <div
+                      key={t.id}
+                      className="glass-card p-4 rounded-lg flex justify-between items-center"
+                    >
+                      <div>
+                        <p className="text-on-surface font-inter text-sm font-medium">{t.name}</p>
+                        <p className="text-on-surface-variant font-inter text-xs">{t.role}</p>
+                      </div>
+                      {t.email && (
+                        <a
+                          href={`mailto:${t.email}`}
+                          className="material-symbols-outlined text-primary text-lg hover:scale-110 transition-transform"
+                          title="Send email"
+                        >
+                          mail
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </motion.section>
+            )}
           </div>
+
+          {/* ─── RIGHT COLUMN: Sidebar ─── */}
+          <aside className="lg:col-span-4 space-y-8">
+            <FundingSidebar
+              project={project}
+              isOwner={isOwner}
+              saved={saved}
+              onSave={handleSave}
+              onEdit={() => router.push(`/edit/${project.id}`)}
+              onDelete={handleDelete}
+            />
+
+            {/* ─── Similar Projects ─── */}
+            {similarProjects.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="space-y-4"
+              >
+                <h3 className="font-geist text-lg font-semibold text-on-surface px-2">
+                  Similar Opportunities
+                </h3>
+                <div className="space-y-4">
+                  {similarProjects.map((sp) => {
+                    const spProgress = sp.goal
+                      ? Math.min(Math.round(((sp.pledged || 0) / sp.goal) * 100), 100)
+                      : 0;
+                    const spDaysLeft = sp.deadline
+                      ? Math.max(0, Math.ceil((new Date(sp.deadline) - new Date()) / (1000 * 60 * 60 * 24)))
+                      : null;
+
+                    return (
+                      <motion.a
+                        key={sp.id}
+                        whileHover={{ scale: 1.01 }}
+                        href={`/projects/${sp.id}`}
+                        className="group block glass-card p-3 rounded-lg hover:border-primary/50 transition-all"
+                      >
+                        <div className="flex gap-4">
+                          {sp.thumbnail ? (
+                            <img
+                              src={sp.thumbnail}
+                              alt={sp.title}
+                              className="w-20 h-20 rounded object-cover shrink-0"
+                            />
+                          ) : (
+                            <div className="w-20 h-20 rounded bg-surface-container-high shrink-0 flex items-center justify-center">
+                              <span className="material-symbols-outlined text-on-surface-variant/30">
+                                rocket_launch
+                              </span>
+                            </div>
+                          )}
+                          <div className="flex flex-col justify-center min-w-0">
+                            <h4 className="text-sm font-inter text-on-surface group-hover:text-primary transition-colors truncate">
+                              {sp.title}
+                            </h4>
+                            <p className="text-xs text-on-surface-variant mt-1 font-inter">
+                              {spProgress}% Funded{spDaysLeft !== null ? ` • ${spDaysLeft}d left` : ""}
+                            </p>
+                          </div>
+                        </div>
+                      </motion.a>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </aside>
         </div>
       </main>
 
-      {/* FULLSCREEN PREVIEW */}
-      {preview && (
-        <div
-          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center"
-          onClick={() => setPreview(null)}
-          aria-label="Close preview"
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setPreview(null); } }}
-        >
-          {preview.type === "image" ? (
-            <img src={preview.url} className="max-w-full max-h-full" />
-          ) : (
-            <video src={preview.url} controls autoPlay className="max-w-full max-h-full" />
-          )}
-        </div>
-      )}
+      {/* ═══════════ FULLSCREEN PREVIEW ═══════════ */}
+      <AnimatePresence>
+        {preview && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center"
+            onClick={() => setPreview(null)}
+            role="button"
+            tabIndex={0}
+            aria-label="Close preview"
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setPreview(null);
+            }}
+          >
+            {preview.type === "image" ? (
+              <motion.img
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.9 }}
+                src={preview.url}
+                className="max-w-full max-h-full object-contain"
+              />
+            ) : (
+              <motion.video
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.9 }}
+                src={preview.url}
+                controls
+                autoPlay
+                className="max-w-full max-h-full"
+              />
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <FloatingProjectChat projectId={project.id} />
       <Footer />

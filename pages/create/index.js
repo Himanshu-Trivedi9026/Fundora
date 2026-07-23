@@ -1,89 +1,207 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/router";
+import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
-import MediaUploader from "../../components/MediaUploader";
-import TeamEditor from "../../components/TeamEditor";
-import CategorySelector from "../../components/CategorySelector";
-import CampaignAIGenerator from "../../components/CampaignAIGenerator"; // ✅ NEW
+import PageContainer from "../../components/ui/PageContainer";
+import LoadingSpinner from "../../components/ui/LoadingSpinner";
+import StepIndicator from "../../components/create/StepIndicator";
+import WizardNavigation from "../../components/create/WizardNavigation";
+import ProjectDetailsStep from "../../components/create/ProjectDetailsStep";
+import AIGeneratorStep from "../../components/create/AIGeneratorStep";
+import MediaStep from "../../components/create/MediaStep";
+import FundingStep from "../../components/create/FundingStep";
+import { saveDraft, loadDraft, clearDraft } from "../../components/create/DraftManager";
 import { supabase } from "../../lib/supabaseClient";
 import { uploadFileToProject } from "../../lib/storage";
 import { createProject } from "../../lib/projects";
 
+const TOTAL_STEPS = 4;
+
+const initialFormData = {
+  title: "",
+  short: "",
+  description: "",
+  categories: [],
+  goal: "",
+  deadline: "",
+  duration: null,
+  prototypeUrl: "",
+};
+
 export default function CreateProject() {
-  const [title, setTitle] = useState("");
-  const [short, setShort] = useState("");
-  const [description, setDescription] = useState("");
-  const [goal, setGoal] = useState("");
-  const [deadline, setDeadline] = useState("");
-  const [prototypeUrl, setPrototypeUrl] = useState("");
+  const router = useRouter();
 
-  const [categories, setCategories] = useState([]);
-  const [mediaFiles, setMediaFiles] = useState([]);
+  /* ─── State ─── */
+  const [currentStep, setCurrentStep] = useState(1);
+  const [formData, setFormData] = useState(initialFormData);
   const [thumbnailFile, setThumbnailFile] = useState(null);
+  const [mediaFiles, setMediaFiles] = useState([]);
   const [team, setTeam] = useState([]);
-
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [draftRestored, setDraftRestored] = useState(false);
+  const [publishError, setPublishError] = useState("");
+  const [user, setUser] = useState(null);
 
-  // Memoize thumbnail preview URL to prevent blob URL leak on re-render
-  const thumbnailPreview = useMemo(
-    () => (thumbnailFile ? URL.createObjectURL(thumbnailFile) : null),
-    [thumbnailFile]
+  /* ─── Auth Check ─── */
+  useEffect(() => {
+    async function checkAuth() {
+      const { data } = await supabase.auth.getUser();
+      if (!data?.user) {
+        router.replace("/login?redirect=/create");
+        return;
+      }
+      setUser(data.user);
+    }
+    checkAuth();
+  }, [router]);
+
+  /* ─── Restore Draft on Mount ─── */
+  useEffect(() => {
+    const draft = loadDraft();
+    if (draft) {
+      setFormData((prev) => ({
+        ...prev,
+        title: draft.title || "",
+        short: draft.short || "",
+        description: draft.description || "",
+        categories: draft.categories || [],
+        goal: draft.goal || "",
+        deadline: draft.deadline || "",
+        duration: draft.duration || null,
+        prototypeUrl: draft.prototypeUrl || "",
+      }));
+      setTeam(draft.team || []);
+      setDraftRestored(true);
+    }
+  }, []);
+
+  /* ─── Validation ─── */
+  const validateStep = useCallback(
+    (step) => {
+      const newErrors = {};
+
+      if (step === 1) {
+        if (!formData.title || formData.title.trim().length < 3) {
+          newErrors.title = "Project name must be at least 3 characters";
+        }
+        if (!formData.short || formData.short.trim().length < 10) {
+          newErrors.short = "Tagline must be at least 10 characters";
+        }
+        if (!formData.categories || formData.categories.length === 0) {
+          newErrors.categories = "Select at least one category";
+        }
+      }
+
+      if (step === 3) {
+        if (!thumbnailFile) {
+          newErrors.thumbnail = "Please select a project thumbnail";
+        }
+      }
+
+      if (step === 4) {
+        if (!formData.goal || Number(formData.goal) <= 0) {
+          newErrors.goal = "Please enter a valid funding goal";
+        }
+        if (!formData.deadline) {
+          newErrors.deadline = "Please select a campaign duration";
+        } else {
+          const deadlineDate = new Date(formData.deadline);
+          if (deadlineDate <= new Date()) {
+            newErrors.deadline = "Deadline must be in the future";
+          }
+        }
+      }
+
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+    },
+    [formData, thumbnailFile]
   );
 
-  // Revoke blob URL on cleanup
-  useEffect(() => {
-    return () => {
-      if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
-    };
-  }, [thumbnailPreview]);
+  /* ─── Navigation ─── */
+  const handleNext = () => {
+    if (currentStep === TOTAL_STEPS) {
+      handlePublish();
+      return;
+    }
 
-  async function handleCreate() {
+    if (!validateStep(currentStep)) return;
+
+    // Clear errors and move to next step
+    setErrors({});
+    setCurrentStep((prev) => Math.min(prev + 1, TOTAL_STEPS));
+  };
+
+  const handlePrev = () => {
+    setErrors({});
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
+  };
+
+  /* ─── Draft ─── */
+  const handleSaveDraft = () => {
+    saveDraft(formData, team);
+    setDraftRestored(false);
+  };
+
+  /* ─── Publish (Backend Flow — UNCHANGED) ─── */
+  async function handlePublish() {
+    setPublishError("");
+
+    if (!validateStep(4)) return;
+
     try {
       setLoading(true);
 
-      const user = (await supabase.auth.getUser()).data.user;
+      /* STEP 1: Auth check */
       if (!user) {
-        alert("Please login first");
+        setPublishError("Please login first to publish your project.");
+        setLoading(false);
         return;
       }
 
-      /* 🔒 STEP 1: Thumbnail validation */
+      /* STEP 2: Thumbnail validation */
       if (!thumbnailFile) {
-        alert("Please select a project thumbnail");
+        setErrors({ thumbnail: "Please select a project thumbnail" });
+        setCurrentStep(3);
+        setLoading(false);
         return;
       }
 
       if (thumbnailFile.size > 10 * 1024 * 1024) {
-        alert("Thumbnail should be less than 10MB");
+        setErrors({ thumbnail: "Thumbnail must be less than 10MB" });
+        setCurrentStep(3);
+        setLoading(false);
         return;
       }
 
-      /* 🔒 STEP 2: Create project FIRST */
+      /* STEP 3: Create project FIRST */
       const project = await createProject({
-        title,
-        short,
-        description,
-        goal: Number(goal),
-        deadline,
-        prototypeUrl,
+        title: formData.title,
+        short: formData.short,
+        description: formData.description,
+        goal: Number(formData.goal),
+        deadline: formData.deadline,
+        prototypeUrl: formData.prototypeUrl,
         owner_id: user.id,
-        categories,
+        categories: formData.categories,
       });
 
-      /* 🔒 STEP 3: Upload thumbnail */
+      /* STEP 4: Upload thumbnail */
       const uploadedThumb = await uploadFileToProject(
         thumbnailFile,
         project.id,
         "thumbnail"
       );
 
-      /* 🔒 STEP 4: Save thumbnail URL */
+      /* STEP 5: Save thumbnail URL */
       await supabase
         .from("projects")
         .update({ thumbnail: uploadedThumb.url })
         .eq("id", project.id);
 
-      /* 🔒 STEP 5: Upload media */
+      /* STEP 6: Upload media */
       const mediaRows = [];
 
       for (const file of mediaFiles) {
@@ -109,7 +227,7 @@ export default function CreateProject() {
         await supabase.from("media").insert(mediaRows);
       }
 
-      /* 🔒 STEP 6: Insert team */
+      /* STEP 7: Insert team */
       if (team.length > 0) {
         await supabase.from("team_members").insert(
           team.map((t) => ({
@@ -120,136 +238,169 @@ export default function CreateProject() {
         );
       }
 
-      alert("Project created successfully!");
-      window.location.href = `/projects/${project.id}`;
+      /* STEP 8: Clear draft and redirect */
+      clearDraft();
+      router.push(`/projects/${project.id}`);
     } catch (err) {
       console.error(err);
-      alert(err?.message || "Something went wrong");
+      setPublishError(err?.message || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   }
 
-  return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-
-      <main className="flex-1 max-w-3xl mx-auto p-6">
-        <h1 className="text-2xl font-bold text-white mb-6">
-          Create Project
-        </h1>
-
-        <div className="space-y-6 bg-slate-900/70 p-6 rounded-xl border border-slate-700">
-
-          {/* TITLE */}
-          <input
-            className="input"
-            placeholder="Project Title"
-            aria-label="Project Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+  /* ─── Render Step Content ─── */
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <ProjectDetailsStep
+            key="step-1"
+            formData={formData}
+            setFormData={setFormData}
+            errors={errors}
           />
-
-          {/* SHORT */}
-          <input
-            className="input"
-            placeholder="Short Description"
-            aria-label="Short Description"
-            value={short}
-            onChange={(e) => setShort(e.target.value)}
+        );
+      case 2:
+        return (
+          <AIGeneratorStep
+            key="step-2"
+            setDescription={(desc) =>
+              setFormData((prev) => ({ ...prev, description: desc }))
+            }
           />
-
-          {/* ⭐ AI GENERATOR INSERTED HERE */}
-          <CampaignAIGenerator setDescription={setDescription} />
-
-          {/* DESCRIPTION */}
-          <textarea
-            className="input"
-            placeholder="Full Description"
-            aria-label="Full Description"
-            rows="4"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              className="input"
-              type="number"
-              placeholder="Goal ₹"
-              aria-label="Funding goal in rupees"
-              value={goal}
-              onChange={(e) => setGoal(e.target.value)}
-            />
-
-            <input
-              className="input"
-              type="date"
-              aria-label="Campaign deadline"
-              value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
-            />
-          </div>
-
-          <input
-            className="input"
-            placeholder="Prototype URL (optional)"
-            aria-label="Prototype URL"
-            value={prototypeUrl}
-            onChange={(e) => setPrototypeUrl(e.target.value)}
-          />
-
-          <CategorySelector
-            selected={categories}
-            setSelected={setCategories}
-          />
-
-          {/* THUMBNAIL */}
-          <div className="space-y-2">
-            <p className="text-sm font-semibold text-slate-200">
-              Project Thumbnail (max 10MB)
-            </p>
-
-            <label className="block cursor-pointer bg-slate-800 border border-slate-700 rounded-lg p-4 text-white hover:bg-slate-700 transition">
-              Select thumbnail image
-              <input
-                type="file"
-                accept="image/*"
-                hidden
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-                  setThumbnailFile(file);
-                }}
-              />
-            </label>
-
-            {thumbnailFile && (
-              <img
-                src={thumbnailPreview}
-                className="max-w-xs rounded border"
-                alt="Thumbnail preview"
-              />
-            )}
-          </div>
-
-          <MediaUploader
+        );
+      case 3:
+        return (
+          <MediaStep
+            key="step-3"
+            thumbnailFile={thumbnailFile}
+            setThumbnailFile={setThumbnailFile}
             mediaFiles={mediaFiles}
             setMediaFiles={setMediaFiles}
+            errors={errors}
           />
+        );
+      case 4:
+        return (
+          <FundingStep
+            key="step-4"
+            formData={formData}
+            setFormData={setFormData}
+            team={team}
+            setTeam={setTeam}
+            errors={errors}
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
-          <TeamEditor team={team} setTeam={setTeam} />
+  /* ─── Loading State ─── */
+  if (!user) {
+    return (
+      <div className="min-h-screen flex flex-col bg-surface">
+        <Navbar />
+        <PageContainer className="flex items-center justify-center">
+          <LoadingSpinner text="Loading..." />
+        </PageContainer>
+      </div>
+    );
+  }
 
-          <button
-            onClick={handleCreate}
-            disabled={loading}
-            className="btn-primary w-full"
-          >
-            {loading ? "Creating..." : "Create Project"}
-          </button>
+  return (
+    <div className="min-h-screen flex flex-col bg-surface">
+      <Navbar />
 
-        </div>
-      </main>
+      <PageContainer narrow>
+        {/* Draft Restored Banner */}
+        <AnimatePresence>
+          {draftRestored && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="mb-6 flex items-center justify-between p-4 rounded-lg bg-primary/10 border border-primary/20"
+            >
+              <div className="flex items-center gap-3">
+                <span
+                  className="material-symbols-outlined text-primary text-[20px]"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  restore
+                </span>
+                <div>
+                  <p className="text-on-surface font-inter text-sm font-medium">
+                    Draft restored
+                  </p>
+                  <p className="text-on-surface-variant font-inter text-xs">
+                    Please re-select your media files.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setDraftRestored(false)}
+                className="text-on-surface-variant hover:text-on-surface transition-colors"
+                aria-label="Dismiss draft restored message"
+              >
+                <span className="material-symbols-outlined text-[18px]">
+                  close
+                </span>
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Step Indicator */}
+        <StepIndicator currentStep={currentStep} />
+
+        {/* Publish Error Banner */}
+        <AnimatePresence>
+          {publishError && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="mb-6 flex items-center justify-between p-4 rounded-lg bg-red-500/10 border border-red-500/20"
+              role="alert"
+            >
+              <div className="flex items-center gap-3">
+                <span className="material-symbols-outlined text-red-400 text-[20px]">
+                  error
+                </span>
+                <p className="text-red-300 font-inter text-sm">
+                  {publishError}
+                </p>
+              </div>
+              <button
+                onClick={() => setPublishError("")}
+                className="text-red-400/60 hover:text-red-300 transition-colors"
+                aria-label="Dismiss error"
+              >
+                <span className="material-symbols-outlined text-[18px]">
+                  close
+                </span>
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Step Content with Animation */}
+        <AnimatePresence mode="wait">
+          {renderStep()}
+        </AnimatePresence>
+      </PageContainer>
+
+      {/* Bottom Navigation */}
+      <WizardNavigation
+        currentStep={currentStep}
+        totalSteps={TOTAL_STEPS}
+        onPrev={handlePrev}
+        onNext={handleNext}
+        onSaveDraft={handleSaveDraft}
+        loading={loading}
+      />
 
       <Footer />
     </div>

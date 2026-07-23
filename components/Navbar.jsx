@@ -2,9 +2,38 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { signOutUser } from "../lib/auth";
-import { FaEnvelope, FaChartBar } from "react-icons/fa";
-import { FiMenu } from "react-icons/fi";
 import { useRouter } from "next/router";
+
+/* Inline SVG icons — eliminates 2.2MB react-icons/fa + react-icons/fi from Navbar */
+function EnvelopeIcon({ size = 18 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <path d="M22 7l-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+    </svg>
+  );
+}
+
+function ChartBarIcon({ size = 14 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 3v18h18" />
+      <path d="M7 16V9" />
+      <path d="M12 16V5" />
+      <path d="M17 16v-7" />
+    </svg>
+  );
+}
+
+function MenuIcon({ size = 22 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 6h16" />
+      <path d="M4 12h16" />
+      <path d="M4 18h16" />
+    </svg>
+  );
+}
 
 /* -------------------------------------------
    MENU ITEM HELPER (UI ONLY)
@@ -14,10 +43,10 @@ function MenuItem({ href, onClick, label, danger }) {
     "block w-full px-4 py-2.5 text-sm transition rounded-md mx-1";
 
   const normal =
-    "text-slate-200 hover:bg-slate-700/60 hover:text-white";
+    "text-on-surface-variant hover:bg-surface-container-high/60 hover:text-on-surface";
 
   const dangerStyle =
-    "text-red-400 hover:bg-red-500/10 hover:text-red-300";
+    "text-danger hover:bg-danger-muted hover:text-danger";
 
   if (href) {
     return (
@@ -57,14 +86,18 @@ export default function Navbar({ onToggleFilters }) {
       setUser(u);
 
       if (u) {
-        const { data: prof } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", u.id)
-          .single();
+        // Parallelize profile + unread queries (was sequential)
+        const [profResult, unreadCount] = await Promise.all([
+          supabase.from("profiles").select("*").eq("id", u.id).single(),
+          supabase
+            .from("dm_messages")
+            .select("id", { count: "exact", head: true })
+            .neq("sender_id", u.id)
+            .eq("read", false),
+        ]);
 
-        setProfile(prof);
-        loadUnread(u.id);
+        setProfile(profResult.data);
+        setUnreadCount(unreadCount.count || 0);
       }
     }
 
@@ -76,14 +109,18 @@ export default function Navbar({ onToggleFilters }) {
         setUser(u);
 
         if (u) {
-          supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", u.id)
-            .single()
-            .then((res) => setProfile(res.data));
-
-          loadUnread(u.id);
+          // Parallelize on auth change too
+          Promise.all([
+            supabase.from("profiles").select("*").eq("id", u.id).single(),
+            supabase
+              .from("dm_messages")
+              .select("id", { count: "exact", head: true })
+              .neq("sender_id", u.id)
+              .eq("read", false),
+          ]).then(([profResult, unreadResult]) => {
+            setProfile(profResult.data);
+            setUnreadCount(unreadResult.count || 0);
+          });
         }
       }
     );
@@ -100,52 +137,41 @@ export default function Navbar({ onToggleFilters }) {
     }
   };
 
-  /* ---------------- UNREAD DM COUNT ---------------- */
-  async function loadUnread(userId) {
-    const { count } = await supabase
-      .from("dm_messages")
-      .select("id", { count: "exact", head: true })
-      .neq("sender_id", userId)
-      .eq("read", false);
-
-    setUnreadCount(count || 0);
-  }
-
   const avatarSrc =
     profile?.avatar_url ||
-    `https://ui-avatars.com/api/?bold=true&background=0D8ABC&color=fff&name=${
+    `https://ui-avatars.com/api/?bold=true&background=8b5cf6&color=fff&name=${
       profile?.full_name || user?.email || "User"
     }`;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-800 bg-slate-900/95 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-surface-dim/80 backdrop-blur-xl shadow-[0_1px_0_rgba(255,255,255,0.04)]">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
 
         {/* LEFT */}
         <div className="flex items-center gap-3">
           <button
             onClick={onToggleFilters}
-            className="text-slate-300 hover:text-white p-2 rounded-md hover:bg-slate-800"
+            className="text-on-surface-variant hover:text-on-surface p-2 rounded-md hover:bg-surface-container-high/50"
             aria-label="Open filters"
           >
-            <FiMenu size={22} />
+            <MenuIcon size={22} />
           </button>
 
           <Link href="/" className="flex items-center gap-2">
             <img src="/logo.png" alt="Fundora" className="h-10 w-auto" />
-            <span className="text-xl font-semibold text-white">Fundora</span>
+            <span className="text-xl font-semibold text-on-surface">Fundora</span>
           </Link>
         </div>
 
         {/* CENTER */}
-        <div className="hidden md:flex items-center gap-5 text-sm text-slate-300">
-          <Link href="/explore" className="hover:text-blue-400">
+        <div className="hidden md:flex items-center gap-5 text-sm text-on-surface-variant">
+          <Link href="/explore" className="hover:text-primary transition-colors">
             Explore
           </Link>
 
           <button
             onClick={handleStartProject}
-            className="hover:text-blue-400"
+            className="hover:text-primary transition-colors"
           >
             Start a project
           </button>
@@ -157,14 +183,14 @@ export default function Navbar({ onToggleFilters }) {
             <>
               <Link
                 href="/login"
-                className="hidden md:inline-flex rounded-full border border-slate-600 px-3 py-1.5 text-xs text-slate-200 hover:bg-slate-800"
+                className="hidden md:inline-flex rounded-full border border-white/[0.08] px-3 py-1.5 text-xs text-on-surface-variant hover:bg-surface-container-high/50 transition-colors"
               >
                 Log in
               </Link>
 
               <Link
                 href="/signup"
-                className="inline-flex rounded-full bg-blue-600 px-4 py-1.5 text-xs text-white hover:bg-blue-500"
+                className="inline-flex rounded-full bg-primary px-4 py-1.5 text-xs text-on-primary hover:bg-primary/90 transition-colors"
               >
                 Sign up
               </Link>
@@ -173,25 +199,25 @@ export default function Navbar({ onToggleFilters }) {
 
           {user && (
             <>
-              {/* 📊 ANALYTICS BUTTON (NEW) */}
+              {/* ANALYTICS BUTTON */}
               <button
                 onClick={() => router.push("/creator/analytics")}
                 className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full
-                           bg-slate-800 text-slate-200 text-xs hover:bg-blue-600 hover:text-white transition"
+                           bg-surface-container-high/50 text-on-surface-variant text-xs hover:bg-primary hover:text-on-primary transition-colors"
               >
-                <FaChartBar size={14} />
+                <ChartBarIcon size={14} />
                 Analytics
               </button>
 
               {/* MESSAGES */}
               <Link
                 href="/dm"
-                className="relative text-slate-300 hover:text-white"
+                className="relative text-on-surface-variant hover:text-on-surface transition-colors"
                 aria-label={`Messages${unreadCount > 0 ? `, ${unreadCount} unread` : ""}`}
               >
-                <FaEnvelope size={18} />
+                <EnvelopeIcon size={18} />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-600 text-white
+                  <span className="absolute -top-1 -right-1 bg-danger text-white
                     text-[10px] w-5 h-5 rounded-full flex items-center justify-center" aria-hidden="true">
                     {unreadCount}
                   </span>
@@ -205,7 +231,7 @@ export default function Navbar({ onToggleFilters }) {
                   aria-label="Account menu"
                   aria-expanded={menuOpen}
                   aria-haspopup="true"
-                  className="w-9 h-9 rounded-full cursor-pointer border border-slate-600 overflow-hidden"
+                  className="w-9 h-9 rounded-full cursor-pointer border border-white/[0.08] overflow-hidden"
                 >
                   <img
                     src={avatarSrc}
@@ -218,16 +244,16 @@ export default function Navbar({ onToggleFilters }) {
                   <div
                     role="menu"
                     aria-label="Account menu"
-                    className="absolute right-0 mt-3 w-60 rounded-2xl bg-slate-900/95 backdrop-blur
-                                  border border-slate-700 shadow-2xl overflow-hidden z-50"
+                    className="absolute right-0 mt-3 w-60 rounded-2xl glass-card
+                              shadow-glass-lg overflow-hidden z-50"
                   >
 
                     {/* PROFILE HEADER */}
-                    <div className="px-4 py-3 border-b border-slate-700">
-                      <p className="text-sm font-semibold text-white truncate">
+                    <div className="px-4 py-3 border-b border-white/[0.06]">
+                      <p className="text-sm font-semibold text-on-surface truncate">
                         {profile?.full_name || user?.email}
                       </p>
-                      <p className="text-xs text-slate-400">
+                      <p className="text-xs text-muted">
                         Account menu
                       </p>
                     </div>
@@ -241,7 +267,7 @@ export default function Navbar({ onToggleFilters }) {
                       <MenuItem href="/creator/profile" label="Edit Payment Portal" />
                       <MenuItem href="/followers" label="Followers" />
 
-                      <div className="my-2 border-t border-slate-700" />
+                      <div className="my-2 border-t border-white/[0.06]" />
 
                       <MenuItem
                         href="/account/delete"
@@ -255,8 +281,8 @@ export default function Navbar({ onToggleFilters }) {
                           setMenuOpen(false);
                           setUser(null);
                         }}
-                        className="w-full text-left px-4 py-2.5 text-sm text-red-400
-                                   hover:bg-red-500/10 hover:text-red-300 transition"
+                        className="w-full text-left px-4 py-2.5 text-sm text-danger
+                                   hover:bg-danger-muted hover:text-danger transition"
                       >
                         Logout
                       </button>

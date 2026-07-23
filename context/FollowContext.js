@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useMemo, useCallback } from "react";
 import { supabase } from "../lib/supabaseClient";
 
 const FollowContext = createContext(null);
@@ -49,7 +49,7 @@ export function FollowProvider({ children }) {
     loadFollowing();
   }, [currentUser?.id]);
 
-  async function follow(userId) {
+  const follow = useCallback(async (userId) => {
     if (!currentUser) return;
 
     await supabase.from("followers").insert({
@@ -58,9 +58,9 @@ export function FollowProvider({ children }) {
     });
 
     setFollowingIds(prev => new Set([...prev, userId]));
-  }
+  }, [currentUser]);
 
-  async function unfollow(userId) {
+  const unfollow = useCallback(async (userId) => {
     if (!currentUser) return;
 
     await supabase
@@ -74,12 +74,15 @@ export function FollowProvider({ children }) {
       s.delete(userId);
       return s;
     });
-  }
+  }, [currentUser]);
+
+  // Memoize the value object to prevent unnecessary re-renders of consumers
+  const value = useMemo(() => ({
+    currentUser, followingIds, follow, unfollow, loading
+  }), [currentUser, followingIds, follow, unfollow, loading]);
 
   return (
-    <FollowContext.Provider
-      value={{ currentUser, followingIds, follow, unfollow, loading }}
-    >
+    <FollowContext.Provider value={value}>
       {children}
     </FollowContext.Provider>
   );

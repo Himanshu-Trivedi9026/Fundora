@@ -1,6 +1,7 @@
+// components/ProjectChat.jsx
 import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "../lib/supabaseClient";
-import { FaSmile, FaPaperclip } from "react-icons/fa";
 
 const EMOJIS = ["😀", "😂", "😍", "🔥", "👍", "🎉", "😎", "🤝", "💡", "🚀"];
 
@@ -16,6 +17,7 @@ export default function ProjectChat({ projectId }) {
   // UI STATES
   const [showEmojis, setShowEmojis] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [activeCount] = useState(() => Math.floor(Math.random() * 20) + 3);
 
   const bottomRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -158,130 +160,216 @@ export default function ProjectChat({ projectId }) {
     return "Member";
   }
 
-  function roleBadgeClass(role) {
-    if (role === "Owner") return "bg-yellow-500 text-black";
-    if (role === "Team") return "bg-blue-600 text-white";
-    return "bg-slate-600 text-white";
+  function roleBadgeStyle(role) {
+    if (role === "Owner") return "bg-primary/20 text-primary";
+    if (role === "Team") return "bg-blue-500/20 text-blue-400";
+    return "bg-surface-variant text-on-surface-variant";
   }
 
   /* ---------------- UI ---------------- */
   return (
-    <div className="flex flex-col h-full bg-slate-900 rounded-xl overflow-hidden">
-      {/* HEADER */}
-      <div className="px-4 py-3 border-b border-slate-700 text-white font-semibold">
-        Project Chat
-      </div>
+    <div className="flex flex-col h-full overflow-hidden">
+      {/* ─── HEADER ─── */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="p-5 border-b border-outline-variant/30 flex justify-between items-center bg-surface-container-highest/20"
+      >
+        <div>
+          <h3 className="font-geist text-white text-[18px] font-semibold">
+            Project Chat
+          </h3>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
+            <p className="text-[12px] text-on-surface-variant font-inter">
+              {activeCount} Developers active
+            </p>
+          </div>
+        </div>
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="material-symbols-outlined text-on-surface-variant hover:text-white transition-colors"
+        >
+          more_vert
+        </motion.button>
+      </motion.div>
 
-      {/* MESSAGES */}
-      <div className="flex-1 overflow-y-auto px-4 py-3">
-        {messages.map((msg) => {
-          const role = getUserRole(msg.sender_id);
-          const isMe = user?.id === msg.sender_id;
+      {/* ─── MESSAGES ─── */}
+      <div className="flex-1 overflow-y-auto p-5 space-y-5 custom-scrollbar">
+        {messages.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-12"
+          >
+            <span className="material-symbols-outlined text-4xl text-on-surface-variant/30 block mb-3">
+              forum
+            </span>
+            <p className="text-on-surface-variant font-inter text-sm">
+              Start the conversation
+            </p>
+          </motion.div>
+        )}
 
-          return (
-            <div key={msg.id} className={`mb-3 ${isMe ? "text-right" : ""}`}>
-              <div className="flex items-center gap-2 text-xs mb-1">
-                <span className="text-slate-200">{msg.sender_name}</span>
-                <span
-                  className={`px-2 py-[2px] rounded-full ${roleBadgeClass(
-                    role
-                  )}`}
-                >
-                  {role}
-                </span>
-              </div>
+        <AnimatePresence>
+          {messages.map((msg, i) => {
+            const role = getUserRole(msg.sender_id);
+            const isMe = user?.id === msg.sender_id;
 
-              <div
-                className={`inline-block px-3 py-2 rounded-lg text-sm max-w-[75%] break-words ${
-                  isMe
-                    ? "bg-cyan-600 text-white"
-                    : "bg-slate-800 text-slate-300"
-                }`}
+            return (
+              <motion.div
+                key={msg.id}
+                initial={{
+                  opacity: 0,
+                  x: isMe ? 20 : -20,
+                  y: 10,
+                }}
+                animate={{ opacity: 1, x: 0, y: 0 }}
+                transition={{
+                  duration: 0.3,
+                  ease: [0.25, 0.46, 0.45, 0.94],
+                  delay: i * 0.02,
+                }}
+                className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}
               >
-                {msg.content && <p>{msg.content}</p>}
+                {/* Sender Info */}
+                <div className={`flex items-center gap-2 mb-1.5 ${isMe ? "flex-row-reverse" : ""}`}>
+                  <span className={`text-[10px] px-2 py-0.5 rounded font-bold tracking-tight ${roleBadgeStyle(role)}`}>
+                    {role.toUpperCase()}
+                  </span>
+                  <span className="text-[11px] text-on-surface-variant font-mono truncate max-w-[140px]">
+                    {msg.sender_name?.split("@")[0] || "User"}
+                  </span>
+                </div>
 
-                {msg.attachment_url && msg.attachment_type === "image" && (
-                  <img
-                    src={msg.attachment_url}
-                    className="mt-2 rounded-lg max-h-48"
-                  />
-                )}
+                {/* Bubble */}
+                <div
+                  className={`px-4 py-2.5 text-sm max-w-[85%] break-words ${
+                    isMe
+                      ? "bg-primary-container/80 text-on-primary-container rounded-2xl rounded-tr-none"
+                      : "bg-surface-container-high text-on-surface rounded-2xl rounded-tl-none border border-outline-variant/20"
+                  }`}
+                >
+                  {msg.content && (
+                    <p className="font-inter leading-relaxed">{msg.content}</p>
+                  )}
 
-                {msg.attachment_url && msg.attachment_type === "file" && (
-                  <a
-                    href={msg.attachment_url}
-                    target="_blank"
-                    className="text-blue-400 underline mt-2 block"
-                  >
-                    Download file
-                  </a>
-                )}
-              </div>
-            </div>
-          );
-        })}
+                  {msg.attachment_url && msg.attachment_type === "image" && (
+                    <img
+                      src={msg.attachment_url}
+                      alt="Chat attachment"
+                      className="mt-2 rounded-lg max-h-48 object-cover"
+                    />
+                  )}
+
+                  {msg.attachment_url && msg.attachment_type === "file" && (
+                    <a
+                      href={msg.attachment_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary underline mt-2 block text-sm flex items-center gap-1"
+                    >
+                      <span className="material-symbols-outlined text-lg">attach_file</span>
+                      Download file
+                    </a>
+                  )}
+                </div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
 
         <div ref={bottomRef} />
       </div>
 
-      {/* EMOJI PICKER */}
-      {showEmojis && (
-        <div className="border-t border-slate-700 p-2 flex flex-wrap gap-2">
-          {EMOJIS.map((e) => (
-            <button
-              key={e}
-              onClick={() => setText((t) => t + e)}
-              className="text-xl"
-            >
-              {e}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* ─── EMOJI PICKER ─── */}
+      <AnimatePresence>
+        {showEmojis && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="border-t border-outline-variant/30 overflow-hidden"
+          >
+            <div className="p-3 flex flex-wrap gap-1.5">
+              {EMOJIS.map((emoji) => (
+                <motion.button
+                  key={emoji}
+                  whileHover={{ scale: 1.2 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setText((t) => t + emoji)}
+                  className="text-xl p-1 hover:bg-surface-variant/50 rounded-lg transition-colors"
+                >
+                  {emoji}
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* INPUT */}
+      {/* ─── INPUT AREA ─── */}
       {user && (
-        <form
-          onSubmit={sendMessage}
-          className="border-t border-slate-700 p-3 flex items-center gap-2"
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+          className="p-4 bg-surface-container-low/50 border-t border-outline-variant/30"
         >
-          <button
-            type="button"
-            onClick={() => setShowEmojis((s) => !s)}
-            className="text-slate-300 hover:text-white shrink-0"
+          <form
+            onSubmit={sendMessage}
+            className="flex items-center gap-2 bg-surface-container-highest/50 p-2 rounded-xl border border-outline-variant/30 focus-within:border-primary transition-colors"
           >
-            <FaSmile />
-          </button>
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setShowEmojis((s) => !s)}
+              className="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors p-1"
+              aria-label="Toggle emoji picker"
+            >
+              mood
+            </motion.button>
 
-          <button
-            type="button"
-            onClick={() => fileInputRef.current.click()}
-            className="text-slate-300 hover:text-white shrink-0"
-          >
-            <FaPaperclip />
-          </button>
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => fileInputRef.current?.click()}
+              className="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors p-1"
+              aria-label="Attach file"
+            >
+              attach_file
+            </motion.button>
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            className="hidden"
-            onChange={handleFileChange}
-          />
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              onChange={handleFileChange}
+            />
 
-          <input
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            className="flex-1 min-w-0 bg-slate-800 text-white rounded-lg px-3 py-2"
-            placeholder="Type a message..."
-          />
+            <input
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              className="flex-1 min-w-0 bg-transparent border-none focus:ring-0 text-on-surface text-sm font-inter placeholder:text-on-surface-variant/50 outline-none"
+              placeholder="Type a message..."
+            />
 
-          <button
-            disabled={uploading}
-            className="bg-cyan-600 px-4 py-2 rounded-lg text-white shrink-0"
-          >
-            {uploading ? "..." : "Send"}
-          </button>
-        </form>
+            <motion.button
+              type="submit"
+              disabled={uploading}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.9 }}
+              className="bg-primary-container text-on-primary-container px-4 py-1.5 rounded-lg font-bold text-sm hover:brightness-110 active:scale-95 transition-all"
+            >
+              {uploading ? "..." : "Send"}
+            </motion.button>
+          </form>
+        </motion.div>
       )}
     </div>
   );

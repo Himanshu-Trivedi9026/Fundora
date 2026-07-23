@@ -72,7 +72,7 @@ export default function HomeHero() {
                      hover:shadow-[0_0_70px_rgba(99,102,241,1)]
                      transition-all duration-300"
         >
-          Let’s Contribute Together for Future
+          Let's Contribute Together for Future
         </motion.button>
 
       </div>
