@@ -33,7 +33,10 @@ const nextConfig = {
             {
               source: "/_next/static/(.*)",
               headers: [
-                { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+                {
+                  key: "Cache-Control",
+                  value: "public, max-age=31536000, immutable",
+                },
               ],
             },
           ]
@@ -41,9 +44,7 @@ const nextConfig = {
       {
         // Cache logo for 1 day
         source: "/logo.png",
-        headers: [
-          { key: "Cache-Control", value: "public, max-age=86400" },
-        ],
+        headers: [{ key: "Cache-Control", value: "public, max-age=86400" }],
       },
       // In development, the Next.js dev server serves its own scripts
       // (e.g. _clientMiddlewareManifest.js) with non-standard MIME types

@@ -40,12 +40,15 @@ describe("debug2", () => {
     });
 
     console.log("FROM mock:", typeof supabaseAdmin.from);
-    console.log("FROM mock.mockReturnValueOnce stack:", supabaseAdmin.from._mockReturnValues?.length ?? 'N/A');
+    console.log(
+      "FROM mock.mockReturnValueOnce stack:",
+      supabaseAdmin.from._mockReturnValues?.length ?? "N/A",
+    );
 
     const result = await predictFundingTimeline({ campaignId: "camp-1" });
     console.log("RESULT:", JSON.stringify(result));
     console.log("FROM calls:", supabaseAdmin.from.mock.calls.length);
-    
+
     expect(result.data.dailyRateNeeded).toBe(0);
   });
 });

@@ -8,12 +8,31 @@ import { motion } from "framer-motion";
  *   compact  — boolean, compact mode for sidebar (default: false)
  *   className — additional classes
  */
-export default function TrustScoreCard({ score = 0, compact = false, className = "" }) {
+export default function TrustScoreCard({
+  score = 0,
+  compact = false,
+  className = "",
+}) {
   // Color based on score
   const getColor = (s) => {
-    if (s >= 80) return { text: "text-success", bg: "bg-success", ring: "ring-success/20" };
-    if (s >= 60) return { text: "text-primary", bg: "bg-primary", ring: "ring-primary/20" };
-    if (s >= 40) return { text: "text-warning", bg: "bg-warning", ring: "ring-warning/20" };
+    if (s >= 80)
+      return {
+        text: "text-success",
+        bg: "bg-success",
+        ring: "ring-success/20",
+      };
+    if (s >= 60)
+      return {
+        text: "text-primary",
+        bg: "bg-primary",
+        ring: "ring-primary/20",
+      };
+    if (s >= 40)
+      return {
+        text: "text-warning",
+        bg: "bg-warning",
+        ring: "ring-warning/20",
+      };
     return { text: "text-danger", bg: "bg-danger", ring: "ring-danger/20" };
   };
 
@@ -37,7 +56,10 @@ export default function TrustScoreCard({ score = 0, compact = false, className =
       className={`glass-panel p-4 rounded-xl border border-white/5 space-y-3 ${className}`}
     >
       <div className="flex items-center gap-2">
-        <span className="material-symbols-outlined text-[16px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
+        <span
+          className="material-symbols-outlined text-[16px] text-primary"
+          style={{ fontVariationSettings: "'FILL' 1" }}
+        >
           thumb_up
         </span>
         <span className="text-xs font-bold uppercase tracking-wider text-on-surface-variant font-inter">
@@ -46,7 +68,9 @@ export default function TrustScoreCard({ score = 0, compact = false, className =
       </div>
 
       <div className="flex items-end gap-3">
-        <div className={`text-3xl font-bold font-geist ${colors.text}`}>{score}</div>
+        <div className={`text-3xl font-bold font-geist ${colors.text}`}>
+          {score}
+        </div>
         <div className="text-xs text-on-surface-variant pb-1">/100</div>
       </div>
 

@@ -43,16 +43,16 @@ These initial phases established the core Fundora crowdfunding platform:
 
 ### Key Files
 
-| Category | Files |
-|----------|-------|
-| **Core Pages** | `pages/index.js` (landing), `pages/explore.js`, `pages/create/index.js`, `pages/projects/[id].js`, `pages/projects/[id]/fund.js`, `pages/home.js`, `pages/login.js`, `pages/signup.js`, `pages/saved.js`, `pages/followers.js` |
-| **Auth** | `lib/withAuth.js`, `lib/supabaseClient.js`, `lib/supabaseAdmin.js`, `pages/auth/callback.js`, `pages/api/account/delete.js` |
-| **Creator** | `pages/creator/[id].js`, `pages/creator/analytics.js`, `pages/creator/edit.js`, `pages/creator/funds-got.js`, `pages/creator/payments.js`, `pages/creator/profile.js` |
-| **Payments** | `pages/api/razorpay/create-order.js`, `pages/api/razorpay/verify.js`, `pages/api/razorpay/webhook.js`, `pages/payments/index.js` |
-| **Core Lib** | `lib/projects.js`, `lib/storage.js`, `lib/categories.js`, `lib/generateReceipt.js`, `lib/pdfCharts.js`, `lib/rateLimit.js` |
-| **Components** | `components/Navbar.jsx`, `components/Footer.jsx`, `components/ProjectCard.jsx`, `components/HeroSection.jsx` (landing), `components/ExploreCard.jsx`, `components/CategorySelector.jsx`, etc. |
-| **Create Flow** | `components/create/ProjectDetailsStep.jsx`, `components/create/AIGeneratorStep.jsx`, `components/create/MediaStep.jsx`, `components/create/FundingStep.jsx` |
-| **Styles** | `styles/globals.css` (glassmorphism design system), `tailwind.config.js` |
+| Category        | Files                                                                                                                                                                                                                          |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Core Pages**  | `pages/index.js` (landing), `pages/explore.js`, `pages/create/index.js`, `pages/projects/[id].js`, `pages/projects/[id]/fund.js`, `pages/home.js`, `pages/login.js`, `pages/signup.js`, `pages/saved.js`, `pages/followers.js` |
+| **Auth**        | `lib/withAuth.js`, `lib/supabaseClient.js`, `lib/supabaseAdmin.js`, `pages/auth/callback.js`, `pages/api/account/delete.js`                                                                                                    |
+| **Creator**     | `pages/creator/[id].js`, `pages/creator/analytics.js`, `pages/creator/edit.js`, `pages/creator/funds-got.js`, `pages/creator/payments.js`, `pages/creator/profile.js`                                                          |
+| **Payments**    | `pages/api/razorpay/create-order.js`, `pages/api/razorpay/verify.js`, `pages/api/razorpay/webhook.js`, `pages/payments/index.js`                                                                                               |
+| **Core Lib**    | `lib/projects.js`, `lib/storage.js`, `lib/categories.js`, `lib/generateReceipt.js`, `lib/pdfCharts.js`, `lib/rateLimit.js`                                                                                                     |
+| **Components**  | `components/Navbar.jsx`, `components/Footer.jsx`, `components/ProjectCard.jsx`, `components/HeroSection.jsx` (landing), `components/ExploreCard.jsx`, `components/CategorySelector.jsx`, etc.                                  |
+| **Create Flow** | `components/create/ProjectDetailsStep.jsx`, `components/create/AIGeneratorStep.jsx`, `components/create/MediaStep.jsx`, `components/create/FundingStep.jsx`                                                                    |
+| **Styles**      | `styles/globals.css` (glassmorphism design system), `tailwind.config.js`                                                                                                                                                       |
 
 ### How It Works
 
@@ -85,14 +85,14 @@ Extended the basic KYC system with **business** and **bank** verification, creat
 
 ### Key Files
 
-| Category | Files |
-|----------|-------|
-| **Libraries** | `lib/verification/businessVerification.js`, `lib/verification/bankVerification.js`, `lib/verification/documentRequirements.js`, `lib/verification/pennyDrop.js`, `lib/verification/gstVerification.js`, `lib/verification/panVerification.js`, `lib/verification/storageAdapter.js` |
-| **Providers** | `lib/verification/providers/pennyDropProvider.js`, `businessVerificationProvider.js`, `bankVerificationProvider.js`, `gstVerificationProvider.js`, `panVerificationProvider.js` |
-| **API Routes** | `pages/api/verification/business.js`, `bank.js`, `business-documents.js`, `bank-documents.js`, `penny-drop.js`, `gst.js`, `pan.js`, `pages/api/admin/business-review.js`, `bank-review.js`, `review-queue.js` |
-| **UI Components** | `BusinessVerificationCard.jsx`, `BankAccountCard.jsx`, `BankAccountForm.jsx`, `BusinessTypeSelector.jsx`, `GSTValidator.jsx`, `CompletionIndicator.jsx`, `PendingActions.jsx`, `RejectedDocuments.jsx` |
-| **Admin Components** | `ReviewTimeline.jsx`, `DocumentPreview.jsx`, `DecisionPanel.jsx`, `AuditHistory.jsx`, `ReviewNotes.jsx`, `ReviewQueueItem.jsx` |
-| **Migration** | `supabase/migrations/004_business_bank_verification.sql` |
+| Category             | Files                                                                                                                                                                                                                                                                               |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Libraries**        | `lib/verification/businessVerification.js`, `lib/verification/bankVerification.js`, `lib/verification/documentRequirements.js`, `lib/verification/pennyDrop.js`, `lib/verification/gstVerification.js`, `lib/verification/panVerification.js`, `lib/verification/storageAdapter.js` |
+| **Providers**        | `lib/verification/providers/pennyDropProvider.js`, `businessVerificationProvider.js`, `bankVerificationProvider.js`, `gstVerificationProvider.js`, `panVerificationProvider.js`                                                                                                     |
+| **API Routes**       | `pages/api/verification/business.js`, `bank.js`, `business-documents.js`, `bank-documents.js`, `penny-drop.js`, `gst.js`, `pan.js`, `pages/api/admin/business-review.js`, `bank-review.js`, `review-queue.js`                                                                       |
+| **UI Components**    | `BusinessVerificationCard.jsx`, `BankAccountCard.jsx`, `BankAccountForm.jsx`, `BusinessTypeSelector.jsx`, `GSTValidator.jsx`, `CompletionIndicator.jsx`, `PendingActions.jsx`, `RejectedDocuments.jsx`                                                                              |
+| **Admin Components** | `ReviewTimeline.jsx`, `DocumentPreview.jsx`, `DecisionPanel.jsx`, `AuditHistory.jsx`, `ReviewNotes.jsx`, `ReviewQueueItem.jsx`                                                                                                                                                      |
+| **Migration**        | `supabase/migrations/004_business_bank_verification.sql`                                                                                                                                                                                                                            |
 
 ### How It Works
 
@@ -125,11 +125,11 @@ Built a comprehensive fraud detection pipeline with AI-enhanced risk analysis:
 
 ### Key Files
 
-| Category | Files |
-|----------|-------|
-| **Libraries** | `lib/fraud/riskEngine.js`, `decisionEngine.js`, `riskScorer.js`, `ruleEngine.js`, `signalAggregator.js`, `behaviorAnalytics.js`, `deviceFingerprint.js`, `fraudEvents.js`, `riskHistory.js`, `providerAdapter.js`, `aiEnhancer.js`, `aiRiskAnalyzer.js`, `signals/index.js` |
-| **API Routes** | `pages/api/fraud/evaluate.js`, `events.js`, `profile.js`, `devices.js`, `history.js`, `pages/api/admin/fraud-dashboard.js` |
-| **Migration** | `supabase/migrations/005_fraud_detection.sql` |
+| Category       | Files                                                                                                                                                                                                                                                                       |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Libraries**  | `lib/fraud/riskEngine.js`, `decisionEngine.js`, `riskScorer.js`, `ruleEngine.js`, `signalAggregator.js`, `behaviorAnalytics.js`, `deviceFingerprint.js`, `fraudEvents.js`, `riskHistory.js`, `providerAdapter.js`, `aiEnhancer.js`, `aiRiskAnalyzer.js`, `signals/index.js` |
+| **API Routes** | `pages/api/fraud/evaluate.js`, `events.js`, `profile.js`, `devices.js`, `history.js`, `pages/api/admin/fraud-dashboard.js`                                                                                                                                                  |
+| **Migration**  | `supabase/migrations/005_fraud_detection.sql`                                                                                                                                                                                                                               |
 
 ### How It Works
 
@@ -163,12 +163,12 @@ Built the financial infrastructure for holding funds, verifying work, and releas
 
 ### Key Files
 
-| Category | Files |
-|----------|-------|
-| **Libraries** | `lib/escrow/escrowEngine.js`, `escrowAccount.js`, `escrowLedger.js`, `escrowEvents.js`, `escrowRules.js`, `releaseEngine.js`, `refundEngine.js`, `settlementEngine.js`, `providerAdapter.js`, `lib/milestone/milestoneEngine.js`, `milestoneReview.js`, `milestoneSubmission.js`, `lib/payout/payoutEngine.js` |
-| **API Routes** | `pages/api/escrow/account.js`, `ledger.js`, `release.js`, `pages/api/milestone/index.js`, `submit.js`, `review.js`, `pages/api/payout/index.js`, `status.js`, `pages/api/admin/escrow-dashboard.js`, `payout-review.js` |
-| **UI Components** | `components/escrow/EscrowCard.jsx`, `LedgerTable.jsx`, `MilestoneCard.jsx`, `PayoutHistory.jsx` |
-| **Migration** | `supabase/migrations/006_escrow_milestones_payouts.sql` |
+| Category          | Files                                                                                                                                                                                                                                                                                                          |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Libraries**     | `lib/escrow/escrowEngine.js`, `escrowAccount.js`, `escrowLedger.js`, `escrowEvents.js`, `escrowRules.js`, `releaseEngine.js`, `refundEngine.js`, `settlementEngine.js`, `providerAdapter.js`, `lib/milestone/milestoneEngine.js`, `milestoneReview.js`, `milestoneSubmission.js`, `lib/payout/payoutEngine.js` |
+| **API Routes**    | `pages/api/escrow/account.js`, `ledger.js`, `release.js`, `pages/api/milestone/index.js`, `submit.js`, `review.js`, `pages/api/payout/index.js`, `status.js`, `pages/api/admin/escrow-dashboard.js`, `payout-review.js`                                                                                        |
+| **UI Components** | `components/escrow/EscrowCard.jsx`, `LedgerTable.jsx`, `MilestoneCard.jsx`, `PayoutHistory.jsx`                                                                                                                                                                                                                |
+| **Migration**     | `supabase/migrations/006_escrow_milestones_payouts.sql`                                                                                                                                                                                                                                                        |
 
 ### How It Works
 
@@ -198,11 +198,11 @@ Added compliance management, reputation scoring, appeals, and policy engine:
 
 ### Key Files
 
-| Category | Files |
-|----------|-------|
-| **Libraries** | `lib/compliance/complianceEngine.js`, `complianceEvents.js`, `lib/reputation/reputationEngine.js`, `lib/appeals/appealsEngine.js`, `lib/policy/policyEngine.js` |
-| **API Routes** | `pages/api/admin/compliance-dashboard.js`, `pages/api/admin/policy-management.js`, `pages/api/appeals/index.js`, `pages/api/reputation/leaderboard.js` |
-| **Migration** | `supabase/migrations/007_compliance_reputation_governance.sql` |
+| Category       | Files                                                                                                                                                           |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Libraries**  | `lib/compliance/complianceEngine.js`, `complianceEvents.js`, `lib/reputation/reputationEngine.js`, `lib/appeals/appealsEngine.js`, `lib/policy/policyEngine.js` |
+| **API Routes** | `pages/api/admin/compliance-dashboard.js`, `pages/api/admin/policy-management.js`, `pages/api/appeals/index.js`, `pages/api/reputation/leaderboard.js`          |
+| **Migration**  | `supabase/migrations/007_compliance_reputation_governance.sql`                                                                                                  |
 
 ### How It Works
 
@@ -232,12 +232,12 @@ Built multi-tenant enterprise features and a developer API platform:
 
 ### Key Files
 
-| Category | Files |
-|----------|-------|
-| **Libraries** | `lib/organization/organizationEngine.js`, `lib/rbac/rbacEngine.js`, `lib/apiPlatform/apiKeyEngine.js`, `apiLogEngine.js`, `developerAppEngine.js`, `withApiKey.js` |
-| **API Routes** | `pages/api/organization/index.js`, `members.js`, `invitations.js`, `teams.js`, `departments.js`, `settings.js`, `analytics.js`, `pages/api/rbac/roles.js`, `pages/api/api-platform/keys.js`, `apps.js`, `logs.js`, `pages/api/admin/organizations.js` |
-| **UI Components** | `components/admin/OrganizationDashboard.jsx`, `OrganizationSettings.jsx`, `components/organization/MemberManagement.jsx` |
-| **Migration** | `supabase/migrations/008_enterprise_organizations_api.sql` |
+| Category          | Files                                                                                                                                                                                                                                                 |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Libraries**     | `lib/organization/organizationEngine.js`, `lib/rbac/rbacEngine.js`, `lib/apiPlatform/apiKeyEngine.js`, `apiLogEngine.js`, `developerAppEngine.js`, `withApiKey.js`                                                                                    |
+| **API Routes**    | `pages/api/organization/index.js`, `members.js`, `invitations.js`, `teams.js`, `departments.js`, `settings.js`, `analytics.js`, `pages/api/rbac/roles.js`, `pages/api/api-platform/keys.js`, `apps.js`, `logs.js`, `pages/api/admin/organizations.js` |
+| **UI Components** | `components/admin/OrganizationDashboard.jsx`, `OrganizationSettings.jsx`, `components/organization/MemberManagement.jsx`                                                                                                                              |
+| **Migration**     | `supabase/migrations/008_enterprise_organizations_api.sql`                                                                                                                                                                                            |
 
 ### How It Works
 
@@ -275,11 +275,11 @@ Built a comprehensive AI platform with multiple engines:
 
 ### Key Files
 
-| Category | Files |
-|----------|-------|
-| **Libraries** | `lib/ai/aiEngine.js`, `providerRegistry.js`, `modelRouter.js`, `promptEngine.js`, `knowledgeEngine.js`, `recommendationEngine.js`, `predictionEngine.js`, `campaignAI.js`, `copilotEngine.js`, `conversationMemory.js`, `embeddingEngine.js`, `costTracker.js`, `tokenTracker.js`, `contextBuilder.js` |
+| Category       | Files                                                                                                                                                                                                                                                                                                      |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Libraries**  | `lib/ai/aiEngine.js`, `providerRegistry.js`, `modelRouter.js`, `promptEngine.js`, `knowledgeEngine.js`, `recommendationEngine.js`, `predictionEngine.js`, `campaignAI.js`, `copilotEngine.js`, `conversationMemory.js`, `embeddingEngine.js`, `costTracker.js`, `tokenTracker.js`, `contextBuilder.js`     |
 | **API Routes** | `pages/api/ai/agent.js`, `chat.js`, `config.js`, `providers.js`, `predictions.js`, `recommendations.js`, `usage.js`, `knowledge.js`, `generate-campaign.js`, `funding-recommendation.js`, `campaign/score.js`, `campaign/suggest.js`, `fraud/analyze.js`, `moderation/classify.js`, `moderation/detect.js` |
-| **Migration** | `supabase/migrations/009_ai_platform.sql` |
+| **Migration**  | `supabase/migrations/009_ai_platform.sql`                                                                                                                                                                                                                                                                  |
 
 ### How It Works
 
@@ -313,17 +313,17 @@ Transformed Fundora into a global, production-scale platform:
 
 ### Key Files
 
-| Category | Files |
-|----------|-------|
-| **i18n** | `lib/i18n/translationService.js`, `pages/api/i18n/translations.js` |
-| **Currency** | `lib/currency/currencyEngine.js`, `pages/api/currency/convert.js`, `rates.js` |
-| **Plugins** | `lib/plugins/pluginEngine.js`, `pluginRegistry.js`, `pluginLoader.js`, `pluginManifest.js`, `pluginSandbox.js`, `pluginLifecycle.js`, `pluginPermissions.js`, `pages/api/plugins/[id].js`, `list.js`, `submit.js`, `pages/api/marketplace/featured.js`, `list.js`, `review.js`, `lib/marketplace/marketplaceEngine.js` |
-| **Observability** | `lib/observability/metricsEngine.js`, `healthMonitor.js`, `alertManager.js`, `tracingEngine.js`, `opentelemetry.js`, `pages/api/observability/metrics.js`, `health.js`, `alerts.js` |
-| **Backup** | `lib/backup/backupEngine.js`, `restoreEngine.js`, `retentionEngine.js`, `snapshotEngine.js`, `pages/api/backup/backups.js`, `restore.js` |
-| **Search** | `lib/search/searchEngine.js`, `autocompleteEngine.js`, `facetEngine.js`, `searchAnalytics.js`, `searchIndexManager.js`, `pages/api/search/index.js`, `autocomplete.js` |
-| **Storage** | `lib/storage/storageAdapter.js`, `providerAdapter.js`, `imageOptimizer.js`, `signedUrlEngine.js`, `pages/api/storage/upload.js`, `signed-url.js` |
-| **Mobile** | `lib/mobile/offlineSync.js`, `paginationEngine.js`, `responseOptimizer.js`, `versionedApi.js`, `pages/api/mobile/sync.js` |
-| **Migration** | `supabase/migrations/010_global_platform.sql` |
+| Category          | Files                                                                                                                                                                                                                                                                                                                  |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **i18n**          | `lib/i18n/translationService.js`, `pages/api/i18n/translations.js`                                                                                                                                                                                                                                                     |
+| **Currency**      | `lib/currency/currencyEngine.js`, `pages/api/currency/convert.js`, `rates.js`                                                                                                                                                                                                                                          |
+| **Plugins**       | `lib/plugins/pluginEngine.js`, `pluginRegistry.js`, `pluginLoader.js`, `pluginManifest.js`, `pluginSandbox.js`, `pluginLifecycle.js`, `pluginPermissions.js`, `pages/api/plugins/[id].js`, `list.js`, `submit.js`, `pages/api/marketplace/featured.js`, `list.js`, `review.js`, `lib/marketplace/marketplaceEngine.js` |
+| **Observability** | `lib/observability/metricsEngine.js`, `healthMonitor.js`, `alertManager.js`, `tracingEngine.js`, `opentelemetry.js`, `pages/api/observability/metrics.js`, `health.js`, `alerts.js`                                                                                                                                    |
+| **Backup**        | `lib/backup/backupEngine.js`, `restoreEngine.js`, `retentionEngine.js`, `snapshotEngine.js`, `pages/api/backup/backups.js`, `restore.js`                                                                                                                                                                               |
+| **Search**        | `lib/search/searchEngine.js`, `autocompleteEngine.js`, `facetEngine.js`, `searchAnalytics.js`, `searchIndexManager.js`, `pages/api/search/index.js`, `autocomplete.js`                                                                                                                                                 |
+| **Storage**       | `lib/storage/storageAdapter.js`, `providerAdapter.js`, `imageOptimizer.js`, `signedUrlEngine.js`, `pages/api/storage/upload.js`, `signed-url.js`                                                                                                                                                                       |
+| **Mobile**        | `lib/mobile/offlineSync.js`, `paginationEngine.js`, `responseOptimizer.js`, `versionedApi.js`, `pages/api/mobile/sync.js`                                                                                                                                                                                              |
+| **Migration**     | `supabase/migrations/010_global_platform.sql`                                                                                                                                                                                                                                                                          |
 
 ### How It Works
 
@@ -361,19 +361,19 @@ Built an ecosystem of intelligent agents, event-driven architecture, and enterpr
 
 ### Key Files
 
-| Category | Files |
-|----------|-------|
-| **Agents** | `lib/agents/agentEngine.js`, `agentRegistry.js`, `agentExecution.js`, `agentMemory.js`, `agentPermissions.js`, `agentScheduler.js`, `agentWorkflow.js`, `agentContext.js`, `pages/api/agents/index.js`, `approve.js`, `memory.js`, `permissions.js`, `run.js`, `schedule.js` |
-| **Events** | `lib/events/eventBus.js`, `pages/api/events/index.js`, `process.js`, `subscriptions.js` |
-| **Connectors** | `lib/connectors/connectorManager.js`, `baseConnector.js`, `pages/api/connectors/index.js` |
-| **MCP** | `lib/mcp/mcpServer.js`, `pages/api/mcp/index.js` |
-| **Exports** | `lib/exports/exportEngine.js`, `pages/api/exports/index.js`, `schedule.js`, `templates.js` |
-| **Tenants** | `lib/tenants/tenantManager.js`, `pages/api/tenants/index.js`, `branding.js`, `quotas.js`, `settings.js` |
-| **Flags** | `lib/flags/featureFlags.js`, `pages/api/flags/index.js`, `abtest.js` |
-| **Automation** | `lib/automation/workflowEngine.js`, `pages/api/automation/workflows.js`, `[id].js`, `[id]/runs.js`, `[id]/trigger.js` |
-| **Marketplace** | `lib/marketplace/marketplaceEngine.js`, `pages/api/marketplace/featured.js`, `list.js`, `review.js`, `pages/api/developer/register.js`, `my-plugins.js` |
-| **Platform Intel** | `lib/platformIntelligence/analyticsEngine.js` |
-| **Migration** | `supabase/migrations/011_ecosystem.sql` |
+| Category           | Files                                                                                                                                                                                                                                                                        |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Agents**         | `lib/agents/agentEngine.js`, `agentRegistry.js`, `agentExecution.js`, `agentMemory.js`, `agentPermissions.js`, `agentScheduler.js`, `agentWorkflow.js`, `agentContext.js`, `pages/api/agents/index.js`, `approve.js`, `memory.js`, `permissions.js`, `run.js`, `schedule.js` |
+| **Events**         | `lib/events/eventBus.js`, `pages/api/events/index.js`, `process.js`, `subscriptions.js`                                                                                                                                                                                      |
+| **Connectors**     | `lib/connectors/connectorManager.js`, `baseConnector.js`, `pages/api/connectors/index.js`                                                                                                                                                                                    |
+| **MCP**            | `lib/mcp/mcpServer.js`, `pages/api/mcp/index.js`                                                                                                                                                                                                                             |
+| **Exports**        | `lib/exports/exportEngine.js`, `pages/api/exports/index.js`, `schedule.js`, `templates.js`                                                                                                                                                                                   |
+| **Tenants**        | `lib/tenants/tenantManager.js`, `pages/api/tenants/index.js`, `branding.js`, `quotas.js`, `settings.js`                                                                                                                                                                      |
+| **Flags**          | `lib/flags/featureFlags.js`, `pages/api/flags/index.js`, `abtest.js`                                                                                                                                                                                                         |
+| **Automation**     | `lib/automation/workflowEngine.js`, `pages/api/automation/workflows.js`, `[id].js`, `[id]/runs.js`, `[id]/trigger.js`                                                                                                                                                        |
+| **Marketplace**    | `lib/marketplace/marketplaceEngine.js`, `pages/api/marketplace/featured.js`, `list.js`, `review.js`, `pages/api/developer/register.js`, `my-plugins.js`                                                                                                                      |
+| **Platform Intel** | `lib/platformIntelligence/analyticsEngine.js`                                                                                                                                                                                                                                |
+| **Migration**      | `supabase/migrations/011_ecosystem.sql`                                                                                                                                                                                                                                      |
 
 ### How It Works
 
@@ -410,18 +410,18 @@ Production hardening with caching, background jobs, performance optimization, se
 
 ### Key Files
 
-| Category | Files |
-|----------|-------|
-| **Cache** | `lib/cache/cacheEngine.js`, `pages/api/infrastructure/cache.js` |
-| **Jobs** | `lib/jobs/jobQueue.js`, `pages/api/jobs/index.js`, `process.js`, `schedule.js`, `pages/api/infrastructure/queues.js` |
-| **Performance** | `lib/performance/poolManager.js`, `pages/api/health/database.js` |
-| **Secrets** | `lib/secrets/secretsManager.js` |
-| **Recovery** | `lib/recovery/recoveryManager.js` |
-| **Webhooks** | `lib/webhooks/webhookEngine.js`, `webhookDelivery.js`, `pages/api/webhooks/index.js`, `deliveries.js`, `test.js` |
-| **Notifications** | `lib/notification/notificationEngine.js`, `pages/api/notifications/index.js`, `preferences.js` |
-| **Deployment** | `deploy/docker-compose.yml`, `Dockerfile`, `deploy/k8s/` (manifests), `deploy/helm/` (charts), `deploy/scripts/` |
-| **Security** | Security middleware, CORS config, input sanitization patterns |
-| **Migration** | `supabase/migrations/012_infrastructure.sql` |
+| Category          | Files                                                                                                                |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **Cache**         | `lib/cache/cacheEngine.js`, `pages/api/infrastructure/cache.js`                                                      |
+| **Jobs**          | `lib/jobs/jobQueue.js`, `pages/api/jobs/index.js`, `process.js`, `schedule.js`, `pages/api/infrastructure/queues.js` |
+| **Performance**   | `lib/performance/poolManager.js`, `pages/api/health/database.js`                                                     |
+| **Secrets**       | `lib/secrets/secretsManager.js`                                                                                      |
+| **Recovery**      | `lib/recovery/recoveryManager.js`                                                                                    |
+| **Webhooks**      | `lib/webhooks/webhookEngine.js`, `webhookDelivery.js`, `pages/api/webhooks/index.js`, `deliveries.js`, `test.js`     |
+| **Notifications** | `lib/notification/notificationEngine.js`, `pages/api/notifications/index.js`, `preferences.js`                       |
+| **Deployment**    | `deploy/docker-compose.yml`, `Dockerfile`, `deploy/k8s/` (manifests), `deploy/helm/` (charts), `deploy/scripts/`     |
+| **Security**      | Security middleware, CORS config, input sanitization patterns                                                        |
+| **Migration**     | `supabase/migrations/012_infrastructure.sql`                                                                         |
 
 ### How It Works
 
@@ -462,34 +462,34 @@ supabase/migrations/
 
 ### Library Modules by Phase
 
-| Phase | `lib/` Modules | Count |
-|-------|---------------|-------|
-| 1-3 | `projects.js`, `storage.js`, `categories.js`, `withAuth.js`, `supabaseClient.js`, `supabaseAdmin.js`, `rateLimit.js`, `pdfCharts.js`, `generateReceipt.js`, `auth.js`, `saved.js`, `uploadCreatorFile.js`, `trust/trustEngine.js`, `verification/baseProvider.js`, `verification/ocrProvider.js`, `verification/provider.js`, `verification/phoneVerification.js`, `verification/sessionManager.js`, `verification/secureLogger.js`, `verification/auditLog.js`, `verification/manualReview.js`, `verification/notifications.js`, `verification/metadataEncryption.js`, `verification/storage.js`, `verification/documentValidator.js`, `verification/ocrProviderRegistry.js` | ~26 |
-| 4 | `verification/businessVerification.js`, `bankVerification.js`, `documentRequirements.js`, `pennyDrop.js`, `gstVerification.js`, `panVerification.js`, `storageAdapter.js` + 5 providers | 12 |
-| 5 | `fraud/` (13 files) | 13 |
-| 6 | `escrow/` (10 files), `milestone/` (4 files), `payout/` (2 files) | 16 |
-| 7 | `compliance/` (3 files), `reputation/` (2 files), `appeals/` (2 files), `policy/` (2 files) | 9 |
-| 8 | `organization/` (2 files), `apiPlatform/` (5 files), `rbac/` (2 files) | 9 |
-| 9 | `ai/` (14 files) | 14 |
-| 10 | `i18n/` (2), `currency/` (2), `plugins/` (8), `observability/` (6), `backup/` (5), `search/` (6), `storage/` (5), `mobile/` (5), `marketplace/` (2), `platformIntelligence/` (2) | 43 |
-| 11 | `agents/` (9 files), `events/` (2), `connectors/` (3), `mcp/` (2), `exports/` (2), `tenants/` (2), `flags/` (2), `automation/` (2) | 24 |
-| 12 | `cache/` (2), `jobs/` (2), `performance/` (2), `secrets/` (2), `recovery/` (2), `webhooks/` (3), `notification/` (2) | 15 |
+| Phase | `lib/` Modules                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Count |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| 1-3   | `projects.js`, `storage.js`, `categories.js`, `withAuth.js`, `supabaseClient.js`, `supabaseAdmin.js`, `rateLimit.js`, `pdfCharts.js`, `generateReceipt.js`, `auth.js`, `saved.js`, `uploadCreatorFile.js`, `trust/trustEngine.js`, `verification/baseProvider.js`, `verification/ocrProvider.js`, `verification/provider.js`, `verification/phoneVerification.js`, `verification/sessionManager.js`, `verification/secureLogger.js`, `verification/auditLog.js`, `verification/manualReview.js`, `verification/notifications.js`, `verification/metadataEncryption.js`, `verification/storage.js`, `verification/documentValidator.js`, `verification/ocrProviderRegistry.js` | ~26   |
+| 4     | `verification/businessVerification.js`, `bankVerification.js`, `documentRequirements.js`, `pennyDrop.js`, `gstVerification.js`, `panVerification.js`, `storageAdapter.js` + 5 providers                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | 12    |
+| 5     | `fraud/` (13 files)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | 13    |
+| 6     | `escrow/` (10 files), `milestone/` (4 files), `payout/` (2 files)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | 16    |
+| 7     | `compliance/` (3 files), `reputation/` (2 files), `appeals/` (2 files), `policy/` (2 files)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | 9     |
+| 8     | `organization/` (2 files), `apiPlatform/` (5 files), `rbac/` (2 files)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | 9     |
+| 9     | `ai/` (14 files)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | 14    |
+| 10    | `i18n/` (2), `currency/` (2), `plugins/` (8), `observability/` (6), `backup/` (5), `search/` (6), `storage/` (5), `mobile/` (5), `marketplace/` (2), `platformIntelligence/` (2)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | 43    |
+| 11    | `agents/` (9 files), `events/` (2), `connectors/` (3), `mcp/` (2), `exports/` (2), `tenants/` (2), `flags/` (2), `automation/` (2)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | 24    |
+| 12    | `cache/` (2), `jobs/` (2), `performance/` (2), `secrets/` (2), `recovery/` (2), `webhooks/` (3), `notification/` (2)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | 15    |
 
 ### API Routes by Phase
 
-| Phase | Routes | Count |
-|-------|--------|-------|
-| 1-3 | Razorpay, creator, projects, auth, export-analytics | ~12 |
-| 4 | verification/ (7), admin/ (3 review routes) | 10 |
-| 5 | fraud/ (5), admin/fraud-dashboard | 6 |
-| 6 | escrow/ (3), milestone/ (3), payout/ (2), admin/ (2 escrow/payout dashboards) | 10 |
-| 7 | admin/ (2 compliance/policy), appeals, reputation | 4 |
-| 8 | organization/ (7), rbac/, api-platform/ (3), admin/organizations | 12 |
-| 9 | ai/ (14 routes) | 14 |
-| 10 | i18n/, currency/ (2), plugins/ (3), marketplace/ (3), observability/ (3), backup/ (2), search/ (2), storage/ (2), mobile/ | ~18 |
-| 11 | agents/ (6), events/ (3), connectors/, mcp/, exports/ (3), tenants/ (4), flags/ (2), automation/ (4), developer/ (2) | ~26 |
-| 12 | infrastructure/ (3), jobs/ (3), webhooks/ (3), notifications/ (2), health/ (2), diagnostics/, deployments/ (2) | ~16 |
+| Phase | Routes                                                                                                                    | Count |
+| ----- | ------------------------------------------------------------------------------------------------------------------------- | ----- |
+| 1-3   | Razorpay, creator, projects, auth, export-analytics                                                                       | ~12   |
+| 4     | verification/ (7), admin/ (3 review routes)                                                                               | 10    |
+| 5     | fraud/ (5), admin/fraud-dashboard                                                                                         | 6     |
+| 6     | escrow/ (3), milestone/ (3), payout/ (2), admin/ (2 escrow/payout dashboards)                                             | 10    |
+| 7     | admin/ (2 compliance/policy), appeals, reputation                                                                         | 4     |
+| 8     | organization/ (7), rbac/, api-platform/ (3), admin/organizations                                                          | 12    |
+| 9     | ai/ (14 routes)                                                                                                           | 14    |
+| 10    | i18n/, currency/ (2), plugins/ (3), marketplace/ (3), observability/ (3), backup/ (2), search/ (2), storage/ (2), mobile/ | ~18   |
+| 11    | agents/ (6), events/ (3), connectors/, mcp/, exports/ (3), tenants/ (4), flags/ (2), automation/ (4), developer/ (2)      | ~26   |
+| 12    | infrastructure/ (3), jobs/ (3), webhooks/ (3), notifications/ (2), health/ (2), diagnostics/, deployments/ (2)            | ~16   |
 
 ---
 
-*Generated from git history, phase reports, and file system analysis of the Fundora codebase.*
+_Generated from git history, phase reports, and file system analysis of the Fundora codebase._

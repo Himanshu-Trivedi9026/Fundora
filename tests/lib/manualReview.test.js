@@ -74,13 +74,23 @@ vi.mock("../../lib/supabaseAdmin", () => {
         // `.eq("id", scalar)` → single row or PGRST116.
         if (this._query.id) {
           const found = rows.find((r) => r.id === this._query.id);
-          return Promise.resolve(found
-            ? { data: found, error: null }
-            : { data: null, error: { code: "PGRST116", message: "not found" } });
+          return Promise.resolve(
+            found
+              ? { data: found, error: null }
+              : {
+                  data: null,
+                  error: { code: "PGRST116", message: "not found" },
+                },
+          );
         }
         if (this._query.user_id) {
-          const vals = Array.isArray(this._query.user_id) ? this._query.user_id : [this._query.user_id];
-          return Promise.resolve({ data: rows.filter((r) => vals.includes(r.user_id)), error: null });
+          const vals = Array.isArray(this._query.user_id)
+            ? this._query.user_id
+            : [this._query.user_id];
+          return Promise.resolve({
+            data: rows.filter((r) => vals.includes(r.user_id)),
+            error: null,
+          });
         }
         return Promise.resolve({ data: rows, error: null, count: rows.length });
       },
@@ -100,7 +110,10 @@ vi.mock("../../lib/supabaseAdmin", () => {
 });
 
 vi.mock("../../lib/verification/auditLog", () => ({
-  logAuditEvent: vi.fn(async (args) => ({ success: true, id: `audit-${args.action}` })),
+  logAuditEvent: vi.fn(async (args) => ({
+    success: true,
+    id: `audit-${args.action}`,
+  })),
 }));
 
 vi.mock("../../lib/notification", () => {
@@ -114,7 +127,8 @@ vi.mock("../../lib/notification", () => {
       VERIFICATION_APPROVED: "verification_approved",
       VERIFICATION_REJECTED: "verification_rejected",
       VERIFICATION_SUSPENDED: "verification_suspended",
-      VERIFICATION_RESUBMISSION_REQUESTED: "verification_resubmission_requested",
+      VERIFICATION_RESUBMISSION_REQUESTED:
+        "verification_resubmission_requested",
     },
     __notifications: notifications,
   };
@@ -161,19 +175,26 @@ describe("manualReview — admin decisions sync Supabase + status + notification
         { id: "req-1", user_id: "creator-1", verification_type: "identity" },
       ];
 
-      const result = await approveRequest("req-1", "admin-1", "Looks good", "admin-1");
+      const result = await approveRequest(
+        "req-1",
+        "admin-1",
+        "Looks good",
+        "admin-1",
+      );
 
       expect(result.success).toBe(true);
 
       // Request status → approved
       const approveUpdate = state.updates.find(
-        (u) => u.table === "verification_requests" && u.query.id === "req-1"
+        (u) => u.table === "verification_requests" && u.query.id === "req-1",
       );
       expect(approveUpdate.payload.status).toBe("approved");
 
       // creator_verifications synced: identity_verified true + status approved
       const creatorUpdate = state.updates.find(
-        (u) => u.table === "creator_verifications" && u.query.user_id === "creator-1"
+        (u) =>
+          u.table === "creator_verifications" &&
+          u.query.user_id === "creator-1",
       );
       expect(creatorUpdate.payload.identity_verified).toBe(true);
       expect(creatorUpdate.payload.verification_status).toBe("approved");
@@ -186,7 +207,7 @@ describe("manualReview — admin decisions sync Supabase + status + notification
           notificationType: "verification_approved",
           actorId: "admin-1",
           entityId: "req-1",
-        })
+        }),
       );
     });
 
@@ -203,19 +224,26 @@ describe("manualReview — admin decisions sync Supabase + status + notification
         { id: "req-2", user_id: "creator-2", verification_type: "identity" },
       ];
 
-      const result = await rejectRequest("req-2", "admin-1", "Blurry PAN", "admin-1");
+      const result = await rejectRequest(
+        "req-2",
+        "admin-1",
+        "Blurry PAN",
+        "admin-1",
+      );
 
       expect(result.success).toBe(true);
 
       const rejectUpdate = state.updates.find(
-        (u) => u.table === "verification_requests" && u.query.id === "req-2"
+        (u) => u.table === "verification_requests" && u.query.id === "req-2",
       );
       expect(rejectUpdate.payload.status).toBe("rejected");
       expect(rejectUpdate.payload.rejection_reason).toBe("Blurry PAN");
 
       // Overall status sync (the key fix: reject now updates creator_verifications)
       const creatorUpdate = state.updates.find(
-        (u) => u.table === "creator_verifications" && u.query.user_id === "creator-2"
+        (u) =>
+          u.table === "creator_verifications" &&
+          u.query.user_id === "creator-2",
       );
       expect(creatorUpdate.payload.verification_status).toBe("rejected");
 
@@ -223,7 +251,7 @@ describe("manualReview — admin decisions sync Supabase + status + notification
         expect.objectContaining({
           userId: "creator-2",
           notificationType: "verification_rejected",
-        })
+        }),
       );
     });
 
@@ -242,19 +270,28 @@ describe("manualReview — admin decisions sync Supabase + status + notification
         { id: "req-3", user_id: "creator-3", verification_type: "identity" },
       ];
 
-      const result = await requestResubmission("req-3", "admin-1", "Need a clearer photo", "admin-1");
+      const result = await requestResubmission(
+        "req-3",
+        "admin-1",
+        "Need a clearer photo",
+        "admin-1",
+      );
 
       expect(result.success).toBe(true);
 
       const resubmitUpdate = state.updates.find(
-        (u) => u.table === "verification_requests" && u.query.id === "req-3"
+        (u) => u.table === "verification_requests" && u.query.id === "req-3",
       );
       expect(resubmitUpdate.payload.status).toBe("documents_uploaded");
-      expect(resubmitUpdate.payload.rejection_reason).toContain("clearer photo");
+      expect(resubmitUpdate.payload.rejection_reason).toContain(
+        "clearer photo",
+      );
 
       // Creator status back to pending so they can resubmit
       const creatorUpdate = state.updates.find(
-        (u) => u.table === "creator_verifications" && u.query.user_id === "creator-3"
+        (u) =>
+          u.table === "creator_verifications" &&
+          u.query.user_id === "creator-3",
       );
       expect(creatorUpdate.payload.verification_status).toBe("pending");
 
@@ -262,7 +299,7 @@ describe("manualReview — admin decisions sync Supabase + status + notification
         expect.objectContaining({
           userId: "creator-3",
           notificationType: "verification_resubmission_requested",
-        })
+        }),
       );
     });
 
@@ -271,11 +308,16 @@ describe("manualReview — admin decisions sync Supabase + status + notification
         { id: "biz-1", user_id: "creator-4" },
       ];
 
-      const result = await requestResubmission("biz-1", "admin-1", "Fix GST doc", "admin-1");
+      const result = await requestResubmission(
+        "biz-1",
+        "admin-1",
+        "Fix GST doc",
+        "admin-1",
+      );
 
       expect(result.success).toBe(true);
       const bizUpdate = state.updates.find(
-        (u) => u.table === "business_verifications" && u.query.id === "biz-1"
+        (u) => u.table === "business_verifications" && u.query.id === "biz-1",
       );
       expect(bizUpdate.payload.status).toBe("resubmission_requested");
     });
@@ -285,7 +327,12 @@ describe("manualReview — admin decisions sync Supabase + status + notification
       state.rows.bank_verifications = [];
       state.rows.verification_requests = [];
 
-      const result = await requestResubmission("missing", "admin-1", "n/a", "admin-1");
+      const result = await requestResubmission(
+        "missing",
+        "admin-1",
+        "n/a",
+        "admin-1",
+      );
       expect(result.success).toBe(false);
       expect(result.error).toContain("not found");
     });
@@ -297,19 +344,26 @@ describe("manualReview — admin decisions sync Supabase + status + notification
         { id: "req-4", user_id: "creator-4", verification_type: "identity" },
       ];
 
-      const result = await suspendVerification("req-4", "admin-1", "Fraud suspicion", "admin-1");
+      const result = await suspendVerification(
+        "req-4",
+        "admin-1",
+        "Fraud suspicion",
+        "admin-1",
+      );
 
       expect(result.success).toBe(true);
 
       const suspendUpdate = state.updates.find(
-        (u) => u.table === "verification_requests" && u.query.id === "req-4"
+        (u) => u.table === "verification_requests" && u.query.id === "req-4",
       );
       expect(suspendUpdate.payload.status).toBe("cancelled");
       expect(suspendUpdate.payload.rejection_reason).toBe("Fraud suspicion");
 
       // Overall status → suspended (blocks publish/funds via isCreatorVerified)
       const creatorUpdate = state.updates.find(
-        (u) => u.table === "creator_verifications" && u.query.user_id === "creator-4"
+        (u) =>
+          u.table === "creator_verifications" &&
+          u.query.user_id === "creator-4",
       );
       expect(creatorUpdate.payload.verification_status).toBe("suspended");
 
@@ -317,7 +371,7 @@ describe("manualReview — admin decisions sync Supabase + status + notification
         expect.objectContaining({
           userId: "creator-4",
           notificationType: "verification_suspended",
-        })
+        }),
       );
     });
 
@@ -353,7 +407,9 @@ describe("manualReview — getReviewQueue enrichment", () => {
       },
     ];
     state.rows.profiles = [{ id: "creator-10", full_name: "Ada Lovelace" }];
-    state.rows.creators = [{ user_id: "creator-10", name: "Ada Lovelace", email: "ada@example.com" }];
+    state.rows.creators = [
+      { user_id: "creator-10", name: "Ada Lovelace", email: "ada@example.com" },
+    ];
     state.rows.verification_documents = [
       {
         id: "doc-1",
@@ -385,10 +441,20 @@ describe("manualReview — getReviewQueue enrichment", () => {
       },
     ];
     state.rows.verification_audit_log = [
-      { id: "aud-1", user_id: "creator-10", event_type: "verification.suspended", action: "verification_suspended", details: {}, created_at: "2026-08-01T00:00:00.000Z" },
+      {
+        id: "aud-1",
+        user_id: "creator-10",
+        event_type: "verification.suspended",
+        action: "verification_suspended",
+        details: {},
+        created_at: "2026-08-01T00:00:00.000Z",
+      },
     ];
 
-    const result = await getReviewQueue({ status: "pending", callerId: "admin-1" });
+    const result = await getReviewQueue({
+      status: "pending",
+      callerId: "admin-1",
+    });
 
     expect(result.success).toBe(true);
     expect(result.requests).toHaveLength(1);
@@ -443,7 +509,10 @@ describe("manualReview — getReviewQueue enrichment", () => {
     state.rows.creator_verifications = [];
     state.rows.verification_audit_log = [];
 
-    const result = await getReviewQueue({ status: "pending", callerId: "admin-1" });
+    const result = await getReviewQueue({
+      status: "pending",
+      callerId: "admin-1",
+    });
 
     // The builder's "submitted"/"pending" filter is a set intersection; both
     // request rows exist so both are returned when no status filtering is

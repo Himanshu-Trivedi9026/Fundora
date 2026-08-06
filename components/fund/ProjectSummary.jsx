@@ -51,7 +51,9 @@ export default function ProjectSummary({ project, creator, onBack }) {
             {project?.title}
           </h1>
           <p className="text-on-surface-variant mt-1 font-inter text-sm md:text-base">
-            {project?.short || project?.description?.slice(0, 120) || "Support this project"}
+            {project?.short ||
+              project?.description?.slice(0, 120) ||
+              "Support this project"}
           </p>
         </div>
       </div>

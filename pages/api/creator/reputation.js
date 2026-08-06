@@ -8,7 +8,10 @@
 import { withAuth } from "../../../lib/withAuth";
 import { rateLimit } from "../../../lib/rateLimit";
 import { logError } from "../../../lib/verification/secureLogger";
-import { getCreatorReputation, calculateCreatorReputation } from "../../../lib/reputation/reputationEngine";
+import {
+  getCreatorReputation,
+  calculateCreatorReputation,
+} from "../../../lib/reputation/reputationEngine";
 
 const rl = rateLimit({ windowMs: 60_000, max: 10 });
 
@@ -21,7 +24,10 @@ export default withAuth(async function handler(req, res, user) {
       if (!result.success) {
         // Try calculating fresh
         const calcResult = await calculateCreatorReputation(user.id);
-        return res.status(200).json({ success: true, data: calcResult.success ? calcResult.data : null });
+        return res.status(200).json({
+          success: true,
+          data: calcResult.success ? calcResult.data : null,
+        });
       }
       return res.status(200).json({ success: true, data: result.data });
     } catch (err) {

@@ -41,10 +41,7 @@ export default function ProjectCard({ project, currentUserId, creatorName }) {
 
   /* ---------------- CALCULATIONS ---------------- */
   const fundedPercent = project.goal
-    ? Math.min(
-        Math.round(((project.pledged || 0) / project.goal) * 100),
-        100
-      )
+    ? Math.min(Math.round(((project.pledged || 0) / project.goal) * 100), 100)
     : 0;
 
   const isOwner = currentUserId === project.owner_id;
@@ -53,7 +50,12 @@ export default function ProjectCard({ project, currentUserId, creatorName }) {
   return (
     <article
       onClick={() => router.push(`/projects/${project.id}`)}
-      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); router.push(`/projects/${project.id}`); } }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          router.push(`/projects/${project.id}`);
+        }
+      }}
       tabIndex={0}
       role="link"
       aria-label={`View project: ${project.title}`}

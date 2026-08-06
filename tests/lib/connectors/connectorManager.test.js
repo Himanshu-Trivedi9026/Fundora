@@ -16,7 +16,11 @@ vi.mock("../../../lib/supabaseAdmin.js", () => {
     supabaseAdmin: {
       from: vi.fn(() => ({
         insert: vi.fn(() => ({
-          select: vi.fn(() => ({ single: vi.fn().mockResolvedValue({ data: { id: "new-1" }, error: null }) })),
+          select: vi.fn(() => ({
+            single: vi
+              .fn()
+              .mockResolvedValue({ data: { id: "new-1" }, error: null }),
+          })),
         })),
         select: vi.fn(() => ({
           eq: vi.fn(() => ({

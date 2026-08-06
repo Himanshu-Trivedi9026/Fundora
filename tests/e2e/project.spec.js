@@ -11,7 +11,9 @@ test.describe("Project Detail Page", () => {
     const response = await page.goto("/projects/non-existent-project-id");
 
     // Should show 404 or error state
-    expect(response?.status() === 404 || response?.status() === 200).toBeTruthy();
+    expect(
+      response?.status() === 404 || response?.status() === 200,
+    ).toBeTruthy();
   });
 
   test("project page has proper structure", async ({ page }) => {
@@ -33,7 +35,10 @@ test.describe("Project Detail Page", () => {
       await page.waitForTimeout(2000);
 
       // Page should have content
-      const hasContent = await page.locator("main, article, [class*='project']").first().isVisible();
+      const hasContent = await page
+        .locator("main, article, [class*='project']")
+        .first()
+        .isVisible();
       expect(hasContent).toBeTruthy();
     }
   });
@@ -53,7 +58,9 @@ test.describe("Project Detail Content", () => {
     await page.goto(`/projects/${testProjectId}`);
 
     // Check for hero/banner
-    const hero = page.locator('[class*="hero"], [class*="banner"], [class*="Hero"]').first();
+    const hero = page
+      .locator('[class*="hero"], [class*="banner"], [class*="Hero"]')
+      .first();
     const isVisible = await hero.isVisible().catch(() => false);
 
     expect(isVisible || true).toBeTruthy();
@@ -70,7 +77,9 @@ test.describe("Project Detail Content", () => {
     await page.goto(`/projects/${testProjectId}`);
 
     // Look for funding sidebar or amount
-    const fundingSection = page.locator('[class*="funding"], [class*="sidebar"], [class*="Funding"]').first();
+    const fundingSection = page
+      .locator('[class*="funding"], [class*="sidebar"], [class*="Funding"]')
+      .first();
     const isVisible = await fundingSection.isVisible().catch(() => false);
 
     expect(isVisible || true).toBeTruthy();
@@ -87,7 +96,11 @@ test.describe("Project Detail Content", () => {
     await page.goto(`/projects/${testProjectId}`);
 
     // Look for back navigation
-    const backLink = page.locator('a[href="/explore"], button:has-text("Back"), a:has-text("Back")').first();
+    const backLink = page
+      .locator(
+        'a[href="/explore"], button:has-text("Back"), a:has-text("Back")',
+      )
+      .first();
     const isVisible = await backLink.isVisible().catch(() => false);
 
     expect(isVisible || true).toBeTruthy();

@@ -27,7 +27,11 @@ vi.mock("@/lib/ai/copilotEngine.js", () => ({
 import handler from "@/pages/api/ai/chat.js";
 import { askCopilot } from "@/lib/ai/copilotEngine.js";
 
-function createMockReq(method = "POST", body = {}, user = { id: "test-user-id" }) {
+function createMockReq(
+  method = "POST",
+  body = {},
+  user = { id: "test-user-id" },
+) {
   return { method, body, user, query: {} };
 }
 
@@ -63,13 +67,13 @@ describe("POST /api/ai/chat", () => {
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ answer: expect.any(String) })
+      expect.objectContaining({ answer: expect.any(String) }),
     );
     expect(askCopilot).toHaveBeenCalledWith(
       expect.objectContaining({
         question: "What is Fundora?",
         copilotType: "creator",
-      })
+      }),
     );
   });
 
@@ -91,7 +95,7 @@ describe("POST /api/ai/chat", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ error: expect.stringContaining("question") })
+      expect.objectContaining({ error: expect.stringContaining("question") }),
     );
   });
 
@@ -103,12 +107,17 @@ describe("POST /api/ai/chat", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ error: expect.stringContaining("copilotType") })
+      expect.objectContaining({
+        error: expect.stringContaining("copilotType"),
+      }),
     );
   });
 
   it("should return 400 when AI engine fails", async () => {
-    askCopilot.mockResolvedValueOnce({ success: false, error: "AI service unavailable" });
+    askCopilot.mockResolvedValueOnce({
+      success: false,
+      error: "AI service unavailable",
+    });
 
     const req = createMockReq("POST", {
       question: "Help me",
@@ -148,7 +157,7 @@ describe("POST /api/ai/chat", () => {
     await handler(req, res);
 
     expect(askCopilot).toHaveBeenCalledWith(
-      expect.objectContaining({ conversationId: "c-existing" })
+      expect.objectContaining({ conversationId: "c-existing" }),
     );
   });
 });

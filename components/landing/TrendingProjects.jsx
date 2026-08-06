@@ -18,13 +18,20 @@ const stagger = {
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] } },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] },
+  },
 };
 
 /** Days between now and the project deadline (0 when past/unknown). */
 function daysLeft(deadline) {
   if (!deadline) return null;
-  return Math.max(0, Math.ceil((new Date(deadline) - new Date()) / (1000 * 60 * 60 * 24)));
+  return Math.max(
+    0,
+    Math.ceil((new Date(deadline) - new Date()) / (1000 * 60 * 60 * 24)),
+  );
 }
 
 /**
@@ -97,16 +104,24 @@ export default function TrendingProjects({ initial = null }) {
             Trending Campaigns
           </h2>
           <p className="text-on-surface-variant font-inter">
-            Discover top-tier startups vetted by our proprietary Intelligence Layer.
-            Every project undergoes a 200-point AI analysis before listing.
+            Discover top-tier startups vetted by our proprietary Intelligence
+            Layer. Every project undergoes a 200-point AI analysis before
+            listing.
           </p>
         </div>
         <button
-          onClick={() => { router.push("/explore"); }}
+          onClick={() => {
+            router.push("/explore");
+          }}
           className="text-primary font-inter flex items-center gap-2 hover:underline transition-all cursor-pointer shrink-0"
         >
           View all projects
-          <span className="material-symbols-outlined text-lg" aria-hidden="true">arrow_forward</span>
+          <span
+            className="material-symbols-outlined text-lg"
+            aria-hidden="true"
+          >
+            arrow_forward
+          </span>
         </button>
       </div>
 
@@ -118,7 +133,10 @@ export default function TrendingProjects({ initial = null }) {
           aria-hidden="true"
         >
           {[0, 1, 2].map((i) => (
-            <div key={i} className="glass-card rounded-xl overflow-hidden animate-pulse">
+            <div
+              key={i}
+              className="glass-card rounded-xl overflow-hidden animate-pulse"
+            >
               <div className="h-56 bg-surface-container-high" />
               <div className="p-6 space-y-3">
                 <div className="h-3 w-1/3 bg-surface-container-high rounded" />
@@ -133,7 +151,12 @@ export default function TrendingProjects({ initial = null }) {
         /* Empty state — no campaigns yet. Real data only, no placeholders. */
         <div className="glass-card rounded-2xl p-10 md:p-16 text-center max-w-2xl mx-auto">
           <div className="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mx-auto mb-6">
-            <span className="material-symbols-outlined text-primary text-3xl" aria-hidden="true">rocket_launch</span>
+            <span
+              className="material-symbols-outlined text-primary text-3xl"
+              aria-hidden="true"
+            >
+              rocket_launch
+            </span>
           </div>
           <h3 className="font-geist text-2xl font-bold text-on-surface mb-3">
             No campaigns launched yet
@@ -148,7 +171,9 @@ export default function TrendingProjects({ initial = null }) {
             {canStartProject({ role }) && (
               <button
                 type="button"
-                onClick={() => { router.push(startProjectHref({ role })); }}
+                onClick={() => {
+                  router.push(startProjectHref({ role }));
+                }}
                 className="w-full sm:w-auto bg-primary text-on-primary px-6 py-3 rounded-lg font-geist font-semibold shadow-lg shadow-primary/20 hover:opacity-90 transition-all duration-200 cursor-pointer"
               >
                 Start a campaign
@@ -156,7 +181,9 @@ export default function TrendingProjects({ initial = null }) {
             )}
             <button
               type="button"
-              onClick={() => { router.push("/explore"); }}
+              onClick={() => {
+                router.push("/explore");
+              }}
               className="w-full sm:w-auto border border-outline-variant bg-surface-container-low text-on-surface px-6 py-3 rounded-lg font-geist font-semibold hover:bg-surface-container transition-all duration-200 cursor-pointer"
             >
               Explore projects
@@ -190,8 +217,15 @@ export default function TrendingProjects({ initial = null }) {
                 key={project.id}
                 variants={fadeUp}
                 whileHover={{ y: -4 }}
-                onClick={() => { router.push(`/projects/${project.id}`); }}
-                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); router.push(`/projects/${project.id}`); } }}
+                onClick={() => {
+                  router.push(`/projects/${project.id}`);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    router.push(`/projects/${project.id}`);
+                  }
+                }}
                 role="link"
                 tabIndex={0}
                 className="glass-card group rounded-xl overflow-hidden cursor-pointer hover:border-primary/30 transition-all duration-300"
@@ -206,18 +240,33 @@ export default function TrendingProjects({ initial = null }) {
                       fill
                       sizes="(max-width: 640px) 100vw, 300px"
                       quality={60}
-                      onError={() => setImgErrors((prev) => ({ ...prev, [project.id]: true }))}
+                      onError={() =>
+                        setImgErrors((prev) => ({
+                          ...prev,
+                          [project.id]: true,
+                        }))
+                      }
                     />
                   ) : (
                     <div
                       className="w-full h-full bg-surface-container flex items-center justify-center"
                       data-testid="thumbnail-fallback"
                     >
-                      <span className="material-symbols-outlined text-4xl text-on-surface-variant/20" aria-hidden="true">rocket_launch</span>
+                      <span
+                        className="material-symbols-outlined text-4xl text-on-surface-variant/20"
+                        aria-hidden="true"
+                      >
+                        rocket_launch
+                      </span>
                     </div>
                   )}
                   <div className="absolute top-4 right-4 bg-surface-dim/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-inter text-primary flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[14px]" aria-hidden="true">bolt</span>
+                    <span
+                      className="material-symbols-outlined text-[14px]"
+                      aria-hidden="true"
+                    >
+                      bolt
+                    </span>
                     {Math.round(progress)}% Funded
                   </div>
                   {aiScore != null && (
@@ -225,7 +274,12 @@ export default function TrendingProjects({ initial = null }) {
                       className="absolute top-4 left-4 bg-primary/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-inter text-on-primary flex items-center gap-1"
                       title={`Fundora AI score: ${aiScore}/100`}
                     >
-                      <span className="material-symbols-outlined text-[14px]" aria-hidden="true">auto_awesome</span>
+                      <span
+                        className="material-symbols-outlined text-[14px]"
+                        aria-hidden="true"
+                      >
+                        auto_awesome
+                      </span>
                       AI {aiScore}
                     </div>
                   )}
@@ -277,19 +331,25 @@ export default function TrendingProjects({ initial = null }) {
                         <p className="text-on-surface font-bold font-inter text-sm">
                           ₹{pledged.toLocaleString("en-IN")}
                         </p>
-                        <p className="text-xs text-on-surface-variant uppercase font-inter">Raised</p>
+                        <p className="text-xs text-on-surface-variant uppercase font-inter">
+                          Raised
+                        </p>
                       </div>
                       <div>
                         <p className="text-on-surface font-bold font-inter text-sm">
                           ₹{goal.toLocaleString("en-IN")}
                         </p>
-                        <p className="text-xs text-on-surface-variant uppercase font-inter">Goal</p>
+                        <p className="text-xs text-on-surface-variant uppercase font-inter">
+                          Goal
+                        </p>
                       </div>
                       <div>
                         <p className="text-on-surface font-bold font-inter text-sm">
                           {remaining !== null ? `${remaining} Days` : "—"}
                         </p>
-                        <p className="text-xs text-on-surface-variant uppercase font-inter">Left</p>
+                        <p className="text-xs text-on-surface-variant uppercase font-inter">
+                          Left
+                        </p>
                       </div>
                     </div>
                   </div>

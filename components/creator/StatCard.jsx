@@ -5,7 +5,15 @@ import AnimatedCounter from "./AnimatedCounter";
  * StatCard — glass card with animated counter.
  * icon: Material Symbol name string.
  */
-export default function StatCard({ icon, value, label, prefix, suffix, decimals, delay = 0 }) {
+export default function StatCard({
+  icon,
+  value,
+  label,
+  prefix,
+  suffix,
+  decimals,
+  delay = 0,
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -28,7 +36,9 @@ export default function StatCard({ icon, value, label, prefix, suffix, decimals,
         decimals={decimals}
         className="font-geist text-3xl font-bold text-on-surface"
       />
-      <span className="text-on-surface-variant text-xs mt-1 font-inter">{label}</span>
+      <span className="text-on-surface-variant text-xs mt-1 font-inter">
+        {label}
+      </span>
     </motion.div>
   );
 }

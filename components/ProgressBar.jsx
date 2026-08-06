@@ -24,14 +24,12 @@ export default function ProgressBar({ pledged = 0, goal = 100 }) {
         aria-valuemax={100}
         aria-label={`Funding progress: ${percent}%`}
       >
-
         {/* GLOW BACKDROP */}
         <div
           className="absolute inset-0 blur-md opacity-40 transition-all duration-700"
           style={{
             width: `${animatedWidth}%`,
-            background:
-              "linear-gradient(90deg, #22c55e, #4ade80, #22c55e)",
+            background: "linear-gradient(90deg, #22c55e, #4ade80, #22c55e)",
           }}
         />
 
@@ -40,8 +38,7 @@ export default function ProgressBar({ pledged = 0, goal = 100 }) {
           className="relative h-full rounded-full transition-all duration-700 ease-out"
           style={{
             width: `${animatedWidth}%`,
-            background:
-              "linear-gradient(90deg, #16a34a, #4ade80, #22c55e)",
+            background: "linear-gradient(90deg, #16a34a, #4ade80, #22c55e)",
           }}
         />
       </div>

@@ -53,7 +53,11 @@ describe("WebhookEngine", () => {
         insert: vi.fn().mockReturnValue({
           select: vi.fn().mockReturnValue({
             single: vi.fn().mockResolvedValue({
-              data: { id: "wh-1", url: "https://example.com/hook", secret: "whsec_abc" },
+              data: {
+                id: "wh-1",
+                url: "https://example.com/hook",
+                secret: "whsec_abc",
+              },
               error: null,
             }),
           }),
@@ -93,7 +97,10 @@ describe("WebhookEngine", () => {
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: { user_id: "user-1" }, error: null }),
+              single: vi.fn().mockResolvedValue({
+                data: { user_id: "user-1" },
+                error: null,
+              }),
             }),
           }),
         })
@@ -111,7 +118,10 @@ describe("WebhookEngine", () => {
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: { user_id: "other-user" }, error: null }),
+            single: vi.fn().mockResolvedValue({
+              data: { user_id: "other-user" },
+              error: null,
+            }),
           }),
         }),
       });
@@ -129,8 +139,16 @@ describe("WebhookEngine", () => {
             eq: vi.fn().mockReturnValue({
               eq: vi.fn().mockResolvedValue({
                 data: [
-                  { id: "wh-1", secret: "whsec_abc", events: ["donation.received"] },
-                  { id: "wh-2", secret: "whsec_def", events: ["donation.received", "campaign.created"] },
+                  {
+                    id: "wh-1",
+                    secret: "whsec_abc",
+                    events: ["donation.received"],
+                  },
+                  {
+                    id: "wh-2",
+                    secret: "whsec_def",
+                    events: ["donation.received", "campaign.created"],
+                  },
                 ],
                 error: null,
               }),

@@ -79,7 +79,11 @@ describe("DeveloperAppEngine", () => {
           eq: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               maybeSingle: vi.fn().mockResolvedValue({
-                data: { id: "app-1", status: "active", client_secret_hash: "hash" },
+                data: {
+                  id: "app-1",
+                  status: "active",
+                  client_secret_hash: "hash",
+                },
                 error: null,
               }),
             }),
@@ -99,7 +103,9 @@ describe("DeveloperAppEngine", () => {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+              maybeSingle: vi
+                .fn()
+                .mockResolvedValue({ data: null, error: null }),
             }),
           }),
         }),

@@ -37,15 +37,16 @@
 
 ### 1.1 `POST /api/account/delete`
 
-| Field | Detail |
-|-------|--------|
-| **Method** | `POST` |
-| **URL** | `/api/account/delete` |
-| **Auth** | Required — `withAuth` (session cookie) |
-| **Headers** | `Cookie: sb-...` (Supabase session); `Content-Type: application/json` |
-| **Rate Limit** | 5 requests/min |
+| Field          | Detail                                                                |
+| -------------- | --------------------------------------------------------------------- |
+| **Method**     | `POST`                                                                |
+| **URL**        | `/api/account/delete`                                                 |
+| **Auth**       | Required — `withAuth` (session cookie)                                |
+| **Headers**    | `Cookie: sb-...` (Supabase session); `Content-Type: application/json` |
+| **Rate Limit** | 5 requests/min                                                        |
 
 **Request Body:**
+
 ```json
 {
   "confirmation": true
@@ -53,11 +54,13 @@
 ```
 
 **Validation Rules:**
-| Rule | Error |
-|------|-------|
+
+| Rule                          | Error                             |
+| ----------------------------- | --------------------------------- |
 | `confirmation` must be `true` | 400: `"confirmation is required"` |
 
 **Expected Response (200):**
+
 ```json
 {
   "success": true
@@ -65,6 +68,7 @@
 ```
 
 **Failure Response (400):**
+
 ```json
 {
   "error": "confirmation is required"
@@ -72,6 +76,7 @@
 ```
 
 **Failure Response (405):**
+
 ```json
 {
   "error": "Method not allowed"
@@ -79,6 +84,7 @@
 ```
 
 **Database Effect:**
+
 - User profile deleted or marked deleted
 - Session invalidated
 - Related records (projects, donations) preserved or reassigned based on policy
@@ -86,12 +92,13 @@
 **Permissions:** Only the authenticated account owner.
 
 **Test Cases:**
-| TC-ID | Scenario | Expected |
-|-------|----------|----------|
+
+| TC-ID        | Scenario                           | Expected             |
+| ------------ | ---------------------------------- | -------------------- |
 | API-AUTH-001 | Valid confirm + authenticated user | 200, account deleted |
-| API-AUTH-002 | `confirmation: false` | 400 error |
-| API-AUTH-003 | No session cookie | 401 |
-| API-AUTH-004 | `GET` method | 405 |
+| API-AUTH-002 | `confirmation: false`              | 400 error            |
+| API-AUTH-003 | No session cookie                  | 401                  |
+| API-AUTH-004 | `GET` method                       | 405                  |
 
 ---
 
@@ -99,15 +106,16 @@
 
 ### 2.1 `POST /api/razorpay/create-order`
 
-| Field | Detail |
-|-------|--------|
-| **Method** | `POST` |
-| **URL** | `/api/razorpay/create-order` |
-| **Auth** | Required — `withAuth` |
-| **Headers** | `Cookie: <session>`; `Content-Type: application/json` |
-| **Rate Limit** | 10 requests/min |
+| Field          | Detail                                                |
+| -------------- | ----------------------------------------------------- |
+| **Method**     | `POST`                                                |
+| **URL**        | `/api/razorpay/create-order`                          |
+| **Auth**       | Required — `withAuth`                                 |
+| **Headers**    | `Cookie: <session>`; `Content-Type: application/json` |
+| **Rate Limit** | 10 requests/min                                       |
 
 **Request Body:**
+
 ```json
 {
   "amount": 500,
@@ -116,14 +124,16 @@
 ```
 
 **Validation Rules:**
-| Rule | Error |
-|------|-------|
-| `amount` must be > 0 and finite | 400: `"Invalid amount"` |
-| `projectId` required | 400: `"projectId is required"` |
-| Project must exist | 404: `"Project not found"` |
+
+| Rule                                    | Error                                  |
+| --------------------------------------- | -------------------------------------- |
+| `amount` must be > 0 and finite         | 400: `"Invalid amount"`                |
+| `projectId` required                    | 400: `"projectId is required"`         |
+| Project must exist                      | 404: `"Project not found"`             |
 | Razorpay credentials must be configured | 500: `"Payment system not configured"` |
 
 **Expected Response (200):**
+
 ```json
 {
   "id": "order_P7abc123xyz",
@@ -135,6 +145,7 @@
 ```
 
 **Failure Response (400/404/500):**
+
 ```json
 { "error": "Invalid amount" }
 ```
@@ -144,30 +155,32 @@
 **Permissions:** Any authenticated user.
 
 **Test Cases:**
-| TC-ID | Scenario | Expected |
-|-------|----------|----------|
+
+| TC-ID       | Scenario                 | Expected              |
+| ----------- | ------------------------ | --------------------- |
 | API-PAY-001 | Valid amount + projectId | 200, orderId returned |
-| API-PAY-002 | Zero or negative amount | 400 |
-| API-PAY-003 | Non-numeric amount | 400 |
-| API-PAY-004 | Missing projectId | 400 |
-| API-PAY-005 | Non-existent projectId | 404 |
-| API-PAY-006 | Unauthenticated | 401 |
-| API-PAY-007 | POST rate limit exceeded | 429 |
-| API-PAY-008 | `GET` method | 405 |
+| API-PAY-002 | Zero or negative amount  | 400                   |
+| API-PAY-003 | Non-numeric amount       | 400                   |
+| API-PAY-004 | Missing projectId        | 400                   |
+| API-PAY-005 | Non-existent projectId   | 404                   |
+| API-PAY-006 | Unauthenticated          | 401                   |
+| API-PAY-007 | POST rate limit exceeded | 429                   |
+| API-PAY-008 | `GET` method             | 405                   |
 
 ---
 
 ### 2.2 `POST /api/razorpay/verify`
 
-| Field | Detail |
-|-------|--------|
-| **Method** | `POST` |
-| **URL** | `/api/razorpay/verify` |
-| **Auth** | Required — `withAuth` |
-| **Headers** | `Cookie: <session>`; `Content-Type: application/json` |
-| **Rate Limit** | 10 requests/min |
+| Field          | Detail                                                |
+| -------------- | ----------------------------------------------------- |
+| **Method**     | `POST`                                                |
+| **URL**        | `/api/razorpay/verify`                                |
+| **Auth**       | Required — `withAuth`                                 |
+| **Headers**    | `Cookie: <session>`; `Content-Type: application/json` |
+| **Rate Limit** | 10 requests/min                                       |
 
 **Request Body:**
+
 ```json
 {
   "razorpay_payment_id": "pay_P7xyz",
@@ -179,15 +192,17 @@
 ```
 
 **Validation Rules:**
-| Rule | Error |
-|------|-------|
-| All Razorpay fields required + must be strings | 400 |
-| `projectId` required + must be string | 400 |
-| `amount` must be > 0 and finite | 400 |
-| Signature must match HMAC-SHA256 | 400: `"Invalid payment signature"` |
-| Project must exist | 404 |
+
+| Rule                                           | Error                              |
+| ---------------------------------------------- | ---------------------------------- |
+| All Razorpay fields required + must be strings | 400                                |
+| `projectId` required + must be string          | 400                                |
+| `amount` must be > 0 and finite                | 400                                |
+| Signature must match HMAC-SHA256               | 400: `"Invalid payment signature"` |
+| Project must exist                             | 404                                |
 
 **Expected Response (200):**
+
 ```json
 {
   "success": true,
@@ -196,40 +211,44 @@
 ```
 
 **Failure Response (400):**
+
 ```json
 { "error": "Invalid payment signature" }
 ```
 
 **Database Effect:**
+
 - `public_donations` row inserted with `status: "paid"`
 - Project funding incremented via `increment_project_funding` RPC
 
 **Permissions:** Any authenticated user.
 
 **Test Cases:**
-| TC-ID | Scenario | Expected |
-|-------|----------|----------|
-| API-PAY-010 | Valid signature + valid project | 200, donationId returned |
-| API-PAY-011 | Invalid signature | 400 |
-| API-PAY-012 | Missing any required field | 400 |
+
+| TC-ID       | Scenario                           | Expected                  |
+| ----------- | ---------------------------------- | ------------------------- |
+| API-PAY-010 | Valid signature + valid project    | 200, donationId returned  |
+| API-PAY-011 | Invalid signature                  | 400                       |
+| API-PAY-012 | Missing any required field         | 400                       |
 | API-PAY-013 | Duplicate payment_id (idempotency) | Depends on DB constraints |
-| API-PAY-014 | Non-existent projectId | 404 |
-| API-PAY-015 | Unauthenticated | 401 |
+| API-PAY-014 | Non-existent projectId             | 404                       |
+| API-PAY-015 | Unauthenticated                    | 401                       |
 
 ---
 
 ### 2.3 `POST /api/razorpay/webhook`
 
-| Field | Detail |
-|-------|--------|
-| **Method** | `POST` |
-| **URL** | `/api/razorpay/webhook` |
-| **Auth** | None — verified via HMAC signature |
-| **Headers** | `x-razorpay-signature: <sha256hex>`; `Content-Type: application/json` |
-| **Body Parser** | `bodyParser: false` (raw body read) |
-| **Rate Limit** | No explicit per-route limit |
+| Field           | Detail                                                                |
+| --------------- | --------------------------------------------------------------------- |
+| **Method**      | `POST`                                                                |
+| **URL**         | `/api/razorpay/webhook`                                               |
+| **Auth**        | None — verified via HMAC signature                                    |
+| **Headers**     | `x-razorpay-signature: <sha256hex>`; `Content-Type: application/json` |
+| **Body Parser** | `bodyParser: false` (raw body read)                                   |
+| **Rate Limit**  | No explicit per-route limit                                           |
 
 **Request Body:**
+
 ```json
 {
   "event": "payment.captured",
@@ -249,23 +268,27 @@
 ```
 
 **Validation Rules:**
-| Rule | Error |
-|------|-------|
-| HMAC-SHA256 signature must match | 400: `"Invalid signature"` |
-| Payload must be valid JSON | 400: `"Invalid JSON payload"` |
+
+| Rule                                                | Error                          |
+| --------------------------------------------------- | ------------------------------ |
+| HMAC-SHA256 signature must match                    | 400: `"Invalid signature"`     |
+| Payload must be valid JSON                          | 400: `"Invalid JSON payload"`  |
 | `payment.notes.projectId` must exist for processing | Skips with `{ success: true }` |
 
 **Expected Response (200):**
+
 ```json
 { "success": true }
 ```
 
 **Failure Response (400):**
+
 ```json
 { "error": "Invalid signature" }
 ```
 
 **Database Effect:**
+
 - `payment.captured` → inserts into `public_donations` (if not duplicate) + updates project funding via RPC
 - `payment.failed` → logged only
 - `refund.processed` → logged only
@@ -274,28 +297,30 @@
 **Permissions:** None (webhook is external).
 
 **Test Cases:**
-| TC-ID | Scenario | Expected |
-|-------|----------|----------|
-| API-PAY-020 | Valid signature + payment.captured | 200, donation recorded |
-| API-PAY-021 | Invalid signature | 400 |
-| API-PAY-022 | Duplicate payment ID | 200, `{ duplicate: true }` |
-| API-PAY-023 | Missing projectId in notes | 200, skipped |
-| API-PAY-024 | payment.failed event | 200, logged only |
-| API-PAY-025 | Invalid JSON body | 400 |
+
+| TC-ID       | Scenario                           | Expected                   |
+| ----------- | ---------------------------------- | -------------------------- |
+| API-PAY-020 | Valid signature + payment.captured | 200, donation recorded     |
+| API-PAY-021 | Invalid signature                  | 400                        |
+| API-PAY-022 | Duplicate payment ID               | 200, `{ duplicate: true }` |
+| API-PAY-023 | Missing projectId in notes         | 200, skipped               |
+| API-PAY-024 | payment.failed event               | 200, logged only           |
+| API-PAY-025 | Invalid JSON body                  | 400                        |
 
 ---
 
 ### 2.4 `POST /api/receipts/generate`
 
-| Field | Detail |
-|-------|--------|
-| **Method** | `POST` |
-| **URL** | `/api/receipts/generate` |
-| **Auth** | Required — `withAuth` |
-| **Headers** | `Cookie: <session>`; `Content-Type: application/json` |
-| **Rate Limit** | 10 requests/min |
+| Field          | Detail                                                |
+| -------------- | ----------------------------------------------------- |
+| **Method**     | `POST`                                                |
+| **URL**        | `/api/receipts/generate`                              |
+| **Auth**       | Required — `withAuth`                                 |
+| **Headers**    | `Cookie: <session>`; `Content-Type: application/json` |
+| **Rate Limit** | 10 requests/min                                       |
 
 **Request Body:**
+
 ```json
 {
   "donationIds": ["uuid-1", "uuid-2"]
@@ -306,6 +331,7 @@
 PDF binary stream (Content-Type: application/pdf)
 
 **Failure Response (400):**
+
 ```json
 { "error": "donationIds required" }
 ```
@@ -318,15 +344,16 @@ PDF binary stream (Content-Type: application/pdf)
 
 ### 2.5 `POST /api/export-analytics`
 
-| Field | Detail |
-|-------|--------|
-| **Method** | `POST` |
-| **URL** | `/api/export-analytics` |
-| **Auth** | Required — `withAuth` |
-| **Headers** | `Cookie: <session>`; `Content-Type: application/json` |
-| **Rate Limit** | 5 requests/min |
+| Field          | Detail                                                |
+| -------------- | ----------------------------------------------------- |
+| **Method**     | `POST`                                                |
+| **URL**        | `/api/export-analytics`                               |
+| **Auth**       | Required — `withAuth`                                 |
+| **Headers**    | `Cookie: <session>`; `Content-Type: application/json` |
+| **Rate Limit** | 5 requests/min                                        |
 
 **Request Body:**
+
 ```json
 {
   "format": "pdf",
@@ -338,6 +365,7 @@ PDF binary stream (Content-Type: application/pdf)
 PDF binary stream or JSON with download URL.
 
 **Failure Response:**
+
 ```json
 { "success": false, "error": "message" }
 ```
@@ -348,14 +376,15 @@ PDF binary stream or JSON with download URL.
 
 ### 3.1 `GET /api/creator/razorpay-config`
 
-| Field | Detail |
-|-------|--------|
-| **Method** | `GET` |
-| **URL** | `/api/creator/razorpay-config` |
-| **Auth** | Required — `withAuth` |
-| **Headers** | `Cookie: <session>` |
+| Field       | Detail                         |
+| ----------- | ------------------------------ |
+| **Method**  | `GET`                          |
+| **URL**     | `/api/creator/razorpay-config` |
+| **Auth**    | Required — `withAuth`          |
+| **Headers** | `Cookie: <session>`            |
 
 **Expected Response (200):**
+
 ```json
 {
   "success": true,
@@ -366,31 +395,33 @@ PDF binary stream or JSON with download URL.
 
 ### 3.2 `GET /api/creator/balance`
 
-| Field | Detail |
-|-------|--------|
-| **Method** | `GET` |
-| **URL** | `/api/creator/balance` |
-| **Auth** | Required — `withAuth` |
+| Field      | Detail                 |
+| ---------- | ---------------------- |
+| **Method** | `GET`                  |
+| **URL**    | `/api/creator/balance` |
+| **Auth**   | Required — `withAuth`  |
 
 **Expected Response (200):**
+
 ```json
 {
   "success": true,
-  "balance": 25000.50,
-  "pending": 5000.00,
-  "withdrawn": 100000.00
+  "balance": 25000.5,
+  "pending": 5000.0,
+  "withdrawn": 100000.0
 }
 ```
 
 ### 3.3 `GET /api/creator/reputation`
 
-| Field | Detail |
-|-------|--------|
-| **Method** | `GET` |
-| **URL** | `/api/creator/reputation` |
-| **Auth** | Required — `withAuth` |
+| Field      | Detail                    |
+| ---------- | ------------------------- |
+| **Method** | `GET`                     |
+| **URL**    | `/api/creator/reputation` |
+| **Auth**   | Required — `withAuth`     |
 
 **Expected Response (200):**
+
 ```json
 {
   "success": true,
@@ -423,6 +454,7 @@ Response format: `{ success: true, ... }` or `{ error: "message" }`
 **`PUT /api/verification/business`** — Upload business document.
 
 **Request (POST):**
+
 ```json
 {
   "verificationId": "uuid",
@@ -435,6 +467,7 @@ Response format: `{ success: true, ... }` or `{ error: "message" }`
 ```
 
 **Request (PUT):**
+
 ```json
 {
   "verificationId": "uuid",
@@ -444,6 +477,7 @@ Response format: `{ success: true, ... }` or `{ error: "message" }`
 ```
 
 **Expected Response (POST 200):**
+
 ```json
 { "success": true }
 ```
@@ -457,6 +491,7 @@ Response format: `{ success: true, ... }` or `{ error: "message" }`
 **`POST /api/verification/bank`** — Add bank account.
 
 **Request (POST):**
+
 ```json
 {
   "accountNumber": "1234567890",
@@ -468,11 +503,12 @@ Response format: `{ success: true, ... }` or `{ error: "message" }`
 ```
 
 **Validation:**
-| Rule | Error |
-|------|-------|
-| Account numbers must match | 400: `"Account numbers do not match"` |
-| IFSC format (4 letters + 0 + 6 alphanumeric) | 400: `"Invalid IFSC format"` |
-| All fields required | 400 |
+
+| Rule                                         | Error                                 |
+| -------------------------------------------- | ------------------------------------- |
+| Account numbers must match                   | 400: `"Account numbers do not match"` |
+| IFSC format (4 letters + 0 + 6 alphanumeric) | 400: `"Invalid IFSC format"`          |
+| All fields required                          | 400                                   |
 
 **Database Effect:** `bank_accounts` table insert with AES-256-GCM encrypted account number.
 
@@ -489,11 +525,13 @@ Verifies bank account via penny drop. Triggers provider call. Status → "Verifi
 ### 4.4 GST / PAN
 
 **`POST /api/verification/gst`**
+
 ```json
 { "gstNumber": "27AABCU9603R1ZX" }
 ```
 
 **`POST /api/verification/pan`**
+
 ```json
 { "panNumber": "ABCDE1234F" }
 ```
@@ -507,11 +545,11 @@ Both validated via mocking provider.
 
 ### 4.6 Admin Review
 
-| Endpoint | Method | Auth | Purpose |
-|----------|--------|------|---------|
+| Endpoint                     | Method   | Auth  | Purpose                     |
+| ---------------------------- | -------- | ----- | --------------------------- |
 | `/api/admin/business-review` | GET/POST | Admin | Review business submissions |
-| `/api/admin/bank-review` | GET/POST | Admin | Review bank submissions |
-| `/api/admin/review-queue` | GET | Admin | Pending review queue |
+| `/api/admin/bank-review`     | GET/POST | Admin | Review bank submissions     |
+| `/api/admin/review-queue`    | GET      | Admin | Pending review queue        |
 
 ---
 
@@ -519,14 +557,15 @@ Both validated via mocking provider.
 
 ### 5.1 `POST /api/fraud/evaluate`
 
-| Field | Detail |
-|-------|--------|
-| **Method** | `POST` |
-| **URL** | `/api/fraud/evaluate` |
-| **Auth** | Required — `withAuth` |
-| **Rate Limit** | 10/min |
+| Field          | Detail                |
+| -------------- | --------------------- |
+| **Method**     | `POST`                |
+| **URL**        | `/api/fraud/evaluate` |
+| **Auth**       | Required — `withAuth` |
+| **Rate Limit** | 10/min                |
 
 **Request Body:**
+
 ```json
 {
   "userId": "uuid (optional, defaults to caller)",
@@ -539,6 +578,7 @@ Both validated via mocking provider.
 ```
 
 **Expected Response (200):**
+
 ```json
 {
   "success": true,
@@ -553,9 +593,13 @@ Both validated via mocking provider.
 **Database Effect:** Reads risk signals, evaluates, returns result. May log to `fraud_events`.
 
 ### 5.2 `GET /api/fraud/events` — Get fraud events for user
+
 ### 5.3 `GET /api/fraud/profile` — Get risk profile
+
 ### 5.4 `GET /api/fraud/devices` — Get device fingerprints
+
 ### 5.5 `GET /api/fraud/history` — Get fraud event history
+
 ### 5.6 `GET /api/admin/fraud-dashboard` — Admin fraud case management
 
 ---
@@ -569,6 +613,7 @@ Both validated via mocking provider.
 **`POST /api/escrow/account`** — Create.
 
 **Request (POST):**
+
 ```json
 {
   "campaignId": "uuid",
@@ -587,6 +632,7 @@ Both validated via mocking provider.
 **`GET /api/escrow/ledger?accountId=uuid`** — Append-only transaction log.
 
 **Expected Response (200):**
+
 ```json
 {
   "success": true,
@@ -621,13 +667,14 @@ Both validated via mocking provider.
 
 ### 6.4 Milestones
 
-| Endpoint | Methods | Purpose |
-|----------|---------|---------|
-| `/api/milestone/index` | GET, POST | List/create milestones |
-| `/api/milestone/submit` | POST | Submit milestone complete + evidence |
-| `/api/milestone/review` | POST | Donor approve/reject milestone |
+| Endpoint                | Methods   | Purpose                              |
+| ----------------------- | --------- | ------------------------------------ |
+| `/api/milestone/index`  | GET, POST | List/create milestones               |
+| `/api/milestone/submit` | POST      | Submit milestone complete + evidence |
+| `/api/milestone/review` | POST      | Donor approve/reject milestone       |
 
 **Milestone Submit Request:**
+
 ```json
 {
   "milestoneId": "uuid",
@@ -637,6 +684,7 @@ Both validated via mocking provider.
 ```
 
 **Milestone Review Request:**
+
 ```json
 {
   "milestoneId": "uuid",
@@ -647,12 +695,13 @@ Both validated via mocking provider.
 
 ### 6.5 Payouts
 
-| Endpoint | Methods | Purpose |
-|----------|---------|---------|
-| `/api/payout/index` | GET, POST | List/request payouts |
-| `/api/payout/status` | GET | Check payout status |
+| Endpoint             | Methods   | Purpose              |
+| -------------------- | --------- | -------------------- |
+| `/api/payout/index`  | GET, POST | List/request payouts |
+| `/api/payout/status` | GET       | Check payout status  |
 
 **Payout Request (POST):**
+
 ```json
 {
   "amount": 10000,
@@ -661,18 +710,19 @@ Both validated via mocking provider.
 ```
 
 **Validation:**
-| Rule | Error |
-|------|-------|
-| `amount` > available balance | 400: `"Insufficient balance"` |
-| `amount` must be > 0 | 400 |
-| `bankAccountId` must be verified | 400: `"Verify bank first"` |
+
+| Rule                             | Error                         |
+| -------------------------------- | ----------------------------- |
+| `amount` > available balance     | 400: `"Insufficient balance"` |
+| `amount` must be > 0             | 400                           |
+| `bankAccountId` must be verified | 400: `"Verify bank first"`    |
 
 ### 6.6 Admin Escrow/Payout
 
-| Endpoint | Methods | Purpose |
-|----------|---------|---------|
-| `/api/admin/escrow-dashboard` | GET | Escrow overview |
-| `/api/admin/payout-review` | GET, POST | Review/approve payouts |
+| Endpoint                      | Methods   | Purpose                |
+| ----------------------------- | --------- | ---------------------- |
+| `/api/admin/escrow-dashboard` | GET       | Escrow overview        |
+| `/api/admin/payout-review`    | GET, POST | Review/approve payouts |
 
 ---
 
@@ -684,6 +734,7 @@ Both validated via mocking provider.
 **`POST /api/admin/compliance-dashboard`** — Create/resolve case, apply penalty.
 
 **Request (POST):**
+
 ```json
 {
   "action": "create",
@@ -701,6 +752,7 @@ Both validated via mocking provider.
 **`POST /api/appeals/index`** — Submit appeal.
 
 **Request (POST):**
+
 ```json
 {
   "caseId": "uuid",
@@ -735,22 +787,23 @@ Both validated via mocking provider.
 
 **`POST /api/organization/index`** — Create/update/delete/archive/transfer.
 
-| Action | Required | Purpose |
-|--------|----------|---------|
-| `create` | `name`, `slug` | New org |
-| `update` | `orgId`, `updates` | Edit org |
-| `delete` | `orgId` | Delete org |
-| `archive` | `orgId` | Archive org |
-| `transfer_ownership` | `orgId`, `newOwnerId` | Transfer |
+| Action               | Required              | Purpose     |
+| -------------------- | --------------------- | ----------- |
+| `create`             | `name`, `slug`        | New org     |
+| `update`             | `orgId`, `updates`    | Edit org    |
+| `delete`             | `orgId`               | Delete org  |
+| `archive`            | `orgId`               | Archive org |
+| `transfer_ownership` | `orgId`, `newOwnerId` | Transfer    |
 
 **Rate Limit:** 30/min.
 
 **Validation:**
-| Rule | Error |
-|------|-------|
-| `name` + `slug` required for create | 400 |
-| `orgId` required for update/delete/archive/transfer | 400 |
-| Slug must be unique | 400 |
+
+| Rule                                                | Error |
+| --------------------------------------------------- | ----- |
+| `name` + `slug` required for create                 | 400   |
+| `orgId` required for update/delete/archive/transfer | 400   |
+| Slug must be unique                                 | 400   |
 
 ### 8.2 Organization Members
 
@@ -763,6 +816,7 @@ Both validated via mocking provider.
 **`POST /api/organization/invitations`** — Invite member / accept / decline.
 
 **Invite Request:**
+
 ```json
 {
   "action": "invite",
@@ -791,6 +845,7 @@ Both validated via mocking provider.
 **`POST /api/rbac/roles`** — Create/update/delete role.
 
 **Request (POST):**
+
 ```json
 {
   "action": "create",
@@ -814,6 +869,7 @@ Both validated via mocking provider.
 **`POST /api/api-platform/keys`** — Generate/revoke key.
 
 **Request (POST - Generate):**
+
 ```json
 {
   "action": "generate",
@@ -823,6 +879,7 @@ Both validated via mocking provider.
 ```
 
 **Expected Response (201):**
+
 ```json
 {
   "success": true,
@@ -833,6 +890,7 @@ Both validated via mocking provider.
 ```
 
 **Request (POST - Revoke):**
+
 ```json
 { "action": "revoke", "keyId": "uuid" }
 ```
@@ -843,6 +901,7 @@ Both validated via mocking provider.
 **`POST /api/api-platform/apps`** — Register/update/delete app.
 
 **Register Request:**
+
 ```json
 {
   "action": "register",
@@ -868,6 +927,7 @@ Response format: `{ success: true, data: { ... } }` or `{ error: "..." }`
 **Rate Limit:** 30/min
 
 **Request:**
+
 ```json
 {
   "question": "How can I improve my campaign?",
@@ -877,12 +937,14 @@ Response format: `{ success: true, data: { ... } }` or `{ error: "..." }`
 ```
 
 **Validation:**
-| Rule | Error |
-|------|-------|
-| `question` required | 400 |
-| `copilotType` required | 400 |
+
+| Rule                   | Error |
+| ---------------------- | ----- |
+| `question` required    | 400   |
+| `copilotType` required | 400   |
 
 **Expected Response (200):**
+
 ```json
 {
   "success": true,
@@ -899,6 +961,7 @@ Response format: `{ success: true, data: { ... } }` or `{ error: "..." }`
 Executes AI agent with task description.
 
 **Request:**
+
 ```json
 {
   "agentType": "campaign_reviewer",
@@ -911,6 +974,7 @@ Executes AI agent with task description.
 Get/set AI provider configuration.
 
 **POST Request:**
+
 ```json
 {
   "provider": "openai",
@@ -928,6 +992,7 @@ List and manage AI model providers.
 Get campaign success prediction.
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -953,6 +1018,7 @@ Token/cost tracking per user.
 CRUD for knowledge base articles with semantic search.
 
 **POST Request:**
+
 ```json
 {
   "title": "How to set up a campaign",
@@ -968,6 +1034,7 @@ CRUD for knowledge base articles with semantic search.
 Generate campaign description from keywords.
 
 **Request:**
+
 ```json
 {
   "keywords": ["education", "rural", "school"],
@@ -1017,26 +1084,26 @@ Detect suspicious content patterns.
 
 ### 11.1 Marketplace
 
-| Endpoint | Methods | Purpose |
-|----------|---------|---------|
-| `/api/marketplace/featured` | GET | Featured plugins |
-| `/api/marketplace/list` | GET | All plugins with filters |
-| `/api/marketplace/review` | POST | Admin review plugin |
+| Endpoint                    | Methods | Purpose                  |
+| --------------------------- | ------- | ------------------------ |
+| `/api/marketplace/featured` | GET     | Featured plugins         |
+| `/api/marketplace/list`     | GET     | All plugins with filters |
+| `/api/marketplace/review`   | POST    | Admin review plugin      |
 
 ### 11.2 Developer
 
-| Endpoint | Methods | Purpose |
-|----------|---------|---------|
-| `/api/developer/register` | POST | Register as developer |
-| `/api/developer/my-plugins` | GET | Developer's plugins |
+| Endpoint                    | Methods | Purpose               |
+| --------------------------- | ------- | --------------------- |
+| `/api/developer/register`   | POST    | Register as developer |
+| `/api/developer/my-plugins` | GET     | Developer's plugins   |
 
 ### 11.3 Plugins
 
-| Endpoint | Methods | Purpose |
-|----------|---------|---------|
-| `/api/plugins/list` | GET | List installed plugins |
-| `/api/plugins/[id]` | GET, POST | Get/update/delete plugin |
-| `/api/plugins/submit` | POST | Submit plugin for review |
+| Endpoint              | Methods   | Purpose                  |
+| --------------------- | --------- | ------------------------ |
+| `/api/plugins/list`   | GET       | List installed plugins   |
+| `/api/plugins/[id]`   | GET, POST | Get/update/delete plugin |
+| `/api/plugins/submit` | POST      | Submit plugin for review |
 
 ---
 
@@ -1044,13 +1111,14 @@ Detect suspicious content patterns.
 
 ### 12.1 Event Bus
 
-| Endpoint | Methods | Rate Limit | Purpose |
-|----------|---------|------------|---------|
-| `/api/events/index` | GET, POST | Standard | Publish/query events |
-| `/api/events/process` | POST | Standard | Process scheduled/DLQ events |
-| `/api/events/subscriptions` | GET, POST | Standard | Manage subscriptions |
+| Endpoint                    | Methods   | Rate Limit | Purpose                      |
+| --------------------------- | --------- | ---------- | ---------------------------- |
+| `/api/events/index`         | GET, POST | Standard   | Publish/query events         |
+| `/api/events/process`       | POST      | Standard   | Process scheduled/DLQ events |
+| `/api/events/subscriptions` | GET, POST | Standard   | Manage subscriptions         |
 
 **POST `/api/events/index` — Publish event:**
+
 ```json
 {
   "eventType": "campaign.created",
@@ -1063,16 +1131,17 @@ Detect suspicious content patterns.
 
 ### 12.2 Agents
 
-| Endpoint | Methods | Purpose |
-|----------|---------|---------|
-| `/api/agents/index` | GET, POST, PUT, DELETE | CRUD agents |
-| `/api/agents/approve` | POST | Approve agent action |
-| `/api/agents/memory` | GET, POST | Agent memory context |
-| `/api/agents/permissions` | GET, POST | Agent permission rules |
-| `/api/agents/run` | POST | Execute agent now |
-| `/api/agents/schedule` | GET, POST | Schedule agent runs |
+| Endpoint                  | Methods                | Purpose                |
+| ------------------------- | ---------------------- | ---------------------- |
+| `/api/agents/index`       | GET, POST, PUT, DELETE | CRUD agents            |
+| `/api/agents/approve`     | POST                   | Approve agent action   |
+| `/api/agents/memory`      | GET, POST              | Agent memory context   |
+| `/api/agents/permissions` | GET, POST              | Agent permission rules |
+| `/api/agents/run`         | POST                   | Execute agent now      |
+| `/api/agents/schedule`    | GET, POST              | Schedule agent runs    |
 
 **Agent create (POST):**
+
 ```json
 {
   "name": "ModeratorBot",
@@ -1083,21 +1152,28 @@ Detect suspicious content patterns.
 
 ### 12.3 Automation Workflows
 
-| Endpoint | Methods | Rate Limit | Purpose |
-|----------|---------|------------|---------|
-| `/api/automation/workflows` | GET, POST | 30/min | List/create workflows |
-| `/api/automation/workflows/[id]` | GET, PUT, DELETE | 30/min | CRUD single workflow |
-| `/api/automation/workflows/[id]/runs` | GET | 30/min | Run history |
-| `/api/automation/workflows/[id]/trigger` | POST | 30/min | Manual trigger |
+| Endpoint                                 | Methods          | Rate Limit | Purpose               |
+| ---------------------------------------- | ---------------- | ---------- | --------------------- |
+| `/api/automation/workflows`              | GET, POST        | 30/min     | List/create workflows |
+| `/api/automation/workflows/[id]`         | GET, PUT, DELETE | 30/min     | CRUD single workflow  |
+| `/api/automation/workflows/[id]/runs`    | GET              | 30/min     | Run history           |
+| `/api/automation/workflows/[id]/trigger` | POST             | 30/min     | Manual trigger        |
 
 **Workflow create (POST):**
+
 ```json
 {
   "name": "New Campaign Alert",
   "description": "Notify team when campaign created",
-  "trigger": { "event": "campaign.created", "filters": { "amount": { "gte": 10000 } } },
+  "trigger": {
+    "event": "campaign.created",
+    "filters": { "amount": { "gte": 10000 } }
+  },
   "steps": [
-    { "type": "send_notification", "config": { "channel": "slack", "message": "...", "template": "..." } }
+    {
+      "type": "send_notification",
+      "config": { "channel": "slack", "message": "...", "template": "..." }
+    }
   ],
   "config": { "maxRetries": 3 }
 }
@@ -1111,14 +1187,15 @@ Detect suspicious content patterns.
 
 ### 13.1 Connectors (`/api/connectors/index`)
 
-| Method | Purpose |
-|--------|---------|
-| `GET` | List connectors (optionally `?providers=true` for available providers) |
-| `POST` | Register new connector |
-| `PUT` | Connect/disconnect/send message (via `action` field) |
-| `DELETE` | Remove connector |
+| Method   | Purpose                                                                |
+| -------- | ---------------------------------------------------------------------- |
+| `GET`    | List connectors (optionally `?providers=true` for available providers) |
+| `POST`   | Register new connector                                                 |
+| `PUT`    | Connect/disconnect/send message (via `action` field)                   |
+| `DELETE` | Remove connector                                                       |
 
 **Register (POST):**
+
 ```json
 {
   "provider": "slack",
@@ -1128,23 +1205,26 @@ Detect suspicious content patterns.
 ```
 
 **Connect (PUT):**
+
 ```json
 { "action": "connect" }
 ```
 
 **Send message (PUT):**
+
 ```json
 { "action": "send", "channel": "#general", "message": "Hello!" }
 ```
 
 ### 13.2 MCP Server (`/api/mcp/index`)
 
-| Method | Purpose |
-|--------|---------|
-| `GET` | List available MCP tools |
-| `POST` | Execute MCP tool |
+| Method | Purpose                  |
+| ------ | ------------------------ |
+| `GET`  | List available MCP tools |
+| `POST` | Execute MCP tool         |
 
 **GET Response:**
+
 ```json
 {
   "success": true,
@@ -1165,6 +1245,7 @@ Detect suspicious content patterns.
 ```
 
 **POST Request:**
+
 ```json
 {
   "tool": "getCampaign",
@@ -1178,13 +1259,14 @@ Detect suspicious content patterns.
 
 ### 14.1 Data Exports
 
-| Endpoint | Methods | Purpose |
-|----------|---------|---------|
-| `/api/exports/index` | GET, POST | List/create exports |
-| `/api/exports/schedule` | GET, POST | Scheduled exports |
-| `/api/exports/templates` | GET, POST | Export templates |
+| Endpoint                 | Methods   | Purpose             |
+| ------------------------ | --------- | ------------------- |
+| `/api/exports/index`     | GET, POST | List/create exports |
+| `/api/exports/schedule`  | GET, POST | Scheduled exports   |
+| `/api/exports/templates` | GET, POST | Export templates    |
 
 **Create export (POST):**
+
 ```json
 {
   "format": "csv",
@@ -1195,21 +1277,22 @@ Detect suspicious content patterns.
 
 ### 14.2 Tenants
 
-| Endpoint | Methods | Purpose |
-|----------|---------|---------|
-| `/api/tenants/index` | GET, POST | List/create tenants |
-| `/api/tenants/branding` | POST | Update tenant branding |
-| `/api/tenants/quotas` | GET, POST | Get/set tenant quotas |
-| `/api/tenants/settings` | GET, POST | Tenant settings |
+| Endpoint                | Methods   | Purpose                |
+| ----------------------- | --------- | ---------------------- |
+| `/api/tenants/index`    | GET, POST | List/create tenants    |
+| `/api/tenants/branding` | POST      | Update tenant branding |
+| `/api/tenants/quotas`   | GET, POST | Get/set tenant quotas  |
+| `/api/tenants/settings` | GET, POST | Tenant settings        |
 
 ### 14.3 Feature Flags
 
-| Endpoint | Methods | Purpose |
-|----------|---------|---------|
-| `/api/flags/index` | GET, POST | List/create/update flags |
-| `/api/flags/abtest` | GET, POST | A/B test configuration |
+| Endpoint            | Methods   | Purpose                  |
+| ------------------- | --------- | ------------------------ |
+| `/api/flags/index`  | GET, POST | List/create/update flags |
+| `/api/flags/abtest` | GET, POST | A/B test configuration   |
 
 **Create flag (POST):**
+
 ```json
 {
   "name": "new_onboarding_flow",
@@ -1225,37 +1308,39 @@ Detect suspicious content patterns.
 
 ### 15.1 Cache (`/api/infrastructure/cache`)
 
-| Method | Purpose |
-|--------|---------|
-| `GET` | Cache stats (hits, misses, size, backend) |
-| `POST` | Invalidate/clear cache |
+| Method | Purpose                                   |
+| ------ | ----------------------------------------- |
+| `GET`  | Cache stats (hits, misses, size, backend) |
+| `POST` | Invalidate/clear cache                    |
 
 **POST Request:**
+
 ```json
 { "action": "invalidate", "key": "cache:key:pattern:*" }
 ```
 
 ### 15.2 Infrastructure Health (`/api/infrastructure/health`)
 
-| Method | Purpose |
-|--------|---------|
-| `GET` | Overall infrastructure health |
+| Method | Purpose                       |
+| ------ | ----------------------------- |
+| `GET`  | Overall infrastructure health |
 
 ### 15.3 Queues (`/api/infrastructure/queues`)
 
-| Method | Purpose |
-|--------|---------|
-| `GET` | Job queue stats |
+| Method | Purpose         |
+| ------ | --------------- |
+| `GET`  | Job queue stats |
 
 ### 15.4 Jobs
 
-| Endpoint | Methods | Purpose |
-|----------|---------|---------|
-| `/api/jobs/index` | GET, POST | List/enqueue/get/cancel jobs |
-| `/api/jobs/process` | POST | Process next pending job |
-| `/api/jobs/schedule` | GET, POST | Job scheduling |
+| Endpoint             | Methods   | Purpose                      |
+| -------------------- | --------- | ---------------------------- |
+| `/api/jobs/index`    | GET, POST | List/enqueue/get/cancel jobs |
+| `/api/jobs/process`  | POST      | Process next pending job     |
+| `/api/jobs/schedule` | GET, POST | Job scheduling               |
 
 **Enqueue (POST):**
+
 ```json
 {
   "jobType": "send_email",
@@ -1268,13 +1353,14 @@ Detect suspicious content patterns.
 
 ### 15.5 Webhooks
 
-| Endpoint | Methods | Purpose |
-|----------|---------|---------|
-| `/api/webhooks/index` | GET, POST | List/create/update/delete webhooks |
-| `/api/webhooks/deliveries` | GET | Delivery logs |
-| `/api/webhooks/test` | POST | Send test ping |
+| Endpoint                   | Methods   | Purpose                            |
+| -------------------------- | --------- | ---------------------------------- |
+| `/api/webhooks/index`      | GET, POST | List/create/update/delete webhooks |
+| `/api/webhooks/deliveries` | GET       | Delivery logs                      |
+| `/api/webhooks/test`       | POST      | Send test ping                     |
 
 **Create webhook (POST):**
+
 ```json
 {
   "action": "create",
@@ -1288,22 +1374,25 @@ Detect suspicious content patterns.
 
 ### 15.6 Notifications
 
-| Endpoint | Methods | Purpose |
-|----------|---------|---------|
-| `/api/notifications/index` | GET, POST, DELETE | List/mark-read/delete notifications |
-| `/api/notifications/preferences` | GET, POST | Notification channel preferences |
+| Endpoint                         | Methods           | Purpose                             |
+| -------------------------------- | ----------------- | ----------------------------------- |
+| `/api/notifications/index`       | GET, POST, DELETE | List/mark-read/delete notifications |
+| `/api/notifications/preferences` | GET, POST         | Notification channel preferences    |
 
 **Mark read (POST):**
+
 ```json
 { "action": "mark_read", "notificationId": "uuid" }
 ```
 
 **Mark all read:**
+
 ```json
 { "action": "mark_all_read" }
 ```
 
 **Preferences (POST):**
+
 ```json
 {
   "channels": { "in_app": true, "email": true, "push": false },
@@ -1320,6 +1409,7 @@ Detect suspicious content patterns.
 **`GET /api/health/index`** — System health (no auth required).
 
 **Response (200):**
+
 ```json
 {
   "status": "healthy",
@@ -1336,6 +1426,7 @@ Detect suspicious content patterns.
 ```
 
 **Response (503) — Degraded:**
+
 ```json
 {
   "status": "unhealthy",
@@ -1349,6 +1440,7 @@ Detect suspicious content patterns.
 **`GET /api/health/database`** — DB-specific health.
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -1366,10 +1458,10 @@ Detect suspicious content patterns.
 
 ### 16.4 Deployments
 
-| Endpoint | Methods | Purpose |
-|----------|---------|---------|
-| `/api/deployments/index` | GET, POST | List/create deployments |
-| `/api/deployments/rollback` | POST | Rollback to version |
+| Endpoint                    | Methods   | Purpose                 |
+| --------------------------- | --------- | ----------------------- |
+| `/api/deployments/index`    | GET, POST | List/create deployments |
+| `/api/deployments/rollback` | POST      | Rollback to version     |
 
 ### 16.5 Metrics
 
@@ -1384,6 +1476,7 @@ Detect suspicious content patterns.
 **`GET /api/i18n/translations?locale=hi`** — Load translations.
 
 **Expected Response:**
+
 ```json
 {
   "success": true,
@@ -1456,18 +1549,18 @@ Detect suspicious content patterns.
 
 ### 17.7 Backup
 
-| Endpoint | Methods | Purpose |
-|----------|---------|---------|
+| Endpoint              | Methods   | Purpose             |
+| --------------------- | --------- | ------------------- |
 | `/api/backup/backups` | GET, POST | List/create backups |
-| `/api/backup/restore` | POST | Restore from backup |
+| `/api/backup/restore` | POST      | Restore from backup |
 
 ### 17.8 Observability
 
-| Endpoint | Methods | Purpose |
-|----------|---------|---------|
-| `/api/observability/metrics` | GET | Platform metrics |
-| `/api/observability/health` | GET | Component health |
-| `/api/observability/alerts` | GET, POST | Alert rules + history |
+| Endpoint                     | Methods   | Purpose               |
+| ---------------------------- | --------- | --------------------- |
+| `/api/observability/metrics` | GET       | Platform metrics      |
+| `/api/observability/health`  | GET       | Component health      |
+| `/api/observability/alerts`  | GET, POST | Alert rules + history |
 
 ### 17.9 Mobile Sync
 
@@ -1475,42 +1568,43 @@ Detect suspicious content patterns.
 
 ### 17.10 Analytics
 
-| Endpoint | Methods | Purpose |
-|----------|---------|---------|
-| `/api/analytics/index` | GET | Platform analytics |
-| `/api/analytics/insights` | GET | AI-powered insights |
-| `/api/analytics/metrics` | GET | Realtime metrics |
-| `/api/analytics/reports` | GET, POST | Custom reports |
+| Endpoint                  | Methods   | Purpose             |
+| ------------------------- | --------- | ------------------- |
+| `/api/analytics/index`    | GET       | Platform analytics  |
+| `/api/analytics/insights` | GET       | AI-powered insights |
+| `/api/analytics/metrics`  | GET       | Realtime metrics    |
+| `/api/analytics/reports`  | GET, POST | Custom reports      |
 
 ---
 
 ## 18. API Test Checklist
 
-| # | Category | State |
-|---|----------|-------|
-| 1.1-1.4 | Authentication | ☐ |
-| 2.1-2.5 | Payments & Receipts | ☐ |
-| 3.1-3.3 | Projects & Creator | ☐ |
-| 4.1-4.6 | Verification (Trust Center) | ☐ |
-| 5.1-5.6 | Fraud Detection | ☐ |
-| 6.1-6.6 | Escrow, Milestones & Payouts | ☐ |
-| 7.1-7.5 | Compliance, Reputation & Governance | ☐ |
-| 8.1-8.7 | Organizations & RBAC | ☐ |
-| 9.1-9.3 | API Platform | ☐ |
-| 10.1-10.15 | AI Platform | ☐ |
-| 11.1-11.3 | Marketplace & Plugins | ☐ |
-| 12.1-12.3 | Events, Agents & Automation | ☐ |
-| 13.1-13.2 | Connectors & MCP | ☐ |
-| 14.1-14.3 | Exports, Tenants & Feature Flags | ☐ |
-| 15.1-15.6 | Infrastructure | ☐ |
-| 16.1-16.5 | Health, Diagnostics & Deployments | ☐ |
-| 17.1-17.10 | Global Platform | ☐ |
+| #          | Category                            | State |
+| ---------- | ----------------------------------- | ----- |
+| 1.1-1.4    | Authentication                      | ☐     |
+| 2.1-2.5    | Payments & Receipts                 | ☐     |
+| 3.1-3.3    | Projects & Creator                  | ☐     |
+| 4.1-4.6    | Verification (Trust Center)         | ☐     |
+| 5.1-5.6    | Fraud Detection                     | ☐     |
+| 6.1-6.6    | Escrow, Milestones & Payouts        | ☐     |
+| 7.1-7.5    | Compliance, Reputation & Governance | ☐     |
+| 8.1-8.7    | Organizations & RBAC                | ☐     |
+| 9.1-9.3    | API Platform                        | ☐     |
+| 10.1-10.15 | AI Platform                         | ☐     |
+| 11.1-11.3  | Marketplace & Plugins               | ☐     |
+| 12.1-12.3  | Events, Agents & Automation         | ☐     |
+| 13.1-13.2  | Connectors & MCP                    | ☐     |
+| 14.1-14.3  | Exports, Tenants & Feature Flags    | ☐     |
+| 15.1-15.6  | Infrastructure                      | ☐     |
+| 16.1-16.5  | Health, Diagnostics & Deployments   | ☐     |
+| 17.1-17.10 | Global Platform                     | ☐     |
 
 ### Key Validation Patterns to Verify
 
 **Response Format:** Every endpoint should return `{ success: boolean, data?: any, error?: string }`.
 
 **HTTP Status Codes:**
+
 - 200 — Success
 - 201 — Created (POST for new resources)
 - 400 — Validation error / bad request
@@ -1527,6 +1621,7 @@ Detect suspicious content patterns.
 **Rate Limiting:** Default 10/min (some endpoints use 30/min or 5/min) — verify 429 when exceeded.
 
 **Sanitization:**
+
 - Bank account numbers masked (`XXXX1234`)
 - Webhook secrets stripped from GET responses
 - Fraud raw scoring details excluded from evaluate response
@@ -1539,4 +1634,4 @@ Detect suspicious content patterns.
 
 ---
 
-*End of API Test Plan*
+_End of API Test Plan_

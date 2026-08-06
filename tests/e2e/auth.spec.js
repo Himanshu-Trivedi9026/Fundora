@@ -8,7 +8,9 @@ import { test, expect } from "@playwright/test";
  */
 
 test.describe("Login Page", () => {
-  test("renders login form with email and password fields", async ({ page }) => {
+  test("renders login form with email and password fields", async ({
+    page,
+  }) => {
     await page.goto("/login");
 
     // Check page title
@@ -184,7 +186,9 @@ test.describe("Signup Page", () => {
     await page.locator('button[type="submit"]').click();
 
     // Should show success/verification message
-    const successMessage = page.locator('[class*="success"], [class*="primary"]').first();
+    const successMessage = page
+      .locator('[class*="success"], [class*="primary"]')
+      .first();
     await expect(successMessage).toBeVisible({ timeout: 10000 });
   });
 });

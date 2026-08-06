@@ -1,7 +1,13 @@
 // API — Agents CRUD
 
 import { withAuth } from "../../../lib/withAuth.js";
-import { createAgent, listAgents, getAgent, updateAgent, deleteAgent } from "../../../lib/agents/index.js";
+import {
+  createAgent,
+  listAgents,
+  getAgent,
+  updateAgent,
+  deleteAgent,
+} from "../../../lib/agents/index.js";
 
 async function handler(req, res) {
   try {
@@ -34,19 +40,27 @@ async function handler(req, res) {
       }
 
       case "PUT": {
-        if (!req.query.id) return res.status(400).json({ success: false, error: "Agent ID required" });
+        if (!req.query.id)
+          return res
+            .status(400)
+            .json({ success: false, error: "Agent ID required" });
         const result = await updateAgent(req.query.id, req.body);
         return res.status(result.success ? 200 : 400).json(result);
       }
 
       case "DELETE": {
-        if (!req.query.id) return res.status(400).json({ success: false, error: "Agent ID required" });
+        if (!req.query.id)
+          return res
+            .status(400)
+            .json({ success: false, error: "Agent ID required" });
         const result = await deleteAgent(req.query.id);
         return res.status(result.success ? 200 : 400).json(result);
       }
 
       default:
-        return res.status(405).json({ success: false, error: "Method not allowed" });
+        return res
+          .status(405)
+          .json({ success: false, error: "Method not allowed" });
     }
   } catch (error) {
     console.error("Handler error:", error);

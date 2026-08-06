@@ -32,7 +32,11 @@ vi.mock("../../../components/PageLayout", () => ({
 
 function mockUseRoleValue(overrides = {}) {
   vi.mocked(useRole).mockReturnValue({
-    user: { id: "u1", email: "investor@fundora.dev", user_metadata: { full_name: "Investor One" } },
+    user: {
+      id: "u1",
+      email: "investor@fundora.dev",
+      user_metadata: { full_name: "Investor One" },
+    },
     profile: null,
     role: ROLES.INVESTOR,
     isAdmin: false,
@@ -63,7 +67,14 @@ function mockTables(payloads = {}) {
 
 const daysAgo = (n) => new Date(Date.now() - n * 86400000).toISOString();
 
-const donation = (id, amount, status, project_id, created_at, overrides = {}) => ({
+const donation = (
+  id,
+  amount,
+  status,
+  project_id,
+  created_at,
+  overrides = {},
+) => ({
   id,
   amount,
   status,
@@ -84,10 +95,26 @@ const donation = (id, amount, status, project_id, created_at, overrides = {}) =>
 
 function sampleDonations() {
   return [
-    donation("d1", 1000, "paid", "p1", daysAgo(75), { title: "Alpha Fund", categories: ["AI"], pledged: 60000 }),
-    donation("d2", 2000, "paid", "p2", daysAgo(45), { title: "Beta Fund", categories: ["Climate"], goal: 200000, pledged: 100000 }),
-    donation("d3", 3000, "paid", "p3", daysAgo(15), { title: "Gamma Fund", categories: ["Health"], pledged: 90000 }),
-    donation("d4", 500, "pending", "p4", daysAgo(5), { title: "Delta Fund", categories: ["AI"] }),
+    donation("d1", 1000, "paid", "p1", daysAgo(75), {
+      title: "Alpha Fund",
+      categories: ["AI"],
+      pledged: 60000,
+    }),
+    donation("d2", 2000, "paid", "p2", daysAgo(45), {
+      title: "Beta Fund",
+      categories: ["Climate"],
+      goal: 200000,
+      pledged: 100000,
+    }),
+    donation("d3", 3000, "paid", "p3", daysAgo(15), {
+      title: "Gamma Fund",
+      categories: ["Health"],
+      pledged: 90000,
+    }),
+    donation("d4", 500, "pending", "p4", daysAgo(5), {
+      title: "Delta Fund",
+      categories: ["AI"],
+    }),
   ];
 }
 
@@ -127,7 +154,8 @@ describe("pages/investor/analytics", () => {
     ].map((t) => screen.getByText(t));
     for (let i = 1; i < order.length; i += 1) {
       expect(
-        order[i - 1].compareDocumentPosition(order[i]) & Node.DOCUMENT_POSITION_FOLLOWING,
+        order[i - 1].compareDocumentPosition(order[i]) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
       ).toBeTruthy();
     }
 
@@ -173,8 +201,14 @@ describe("pages/investor/analytics", () => {
     expect(screen.queryByText("Beta Fund")).not.toBeInTheDocument();
     expect(screen.getByText("Gamma Fund")).toBeInTheDocument();
 
-    expect(screen.getByRole("button", { name: "30 Days" })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("button", { name: "All Time" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("button", { name: "30 Days" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "All Time" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
   });
 
   it("toggles the allocation donut between By Category and By Project", async () => {
@@ -182,21 +216,22 @@ describe("pages/investor/analytics", () => {
     render(<InvestorAnalytics />);
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "By Category" })).toHaveAttribute(
-        "aria-pressed",
-        "true",
-      );
+      expect(
+        screen.getByRole("button", { name: "By Category" }),
+      ).toHaveAttribute("aria-pressed", "true");
     });
 
     await userEvent.click(screen.getByRole("button", { name: "By Project" }));
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "By Project" })).toHaveAttribute(
-        "aria-pressed",
-        "true",
-      );
+      expect(
+        screen.getByRole("button", { name: "By Project" }),
+      ).toHaveAttribute("aria-pressed", "true");
     });
-    expect(screen.getByRole("button", { name: "By Category" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("button", { name: "By Category" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
   });
 
   it("shows a single onboarding empty state for new investors and no chart widgets", async () => {

@@ -1,8 +1,4 @@
-export default function LoadingSpinner({
-  size = "md",
-  text,
-  className = "",
-}) {
+export default function LoadingSpinner({ size = "md", text, className = "" }) {
   const sizes = {
     sm: "text-[18px]",
     md: "text-[24px]",

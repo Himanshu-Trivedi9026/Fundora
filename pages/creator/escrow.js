@@ -251,9 +251,7 @@ export default function EscrowPage() {
                               </h3>
                               <p className="text-xs text-on-surface-variant">
                                 Balance:{" "}
-                                {currencyFormatter.format(
-                                  account.balance || 0,
-                                )}
+                                {currencyFormatter.format(account.balance || 0)}
                               </p>
                             </div>
                             <span className="text-xs text-on-surface-variant">

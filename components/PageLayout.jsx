@@ -18,9 +18,15 @@ import Sidebar from "./Sidebar";
 import Footer from "./Footer";
 import { useRole } from "../context/RoleContext";
 
-export default function PageLayout({ children, onToggleFilters, hideSidebar = false, hideFooter = false }) {
+export default function PageLayout({
+  children,
+  onToggleFilters,
+  hideSidebar = false,
+  hideFooter = false,
+}) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
-    typeof window !== "undefined" && localStorage.getItem("sidebarCollapsed") === "true"
+    typeof window !== "undefined" &&
+      localStorage.getItem("sidebarCollapsed") === "true",
   );
   const { user, loading } = useRole();
   const isLoggedIn = !!user;
@@ -55,9 +61,12 @@ export default function PageLayout({ children, onToggleFilters, hideSidebar = fa
             isLoggedIn && !hideSidebar ? `ml-0 md:ml-[${sidebarWidth}px]` : ""
           }`}
           style={{
-            marginLeft: isLoggedIn && !hideSidebar
-              ? (typeof window !== "undefined" && window.innerWidth >= 768 ? sidebarWidth : 0)
-              : 0,
+            marginLeft:
+              isLoggedIn && !hideSidebar
+                ? typeof window !== "undefined" && window.innerWidth >= 768
+                  ? sidebarWidth
+                  : 0
+                : 0,
           }}
         >
           {children}

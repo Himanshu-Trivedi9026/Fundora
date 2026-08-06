@@ -59,7 +59,8 @@ describe("AIModerator", () => {
       const result = await classifyContent({
         entityType: "campaign",
         entityId: "camp-1",
-        content: "Help us build a school in the local community with your generous support",
+        content:
+          "Help us build a school in the local community with your generous support",
       });
 
       expect(result.success).toBe(true);
@@ -103,10 +104,16 @@ describe("AIModerator", () => {
       expect(noType.success).toBe(false);
       expect(noType.error).toBe("entityType is required");
 
-      const noId = await classifyContent({ entityType: "campaign", content: "text" });
+      const noId = await classifyContent({
+        entityType: "campaign",
+        content: "text",
+      });
       expect(noId.success).toBe(false);
 
-      const noContent = await classifyContent({ entityType: "campaign", entityId: "1" });
+      const noContent = await classifyContent({
+        entityType: "campaign",
+        entityId: "1",
+      });
       expect(noContent.success).toBe(false);
     });
   });
@@ -166,16 +173,33 @@ describe("AIModerator", () => {
   describe("detectDuplicateCampaign", () => {
     it("finds similar campaigns via text similarity", async () => {
       const mockExisting = [
-        { id: "existing-1", title: "Build a School in Rural Area", description: "Help build a school", creator_id: "other" },
-        { id: "existing-2", title: "Build a Hospital", description: "Help build a hospital", creator_id: "other" },
+        {
+          id: "existing-1",
+          title: "Build a School in Rural Area",
+          description: "Help build a school",
+          creator_id: "other",
+        },
+        {
+          id: "existing-2",
+          title: "Build a Hospital",
+          description: "Help build a hospital",
+          creator_id: "other",
+        },
       ];
 
       const mockOwn = [
-        { id: "own-1", title: "My Previous School Campaign", description: "Build a school in another area", status: "active" },
+        {
+          id: "own-1",
+          title: "My Previous School Campaign",
+          description: "Build a school in another area",
+          status: "active",
+        },
       ];
 
       // Chain: from → select → eq → neq → in → order → limit
-      const limitMock = vi.fn().mockResolvedValue({ data: mockExisting, error: null });
+      const limitMock = vi
+        .fn()
+        .mockResolvedValue({ data: mockExisting, error: null });
       const orderMock = vi.fn().mockReturnValue({ limit: limitMock });
       const inMock = vi.fn().mockReturnValue({ order: orderMock });
       const neqMock = vi.fn().mockReturnValue({ in: inMock });
@@ -194,7 +218,8 @@ describe("AIModerator", () => {
 
       const result = await detectDuplicateCampaign({
         title: "Build a School in Rural Area",
-        description: "Help us build a school in a rural area that needs educational facilities",
+        description:
+          "Help us build a school in a rural area that needs educational facilities",
         category: "education",
         creatorId: "creator-1",
       });
@@ -220,17 +245,15 @@ describe("AIModerator", () => {
         }),
       };
 
-      supabaseAdmin.from
-        .mockReturnValueOnce(emptyChain)
-        .mockReturnValueOnce({
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              in: vi.fn().mockReturnValue({
-                neq: vi.fn().mockResolvedValue({ data: [], error: null }),
-              }),
+      supabaseAdmin.from.mockReturnValueOnce(emptyChain).mockReturnValueOnce({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            in: vi.fn().mockReturnValue({
+              neq: vi.fn().mockResolvedValue({ data: [], error: null }),
             }),
           }),
-        });
+        }),
+      });
 
       const result = await detectDuplicateCampaign({
         title: "Unique Quantum Computing Research Initiative",
@@ -306,7 +329,7 @@ describe("AIModerator", () => {
 
       expect(result.success).toBe(true);
       const personalInfoFlag = result.data.flags.find(
-        (f) => f.type === "personal_info"
+        (f) => f.type === "personal_info",
       );
       expect(personalInfoFlag).toBeDefined();
       expect(personalInfoFlag.severity).toBe("high");
@@ -339,13 +362,13 @@ describe("AIModerator", () => {
 
       // Should flag stock photo
       const stockFlag = result.data.indicators.find(
-        (i) => i.type === "stock_photo"
+        (i) => i.type === "stock_photo",
       );
       expect(stockFlag).toBeDefined();
 
       // Should flag executable file
       const execFlag = result.data.indicators.find(
-        (i) => i.type === "suspicious_file"
+        (i) => i.type === "suspicious_file",
       );
       expect(execFlag).toBeDefined();
     });
@@ -376,7 +399,7 @@ describe("AIModerator", () => {
 
       expect(result.success).toBe(true);
       const singleFlag = result.data.indicators.find(
-        (i) => i.type === "single_media"
+        (i) => i.type === "single_media",
       );
       expect(singleFlag).toBeDefined();
     });
@@ -399,7 +422,7 @@ describe("AIModerator", () => {
 
       // Should have personal info violation
       const personalInfoViolation = result.data.violations.find(
-        (v) => v.policy === "NO_PERSONAL_INFO"
+        (v) => v.policy === "NO_PERSONAL_INFO",
       );
       expect(personalInfoViolation).toBeDefined();
       expect(personalInfoViolation.severity).toBe("high");
@@ -426,14 +449,16 @@ describe("AIModerator", () => {
 
       expect(result.success).toBe(true);
       const hateViolation = result.data.violations.find(
-        (v) => v.policy === "NO_HATE_SPEECH"
+        (v) => v.policy === "NO_HATE_SPEECH",
       );
       expect(hateViolation).toBeDefined();
       expect(hateViolation.severity).toBe("critical");
     });
 
     it("returns error when required params are missing", async () => {
-      const noContent = await suggestPolicyViolation({ entityType: "campaign" });
+      const noContent = await suggestPolicyViolation({
+        entityType: "campaign",
+      });
       expect(noContent.success).toBe(false);
 
       const noType = await suggestPolicyViolation({ content: "text" });
@@ -513,7 +538,7 @@ describe("AIModerator", () => {
       });
 
       expect(withAi.data.overallConfidence).toBeGreaterThan(
-        withoutAi.data.overallConfidence
+        withoutAi.data.overallConfidence,
       );
     });
   });

@@ -42,35 +42,38 @@ export default function AdminAuditLogs() {
   const [hasMore, setHasMore] = useState(false);
   const [total, setTotal] = useState(0);
 
-  const fetchLogs = useCallback(async (pageNum) => {
-    queueMicrotask(() => setLoading(true));
-    queueMicrotask(() => setPage(pageNum));
-    setError(null);
-    try {
-      let query = supabase
-        .from("verification_audit_log")
-        .select("*", { count: "exact" })
-        .order("created_at", { ascending: false })
-        .range(pageNum * PAGE_SIZE, (pageNum + 1) * PAGE_SIZE - 1);
+  const fetchLogs = useCallback(
+    async (pageNum) => {
+      queueMicrotask(() => setLoading(true));
+      queueMicrotask(() => setPage(pageNum));
+      setError(null);
+      try {
+        let query = supabase
+          .from("verification_audit_log")
+          .select("*", { count: "exact" })
+          .order("created_at", { ascending: false })
+          .range(pageNum * PAGE_SIZE, (pageNum + 1) * PAGE_SIZE - 1);
 
-      if (eventType) {
-        query = query.eq("event_type", eventType);
+        if (eventType) {
+          query = query.eq("event_type", eventType);
+        }
+
+        const { data, count, error: fetchErr } = await query;
+        if (fetchErr) throw fetchErr;
+
+        setEntries(data || []);
+        setTotal(count || 0);
+        setHasMore(data?.length === PAGE_SIZE);
+      } catch (err) {
+        console.error("Audit log fetch error:", err);
+        setError("Failed to load audit logs");
+        setEntries([]);
+      } finally {
+        queueMicrotask(() => setLoading(false));
       }
-
-      const { data, count, error: fetchErr } = await query;
-      if (fetchErr) throw fetchErr;
-
-      setEntries(data || []);
-      setTotal(count || 0);
-      setHasMore(data?.length === PAGE_SIZE);
-    } catch (err) {
-      console.error("Audit log fetch error:", err);
-      setError("Failed to load audit logs");
-      setEntries([]);
-    } finally {
-      queueMicrotask(() => setLoading(false));
-    }
-  }, [eventType]);
+    },
+    [eventType],
+  );
 
   useEffect(() => {
     if (authLoading) return;
@@ -99,20 +102,22 @@ export default function AdminAuditLogs() {
 
   // Local filter by search text on already-fetched entries
   const filtered = search
-    ? entries.filter(e =>
-        (e.action || "").toLowerCase().includes(search.toLowerCase()) ||
-        (e.entity_type || "").toLowerCase().includes(search.toLowerCase()) ||
-        (e.event_type || "").toLowerCase().includes(search.toLowerCase())
+    ? entries.filter(
+        (e) =>
+          (e.action || "").toLowerCase().includes(search.toLowerCase()) ||
+          (e.entity_type || "").toLowerCase().includes(search.toLowerCase()) ||
+          (e.event_type || "").toLowerCase().includes(search.toLowerCase()),
       )
     : entries;
 
   // Map to AuditHistory expected shape
-  const auditEntries = filtered.map(e => ({
+  const auditEntries = filtered.map((e) => ({
     id: e.id,
     eventType: e.event_type,
     action: e.action,
     timestamp: e.created_at,
-    details: e.details || e.entity_type + ": " + (e.entity_id?.substring(0, 12) || ""),
+    details:
+      e.details || e.entity_type + ": " + (e.entity_id?.substring(0, 12) || ""),
   }));
 
   if (authLoading) {
@@ -177,7 +182,9 @@ export default function AdminAuditLogs() {
             <div className="flex items-center justify-center min-h-[40vh]">
               <GlassCard>
                 <div className="text-center py-8">
-                  <span className="material-symbols-outlined text-[48px] text-red-400 mb-4">error</span>
+                  <span className="material-symbols-outlined text-[48px] text-red-400 mb-4">
+                    error
+                  </span>
                   <p className="text-red-300">{error}</p>
                   <button
                     onClick={() => fetchLogs(true)}
@@ -192,7 +199,11 @@ export default function AdminAuditLogs() {
             <EmptyState
               icon="history"
               title="No audit entries"
-              description={eventType ? "No entries match the selected filter." : "No audit entries have been recorded yet."}
+              description={
+                eventType
+                  ? "No entries match the selected filter."
+                  : "No audit entries have been recorded yet."
+              }
               action={
                 eventType ? (
                   <button
@@ -223,7 +234,9 @@ export default function AdminAuditLogs() {
                     onClick={handlePrevPage}
                     disabled={page === 0}
                   >
-                    <span className="material-symbols-outlined text-[16px]">chevron_left</span>
+                    <span className="material-symbols-outlined text-[16px]">
+                      chevron_left
+                    </span>
                     Previous
                   </Button>
                   <Button
@@ -233,7 +246,9 @@ export default function AdminAuditLogs() {
                     disabled={!hasMore}
                   >
                     Next
-                    <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                    <span className="material-symbols-outlined text-[16px]">
+                      chevron_right
+                    </span>
                   </Button>
                 </div>
               </div>

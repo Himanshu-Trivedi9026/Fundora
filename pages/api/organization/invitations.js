@@ -28,11 +28,15 @@ export default withAuth(async function handler(req, res, user) {
         return res.status(400).json({ error: "organizationId is required" });
       }
 
-      const result = await getInvitations(organizationId, {
-        status,
-        limit: parseInt(limit, 10) || 50,
-        offset: parseInt(offset, 10) || 0,
-      }, user.id);
+      const result = await getInvitations(
+        organizationId,
+        {
+          status,
+          limit: parseInt(limit, 10) || 50,
+          offset: parseInt(offset, 10) || 0,
+        },
+        user.id,
+      );
 
       if (!result.success) {
         return res.status(500).json({ error: result.error });
@@ -57,7 +61,9 @@ export default withAuth(async function handler(req, res, user) {
 
       if (action === "create") {
         if (!organizationId || !email) {
-          return res.status(400).json({ error: "organizationId and email are required" });
+          return res
+            .status(400)
+            .json({ error: "organizationId and email are required" });
         }
 
         const result = await createInvitation({
@@ -79,7 +85,11 @@ export default withAuth(async function handler(req, res, user) {
           return res.status(400).json({ error: "invitationId is required" });
         }
 
-        const result = await acceptInvitation(invitationId, user.id, user.email);
+        const result = await acceptInvitation(
+          invitationId,
+          user.id,
+          user.email,
+        );
         if (!result.success) {
           return res.status(400).json({ error: result.error });
         }

@@ -13,7 +13,10 @@ async function handler(req, res) {
     switch (req.method) {
       case "GET": {
         const plugin = registry.getPlugin(id);
-        if (!plugin) return res.status(404).json({ success: false, error: "Plugin not found" });
+        if (!plugin)
+          return res
+            .status(404)
+            .json({ success: false, error: "Plugin not found" });
         return res.status(200).json({ success: true, data: plugin });
       }
 
@@ -27,7 +30,9 @@ async function handler(req, res) {
           targetId: id,
           metadata: updates,
         });
-        return res.status(200).json({ success: true, data: { id, ...updates } });
+        return res
+          .status(200)
+          .json({ success: true, data: { id, ...updates } });
       }
 
       case "DELETE": {
@@ -38,11 +43,15 @@ async function handler(req, res) {
           targetType: "plugin",
           targetId: id,
         });
-        return res.status(200).json({ success: true, data: { id, status: "uninstalled" } });
+        return res
+          .status(200)
+          .json({ success: true, data: { id, status: "uninstalled" } });
       }
 
       default:
-        return res.status(405).json({ success: false, error: "Method not allowed" });
+        return res
+          .status(405)
+          .json({ success: false, error: "Method not allowed" });
     }
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });

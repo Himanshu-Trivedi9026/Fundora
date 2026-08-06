@@ -107,10 +107,7 @@ export default function PredictionsPage() {
           {/* Loading state */}
           {loading && (
             <div className="flex items-center justify-center min-h-[40vh]">
-              <LoadingSpinner
-                size="lg"
-                text="Analysing funding data..."
-              />
+              <LoadingSpinner size="lg" text="Analysing funding data..." />
             </div>
           )}
 
@@ -184,10 +181,7 @@ export default function PredictionsPage() {
                 </GlassCard>
 
                 {/* Confidence interval */}
-                <GlassCard
-                  hover
-                  className="flex flex-col"
-                >
+                <GlassCard hover className="flex flex-col">
                   <div className="flex items-center gap-3 mb-4">
                     <span className="material-symbols-outlined text-[28px] text-primary">
                       analytics
@@ -303,7 +297,9 @@ export default function PredictionsPage() {
                               </span>
                             )}
                             {item.count != null && (
-                              <Badge variant="default">{item.count} campaigns</Badge>
+                              <Badge variant="default">
+                                {item.count} campaigns
+                              </Badge>
                             )}
                           </div>
                         </div>

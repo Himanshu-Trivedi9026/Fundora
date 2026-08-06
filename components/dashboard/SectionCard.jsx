@@ -68,17 +68,11 @@ export default function SectionCard({
       )}
 
       {/* Error state */}
-      {!loading && error && (
-        <RetryError message={error} onRetry={onRetry} />
-      )}
+      {!loading && error && <RetryError message={error} onRetry={onRetry} />}
 
       {/* Empty state */}
       {!loading && !error && empty && (
-        <EmptyState
-          icon={emptyIcon}
-          title={emptyTitle}
-          action={emptyAction}
-        />
+        <EmptyState icon={emptyIcon} title={emptyTitle} action={emptyAction} />
       )}
 
       {/* Content */}

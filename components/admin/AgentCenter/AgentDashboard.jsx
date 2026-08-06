@@ -60,10 +60,26 @@ export default function AgentDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Active Agents" value={agents.filter(a => a.status === "active").length} color="green" />
-        <StatCard label="Total Runs" value={agents.reduce((s, a) => s + (a.run_count || 0), 0)} color="blue" />
-        <StatCard label="Pending Approval" value={agents.filter(a => a.status === "pending").length} color="yellow" />
-        <StatCard label="Error Rate" value={`${agents.filter(a => a.status === "error").length > 0 ? "⚠" : "0%"}`} color="red" />
+        <StatCard
+          label="Active Agents"
+          value={agents.filter((a) => a.status === "active").length}
+          color="green"
+        />
+        <StatCard
+          label="Total Runs"
+          value={agents.reduce((s, a) => s + (a.run_count || 0), 0)}
+          color="blue"
+        />
+        <StatCard
+          label="Pending Approval"
+          value={agents.filter((a) => a.status === "pending").length}
+          color="yellow"
+        />
+        <StatCard
+          label="Error Rate"
+          value={`${agents.filter((a) => a.status === "error").length > 0 ? "⚠" : "0%"}`}
+          color="red"
+        />
       </div>
 
       <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
@@ -71,12 +87,24 @@ export default function AgentDashboard() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-800">
-                <th className="text-left p-4 text-gray-400 text-sm font-medium">Name</th>
-                <th className="text-left p-4 text-gray-400 text-sm font-medium">Type</th>
-                <th className="text-left p-4 text-gray-400 text-sm font-medium">Status</th>
-                <th className="text-left p-4 text-gray-400 text-sm font-medium">Model</th>
-                <th className="text-left p-4 text-gray-400 text-sm font-medium">Runs</th>
-                <th className="text-left p-4 text-gray-400 text-sm font-medium">Last Run</th>
+                <th className="text-left p-4 text-gray-400 text-sm font-medium">
+                  Name
+                </th>
+                <th className="text-left p-4 text-gray-400 text-sm font-medium">
+                  Type
+                </th>
+                <th className="text-left p-4 text-gray-400 text-sm font-medium">
+                  Status
+                </th>
+                <th className="text-left p-4 text-gray-400 text-sm font-medium">
+                  Model
+                </th>
+                <th className="text-left p-4 text-gray-400 text-sm font-medium">
+                  Runs
+                </th>
+                <th className="text-left p-4 text-gray-400 text-sm font-medium">
+                  Last Run
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -88,7 +116,10 @@ export default function AgentDashboard() {
                 </tr>
               ) : (
                 agents.map((agent) => (
-                  <tr key={agent.id} className="border-b border-gray-800 hover:bg-gray-800/50">
+                  <tr
+                    key={agent.id}
+                    className="border-b border-gray-800 hover:bg-gray-800/50"
+                  >
                     <td className="p-4 text-white">{agent.name}</td>
                     <td className="p-4">
                       <span className="px-2 py-1 bg-gray-800 text-gray-300 rounded text-xs">
@@ -97,14 +128,24 @@ export default function AgentDashboard() {
                     </td>
                     <td className="p-4">
                       <div className="flex items-center gap-2">
-                        <span className={`w-2 h-2 rounded-full ${STATUS_COLORS[agent.status] || "bg-gray-500"}`} />
-                        <span className="text-sm text-gray-300 capitalize">{agent.status}</span>
+                        <span
+                          className={`w-2 h-2 rounded-full ${STATUS_COLORS[agent.status] || "bg-gray-500"}`}
+                        />
+                        <span className="text-sm text-gray-300 capitalize">
+                          {agent.status}
+                        </span>
                       </div>
                     </td>
-                    <td className="p-4 text-gray-300 text-sm">{agent.model || "default"}</td>
-                    <td className="p-4 text-gray-300 text-sm">{agent.run_count || 0}</td>
+                    <td className="p-4 text-gray-300 text-sm">
+                      {agent.model || "default"}
+                    </td>
+                    <td className="p-4 text-gray-300 text-sm">
+                      {agent.run_count || 0}
+                    </td>
                     <td className="p-4 text-gray-500 text-sm">
-                      {agent.last_run_at ? new Date(agent.last_run_at).toLocaleString() : "Never"}
+                      {agent.last_run_at
+                        ? new Date(agent.last_run_at).toLocaleString()
+                        : "Never"}
                     </td>
                   </tr>
                 ))
@@ -126,7 +167,9 @@ function StatCard({ label, value, color }) {
   };
 
   return (
-    <div className={`bg-gray-900 rounded-xl p-4 border ${colors[color] || "border-gray-800"}`}>
+    <div
+      className={`bg-gray-900 rounded-xl p-4 border ${colors[color] || "border-gray-800"}`}
+    >
       <p className="text-gray-400 text-sm mb-1">{label}</p>
       <p className="text-2xl font-bold text-white">{value}</p>
     </div>

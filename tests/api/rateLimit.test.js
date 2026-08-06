@@ -81,7 +81,7 @@ describe("rateLimit middleware", () => {
     expect(result).toBe(false);
     expect(res.status).toHaveBeenCalledWith(429);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ error: "Too many requests" })
+      expect.objectContaining({ error: "Too many requests" }),
     );
   });
 
@@ -94,7 +94,10 @@ describe("rateLimit middleware", () => {
 
     expect(res.setHeader).toHaveBeenCalledWith("X-RateLimit-Limit", "10");
     expect(res.setHeader).toHaveBeenCalledWith("X-RateLimit-Remaining", "9");
-    expect(res.setHeader).toHaveBeenCalledWith("X-RateLimit-Reset", expect.any(String));
+    expect(res.setHeader).toHaveBeenCalledWith(
+      "X-RateLimit-Reset",
+      expect.any(String),
+    );
   });
 
   it("sets Retry-After header when rate limited", () => {
@@ -107,7 +110,10 @@ describe("rateLimit middleware", () => {
     const res2 = createRes();
     limiter(createReq(ip), res2); // count 2 - blocked
 
-    expect(res2.setHeader).toHaveBeenCalledWith("Retry-After", expect.any(String));
+    expect(res2.setHeader).toHaveBeenCalledWith(
+      "Retry-After",
+      expect.any(String),
+    );
     expect(res2.status).toHaveBeenCalledWith(429);
   });
 
@@ -146,8 +152,14 @@ describe("rateLimit middleware", () => {
   it("uses custom keyFn when provided", () => {
     const keyFn = vi.fn((req) => `custom:${req.headers["x-custom-id"]}`);
     const limiter = rateLimit({ windowMs: 60_000, max: 1, keyFn });
-    const req1 = { headers: { "x-custom-id": "aaa" }, socket: { remoteAddress: "127.0.0.1" } };
-    const req2 = { headers: { "x-custom-id": "bbb" }, socket: { remoteAddress: "127.0.0.1" } };
+    const req1 = {
+      headers: { "x-custom-id": "aaa" },
+      socket: { remoteAddress: "127.0.0.1" },
+    };
+    const req2 = {
+      headers: { "x-custom-id": "bbb" },
+      socket: { remoteAddress: "127.0.0.1" },
+    };
     const res1 = createRes();
     const res2 = createRes();
 

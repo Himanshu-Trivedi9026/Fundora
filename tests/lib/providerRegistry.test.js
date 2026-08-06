@@ -8,13 +8,27 @@ const { MockBaseVerificationProvider } = vi.hoisted(() => {
       this.providerName = providerName || "mock";
     }
     async initialize() {}
-    async submitVerification() { return { referenceId: "mock_ref", status: "initiated" }; }
-    async checkStatus() { return { status: "mock_status" }; }
-    async handleWebhook() { return null; }
-    mapStatus(s) { return s; }
-    calculateTrustScore() { return 50; }
-    calculateRiskScore() { return 25; }
-    verifyWebhookSignature() { return true; }
+    async submitVerification() {
+      return { referenceId: "mock_ref", status: "initiated" };
+    }
+    async checkStatus() {
+      return { status: "mock_status" };
+    }
+    async handleWebhook() {
+      return null;
+    }
+    mapStatus(s) {
+      return s;
+    }
+    calculateTrustScore() {
+      return 50;
+    }
+    calculateRiskScore() {
+      return 25;
+    }
+    verifyWebhookSignature() {
+      return true;
+    }
   }
   return { MockBaseVerificationProvider };
 });
@@ -32,31 +46,44 @@ vi.mock("../../lib/verification/secureLogger", () => ({
 // Mock all Phase 4 provider classes — define inline since they only need to extend the hoisted class
 vi.mock("../../lib/verification/providers/pennyDropProvider", () => ({
   PennyDropProvider: class extends MockBaseVerificationProvider {
-    constructor() { super({ providerName: "penny_drop_internal" }); }
+    constructor() {
+      super({ providerName: "penny_drop_internal" });
+    }
   },
 }));
 
-vi.mock("../../lib/verification/providers/businessVerificationProvider", () => ({
-  BusinessVerificationProvider: class extends MockBaseVerificationProvider {
-    constructor() { super({ providerName: "fundora_internal_business" }); }
-  },
-}));
+vi.mock(
+  "../../lib/verification/providers/businessVerificationProvider",
+  () => ({
+    BusinessVerificationProvider: class extends MockBaseVerificationProvider {
+      constructor() {
+        super({ providerName: "fundora_internal_business" });
+      }
+    },
+  }),
+);
 
 vi.mock("../../lib/verification/providers/bankVerificationProvider", () => ({
   BankVerificationProvider: class extends MockBaseVerificationProvider {
-    constructor() { super({ providerName: "fundora_internal_bank" }); }
+    constructor() {
+      super({ providerName: "fundora_internal_bank" });
+    }
   },
 }));
 
 vi.mock("../../lib/verification/providers/gstVerificationProvider", () => ({
   GSTVerificationProvider: class extends MockBaseVerificationProvider {
-    constructor() { super({ providerName: "fundora_internal_gst" }); }
+    constructor() {
+      super({ providerName: "fundora_internal_gst" });
+    }
   },
 }));
 
 vi.mock("../../lib/verification/providers/panVerificationProvider", () => ({
   PANVerificationProvider: class extends MockBaseVerificationProvider {
-    constructor() { super({ providerName: "fundora_internal_pan" }); }
+    constructor() {
+      super({ providerName: "fundora_internal_pan" });
+    }
   },
 }));
 
@@ -126,7 +153,7 @@ describe("Provider Registry", () => {
       expect(provider).toBeDefined();
       expect(logWarn).toHaveBeenCalledWith(
         "VerificationProvider",
-        expect.stringContaining("not found")
+        expect.stringContaining("not found"),
       );
     });
 
@@ -297,7 +324,9 @@ describe("Provider Registry", () => {
   // ─── registerProvider ───
   describe("registerProvider", () => {
     it("registers a new provider with BaseVerificationProvider instance", () => {
-      const newProvider = new MockBaseVerificationProvider({ providerName: "test_provider" });
+      const newProvider = new MockBaseVerificationProvider({
+        providerName: "test_provider",
+      });
       registerProvider("test_provider", newProvider);
 
       const retrieved = getProvider("test_provider");
@@ -317,8 +346,12 @@ describe("Provider Registry", () => {
     });
 
     it("overwrites existing provider with same name", () => {
-      const provider1 = new MockBaseVerificationProvider({ providerName: "overwrite_test" });
-      const provider2 = new MockBaseVerificationProvider({ providerName: "overwrite_test_v2" });
+      const provider1 = new MockBaseVerificationProvider({
+        providerName: "overwrite_test",
+      });
+      const provider2 = new MockBaseVerificationProvider({
+        providerName: "overwrite_test_v2",
+      });
 
       registerProvider("overwrite_test", provider1);
       registerProvider("overwrite_test", provider2);

@@ -27,7 +27,16 @@ const fadeUp = {
 
 function ArrowIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M5 12h14" />
       <path d="M12 5l7 7-7 7" />
     </svg>
@@ -54,7 +63,11 @@ export default function GetStarted() {
     return (
       <div className="min-h-screen flex flex-col bg-surface-dim">
         <main className="flex-1 flex items-center justify-center">
-          <div role="status" aria-label="Loading" className="text-on-surface-variant text-lg">
+          <div
+            role="status"
+            aria-label="Loading"
+            className="text-on-surface-variant text-lg"
+          >
             <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
           </div>
         </main>
@@ -107,9 +120,16 @@ export default function GetStarted() {
             className="w-full max-w-3xl relative z-10"
           >
             {/* ─── Header ─── */}
-            <motion.div variants={fadeUp} className="flex flex-col items-center mb-12 text-center">
+            <motion.div
+              variants={fadeUp}
+              className="flex flex-col items-center mb-12 text-center"
+            >
               <div className="mb-6 p-4 rounded-2xl bg-surface-container-high border border-outline-variant/30">
-                <span className="material-symbols-outlined text-primary text-[40px]" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">
+                <span
+                  className="material-symbols-outlined text-primary text-[40px]"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                  aria-hidden="true"
+                >
                   explore
                 </span>
               </div>
@@ -140,7 +160,8 @@ export default function GetStarted() {
                     backdropFilter: "blur(24px) saturate(1.2)",
                     WebkitBackdropFilter: "blur(24px) saturate(1.2)",
                     border: "1px solid rgba(73, 68, 84, 0.3)",
-                    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.37), inset 0 1px 0 rgba(255,255,255,0.04)",
+                    boxShadow:
+                      "0 8px 32px rgba(0, 0, 0, 0.37), inset 0 1px 0 rgba(255,255,255,0.04)",
                   }}
                 >
                   {/* Top gradient accent line */}
@@ -148,7 +169,9 @@ export default function GetStarted() {
 
                   {/* Emoji icon tile — scales on hover */}
                   <div className="mb-6 p-4 rounded-2xl w-fit bg-surface-container-high border border-outline-variant/30 text-3xl transition-all duration-300 group-hover:bg-primary/10 group-hover:scale-110 group-hover:-rotate-6">
-                    <span role="img" aria-hidden="true">{r.emoji}</span>
+                    <span role="img" aria-hidden="true">
+                      {r.emoji}
+                    </span>
                   </div>
 
                   <h2 className="font-geist text-2xl font-bold text-on-surface mb-2">
@@ -159,21 +182,27 @@ export default function GetStarted() {
                   </p>
 
                   {/* Visual CTA pill — the whole card is the clickable target */}
-                  <span className="inline-flex items-center justify-center gap-2 font-geist text-sm font-semibold
+                  <span
+                    className="inline-flex items-center justify-center gap-2 font-geist text-sm font-semibold
                     px-6 py-3 rounded-full bg-primary text-on-primary
                     shadow-lg shadow-primary/20
                     transition-all duration-300 group-hover:shadow-primary/40 group-hover:brightness-110
                     w-full sm:w-auto"
                   >
                     {r.buttonLabel}
-                    <span className="transition-transform duration-300 group-hover:translate-x-1"><ArrowIcon /></span>
+                    <span className="transition-transform duration-300 group-hover:translate-x-1">
+                      <ArrowIcon />
+                    </span>
                   </span>
                 </motion.button>
               ))}
             </div>
 
             {/* ─── Existing account link ─── */}
-            <motion.div variants={fadeUp} className="mt-10 flex flex-col items-center gap-4 text-center">
+            <motion.div
+              variants={fadeUp}
+              className="mt-10 flex flex-col items-center gap-4 text-center"
+            >
               <p className="font-inter text-sm text-on-surface-variant">
                 Already have an account?{" "}
                 <Link

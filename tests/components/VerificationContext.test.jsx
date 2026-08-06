@@ -4,9 +4,39 @@ import React from "react";
 
 // Mock history data
 const mockHistory = [
-  { id: "h1", action: "created", old_status: null, new_status: "pending", old_level: 0, new_level: 0, performed_by_type: "system", reason: null, created_at: "2026-01-01T00:00:00Z" },
-  { id: "h2", action: "approved", old_status: "pending", new_status: "approved", old_level: 0, new_level: 1, performed_by_type: "admin", reason: "Email verified", created_at: "2026-01-05T10:00:00Z" },
-  { id: "h3", action: "level_changed", old_status: "approved", new_status: "approved", old_level: 1, new_level: 2, performed_by_type: "system", reason: "ID verified", created_at: "2026-01-15T12:00:00Z" },
+  {
+    id: "h1",
+    action: "created",
+    old_status: null,
+    new_status: "pending",
+    old_level: 0,
+    new_level: 0,
+    performed_by_type: "system",
+    reason: null,
+    created_at: "2026-01-01T00:00:00Z",
+  },
+  {
+    id: "h2",
+    action: "approved",
+    old_status: "pending",
+    new_status: "approved",
+    old_level: 0,
+    new_level: 1,
+    performed_by_type: "admin",
+    reason: "Email verified",
+    created_at: "2026-01-05T10:00:00Z",
+  },
+  {
+    id: "h3",
+    action: "level_changed",
+    old_status: "approved",
+    new_status: "approved",
+    old_level: 1,
+    new_level: 2,
+    performed_by_type: "system",
+    reason: "ID verified",
+    created_at: "2026-01-15T12:00:00Z",
+  },
 ];
 
 // Mock Supabase client before importing context
@@ -17,7 +47,9 @@ vi.mock("../../lib/supabaseClient", () => {
   return {
     supabase: {
       auth: {
-        getUser: vi.fn().mockResolvedValue({ data: { user: mockUser }, error: null }),
+        getUser: vi
+          .fn()
+          .mockResolvedValue({ data: { user: mockUser }, error: null }),
         onAuthStateChange: vi.fn((cb) => {
           authCallback = cb;
           return { data: { subscription: { unsubscribe: vi.fn() } } };
@@ -73,7 +105,13 @@ vi.mock("../../context/RoleContext", () => ({
   useRole: () => ({ isCreator: true, isAdmin: false }),
 }));
 
-import { VerificationProvider, useVerification, VERIFICATION_LEVELS, VERIFICATION_STATUSES, EXPIRY_STATUSES } from "../../context/VerificationContext";
+import {
+  VerificationProvider,
+  useVerification,
+  VERIFICATION_LEVELS,
+  VERIFICATION_STATUSES,
+  EXPIRY_STATUSES,
+} from "../../context/VerificationContext";
 
 function wrapper({ children }) {
   return <VerificationProvider>{children}</VerificationProvider>;

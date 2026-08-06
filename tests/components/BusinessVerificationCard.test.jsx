@@ -22,8 +22,12 @@ describe("BusinessVerificationCard", () => {
   it("renders with verified status", () => {
     render(
       <BusinessVerificationCard
-        verification={{ status: "verified", business_name: "Test Corp", business_type: "private_limited" }}
-      />
+        verification={{
+          status: "verified",
+          business_name: "Test Corp",
+          business_type: "private_limited",
+        }}
+      />,
     );
     expect(screen.getByText("Verified")).toBeTruthy();
     expect(screen.getByText("Test Corp")).toBeTruthy();
@@ -33,7 +37,7 @@ describe("BusinessVerificationCard", () => {
     render(
       <BusinessVerificationCard
         verification={{ status: "pending", business_name: "Pending Co" }}
-      />
+      />,
     );
     expect(screen.getByText("Under Review")).toBeTruthy();
   });
@@ -47,7 +51,7 @@ describe("BusinessVerificationCard", () => {
       <BusinessVerificationCard
         verification={{ status: "pending" }}
         documents={docs}
-      />
+      />,
     );
     expect(screen.getByText("Documents (2)")).toBeTruthy();
     expect(screen.getByText("gst certificate")).toBeTruthy();
@@ -64,7 +68,7 @@ describe("BusinessVerificationCard", () => {
       <BusinessVerificationCard
         verification={{ status: "pending" }}
         onStartVerification={vi.fn()}
-      />
+      />,
     );
     expect(screen.queryByText("Start Business Verification")).toBeNull();
   });

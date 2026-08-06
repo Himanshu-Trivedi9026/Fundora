@@ -27,7 +27,9 @@ vi.mock("../../lib/verification/phoneVerification", () => ({
 vi.mock("../../lib/supabaseAdmin", () => {
   const calls = { updates: [] };
   const supabaseAdmin = {
-    auth: { getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }) },
+    auth: {
+      getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
+    },
     from: vi.fn(() => ({
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
@@ -48,7 +50,10 @@ function mockReq(method = "POST", body = {}) {
 }
 
 function mockRes() {
-  const res = { status: vi.fn().mockReturnThis(), json: vi.fn().mockReturnThis() };
+  const res = {
+    status: vi.fn().mockReturnThis(),
+    json: vi.fn().mockReturnThis(),
+  };
   return res;
 }
 
@@ -78,17 +83,29 @@ describe("API — Verification Phone", () => {
     phone.createOTP.mockResolvedValue({ success: true });
 
     const res = mockRes();
-    await handler(mockReq("POST", { action: "send", phone: "+919999999999" }), res, { id: "user-1" });
+    await handler(
+      mockReq("POST", { action: "send", phone: "+919999999999" }),
+      res,
+      { id: "user-1" },
+    );
 
     expect(phone.createOTP).toHaveBeenCalledWith("user-1", "+919999999999");
     expect(res.status).toHaveBeenCalledWith(200);
   });
 
   it("POST send propagates cooldown errors", async () => {
-    phone.createOTP.mockResolvedValue({ success: false, error: "Please wait 30 seconds", cooldown: 30 });
+    phone.createOTP.mockResolvedValue({
+      success: false,
+      error: "Please wait 30 seconds",
+      cooldown: 30,
+    });
 
     const res = mockRes();
-    await handler(mockReq("POST", { action: "send", phone: "+919999999999" }), res, { id: "user-1" });
+    await handler(
+      mockReq("POST", { action: "send", phone: "+919999999999" }),
+      res,
+      { id: "user-1" },
+    );
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json.mock.calls[0][0].cooldown).toBe(30);
@@ -105,25 +122,40 @@ describe("API — Verification Phone", () => {
 
     const res = mockRes();
     await handler(
-      mockReq("POST", { action: "verify", phone: "+919999999999", otp: "123456" }),
+      mockReq("POST", {
+        action: "verify",
+        phone: "+919999999999",
+        otp: "123456",
+      }),
       res,
-      { id: "user-1" }
+      { id: "user-1" },
     );
 
-    expect(phone.verifyOTP).toHaveBeenCalledWith("user-1", "+919999999999", "123456");
+    expect(phone.verifyOTP).toHaveBeenCalledWith(
+      "user-1",
+      "+919999999999",
+      "123456",
+    );
     // Server-side flag set on the creator_verifications row.
     expect(state.calls.updates).toContainEqual({ phone_verified: true });
     expect(res.status).toHaveBeenCalledWith(200);
   });
 
   it("POST verify propagates a wrong-OTP error", async () => {
-    phone.verifyOTP.mockResolvedValue({ success: false, error: "Invalid OTP. 2 attempts remaining." });
+    phone.verifyOTP.mockResolvedValue({
+      success: false,
+      error: "Invalid OTP. 2 attempts remaining.",
+    });
 
     const res = mockRes();
     await handler(
-      mockReq("POST", { action: "verify", phone: "+919999999999", otp: "000000" }),
+      mockReq("POST", {
+        action: "verify",
+        phone: "+919999999999",
+        otp: "000000",
+      }),
       res,
-      { id: "user-1" }
+      { id: "user-1" },
     );
 
     expect(res.status).toHaveBeenCalledWith(400);
@@ -132,7 +164,11 @@ describe("API — Verification Phone", () => {
 
   it("POST verify requires phone and otp", async () => {
     const res = mockRes();
-    await handler(mockReq("POST", { action: "verify", phone: "+919999999999" }), res, { id: "user-1" });
+    await handler(
+      mockReq("POST", { action: "verify", phone: "+919999999999" }),
+      res,
+      { id: "user-1" },
+    );
     expect(res.status).toHaveBeenCalledWith(400);
   });
 
@@ -145,7 +181,11 @@ describe("API — Verification Phone", () => {
     });
 
     const res = mockRes();
-    await handler(mockReq("POST", { action: "status", phone: "+919999999999" }), res, { id: "user-1" });
+    await handler(
+      mockReq("POST", { action: "status", phone: "+919999999999" }),
+      res,
+      { id: "user-1" },
+    );
 
     expect(phone.getOTPStatus).toHaveBeenCalledWith("user-1", "+919999999999");
     expect(res.status).toHaveBeenCalledWith(200);
@@ -154,7 +194,9 @@ describe("API — Verification Phone", () => {
 
   it("POST rejects an unknown action", async () => {
     const res = mockRes();
-    await handler(mockReq("POST", { action: "nonsense" }), res, { id: "user-1" });
+    await handler(mockReq("POST", { action: "nonsense" }), res, {
+      id: "user-1",
+    });
     expect(res.status).toHaveBeenCalledWith(400);
   });
 

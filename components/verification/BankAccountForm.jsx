@@ -8,7 +8,11 @@ import { useState } from "react";
  * @param {Object} props.initialData — Initial form data for editing
  * @param {boolean} props.loading — Loading state
  */
-export default function BankAccountForm({ onSubmit, initialData = {}, loading = false }) {
+export default function BankAccountForm({
+  onSubmit,
+  initialData = {},
+  loading = false,
+}) {
   const [form, setForm] = useState({
     accountHolderName: initialData.accountHolderName || "",
     accountNumber: initialData.accountNumber || "",
@@ -23,11 +27,15 @@ export default function BankAccountForm({ onSubmit, initialData = {}, loading = 
 
   const validate = () => {
     const errs = {};
-    if (!form.accountHolderName.trim()) errs.accountHolderName = "Account holder name is required";
-    if (!form.accountNumber.trim()) errs.accountNumber = "Account number is required";
-    else if (form.accountNumber.replace(/\s/g, "").length < 9) errs.accountNumber = "Invalid account number";
+    if (!form.accountHolderName.trim())
+      errs.accountHolderName = "Account holder name is required";
+    if (!form.accountNumber.trim())
+      errs.accountNumber = "Account number is required";
+    else if (form.accountNumber.replace(/\s/g, "").length < 9)
+      errs.accountNumber = "Invalid account number";
     if (!form.ifscCode.trim()) errs.ifscCode = "IFSC code is required";
-    else if (form.ifscCode.trim().length !== 11) errs.ifscCode = "IFSC must be 11 characters";
+    else if (form.ifscCode.trim().length !== 11)
+      errs.ifscCode = "IFSC must be 11 characters";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -51,7 +59,9 @@ export default function BankAccountForm({ onSubmit, initialData = {}, loading = 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="text-xs text-on-surface-variant font-inter mb-1 block">Account Holder Name *</label>
+        <label className="text-xs text-on-surface-variant font-inter mb-1 block">
+          Account Holder Name *
+        </label>
         <input
           type="text"
           value={form.accountHolderName}
@@ -61,11 +71,15 @@ export default function BankAccountForm({ onSubmit, initialData = {}, loading = 
           }`}
           placeholder="Enter account holder name"
         />
-        {errors.accountHolderName && <p className="text-xs text-danger mt-1">{errors.accountHolderName}</p>}
+        {errors.accountHolderName && (
+          <p className="text-xs text-danger mt-1">{errors.accountHolderName}</p>
+        )}
       </div>
 
       <div>
-        <label className="text-xs text-on-surface-variant font-inter mb-1 block">Account Number *</label>
+        <label className="text-xs text-on-surface-variant font-inter mb-1 block">
+          Account Number *
+        </label>
         <input
           type="text"
           value={form.accountNumber}
@@ -75,12 +89,16 @@ export default function BankAccountForm({ onSubmit, initialData = {}, loading = 
           }`}
           placeholder="Enter account number"
         />
-        {errors.accountNumber && <p className="text-xs text-danger mt-1">{errors.accountNumber}</p>}
+        {errors.accountNumber && (
+          <p className="text-xs text-danger mt-1">{errors.accountNumber}</p>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="text-xs text-on-surface-variant font-inter mb-1 block">IFSC Code *</label>
+          <label className="text-xs text-on-surface-variant font-inter mb-1 block">
+            IFSC Code *
+          </label>
           <input
             type="text"
             value={form.ifscCode}
@@ -91,10 +109,14 @@ export default function BankAccountForm({ onSubmit, initialData = {}, loading = 
             }`}
             placeholder="ABCD0123456"
           />
-          {errors.ifscCode && <p className="text-xs text-danger mt-1">{errors.ifscCode}</p>}
+          {errors.ifscCode && (
+            <p className="text-xs text-danger mt-1">{errors.ifscCode}</p>
+          )}
         </div>
         <div>
-          <label className="text-xs text-on-surface-variant font-inter mb-1 block">Account Type</label>
+          <label className="text-xs text-on-surface-variant font-inter mb-1 block">
+            Account Type
+          </label>
           <select
             value={form.accountType}
             onChange={(e) => update("accountType", e.target.value)}
@@ -109,7 +131,9 @@ export default function BankAccountForm({ onSubmit, initialData = {}, loading = 
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="text-xs text-on-surface-variant font-inter mb-1 block">Bank Name</label>
+          <label className="text-xs text-on-surface-variant font-inter mb-1 block">
+            Bank Name
+          </label>
           <input
             type="text"
             value={form.bankName}
@@ -119,7 +143,9 @@ export default function BankAccountForm({ onSubmit, initialData = {}, loading = 
           />
         </div>
         <div>
-          <label className="text-xs text-on-surface-variant font-inter mb-1 block">Branch Name</label>
+          <label className="text-xs text-on-surface-variant font-inter mb-1 block">
+            Branch Name
+          </label>
           <input
             type="text"
             value={form.branchName}
@@ -131,7 +157,9 @@ export default function BankAccountForm({ onSubmit, initialData = {}, loading = 
       </div>
 
       <div>
-        <label className="text-xs text-on-surface-variant font-inter mb-1 block">UPI ID (optional)</label>
+        <label className="text-xs text-on-surface-variant font-inter mb-1 block">
+          UPI ID (optional)
+        </label>
         <input
           type="text"
           value={form.upiId}
@@ -146,7 +174,11 @@ export default function BankAccountForm({ onSubmit, initialData = {}, loading = 
         disabled={loading}
         className="w-full py-2.5 px-4 rounded-xl bg-primary text-on-primary text-sm font-inter font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {loading ? "Saving..." : initialData.accountHolderName ? "Update Account" : "Add Account"}
+        {loading
+          ? "Saving..."
+          : initialData.accountHolderName
+            ? "Update Account"
+            : "Add Account"}
       </button>
     </form>
   );

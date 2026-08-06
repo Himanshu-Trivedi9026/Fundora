@@ -29,12 +29,12 @@ curl http://localhost:3000/api/health
 
 ### Services
 
-| Service | Port | Description |
-|---------|------|-------------|
-| Fundora App | 3000 | Next.js application |
-| Redis | 6379 | Cache & job queue backend |
-| Prometheus | 9090 | Metrics collection |
-| Grafana | 3001 | Monitoring dashboards |
+| Service     | Port | Description               |
+| ----------- | ---- | ------------------------- |
+| Fundora App | 3000 | Next.js application       |
+| Redis       | 6379 | Cache & job queue backend |
+| Prometheus  | 9090 | Metrics collection        |
+| Grafana     | 3001 | Monitoring dashboards     |
 
 ## Kubernetes Deployment
 
@@ -79,11 +79,11 @@ helm rollback fundora 1
 
 The application exposes three types of health probes:
 
-| Probe | Path | Purpose |
-|-------|------|---------|
-| Liveness | `GET /api/health` | Is the app running? |
+| Probe     | Path              | Purpose                    |
+| --------- | ----------------- | -------------------------- |
+| Liveness  | `GET /api/health` | Is the app running?        |
 | Readiness | `GET /api/health` | Can the app serve traffic? |
-| Startup | `GET /api/health` | Has the app fully started? |
+| Startup   | `GET /api/health` | Has the app fully started? |
 
 Database-specific health: `GET /api/health/database`
 
@@ -93,34 +93,34 @@ See `deploy/docker/.env.example` for all configuration options.
 
 ### Required
 
-| Variable | Description |
-|----------|-------------|
-| `SUPABASE_URL` | Supabase project URL |
+| Variable                    | Description               |
+| --------------------------- | ------------------------- |
+| `SUPABASE_URL`              | Supabase project URL      |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key |
-| `NEXTAUTH_SECRET` | NextAuth.js secret key |
-| `NEXTAUTH_URL` | Application public URL |
+| `NEXTAUTH_SECRET`           | NextAuth.js secret key    |
+| `NEXTAUTH_URL`              | Application public URL    |
 
 ### Optional
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `REDIS_URL` | `redis://redis:6379` | Redis connection string |
-| `LOG_LEVEL` | `info` | Logging level |
-| `CACHE_BACKEND` | `memory` | Cache backend (`memory`/`redis`/`database`) |
-| `ENABLE_TRACING` | `false` | Enable OpenTelemetry tracing |
-| `ENABLE_METRICS` | `true` | Enable metrics collection |
-| `JOB_CONCURRENCY` | `5` | Max concurrent job workers |
+| Variable          | Default              | Description                                 |
+| ----------------- | -------------------- | ------------------------------------------- |
+| `REDIS_URL`       | `redis://redis:6379` | Redis connection string                     |
+| `LOG_LEVEL`       | `info`               | Logging level                               |
+| `CACHE_BACKEND`   | `memory`             | Cache backend (`memory`/`redis`/`database`) |
+| `ENABLE_TRACING`  | `false`              | Enable OpenTelemetry tracing                |
+| `ENABLE_METRICS`  | `true`               | Enable metrics collection                   |
+| `JOB_CONCURRENCY` | `5`                  | Max concurrent job workers                  |
 
 ## CI/CD Pipeline
 
 The project includes GitHub Actions workflows:
 
-| Workflow | Trigger | Description |
-|----------|---------|-------------|
-| `ci.yml` | Push/PR to main | Lint, type-check, test, security scan, build |
-| `deploy.yml` | Push to main | Build container, deploy to K8s, smoke test, rollback on failure |
-| `preview.yml` | PR opened | Build preview deployment |
-| `security.yml` | Weekly/Mon | Dependency audit, SAST, secret scanning |
+| Workflow       | Trigger         | Description                                                     |
+| -------------- | --------------- | --------------------------------------------------------------- |
+| `ci.yml`       | Push/PR to main | Lint, type-check, test, security scan, build                    |
+| `deploy.yml`   | Push to main    | Build container, deploy to K8s, smoke test, rollback on failure |
+| `preview.yml`  | PR opened       | Build preview deployment                                        |
+| `security.yml` | Weekly/Mon      | Dependency audit, SAST, secret scanning                         |
 
 ## Monitoring
 

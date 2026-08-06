@@ -9,22 +9,22 @@
 
 ### Required
 
-| Variable | Description | Format |
-|----------|-------------|--------|
-| `ENCRYPTION_KEY` | AES-256-GCM encryption key for document metadata | 64-char hex string (32 bytes) |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (server-side only) | JWT format |
-| `JWT_SECRET` | Supabase JWT secret for token verification | String |
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL | `https://xxx.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous/public key | JWT format |
+| Variable                        | Description                                      | Format                        |
+| ------------------------------- | ------------------------------------------------ | ----------------------------- |
+| `ENCRYPTION_KEY`                | AES-256-GCM encryption key for document metadata | 64-char hex string (32 bytes) |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Supabase service role key (server-side only)     | JWT format                    |
+| `JWT_SECRET`                    | Supabase JWT secret for token verification       | String                        |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL                             | `https://xxx.supabase.co`     |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous/public key                    | JWT format                    |
 
 ### Optional
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `OTP_SALT` | Salt for OTP hashing | `fundora-otp-salt` |
-| `OPENAI_API_KEY` | OpenAI API key for AI campaign generator | None |
-| `RAZORPAY_KEY_ID` | Razorpay payment gateway key | None |
-| `RAZORPAY_KEY_SECRET` | Razorpay payment gateway secret | None |
+| Variable              | Description                              | Default            |
+| --------------------- | ---------------------------------------- | ------------------ |
+| `OTP_SALT`            | Salt for OTP hashing                     | `fundora-otp-salt` |
+| `OPENAI_API_KEY`      | OpenAI API key for AI campaign generator | None               |
+| `RAZORPAY_KEY_ID`     | Razorpay payment gateway key             | None               |
+| `RAZORPAY_KEY_SECRET` | Razorpay payment gateway secret          | None               |
 
 ### Generating ENCRYPTION_KEY
 
@@ -38,13 +38,13 @@ node -e "process.stdout.write(require('crypto').randomBytes(32).toString('hex'))
 
 ## Required Secrets
 
-| Secret | Purpose | Where to Store |
-|--------|---------|----------------|
-| `ENCRYPTION_KEY` | Encrypts document metadata (AES-256-GCM) | Secrets manager |
-| `SUPABASE_SERVICE_ROLE_KEY` | Server-side DB operations bypassing RLS | Secrets manager |
-| `JWT_SECRET` | Token verification for auth | Secrets manager |
-| `OPENAI_API_KEY` | AI campaign text generation | Secrets manager |
-| `RAZORPAY_KEY_SECRET` | Payment processing | Secrets manager |
+| Secret                      | Purpose                                  | Where to Store  |
+| --------------------------- | ---------------------------------------- | --------------- |
+| `ENCRYPTION_KEY`            | Encrypts document metadata (AES-256-GCM) | Secrets manager |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-side DB operations bypassing RLS  | Secrets manager |
+| `JWT_SECRET`                | Token verification for auth              | Secrets manager |
+| `OPENAI_API_KEY`            | AI campaign text generation              | Secrets manager |
+| `RAZORPAY_KEY_SECRET`       | Payment processing                       | Secrets manager |
 
 ---
 
@@ -205,18 +205,19 @@ pg_dump $DATABASE_URL > backup_$(date +%Y%m%d).sql
 
 ### What to Monitor
 
-| Metric | Alert Threshold | Action |
-|--------|----------------|--------|
-| API response time (verification endpoints) | > 2s | Check DB queries, add indexes |
-| Error rate (verification API) | > 5% | Check logs, investigate |
-| Failed login attempts | > 10/min per IP | Rate limiting active |
-| OTP verification failures | > 3 per user | Account lockout check |
-| Storage upload failures | > 0 | Check bucket policies |
-| Encryption/decryption errors | > 0 | Check ENCRYPTION_KEY |
+| Metric                                     | Alert Threshold | Action                        |
+| ------------------------------------------ | --------------- | ----------------------------- |
+| API response time (verification endpoints) | > 2s            | Check DB queries, add indexes |
+| Error rate (verification API)              | > 5%            | Check logs, investigate       |
+| Failed login attempts                      | > 10/min per IP | Rate limiting active          |
+| OTP verification failures                  | > 3 per user    | Account lockout check         |
+| Storage upload failures                    | > 0             | Check bucket policies         |
+| Encryption/decryption errors               | > 0             | Check ENCRYPTION_KEY          |
 
 ### Structured Logging
 
 All verification operations log via `secureLogger.js`:
+
 - Format: JSON with `level`, `module`, `message`, `timestamp`, `data`
 - PII auto-redacted: phone numbers, emails, IPs, tokens, OTPs
 - Log levels: `debug`, `info`, `warn`, `error`
@@ -224,6 +225,7 @@ All verification operations log via `secureLogger.js`:
 ### Log Rotation
 
 Configure log rotation on your hosting platform:
+
 - Retention: 30 days minimum
 - Compression: Enable for older logs
 - Storage: Ensure sufficient disk space for structured JSON logs
@@ -268,6 +270,7 @@ Configure log rotation on your hosting platform:
 ### If Issues Occur
 
 1. **Immediate:** Revert to previous deployment
+
    ```bash
    # Vercel
    vercel rollback
@@ -277,6 +280,7 @@ Configure log rotation on your hosting platform:
    ```
 
 2. **Database:** Restore from backup if migrations caused issues
+
    ```bash
    # Restore database
    psql $DATABASE_URL < backup_YYYYMMDD.sql
@@ -288,13 +292,13 @@ Configure log rotation on your hosting platform:
 
 ### Rollback Decision Matrix
 
-| Issue | Action |
-|-------|--------|
-| Tests failing | Fix code, do NOT rollback DB |
-| DB migration error | Rollback DB, keep code |
-| Encryption errors | Check ENCRYPTION_KEY, do NOT rollback |
-| Storage errors | Check bucket policies |
-| Auth errors | Check SUPABASE_SERVICE_ROLE_KEY |
+| Issue              | Action                                |
+| ------------------ | ------------------------------------- |
+| Tests failing      | Fix code, do NOT rollback DB          |
+| DB migration error | Rollback DB, keep code                |
+| Encryption errors  | Check ENCRYPTION_KEY, do NOT rollback |
+| Storage errors     | Check bucket policies                 |
+| Auth errors        | Check SUPABASE_SERVICE_ROLE_KEY       |
 
 ---
 

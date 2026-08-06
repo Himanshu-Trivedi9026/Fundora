@@ -15,7 +15,9 @@ export default function ObservabilityPage() {
       try {
         const params = new URLSearchParams({ dashboard: "true" });
         if (timeRange) params.set("since", timeRange);
-        const res = await authFetch(`/api/observability/metrics?${params.toString()}`);
+        const res = await authFetch(
+          `/api/observability/metrics?${params.toString()}`,
+        );
         const json = await res.json();
         setMetrics(json.data || json);
       } catch (e) {
@@ -29,7 +31,9 @@ export default function ObservabilityPage() {
   const extractMetric = (metricName) => {
     if (!metrics) return null;
     if (Array.isArray(metrics)) {
-      return metrics.find((m) => m.name === metricName || m.metricName === metricName);
+      return metrics.find(
+        (m) => m.name === metricName || m.metricName === metricName,
+      );
     }
     return metrics[metricName] || null;
   };
@@ -82,8 +86,12 @@ export default function ObservabilityPage() {
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-2xl font-bold text-white">Observability Dashboard</h1>
-              <p className="text-gray-400 mt-1">System metrics, error rates, and performance monitoring</p>
+              <h1 className="text-2xl font-bold text-white">
+                Observability Dashboard
+              </h1>
+              <p className="text-gray-400 mt-1">
+                System metrics, error rates, and performance monitoring
+              </p>
             </div>
             <div className="flex items-center gap-2">
               {["1h", "6h", "24h", "7d", "30d"].map((range) => (
@@ -118,10 +126,19 @@ export default function ObservabilityPage() {
 
           {error && (
             <GlassCard className="text-center py-12">
-              <span className="material-symbols-outlined text-4xl text-red-400 mb-3">error_outline</span>
-              <p className="text-red-400 text-lg font-medium">Failed to load metrics</p>
+              <span className="material-symbols-outlined text-4xl text-red-400 mb-3">
+                error_outline
+              </span>
+              <p className="text-red-400 text-lg font-medium">
+                Failed to load metrics
+              </p>
               <p className="text-gray-500 text-sm mt-1">{error}</p>
-              <Button variant="secondary" size="sm" className="mt-4" onClick={() => window.location.reload()}>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="mt-4"
+                onClick={() => window.location.reload()}
+              >
                 Retry
               </Button>
             </GlassCard>
@@ -129,9 +146,15 @@ export default function ObservabilityPage() {
 
           {!loading && !error && !metrics && (
             <GlassCard className="text-center py-12">
-              <span className="material-symbols-outlined text-4xl text-gray-500 mb-3">monitoring</span>
-              <p className="text-gray-400 text-lg font-medium">No metrics available</p>
-              <p className="text-gray-600 text-sm mt-1">System metrics will appear here once data is collected.</p>
+              <span className="material-symbols-outlined text-4xl text-gray-500 mb-3">
+                monitoring
+              </span>
+              <p className="text-gray-400 text-lg font-medium">
+                No metrics available
+              </p>
+              <p className="text-gray-600 text-sm mt-1">
+                System metrics will appear here once data is collected.
+              </p>
             </GlassCard>
           )}
 
@@ -145,25 +168,39 @@ export default function ObservabilityPage() {
                   return (
                     <GlassCard key={metric.key}>
                       <div className="flex items-center gap-3 mb-3">
-                        <div className={`w-10 h-10 rounded-lg ${metric.bgColor} flex items-center justify-center`}>
-                          <span className={`material-symbols-outlined text-xl ${metric.color}`}>{metric.icon}</span>
+                        <div
+                          className={`w-10 h-10 rounded-lg ${metric.bgColor} flex items-center justify-center`}
+                        >
+                          <span
+                            className={`material-symbols-outlined text-xl ${metric.color}`}
+                          >
+                            {metric.icon}
+                          </span>
                         </div>
-                        <p className="text-gray-400 text-xs font-medium">{metric.label}</p>
+                        <p className="text-gray-400 text-xs font-medium">
+                          {metric.label}
+                        </p>
                       </div>
-                      <p className={`text-2xl font-bold text-white ${!value ? "opacity-40" : ""}`}>
+                      <p
+                        className={`text-2xl font-bold text-white ${!value ? "opacity-40" : ""}`}
+                      >
                         {formatValue(value, metric.suffix)}
                       </p>
                       {data?.change !== undefined && (
                         <div className="flex items-center gap-1 mt-1">
                           <span
                             className={`text-[11px] ${
-                              data.change >= 0 ? "text-green-400" : "text-red-400"
+                              data.change >= 0
+                                ? "text-green-400"
+                                : "text-red-400"
                             }`}
                           >
                             {data.change >= 0 ? "+" : ""}
                             {data.change}%
                           </span>
-                          <span className="text-gray-600 text-[11px]">vs previous period</span>
+                          <span className="text-gray-600 text-[11px]">
+                            vs previous period
+                          </span>
                         </div>
                       )}
                     </GlassCard>
@@ -172,21 +209,36 @@ export default function ObservabilityPage() {
               </div>
 
               {/* Detailed Metrics */}
-              <h2 className="text-white font-semibold text-sm mb-4">Detailed Metrics</h2>
+              <h2 className="text-white font-semibold text-sm mb-4">
+                Detailed Metrics
+              </h2>
               <div className="space-y-3">
                 {Array.isArray(metrics) ? (
                   metrics.slice(0, 10).map((m, idx) => (
-                    <GlassCard key={m.name || idx} className="flex items-center justify-between">
+                    <GlassCard
+                      key={m.name || idx}
+                      className="flex items-center justify-between"
+                    >
                       <div className="flex items-center gap-3">
-                        <span className="material-symbols-outlined text-[18px] text-gray-400">analytics</span>
+                        <span className="material-symbols-outlined text-[18px] text-gray-400">
+                          analytics
+                        </span>
                         <div>
-                          <h3 className="text-white text-sm">{m.name || m.metricName}</h3>
-                          {m.source && <p className="text-gray-600 text-[11px]">Source: {m.source}</p>}
+                          <h3 className="text-white text-sm">
+                            {m.name || m.metricName}
+                          </h3>
+                          {m.source && (
+                            <p className="text-gray-600 text-[11px]">
+                              Source: {m.source}
+                            </p>
+                          )}
                         </div>
                       </div>
                       <div className="text-right">
                         <p className="text-white font-semibold">
-                          {m.value !== undefined ? formatValue(m.value) : m.count || "--"}
+                          {m.value !== undefined
+                            ? formatValue(m.value)
+                            : m.count || "--"}
                         </p>
                         {m.timestamp && (
                           <p className="text-gray-600 text-[11px]">

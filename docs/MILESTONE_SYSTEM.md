@@ -33,6 +33,7 @@ draft → active → submitted → approved → completed
 Creates a new milestone for a campaign.
 
 **Parameters:**
+
 - `campaignId` (string, required) — Campaign ID
 - `creatorId` (string, required) — Creator ID
 - `title` (string, required) — Milestone title
@@ -84,6 +85,7 @@ Checks if a milestone meets the auto-approval threshold.
 Creates a review for a milestone.
 
 **Parameters:**
+
 - `milestoneId` (string, required) — Milestone ID
 - `reviewerId` (string, required) — Reviewer (donor) ID
 - `decision` (string, required) — 'approve', 'reject', or 'abstain'
@@ -125,6 +127,7 @@ After every review create, update, or delete, the system recalculates:
 ## Auto-Approval
 
 A milestone qualifies for auto-approval when:
+
 - Status is `submitted`
 - Total reviews > 0
 - Approval percentage ≥ auto_approve_threshold (default: 80%)
@@ -132,7 +135,11 @@ A milestone qualifies for auto-approval when:
 ## Usage Example
 
 ```javascript
-import { createMilestone, activateMilestone, createReview } from "../lib/milestone";
+import {
+  createMilestone,
+  activateMilestone,
+  createReview,
+} from "../lib/milestone";
 
 // Create milestone
 const milestone = await createMilestone({

@@ -28,13 +28,15 @@ export default function DMChat() {
   const cleanupTyping = useRef(null);
 
   /* ---------------- AUTH ---------------- */
-  const loadInbox = useCallback(async (uid) => {
-    const userIdToUse = uid || currentUserId;
-    if (!userIdToUse) return;
+  const loadInbox = useCallback(
+    async (uid) => {
+      const userIdToUse = uid || currentUserId;
+      if (!userIdToUse) return;
 
-    const { data } = await supabase
-      .from("dm_conversations")
-      .select(`
+      const { data } = await supabase
+        .from("dm_conversations")
+        .select(
+          `
         id,
         user1,
         user2,
@@ -43,12 +45,15 @@ export default function DMChat() {
           content,
           created_at
         )
-      `)
-      .or(`user1.eq.${userIdToUse},user2.eq.${userIdToUse}`)
-      .order("created_at", { ascending: false });
+      `,
+        )
+        .or(`user1.eq.${userIdToUse},user2.eq.${userIdToUse}`)
+        .order("created_at", { ascending: false });
 
-    setThreads(data || []);
-  }, [currentUserId]);
+      setThreads(data || []);
+    },
+    [currentUserId],
+  );
 
   const initConversation = useCallback(async () => {
     queueMicrotask(() => setLoading(true));
@@ -76,7 +81,7 @@ export default function DMChat() {
             },
             (payload) => {
               setMessages((prev) => [...prev, payload.new]);
-            }
+            },
           )
           .subscribe();
 
@@ -98,7 +103,7 @@ export default function DMChat() {
               if (payload.new.user_id !== currentUserId) {
                 setTypingUser(payload.new.is_typing);
               }
-            }
+            },
           )
           .subscribe();
 
@@ -158,7 +163,6 @@ export default function DMChat() {
     };
   }, [currentUserId, otherUserId, initConversation]);
 
-  
   async function sendTyping(status) {
     if (!conversationId) return;
 
@@ -205,8 +209,8 @@ export default function DMChat() {
     const type = file.type.startsWith("image")
       ? "image"
       : file.type.startsWith("video")
-      ? "video"
-      : "file";
+        ? "video"
+        : "file";
 
     const path = `${conversationId}/${Date.now()}.${ext}`;
 
@@ -305,7 +309,6 @@ export default function DMChat() {
 
       <main className="pt-16 min-h-screen flex-1 relative">
         <div className="max-w-7xl mx-auto h-[calc(100vh-4rem)] flex gap-6 px-4 md:px-6 py-4 md:py-6">
-
           {/* ═══════════ LEFT PANE: Conversation List (desktop) ═══════════ */}
           <motion.section
             initial={{ opacity: 0, x: -20 }}
@@ -324,11 +327,19 @@ export default function DMChat() {
                   whileTap={{ scale: 0.95 }}
                   className="w-8 h-8 rounded-lg bg-surface-variant/50 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors"
                 >
-                  <span className="material-symbols-outlined text-lg" aria-hidden="true">edit_square</span>
+                  <span
+                    className="material-symbols-outlined text-lg"
+                    aria-hidden="true"
+                  >
+                    edit_square
+                  </span>
                 </motion.button>
               </div>
               <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg" aria-hidden="true">
+                <span
+                  className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg"
+                  aria-hidden="true"
+                >
                   search
                 </span>
                 <input
@@ -344,7 +355,10 @@ export default function DMChat() {
             <div className="flex-1 overflow-y-auto scrollbar-hide p-2">
               {threads.length === 0 ? (
                 <div className="text-center py-12">
-                  <span className="material-symbols-outlined text-4xl text-on-surface-variant/30 block mb-3" aria-hidden="true">
+                  <span
+                    className="material-symbols-outlined text-4xl text-on-surface-variant/30 block mb-3"
+                    aria-hidden="true"
+                  >
                     forum
                   </span>
                   <p className="text-on-surface-variant font-inter text-sm">
@@ -355,7 +369,9 @@ export default function DMChat() {
                 <div className="space-y-1">
                   {threads.map((thread) => {
                     const otherUser =
-                      thread.user1 === currentUserId ? thread.user2 : thread.user1;
+                      thread.user1 === currentUserId
+                        ? thread.user2
+                        : thread.user1;
                     const isActive = otherUser === otherUserId;
 
                     return (
@@ -363,7 +379,12 @@ export default function DMChat() {
                         key={thread.id}
                         whileHover={{ x: 3 }}
                         onClick={() => openThread(thread)}
-                        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openThread(thread); } }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            openThread(thread);
+                          }
+                        }}
                         role="button"
                         tabIndex={0}
                         className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all ${
@@ -374,22 +395,32 @@ export default function DMChat() {
                       >
                         <div className="relative shrink-0">
                           <div className="w-12 h-12 rounded-full overflow-hidden border border-outline-variant bg-surface-container-high flex items-center justify-center">
-                            <span className="material-symbols-outlined text-on-surface-variant/50 text-xl" aria-hidden="true">
+                            <span
+                              className="material-symbols-outlined text-on-surface-variant/50 text-xl"
+                              aria-hidden="true"
+                            >
                               person
                             </span>
                           </div>
-                          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-surface-container rounded-full" aria-hidden="true" />
+                          <div
+                            className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-surface-container rounded-full"
+                            aria-hidden="true"
+                          />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex justify-between items-center mb-0.5">
-                            <span className={`font-geist text-sm truncate ${isActive ? "text-on-surface font-semibold" : "text-on-surface-variant"}`}>
+                            <span
+                              className={`font-geist text-sm truncate ${isActive ? "text-on-surface font-semibold" : "text-on-surface-variant"}`}
+                            >
                               {otherUser.slice(0, 8)}...
                             </span>
                             <span className="text-[11px] text-on-surface-variant/60 shrink-0 ml-2">
                               {getTimestamp(thread)}
                             </span>
                           </div>
-                          <p className={`font-inter text-sm truncate ${isActive ? "text-on-surface" : "text-on-surface-variant/70"}`}>
+                          <p
+                            className={`font-inter text-sm truncate ${isActive ? "text-on-surface" : "text-on-surface-variant/70"}`}
+                          >
                             {getLastMessage(thread)}
                           </p>
                         </div>
@@ -405,7 +436,11 @@ export default function DMChat() {
           <motion.section
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+            transition={{
+              duration: 0.5,
+              delay: 0.1,
+              ease: [0.25, 0.46, 0.45, 0.94],
+            }}
             className="flex-1 flex flex-col glass-card rounded-2xl overflow-hidden relative"
           >
             {/* ─── Chat Header ─── */}
@@ -419,7 +454,9 @@ export default function DMChat() {
                 {/* Mobile back button */}
                 <motion.button
                   whileTap={{ scale: 0.9 }}
-                  onClick={() => { router.push("/dm"); }}
+                  onClick={() => {
+                    router.push("/dm");
+                  }}
                   className="md:hidden material-symbols-outlined text-on-surface-variant p-1"
                   aria-label="Back to messages"
                 >
@@ -428,18 +465,27 @@ export default function DMChat() {
 
                 <div className="relative">
                   <div className="w-11 h-11 rounded-full overflow-hidden border border-primary/20 bg-surface-container-high flex items-center justify-center">
-                    <span className="material-symbols-outlined text-on-surface-variant/50 text-xl" aria-hidden="true">
+                    <span
+                      className="material-symbols-outlined text-on-surface-variant/50 text-xl"
+                      aria-hidden="true"
+                    >
                       person
                     </span>
                   </div>
-                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-surface-container rounded-full" aria-hidden="true" />
+                  <div
+                    className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-surface-container rounded-full"
+                    aria-hidden="true"
+                  />
                 </div>
                 <div>
                   <h3 className="font-geist text-[18px] leading-tight text-on-surface">
                     {otherUserId?.slice(0, 8)}...
                   </h3>
                   <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full" aria-hidden="true" />
+                    <span
+                      className="w-1.5 h-1.5 bg-green-500 rounded-full"
+                      aria-hidden="true"
+                    />
                     <span className="text-[12px] text-on-surface-variant font-inter">
                       Active now
                     </span>
@@ -451,7 +497,12 @@ export default function DMChat() {
                 {/* AI/Human Toggle */}
                 <div className="hidden sm:flex items-center bg-surface-container p-1 rounded-full border border-outline-variant mr-2">
                   <button className="px-3 py-1.5 rounded-full text-[12px] font-medium bg-primary text-on-primary ai-glow transition-all flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-[16px]" aria-hidden="true">smart_toy</span>
+                    <span
+                      className="material-symbols-outlined text-[16px]"
+                      aria-hidden="true"
+                    >
+                      smart_toy
+                    </span>
                     AI Help
                   </button>
                   <button className="px-3 py-1.5 rounded-full text-[12px] font-medium text-on-surface-variant hover:text-on-surface transition-colors">
@@ -525,21 +576,30 @@ export default function DMChat() {
                       }`}
                     >
                       {/* Avatar */}
-                      <div className={`w-8 h-8 rounded-full overflow-hidden shrink-0 border ${
-                        isMine ? "border-primary-container/50" : "border-outline-variant"
-                      } bg-surface-container-high flex items-center justify-center`}>
-                        <span className="material-symbols-outlined text-on-surface-variant/40 text-sm" aria-hidden="true">
+                      <div
+                        className={`w-8 h-8 rounded-full overflow-hidden shrink-0 border ${
+                          isMine
+                            ? "border-primary-container/50"
+                            : "border-outline-variant"
+                        } bg-surface-container-high flex items-center justify-center`}
+                      >
+                        <span
+                          className="material-symbols-outlined text-on-surface-variant/40 text-sm"
+                          aria-hidden="true"
+                        >
                           {isMine ? "person" : "person"}
                         </span>
                       </div>
 
                       {/* Bubble */}
                       <div className="space-y-1">
-                        <div className={`p-4 rounded-2xl shadow-lg ${
-                          isMine
-                            ? "message-bubble-out ai-glow"
-                            : "message-bubble-in"
-                        }`}>
+                        <div
+                          className={`p-4 rounded-2xl shadow-lg ${
+                            isMine
+                              ? "message-bubble-out ai-glow"
+                              : "message-bubble-in"
+                          }`}
+                        >
                           {m.attachment_url ? (
                             m.attachment_type === "image" ? (
                               <div className="relative w-full h-64 max-h-64">
@@ -560,21 +620,30 @@ export default function DMChat() {
                                   isMine ? "text-white" : "text-primary"
                                 }`}
                               >
-                                <span className="material-symbols-outlined text-lg" aria-hidden="true">attach_file</span>
+                                <span
+                                  className="material-symbols-outlined text-lg"
+                                  aria-hidden="true"
+                                >
+                                  attach_file
+                                </span>
                                 Download attachment
                               </a>
                             )
                           ) : (
-                            <p className={`text-sm font-inter leading-relaxed ${
-                              isMine ? "text-white" : "text-on-surface"
-                            }`}>
+                            <p
+                              className={`text-sm font-inter leading-relaxed ${
+                                isMine ? "text-white" : "text-on-surface"
+                              }`}
+                            >
                               {m.content}
                             </p>
                           )}
                         </div>
-                        <span className={`text-[10px] text-on-surface-variant font-inter ${
-                          isMine ? "mr-2" : "ml-2"
-                        }`}>
+                        <span
+                          className={`text-[10px] text-on-surface-variant font-inter ${
+                            isMine ? "mr-2" : "ml-2"
+                          }`}
+                        >
                           {new Date(m.created_at).toLocaleTimeString("en-US", {
                             hour: "numeric",
                             minute: "2-digit",
@@ -596,7 +665,12 @@ export default function DMChat() {
                     className="flex items-center gap-2"
                   >
                     <div className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center border border-outline-variant">
-                      <span className="material-symbols-outlined text-on-surface-variant/40 text-sm" aria-hidden="true">person</span>
+                      <span
+                        className="material-symbols-outlined text-on-surface-variant/40 text-sm"
+                        aria-hidden="true"
+                      >
+                        person
+                      </span>
                     </div>
                     <div className="message-bubble-in px-4 py-3 rounded-2xl">
                       <motion.div
@@ -619,20 +693,27 @@ export default function DMChat() {
             {/* ─── AI Suggested Replies ─── */}
             <div className="px-6 pb-2">
               <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
-                <span className="material-symbols-outlined text-primary text-lg shrink-0 mt-1" aria-hidden="true">magic_button</span>
-                {["Draft vesting contract", "Check audit status", "Send Q4 roadmap"].map(
-                  (suggestion) => (
-                    <motion.button
-                      key={suggestion}
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
-                      onClick={() => setText(suggestion)}
-                      className="whitespace-nowrap px-4 py-2 bg-surface-container-high hover:bg-primary-container/20 border border-outline-variant rounded-full font-inter text-sm text-on-surface-variant hover:text-primary transition-all"
-                    >
-                      {suggestion}
-                    </motion.button>
-                  )
-                )}
+                <span
+                  className="material-symbols-outlined text-primary text-lg shrink-0 mt-1"
+                  aria-hidden="true"
+                >
+                  magic_button
+                </span>
+                {[
+                  "Draft vesting contract",
+                  "Check audit status",
+                  "Send Q4 roadmap",
+                ].map((suggestion) => (
+                  <motion.button
+                    key={suggestion}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => setText(suggestion)}
+                    className="whitespace-nowrap px-4 py-2 bg-surface-container-high hover:bg-primary-container/20 border border-outline-variant rounded-full font-inter text-sm text-on-surface-variant hover:text-primary transition-all"
+                  >
+                    {suggestion}
+                  </motion.button>
+                ))}
               </div>
             </div>
 
@@ -710,7 +791,7 @@ export default function DMChat() {
                       clearTimeout(typingTimeout.current);
                       typingTimeout.current = setTimeout(
                         () => sendTyping(false),
-                        1200
+                        1200,
                       );
                     }}
                     placeholder="Type your message or use /ai for help..."
@@ -726,14 +807,17 @@ export default function DMChat() {
                   className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-on-primary shadow-lg shadow-primary/20 transition-all"
                   aria-label="Send message"
                 >
-                  <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">
+                  <span
+                    className="material-symbols-outlined text-xl"
+                    style={{ fontVariationSettings: "'FILL' 1" }}
+                    aria-hidden="true"
+                  >
                     send
                   </span>
                 </motion.button>
               </form>
             </footer>
           </motion.section>
-
         </div>
       </main>
     </div>

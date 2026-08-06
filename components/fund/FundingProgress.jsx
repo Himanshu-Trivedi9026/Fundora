@@ -3,7 +3,12 @@ import { motion } from "framer-motion";
 /**
  * FundingProgress — Animated progress bar with funding stats.
  */
-export default function FundingProgress({ totalRaised, goal, progress, donorCount }) {
+export default function FundingProgress({
+  totalRaised,
+  goal,
+  progress,
+  donorCount,
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -17,17 +22,25 @@ export default function FundingProgress({ totalRaised, goal, progress, donorCoun
           <p className="text-2xl font-bold text-on-surface font-geist">
             ₹{totalRaised.toLocaleString("en-IN")}
           </p>
-          <p className="text-xs text-on-surface-variant font-inter mt-1">Raised</p>
+          <p className="text-xs text-on-surface-variant font-inter mt-1">
+            Raised
+          </p>
         </div>
         <div>
           <p className="text-2xl font-bold text-primary font-geist">
             ₹{goal.toLocaleString("en-IN")}
           </p>
-          <p className="text-xs text-on-surface-variant font-inter mt-1">Goal</p>
+          <p className="text-xs text-on-surface-variant font-inter mt-1">
+            Goal
+          </p>
         </div>
         <div>
-          <p className="text-2xl font-bold text-on-surface font-geist">{donorCount}</p>
-          <p className="text-xs text-on-surface-variant font-inter mt-1">Backers</p>
+          <p className="text-2xl font-bold text-on-surface font-geist">
+            {donorCount}
+          </p>
+          <p className="text-xs text-on-surface-variant font-inter mt-1">
+            Backers
+          </p>
         </div>
       </div>
 
@@ -36,7 +49,11 @@ export default function FundingProgress({ totalRaised, goal, progress, donorCoun
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
-          transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.3 }}
+          transition={{
+            duration: 1.2,
+            ease: [0.25, 0.46, 0.45, 0.94],
+            delay: 0.3,
+          }}
           className="h-full rounded-full bg-gradient-to-r from-primary-container to-primary"
           role="progressbar"
           aria-valuenow={Math.round(progress)}

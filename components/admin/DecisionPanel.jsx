@@ -189,7 +189,9 @@ export default function DecisionPanel({
                 >
                   {ACTIONS[activeAction].icon}
                 </span>
-                <p className={`text-sm font-inter font-medium ${ACTIONS[activeAction].color}`}>
+                <p
+                  className={`text-sm font-inter font-medium ${ACTIONS[activeAction].color}`}
+                >
                   Confirm {ACTIONS[activeAction].label}
                 </p>
               </div>

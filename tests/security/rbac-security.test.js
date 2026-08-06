@@ -114,7 +114,12 @@ describe("RBAC Security", () => {
     });
 
     it("should reject invalid role in setOrganizationRole", async () => {
-      const result = await setOrganizationRole("org-1", "user-1", "superadmin", "admin-1");
+      const result = await setOrganizationRole(
+        "org-1",
+        "user-1",
+        "superadmin",
+        "admin-1",
+      );
       expect(result.success).toBe(false);
       expect(result.error).toContain("Invalid role");
     });
@@ -123,16 +128,22 @@ describe("RBAC Security", () => {
       // createCustomRole calls hasPermission (4 from) then validates permissions
       // hasPermission: checkPlatformAdmin + getUserRole + getUserPermissions (2 from)
       supabaseAdmin.from
-        .mockReturnValueOnce(mockCheckPlatformAdmin({ data: null, error: null }))
-        .mockReturnValueOnce(mockGetUserRole({ data: { role: "org_owner" }, error: null }))
-        .mockReturnValueOnce(mockGetUserRole({ data: { role: "org_owner" }, error: null }))
+        .mockReturnValueOnce(
+          mockCheckPlatformAdmin({ data: null, error: null }),
+        )
+        .mockReturnValueOnce(
+          mockGetUserRole({ data: { role: "org_owner" }, error: null }),
+        )
+        .mockReturnValueOnce(
+          mockGetUserRole({ data: { role: "org_owner" }, error: null }),
+        )
         .mockReturnValueOnce(mockOrgRolesLookup({ data: null, error: null }));
 
       const result = await createCustomRole(
         "org-1",
         "hacker_role",
         ["system:root", "admin:override"],
-        "admin-1"
+        "admin-1",
       );
       expect(result.success).toBe(false);
       expect(result.error).toContain("Invalid permissions");
@@ -142,9 +153,15 @@ describe("RBAC Security", () => {
   describe("permission boundaries", () => {
     it("should not grant org permissions without org context", async () => {
       // checkPlatformAdmin — not admin
-      supabaseAdmin.from.mockReturnValueOnce(mockCheckPlatformAdmin({ data: null, error: null }));
+      supabaseAdmin.from.mockReturnValueOnce(
+        mockCheckPlatformAdmin({ data: null, error: null }),
+      );
 
-      const result = await hasPermission("user-1", null, PERMISSIONS.CAMPAIGN_CREATE);
+      const result = await hasPermission(
+        "user-1",
+        null,
+        PERMISSIONS.CAMPAIGN_CREATE,
+      );
       expect(result.success).toBe(true);
       expect(result.data.allowed).toBe(false);
       expect(result.data.reason).toContain("No organization context");
@@ -153,10 +170,16 @@ describe("RBAC Security", () => {
     it("should deny platform admin permission to non-admin", async () => {
       // hasPermission: checkPlatformAdmin (not admin) + getUserRole (not member)
       supabaseAdmin.from
-        .mockReturnValueOnce(mockCheckPlatformAdmin({ data: null, error: null }))
+        .mockReturnValueOnce(
+          mockCheckPlatformAdmin({ data: null, error: null }),
+        )
         .mockReturnValueOnce(mockGetUserRole({ data: null, error: null }));
 
-      const result = await hasPermission("user-1", "org-1", PERMISSIONS.PLATFORM_ADMIN);
+      const result = await hasPermission(
+        "user-1",
+        "org-1",
+        PERMISSIONS.PLATFORM_ADMIN,
+      );
       expect(result.success).toBe(true);
       expect(result.data.allowed).toBe(false);
     });
@@ -168,21 +191,34 @@ describe("RBAC Security", () => {
 
       // setOrganizationRole calls hasPermission (4 from) + update (1 from)
       supabaseAdmin.from
-        .mockReturnValueOnce(mockCheckPlatformAdmin({ data: null, error: null }))
-        .mockReturnValueOnce(mockGetUserRole({ data: { role: "org_owner" }, error: null }))
-        .mockReturnValueOnce(mockGetUserRole({ data: { role: "org_owner" }, error: null }))
+        .mockReturnValueOnce(
+          mockCheckPlatformAdmin({ data: null, error: null }),
+        )
+        .mockReturnValueOnce(
+          mockGetUserRole({ data: { role: "org_owner" }, error: null }),
+        )
+        .mockReturnValueOnce(
+          mockGetUserRole({ data: { role: "org_owner" }, error: null }),
+        )
         .mockReturnValueOnce(mockOrgRolesLookup({ data: null, error: null }))
-        .mockReturnValueOnce(mockUpdate({
-          data: { id: "mem-1", role: "finance_manager" },
-          error: null,
-        }));
+        .mockReturnValueOnce(
+          mockUpdate({
+            data: { id: "mem-1", role: "finance_manager" },
+            error: null,
+          }),
+        );
 
-      await setOrganizationRole("org-1", "user-2", "finance_manager", "admin-1");
+      await setOrganizationRole(
+        "org-1",
+        "user-2",
+        "finance_manager",
+        "admin-1",
+      );
 
       expect(logAuditEvent).toHaveBeenCalledWith(
         expect.objectContaining({
           eventType: "role_changed",
-        })
+        }),
       );
     });
   });
@@ -204,14 +240,16 @@ describe("RBAC Security", () => {
 
   describe("webhook signature security", () => {
     it("should not verify with wrong secret", async () => {
-      const { signPayload, verifySignature } = await import("../../lib/webhooks/webhookEngine");
+      const { signPayload, verifySignature } =
+        await import("../../lib/webhooks/webhookEngine");
       const sig = signPayload({ test: true }, "secret-a");
       const result = verifySignature({ test: true }, sig, "secret-b");
       expect(result).toBe(false);
     });
 
     it("should not verify with tampered payload", async () => {
-      const { signPayload, verifySignature } = await import("../../lib/webhooks/webhookEngine");
+      const { signPayload, verifySignature } =
+        await import("../../lib/webhooks/webhookEngine");
       const sig = signPayload({ amount: 100 }, "secret");
       const result = verifySignature({ amount: 999 }, sig, "secret");
       expect(result).toBe(false);

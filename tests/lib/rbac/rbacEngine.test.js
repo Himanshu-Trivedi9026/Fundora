@@ -52,14 +52,20 @@ function buildChain({ eqs = 0, terminal, terminalValue }) {
     return { [terminal]: vi.fn().mockResolvedValue(terminalValue) };
   }
   return {
-    eq: vi.fn().mockReturnValue(buildChain({ eqs: eqs - 1, terminal, terminalValue })),
+    eq: vi
+      .fn()
+      .mockReturnValue(buildChain({ eqs: eqs - 1, terminal, terminalValue })),
   };
 }
 
 function chainFrom(result) {
   return {
     select: vi.fn().mockReturnValue(
-      buildChain({ eqs: result.eqs || 0, terminal: result.terminal, terminalValue: result.value })
+      buildChain({
+        eqs: result.eqs || 0,
+        terminal: result.terminal,
+        terminalValue: result.value,
+      }),
     ),
   };
 }
@@ -165,7 +171,12 @@ describe("RBAC Engine", () => {
 
   describe("checkPlatformAdmin", () => {
     it("should return true for platform admin", async () => {
-      supabaseAdmin.from.mockReturnValueOnce(mockCheckPlatformAdmin({ data: { role: "platform_admin" }, error: null }));
+      supabaseAdmin.from.mockReturnValueOnce(
+        mockCheckPlatformAdmin({
+          data: { role: "platform_admin" },
+          error: null,
+        }),
+      );
 
       const result = await checkPlatformAdmin("user-1");
       expect(result.success).toBe(true);
@@ -173,7 +184,9 @@ describe("RBAC Engine", () => {
     });
 
     it("should return false for non-admin", async () => {
-      supabaseAdmin.from.mockReturnValueOnce(mockCheckPlatformAdmin({ data: null, error: null }));
+      supabaseAdmin.from.mockReturnValueOnce(
+        mockCheckPlatformAdmin({ data: null, error: null }),
+      );
 
       const result = await checkPlatformAdmin("user-1");
       expect(result.success).toBe(true);
@@ -188,7 +201,9 @@ describe("RBAC Engine", () => {
 
   describe("getUserRole", () => {
     it("should return user role in org", async () => {
-      supabaseAdmin.from.mockReturnValueOnce(mockGetUserRole({ data: { role: "org_admin" }, error: null }));
+      supabaseAdmin.from.mockReturnValueOnce(
+        mockGetUserRole({ data: { role: "org_admin" }, error: null }),
+      );
 
       const result = await getUserRole("user-1", "org-1");
       expect(result.success).toBe(true);
@@ -196,7 +211,9 @@ describe("RBAC Engine", () => {
     });
 
     it("should return null for non-member", async () => {
-      supabaseAdmin.from.mockReturnValueOnce(mockGetUserRole({ data: null, error: null }));
+      supabaseAdmin.from.mockReturnValueOnce(
+        mockGetUserRole({ data: null, error: null }),
+      );
 
       const result = await getUserRole("user-1", "org-1");
       expect(result.success).toBe(true);
@@ -208,7 +225,9 @@ describe("RBAC Engine", () => {
     it("should return permissions for a role", async () => {
       // getUserPermissions calls getUserRole (1 from) then queries organization_roles (1 from)
       supabaseAdmin.from
-        .mockReturnValueOnce(mockGetUserRole({ data: { role: "org_admin" }, error: null }))
+        .mockReturnValueOnce(
+          mockGetUserRole({ data: { role: "org_admin" }, error: null }),
+        )
         .mockReturnValueOnce(mockOrgRolesLookup({ data: null, error: null }));
 
       const result = await getUserPermissions("user-1", "org-1");
@@ -220,9 +239,18 @@ describe("RBAC Engine", () => {
 
   describe("hasPermission", () => {
     it("should allow platform admin everything", async () => {
-      supabaseAdmin.from.mockReturnValueOnce(mockCheckPlatformAdmin({ data: { role: "platform_admin" }, error: null }));
+      supabaseAdmin.from.mockReturnValueOnce(
+        mockCheckPlatformAdmin({
+          data: { role: "platform_admin" },
+          error: null,
+        }),
+      );
 
-      const result = await hasPermission("user-1", "org-1", PERMISSIONS.PLATFORM_ADMIN);
+      const result = await hasPermission(
+        "user-1",
+        "org-1",
+        PERMISSIONS.PLATFORM_ADMIN,
+      );
       expect(result.success).toBe(true);
       expect(result.data.allowed).toBe(true);
     });
@@ -230,10 +258,16 @@ describe("RBAC Engine", () => {
     it("should deny non-member", async () => {
       // checkPlatformAdmin (not admin) + getUserRole (not member)
       supabaseAdmin.from
-        .mockReturnValueOnce(mockCheckPlatformAdmin({ data: null, error: null }))
+        .mockReturnValueOnce(
+          mockCheckPlatformAdmin({ data: null, error: null }),
+        )
         .mockReturnValueOnce(mockGetUserRole({ data: null, error: null }));
 
-      const result = await hasPermission("user-1", "org-1", PERMISSIONS.CAMPAIGN_CREATE);
+      const result = await hasPermission(
+        "user-1",
+        "org-1",
+        PERMISSIONS.CAMPAIGN_CREATE,
+      );
       expect(result.success).toBe(true);
       expect(result.data.allowed).toBe(false);
     });
@@ -248,22 +282,43 @@ describe("RBAC Engine", () => {
 
       supabaseAdmin.from
         // 1. checkPlatformAdmin (not platform admin)
-        .mockReturnValueOnce(mockCheckPlatformAdmin({ data: null, error: null }))
+        .mockReturnValueOnce(
+          mockCheckPlatformAdmin({ data: null, error: null }),
+        )
         // 2. getUserRole (performedBy is org_admin)
-        .mockReturnValueOnce(mockGetUserRole({ data: { role: "org_admin" }, error: null }))
+        .mockReturnValueOnce(
+          mockGetUserRole({ data: { role: "org_admin" }, error: null }),
+        )
         // 3. getUserPermissions → getUserRole (same user)
-        .mockReturnValueOnce(mockGetUserRole({ data: { role: "org_admin" }, error: null }))
+        .mockReturnValueOnce(
+          mockGetUserRole({ data: { role: "org_admin" }, error: null }),
+        )
         // 4. getUserPermissions → organization_roles lookup
         .mockReturnValueOnce(mockOrgRolesLookup({ data: null, error: null }))
         // 5. Update role: from→update→eq→eq→select→single
-        .mockReturnValueOnce(mockUpdate({ data: { id: "mem-1", role: "finance_manager" }, error: null }));
+        .mockReturnValueOnce(
+          mockUpdate({
+            data: { id: "mem-1", role: "finance_manager" },
+            error: null,
+          }),
+        );
 
-      const result = await setOrganizationRole("org-1", "user-2", "finance_manager", "admin-1");
+      const result = await setOrganizationRole(
+        "org-1",
+        "user-2",
+        "finance_manager",
+        "admin-1",
+      );
       expect(result.success).toBe(true);
     });
 
     it("should reject invalid role", async () => {
-      const result = await setOrganizationRole("org-1", "user-2", "invalid_role", "admin-1");
+      const result = await setOrganizationRole(
+        "org-1",
+        "user-2",
+        "invalid_role",
+        "admin-1",
+      );
       expect(result.success).toBe(false);
     });
   });
@@ -276,31 +331,58 @@ describe("RBAC Engine", () => {
 
       supabaseAdmin.from
         // 1. checkPlatformAdmin (not platform admin)
-        .mockReturnValueOnce(mockCheckPlatformAdmin({ data: null, error: null }))
+        .mockReturnValueOnce(
+          mockCheckPlatformAdmin({ data: null, error: null }),
+        )
         // 2. getUserRole (performedBy is org_owner)
-        .mockReturnValueOnce(mockGetUserRole({ data: { role: "org_owner" }, error: null }))
+        .mockReturnValueOnce(
+          mockGetUserRole({ data: { role: "org_owner" }, error: null }),
+        )
         // 3. getUserPermissions → getUserRole
-        .mockReturnValueOnce(mockGetUserRole({ data: { role: "org_owner" }, error: null }))
+        .mockReturnValueOnce(
+          mockGetUserRole({ data: { role: "org_owner" }, error: null }),
+        )
         // 4. getUserPermissions → organization_roles
         .mockReturnValueOnce(mockOrgRolesLookup({ data: null, error: null }))
         // 5. Check existing role name
         .mockReturnValueOnce(mockOrgRolesLookup({ data: null, error: null }))
         // 6. Insert new role
-        .mockReturnValueOnce(mockInsert({ data: { id: "role-1", name: "custom_role" }, error: null }));
+        .mockReturnValueOnce(
+          mockInsert({
+            data: { id: "role-1", name: "custom_role" },
+            error: null,
+          }),
+        );
 
-      const result = await createCustomRole("org-1", "custom_role", ["campaign:read"], "admin-1");
+      const result = await createCustomRole(
+        "org-1",
+        "custom_role",
+        ["campaign:read"],
+        "admin-1",
+      );
       expect(result.success).toBe(true);
     });
 
     it("should reject invalid permissions", async () => {
       // hasPermission check (org_owner)
       supabaseAdmin.from
-        .mockReturnValueOnce(mockCheckPlatformAdmin({ data: null, error: null }))
-        .mockReturnValueOnce(mockGetUserRole({ data: { role: "org_owner" }, error: null }))
-        .mockReturnValueOnce(mockGetUserRole({ data: { role: "org_owner" }, error: null }))
+        .mockReturnValueOnce(
+          mockCheckPlatformAdmin({ data: null, error: null }),
+        )
+        .mockReturnValueOnce(
+          mockGetUserRole({ data: { role: "org_owner" }, error: null }),
+        )
+        .mockReturnValueOnce(
+          mockGetUserRole({ data: { role: "org_owner" }, error: null }),
+        )
         .mockReturnValueOnce(mockOrgRolesLookup({ data: null, error: null }));
 
-      const result = await createCustomRole("org-1", "bad_role", ["invalid:permission"], "admin-1");
+      const result = await createCustomRole(
+        "org-1",
+        "bad_role",
+        ["invalid:permission"],
+        "admin-1",
+      );
       expect(result.success).toBe(false);
     });
   });
@@ -309,9 +391,15 @@ describe("RBAC Engine", () => {
     it("should return system + custom roles", async () => {
       supabaseAdmin.from.mockReturnValueOnce(
         mockOrderQuery({
-          data: [{ name: "custom_role", permissions: ["campaign:read"], is_system: false }],
+          data: [
+            {
+              name: "custom_role",
+              permissions: ["campaign:read"],
+              is_system: false,
+            },
+          ],
           error: null,
-        })
+        }),
       );
 
       const result = await getOrganizationRoles("org-1");

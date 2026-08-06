@@ -12,7 +12,9 @@ export default function TenantList() {
   const fetchTenants = useCallback(async () => {
     queueMicrotask(() => setLoading(true));
     try {
-      const url = search ? `/api/tenants?search=${encodeURIComponent(search)}&limit=50` : "/api/tenants?limit=50";
+      const url = search
+        ? `/api/tenants?search=${encodeURIComponent(search)}&limit=50`
+        : "/api/tenants?limit=50";
       const res = await fetch(url);
       const json = await res.json();
       if (json.success) setTenants(json.data || []);
@@ -40,7 +42,10 @@ export default function TenantList() {
             onKeyDown={(e) => e.key === "Enter" && fetchTenants()}
             className="bg-gray-800 text-white rounded-lg px-3 py-2 border border-gray-700 text-sm w-64"
           />
-          <button onClick={fetchTenants} className="px-3 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 text-sm">
+          <button
+            onClick={fetchTenants}
+            className="px-3 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 text-sm"
+          >
             Search
           </button>
         </div>
@@ -49,7 +54,10 @@ export default function TenantList() {
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-20 bg-gray-800 rounded-xl animate-pulse" />
+            <div
+              key={i}
+              className="h-20 bg-gray-800 rounded-xl animate-pulse"
+            />
           ))}
         </div>
       ) : tenants.length === 0 ? (
@@ -61,7 +69,9 @@ export default function TenantList() {
           {tenants.map((tenant) => (
             <div
               key={tenant.id}
-              onClick={() => setSelected(selected === tenant.id ? null : tenant.id)}
+              onClick={() =>
+                setSelected(selected === tenant.id ? null : tenant.id)
+              }
               className="bg-gray-900 rounded-xl p-5 border border-gray-800 hover:border-gray-700 cursor-pointer transition-colors"
             >
               <div className="flex items-center justify-between">
@@ -70,17 +80,25 @@ export default function TenantList() {
                   <p className="text-gray-500 text-sm mt-0.5">{tenant.slug}</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`text-xs px-2 py-1 rounded-full ${
-                    tenant.plan === "enterprise" ? "bg-purple-500/20 text-purple-400" :
-                    tenant.plan === "pro" ? "bg-blue-500/20 text-blue-400" :
-                    "bg-gray-700 text-gray-400"
-                  }`}>
+                  <span
+                    className={`text-xs px-2 py-1 rounded-full ${
+                      tenant.plan === "enterprise"
+                        ? "bg-purple-500/20 text-purple-400"
+                        : tenant.plan === "pro"
+                          ? "bg-blue-500/20 text-blue-400"
+                          : "bg-gray-700 text-gray-400"
+                    }`}
+                  >
                     {tenant.plan}
                   </span>
                   {tenant.website_url && (
-                    <a href={tenant.website_url} target="_blank" rel="noopener noreferrer"
+                    <a
+                      href={tenant.website_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="text-indigo-400 hover:text-indigo-300 text-sm"
-                      onClick={(e) => e.stopPropagation()}>
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       Visit →
                     </a>
                   )}
@@ -88,12 +106,18 @@ export default function TenantList() {
               </div>
 
               {tenant.description && (
-                <p className="text-gray-500 text-sm mt-2">{tenant.description}</p>
+                <p className="text-gray-500 text-sm mt-2">
+                  {tenant.description}
+                </p>
               )}
 
               <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
-                <span>Created: {new Date(tenant.created_at).toLocaleDateString()}</span>
-                {tenant.contact_email && <span>Contact: {tenant.contact_email}</span>}
+                <span>
+                  Created: {new Date(tenant.created_at).toLocaleDateString()}
+                </span>
+                {tenant.contact_email && (
+                  <span>Contact: {tenant.contact_email}</span>
+                )}
               </div>
             </div>
           ))}

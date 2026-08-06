@@ -14,7 +14,10 @@ export default function PendingActions({ actions = [], onActionClick }) {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="font-geist text-sm font-semibold flex items-center gap-2">
-          <span className="material-symbols-outlined text-warning text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+          <span
+            className="material-symbols-outlined text-warning text-[16px]"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >
             pending_actions
           </span>
           Pending Actions
@@ -32,9 +35,15 @@ export default function PendingActions({ actions = [], onActionClick }) {
             onClick={() => onActionClick?.(action.type)}
             className="w-full flex items-center gap-3 p-3 rounded-xl bg-surface-container-high/30 border border-white/5 hover:border-white/10 transition-colors text-left"
           >
-            <span className="material-symbols-outlined text-warning text-[16px]">{action.icon}</span>
-            <span className="text-sm font-inter text-on-surface flex-1">{action.label}</span>
-            <span className="material-symbols-outlined text-on-surface-variant text-[16px]">chevron_right</span>
+            <span className="material-symbols-outlined text-warning text-[16px]">
+              {action.icon}
+            </span>
+            <span className="text-sm font-inter text-on-surface flex-1">
+              {action.label}
+            </span>
+            <span className="material-symbols-outlined text-on-surface-variant text-[16px]">
+              chevron_right
+            </span>
           </motion.button>
         ))}
       </div>

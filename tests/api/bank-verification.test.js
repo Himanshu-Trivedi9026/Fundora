@@ -23,11 +23,17 @@ vi.mock("../../lib/rateLimit", () => ({
 }));
 
 vi.mock("../../lib/verification/bankVerification", () => ({
-  createBankAccount: vi.fn().mockResolvedValue({ success: true, data: { id: "123" } }),
-  updateBankAccount: vi.fn().mockResolvedValue({ success: true, data: { id: "123" } }),
+  createBankAccount: vi
+    .fn()
+    .mockResolvedValue({ success: true, data: { id: "123" } }),
+  updateBankAccount: vi
+    .fn()
+    .mockResolvedValue({ success: true, data: { id: "123" } }),
   deleteBankAccount: vi.fn().mockResolvedValue({ success: true }),
   getBankAccounts: vi.fn().mockResolvedValue({ success: true, data: [] }),
-  uploadBankDocument: vi.fn().mockResolvedValue({ success: true, data: { path: "masked" } }),
+  uploadBankDocument: vi
+    .fn()
+    .mockResolvedValue({ success: true, data: { path: "masked" } }),
 }));
 
 describe("API — Bank Verification", () => {
@@ -61,23 +67,33 @@ describe("API — Bank Verification", () => {
 
   it("POST creates bank account", async () => {
     const res = mockRes();
-    await handler(mockReq("POST", {
-      accountHolderName: "John",
-      accountNumber: "1234567890",
-      ifscCode: "HDFC0123456",
-    }), res, { id: "user1" });
+    await handler(
+      mockReq("POST", {
+        accountHolderName: "John",
+        accountNumber: "1234567890",
+        ifscCode: "HDFC0123456",
+      }),
+      res,
+      { id: "user1" },
+    );
     expect(res.status).toHaveBeenCalledWith(200);
   });
 
   it("PUT updates bank account", async () => {
     const res = mockRes();
-    await handler(mockReq("PUT", { accountId: "acc1", updates: { bankName: "SBI" } }), res, { id: "user1" });
+    await handler(
+      mockReq("PUT", { accountId: "acc1", updates: { bankName: "SBI" } }),
+      res,
+      { id: "user1" },
+    );
     expect(res.status).toHaveBeenCalledWith(200);
   });
 
   it("DELETE soft deletes bank account", async () => {
     const res = mockRes();
-    await handler(mockReq("DELETE", { accountId: "acc1" }), res, { id: "user1" });
+    await handler(mockReq("DELETE", { accountId: "acc1" }), res, {
+      id: "user1",
+    });
     expect(res.status).toHaveBeenCalledWith(200);
   });
 });

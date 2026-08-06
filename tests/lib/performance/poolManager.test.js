@@ -6,7 +6,18 @@ vi.mock("../../../lib/supabaseAdmin.js", () => ({
     from: vi.fn(() => ({
       select: vi.fn(() => ({
         order: vi.fn(() => ({
-          limit: vi.fn(() => Promise.resolve({ data: [{ component: "database", status: "healthy", checked_at: new Date().toISOString() }], error: null })),
+          limit: vi.fn(() =>
+            Promise.resolve({
+              data: [
+                {
+                  component: "database",
+                  status: "healthy",
+                  checked_at: new Date().toISOString(),
+                },
+              ],
+              error: null,
+            }),
+          ),
         })),
       })),
       insert: vi.fn(() => Promise.resolve({ error: null })),
@@ -104,7 +115,9 @@ describe("Pool Manager", () => {
 
     it("should propagate query errors", async () => {
       const mockQuery = vi.fn().mockRejectedValue(new Error("query failed"));
-      await expect(trackQuery("failing-query", mockQuery)).rejects.toThrow("query failed");
+      await expect(trackQuery("failing-query", mockQuery)).rejects.toThrow(
+        "query failed",
+      );
     });
 
     it("should allow setting slow query threshold", () => {
@@ -123,7 +136,9 @@ describe("Pool Manager", () => {
       const metrics = getEndpointMetrics();
       expect(metrics).toHaveLength(2);
 
-      const getUsers = metrics.find((m) => m.method === "GET" && m.path === "/api/users");
+      const getUsers = metrics.find(
+        (m) => m.method === "GET" && m.path === "/api/users",
+      );
       expect(getUsers).toBeDefined();
       expect(getUsers.count).toBe(2);
       expect(getUsers.avgDuration).toBe(175);

@@ -79,34 +79,53 @@ export default function ObservabilityDashboard() {
         <div className="space-y-4">
           {health ? (
             <>
-              <div className={`p-4 rounded-xl border ${
-                health.healthy
-                  ? "bg-green-900/20 border-green-800"
-                  : "bg-red-900/20 border-red-800"
-              }`}>
+              <div
+                className={`p-4 rounded-xl border ${
+                  health.healthy
+                    ? "bg-green-900/20 border-green-800"
+                    : "bg-red-900/20 border-red-800"
+                }`}
+              >
                 <p className="text-lg font-bold text-white">
-                  System Status: {health.healthy ? "✅ All Systems Operational" : "⚠️ Issues Detected"}
+                  System Status:{" "}
+                  {health.healthy
+                    ? "✅ All Systems Operational"
+                    : "⚠️ Issues Detected"}
                 </p>
                 <p className="text-sm text-gray-400 mt-1">
-                  {health.healthyCount || 0}/{health.totalComponents || 0} components healthy
+                  {health.healthyCount || 0}/{health.totalComponents || 0}{" "}
+                  components healthy
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {(health.checks || health.data ? Object.entries(health.data) : []).map(([component, status]) => (
-                  <div key={component} className="bg-gray-900/60 border border-gray-800 rounded-xl p-4 flex items-center justify-between">
+                {(health.checks || health.data
+                  ? Object.entries(health.data)
+                  : []
+                ).map(([component, status]) => (
+                  <div
+                    key={component}
+                    className="bg-gray-900/60 border border-gray-800 rounded-xl p-4 flex items-center justify-between"
+                  >
                     <div>
-                      <p className="text-white font-medium capitalize">{component}</p>
+                      <p className="text-white font-medium capitalize">
+                        {component}
+                      </p>
                       <p className="text-xs text-gray-500">
                         {status.latencyMs ? `${status.latencyMs}ms` : ""}
-                        {status.lastChecked ? ` · ${new Date(status.lastChecked).toLocaleString()}` : ""}
+                        {status.lastChecked
+                          ? ` · ${new Date(status.lastChecked).toLocaleString()}`
+                          : ""}
                       </p>
                     </div>
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      status.status === "healthy" || status.status === "healthy"
-                        ? "bg-green-900/50 text-green-400"
-                        : "bg-red-900/50 text-red-400"
-                    }`}>
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-medium ${
+                        status.status === "healthy" ||
+                        status.status === "healthy"
+                          ? "bg-green-900/50 text-green-400"
+                          : "bg-red-900/50 text-red-400"
+                      }`}
+                    >
                       {status.status || "unknown"}
                     </span>
                   </div>
@@ -118,7 +137,9 @@ export default function ObservabilityDashboard() {
               </div>
             </>
           ) : (
-            <div className="text-center py-8 text-gray-500">No health data available</div>
+            <div className="text-center py-8 text-gray-500">
+              No health data available
+            </div>
           )}
         </div>
       )}
@@ -127,25 +148,38 @@ export default function ObservabilityDashboard() {
       {tab === "alerts" && (
         <div className="bg-gray-900/40 border border-gray-800 rounded-xl overflow-hidden">
           {alerts.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">No active alerts</div>
+            <div className="p-8 text-center text-gray-500">
+              No active alerts
+            </div>
           ) : (
             <div className="divide-y divide-gray-800">
               {alerts.map((alert, i) => (
-                <div key={alert.id || i} className="p-4 flex items-center justify-between">
+                <div
+                  key={alert.id || i}
+                  className="p-4 flex items-center justify-between"
+                >
                   <div>
                     <p className="text-white font-medium">{alert.alert_name}</p>
                     <p className="text-sm text-gray-400">{alert.message}</p>
-                    <p className="text-xs text-gray-500 mt-1">{new Date(alert.created_at).toLocaleString()}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {new Date(alert.created_at).toLocaleString()}
+                    </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      alert.severity === "critical" ? "bg-red-900/50 text-red-400" :
-                      alert.severity === "warning" ? "bg-yellow-900/50 text-yellow-400" :
-                      "bg-blue-900/50 text-blue-400"
-                    }`}>
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-medium ${
+                        alert.severity === "critical"
+                          ? "bg-red-900/50 text-red-400"
+                          : alert.severity === "warning"
+                            ? "bg-yellow-900/50 text-yellow-400"
+                            : "bg-blue-900/50 text-blue-400"
+                      }`}
+                    >
                       {alert.severity}
                     </span>
-                    <span className="text-xs text-gray-500">{alert.status}</span>
+                    <span className="text-xs text-gray-500">
+                      {alert.status}
+                    </span>
                   </div>
                 </div>
               ))}
@@ -158,12 +192,19 @@ export default function ObservabilityDashboard() {
       {tab === "metrics" && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {Object.keys(metrics).length === 0 ? (
-            <div className="col-span-3 text-center py-8 text-gray-500">No metrics data available</div>
+            <div className="col-span-3 text-center py-8 text-gray-500">
+              No metrics data available
+            </div>
           ) : (
             Object.entries(metrics).map(([name, stats]) => (
-              <div key={name} className="bg-gray-900/60 border border-gray-800 rounded-xl p-4">
+              <div
+                key={name}
+                className="bg-gray-900/60 border border-gray-800 rounded-xl p-4"
+              >
                 <p className="text-gray-400 text-sm mb-1">{name}</p>
-                <p className="text-2xl font-bold text-white">{stats.last?.toLocaleString() || "—"}</p>
+                <p className="text-2xl font-bold text-white">
+                  {stats.last?.toLocaleString() || "—"}
+                </p>
                 <div className="mt-2 flex justify-between text-xs text-gray-500">
                   <span>Avg: {stats.avg?.toFixed(1) || "—"}</span>
                   <span>Total: {stats.total || "—"}</span>

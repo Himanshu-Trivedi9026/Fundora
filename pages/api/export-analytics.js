@@ -1,10 +1,7 @@
 import PDFDocument from "pdfkit";
 import fs from "fs";
 import path from "path";
-import {
-  generateLineChart,
-  generateBarChart,
-} from "../../lib/pdfCharts";
+import { generateLineChart, generateBarChart } from "../../lib/pdfCharts";
 import { withAuth } from "../../lib/withAuth";
 import { rateLimit } from "../../lib/rateLimit";
 
@@ -44,10 +41,14 @@ export default withAuth(async function handler(req, res, user) {
       return res.status(400).json({ error: "earningsByDate must be an array" });
     }
     if (!Array.isArray(fundingByProject)) {
-      return res.status(400).json({ error: "fundingByProject must be an array" });
+      return res
+        .status(400)
+        .json({ error: "fundingByProject must be an array" });
     }
     if (!Array.isArray(donorsByProject)) {
-      return res.status(400).json({ error: "donorsByProject must be an array" });
+      return res
+        .status(400)
+        .json({ error: "donorsByProject must be an array" });
     }
 
     const doc = new PDFDocument({ margin: 50 });
@@ -55,7 +56,7 @@ export default withAuth(async function handler(req, res, user) {
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      "attachment; filename=fundora-premium-report.pdf"
+      "attachment; filename=fundora-premium-report.pdf",
     );
 
     doc.pipe(res);
@@ -125,10 +126,7 @@ export default withAuth(async function handler(req, res, user) {
     /* ---------------- CHART 2 ---------------- */
     doc.fontSize(18).text("Funding by Project");
 
-    const barChart = await generateBarChart(
-      fundingByProject,
-      "Funding"
-    );
+    const barChart = await generateBarChart(fundingByProject, "Funding");
 
     doc.image(barChart, { width: 500 });
 
@@ -137,10 +135,7 @@ export default withAuth(async function handler(req, res, user) {
     /* ---------------- CHART 3 ---------------- */
     doc.fontSize(18).text("Donors by Project");
 
-    const donorsChart = await generateBarChart(
-      donorsByProject,
-      "Donors"
-    );
+    const donorsChart = await generateBarChart(donorsByProject, "Donors");
 
     doc.image(donorsChart, { width: 500 });
 

@@ -5,7 +5,9 @@ import { logError } from "../../../lib/verification/secureLogger.js";
 
 async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ success: false, error: "Method not allowed" });
+    return res
+      .status(405)
+      .json({ success: false, error: "Method not allowed" });
   }
 
   try {
@@ -13,7 +15,10 @@ async function handler(req, res) {
     const userId = req.user?.id;
 
     if (!name || !description || !version) {
-      return res.status(400).json({ success: false, error: "Missing required fields: name, description, version" });
+      return res.status(400).json({
+        success: false,
+        error: "Missing required fields: name, description, version",
+      });
     }
 
     // Plugin submission logic (simplified — full flow via PluginEngine)

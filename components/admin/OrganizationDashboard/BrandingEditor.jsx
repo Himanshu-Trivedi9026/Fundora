@@ -80,9 +80,13 @@ export default function BrandingEditor() {
       </div>
 
       {message && (
-        <div className={`mb-4 px-4 py-2 rounded-lg text-sm ${
-          message.type === "success" ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
-        }`}>
+        <div
+          className={`mb-4 px-4 py-2 rounded-lg text-sm ${
+            message.type === "success"
+              ? "bg-green-500/20 text-green-400"
+              : "bg-red-500/20 text-red-400"
+          }`}
+        >
           {message.text}
         </div>
       )}
@@ -92,36 +96,54 @@ export default function BrandingEditor() {
           <h3 className="text-white font-semibold mb-4">Colors</h3>
           <div className="space-y-4">
             <div>
-              <label className="text-gray-400 text-sm block mb-1">Primary Color</label>
+              <label className="text-gray-400 text-sm block mb-1">
+                Primary Color
+              </label>
               <div className="flex gap-3">
                 <input
                   type="color"
                   value={branding.primary_color}
-                  onChange={(e) => setBranding({ ...branding, primary_color: e.target.value })}
+                  onChange={(e) =>
+                    setBranding({ ...branding, primary_color: e.target.value })
+                  }
                   className="w-12 h-10 rounded cursor-pointer"
                 />
                 <input
                   type="text"
                   value={branding.primary_color}
-                  onChange={(e) => setBranding({ ...branding, primary_color: e.target.value })}
+                  onChange={(e) =>
+                    setBranding({ ...branding, primary_color: e.target.value })
+                  }
                   className="flex-1 bg-gray-800 text-white rounded-lg px-3 py-2 border border-gray-700 font-mono text-sm"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-gray-400 text-sm block mb-1">Secondary Color</label>
+              <label className="text-gray-400 text-sm block mb-1">
+                Secondary Color
+              </label>
               <div className="flex gap-3">
                 <input
                   type="color"
                   value={branding.secondary_color}
-                  onChange={(e) => setBranding({ ...branding, secondary_color: e.target.value })}
+                  onChange={(e) =>
+                    setBranding({
+                      ...branding,
+                      secondary_color: e.target.value,
+                    })
+                  }
                   className="w-12 h-10 rounded cursor-pointer"
                 />
                 <input
                   type="text"
                   value={branding.secondary_color}
-                  onChange={(e) => setBranding({ ...branding, secondary_color: e.target.value })}
+                  onChange={(e) =>
+                    setBranding({
+                      ...branding,
+                      secondary_color: e.target.value,
+                    })
+                  }
                   className="flex-1 bg-gray-800 text-white rounded-lg px-3 py-2 border border-gray-700 font-mono text-sm"
                 />
               </div>
@@ -133,33 +155,45 @@ export default function BrandingEditor() {
           <h3 className="text-white font-semibold mb-4">Assets</h3>
           <div className="space-y-4">
             <div>
-              <label className="text-gray-400 text-sm block mb-1">Logo URL</label>
+              <label className="text-gray-400 text-sm block mb-1">
+                Logo URL
+              </label>
               <input
                 type="text"
                 value={branding.logo_url}
-                onChange={(e) => setBranding({ ...branding, logo_url: e.target.value })}
+                onChange={(e) =>
+                  setBranding({ ...branding, logo_url: e.target.value })
+                }
                 placeholder="https://example.com/logo.png"
                 className="w-full bg-gray-800 text-white rounded-lg px-3 py-2 border border-gray-700 text-sm"
               />
             </div>
 
             <div>
-              <label className="text-gray-400 text-sm block mb-1">Favicon URL</label>
+              <label className="text-gray-400 text-sm block mb-1">
+                Favicon URL
+              </label>
               <input
                 type="text"
                 value={branding.favicon_url}
-                onChange={(e) => setBranding({ ...branding, favicon_url: e.target.value })}
+                onChange={(e) =>
+                  setBranding({ ...branding, favicon_url: e.target.value })
+                }
                 placeholder="https://example.com/favicon.ico"
                 className="w-full bg-gray-800 text-white rounded-lg px-3 py-2 border border-gray-700 text-sm"
               />
             </div>
 
             <div>
-              <label className="text-gray-400 text-sm block mb-1">Font Family</label>
+              <label className="text-gray-400 text-sm block mb-1">
+                Font Family
+              </label>
               <input
                 type="text"
                 value={branding.font_family}
-                onChange={(e) => setBranding({ ...branding, font_family: e.target.value })}
+                onChange={(e) =>
+                  setBranding({ ...branding, font_family: e.target.value })
+                }
                 className="w-full bg-gray-800 text-white rounded-lg px-3 py-2 border border-gray-700 text-sm"
               />
             </div>
@@ -172,22 +206,43 @@ export default function BrandingEditor() {
         <h3 className="text-white font-semibold mb-4">Preview</h3>
         <div
           className="rounded-xl p-6"
-          style={{ backgroundColor: branding.primary_color + "20", border: `1px solid ${branding.primary_color}40` }}
+          style={{
+            backgroundColor: branding.primary_color + "20",
+            border: `1px solid ${branding.primary_color}40`,
+          }}
         >
           <div className="flex items-center gap-4 mb-4">
             {branding.logo_url && (
-              <Image src={branding.logo_url} alt="Logo" width={40} height={40} className="w-10 h-10 rounded" onError={(e) => e.target.style.display = "none"} />
+              <Image
+                src={branding.logo_url}
+                alt="Logo"
+                width={40}
+                height={40}
+                className="w-10 h-10 rounded"
+                onError={(e) => (e.target.style.display = "none")}
+              />
             )}
             <div>
-              <h4 className="text-white font-semibold" style={{ fontFamily: branding.font_family }}>Organization Name</h4>
+              <h4
+                className="text-white font-semibold"
+                style={{ fontFamily: branding.font_family }}
+              >
+                Organization Name
+              </h4>
               <p className="text-gray-400 text-sm">Branding Preview</p>
             </div>
           </div>
           <div className="flex gap-3">
-            <span className="px-4 py-2 rounded-lg text-white text-sm" style={{ backgroundColor: branding.primary_color }}>
+            <span
+              className="px-4 py-2 rounded-lg text-white text-sm"
+              style={{ backgroundColor: branding.primary_color }}
+            >
               Primary Button
             </span>
-            <span className="px-4 py-2 rounded-lg text-white text-sm" style={{ backgroundColor: branding.secondary_color }}>
+            <span
+              className="px-4 py-2 rounded-lg text-white text-sm"
+              style={{ backgroundColor: branding.secondary_color }}
+            >
               Secondary Button
             </span>
           </div>

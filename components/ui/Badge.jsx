@@ -1,14 +1,10 @@
 const variants = {
   default:
     "bg-surface-container-lowest text-on-surface-variant border-white/[0.08] hover:border-primary/30 hover:text-on-surface",
-  primary:
-    "bg-primary/20 text-primary border-primary/30",
-  success:
-    "bg-success-muted text-success border-success/20",
-  warning:
-    "bg-warning-muted text-warning border-warning/20",
-  danger:
-    "bg-danger-muted text-danger border-danger/20",
+  primary: "bg-primary/20 text-primary border-primary/30",
+  success: "bg-success-muted text-success border-success/20",
+  warning: "bg-warning-muted text-warning border-warning/20",
+  danger: "bg-danger-muted text-danger border-danger/20",
 };
 
 export default function Badge({

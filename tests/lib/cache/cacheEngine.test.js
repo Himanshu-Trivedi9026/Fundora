@@ -107,7 +107,10 @@ describe("Cache Engine", () => {
       const acquired = await acquireLock("test-lock");
       expect(acquired.success).toBe(true);
 
-      const secondAttempt = await acquireLock("test-lock", { maxRetries: 1, retryDelay: 10 });
+      const secondAttempt = await acquireLock("test-lock", {
+        maxRetries: 1,
+        retryDelay: 10,
+      });
       expect(secondAttempt.success).toBe(false);
 
       await releaseLock("test-lock");
@@ -154,9 +157,13 @@ describe("Cache Engine", () => {
 
     it("should reset rate limit", async () => {
       await checkRateLimit("rl-reset", { maxRequests: 1 });
-      expect((await checkRateLimit("rl-reset", { maxRequests: 1 })).success).toBe(false);
+      expect(
+        (await checkRateLimit("rl-reset", { maxRequests: 1 })).success,
+      ).toBe(false);
       resetRateLimit("rl-reset");
-      expect((await checkRateLimit("rl-reset", { maxRequests: 1 })).success).toBe(true);
+      expect(
+        (await checkRateLimit("rl-reset", { maxRequests: 1 })).success,
+      ).toBe(true);
     });
   });
 

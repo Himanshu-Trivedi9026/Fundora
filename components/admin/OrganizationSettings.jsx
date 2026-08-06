@@ -29,7 +29,9 @@ export default function OrganizationSettings({ organizationId }) {
     try {
       const [orgRes, settingsRes] = await Promise.all([
         authFetch(`/api/organization?orgId=${organizationId}`),
-        authFetch(`/api/organization/settings?organizationId=${organizationId}`),
+        authFetch(
+          `/api/organization/settings?organizationId=${organizationId}`,
+        ),
       ]);
 
       const orgJson = await orgRes.json();
@@ -114,17 +116,23 @@ export default function OrganizationSettings({ organizationId }) {
   }
 
   if (loading) {
-    return <div className="text-center py-8 text-gray-500">Loading settings...</div>;
+    return (
+      <div className="text-center py-8 text-gray-500">Loading settings...</div>
+    );
   }
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Organization Settings</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">
+        Organization Settings
+      </h1>
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
           {error}
-          <button onClick={() => setError(null)} className="ml-2 underline">Dismiss</button>
+          <button onClick={() => setError(null)} className="ml-2 underline">
+            Dismiss
+          </button>
         </div>
       )}
 
@@ -140,7 +148,9 @@ export default function OrganizationSettings({ organizationId }) {
           <h2 className="text-lg font-semibold mb-4">Basic Information</h2>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Name
+              </label>
               <input
                 type="text"
                 value={form.name}
@@ -149,7 +159,9 @@ export default function OrganizationSettings({ organizationId }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Website
+              </label>
               <input
                 type="url"
                 value={form.website}
@@ -158,7 +170,9 @@ export default function OrganizationSettings({ organizationId }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Industry</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Industry
+              </label>
               <input
                 type="text"
                 value={form.industry}
@@ -167,7 +181,9 @@ export default function OrganizationSettings({ organizationId }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Company Size</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Company Size
+              </label>
               <select
                 value={form.size}
                 onChange={(e) => setForm({ ...form, size: e.target.value })}
@@ -184,10 +200,14 @@ export default function OrganizationSettings({ organizationId }) {
             </div>
           </div>
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
             <textarea
               value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, description: e.target.value })
+              }
               className="w-full border border-gray-300 rounded-lg px-3 py-2"
               rows={3}
             />
@@ -199,20 +219,28 @@ export default function OrganizationSettings({ organizationId }) {
           <h2 className="text-lg font-semibold mb-4">Contact Information</h2>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Contact Email</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Contact Email
+              </label>
               <input
                 type="email"
                 value={form.contact_email}
-                onChange={(e) => setForm({ ...form, contact_email: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, contact_email: e.target.value })
+                }
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Contact Phone</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Contact Phone
+              </label>
               <input
                 type="tel"
                 value={form.contact_phone}
-                onChange={(e) => setForm({ ...form, contact_phone: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, contact_phone: e.target.value })
+                }
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
               />
             </div>

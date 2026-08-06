@@ -10,11 +10,16 @@ function AdminObservabilityPage() {
     <PageLayout>
       <Head>
         <title>Observability — Fundora</title>
-        <meta name="description" content="Platform monitoring and observability" />
+        <meta
+          name="description"
+          content="Platform monitoring and observability"
+        />
       </Head>
       <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-purple-950">
         <div className="max-w-7xl mx-auto px-4 py-8">
-          <h1 className="text-3xl font-bold text-white mb-8">Observability Dashboard</h1>
+          <h1 className="text-3xl font-bold text-white mb-8">
+            Observability Dashboard
+          </h1>
           <ObservabilityDashboard />
         </div>
       </div>

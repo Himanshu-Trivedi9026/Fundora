@@ -33,7 +33,10 @@ vi.mock("../../../lib/fraud", () => ({
   }),
 }));
 
-import { createPayoutRequest, approvePayout } from "../../../lib/payout/payoutEngine";
+import {
+  createPayoutRequest,
+  approvePayout,
+} from "../../../lib/payout/payoutEngine";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 import { evaluateUser } from "../../../lib/fraud";
 
@@ -68,7 +71,9 @@ describe("PayoutEngine", () => {
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockAccount, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockAccount, error: null }),
             }),
           }),
         })
@@ -82,7 +87,9 @@ describe("PayoutEngine", () => {
         .mockReturnValueOnce({
           insert: vi.fn().mockReturnValue({
             select: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockRequest, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockRequest, error: null }),
             }),
           }),
         });
@@ -114,7 +121,9 @@ describe("PayoutEngine", () => {
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: mockAccount, error: null }),
+            single: vi
+              .fn()
+              .mockResolvedValue({ data: mockAccount, error: null }),
           }),
         }),
       });
@@ -145,7 +154,9 @@ describe("PayoutEngine", () => {
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: mockAccount, error: null }),
+            single: vi
+              .fn()
+              .mockResolvedValue({ data: mockAccount, error: null }),
           }),
         }),
       });
@@ -175,7 +186,9 @@ describe("PayoutEngine", () => {
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockRequest, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockRequest, error: null }),
             }),
           }),
         })
@@ -183,7 +196,10 @@ describe("PayoutEngine", () => {
           update: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               select: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: { ...mockRequest, status: "approved" }, error: null }),
+                single: vi.fn().mockResolvedValue({
+                  data: { ...mockRequest, status: "approved" },
+                  error: null,
+                }),
               }),
             }),
           }),

@@ -16,7 +16,8 @@ export default function VerificationStatus({
   showIcon = true,
   className = "",
 }) {
-  const statusInfo = VERIFICATION_STATUSES[status] || VERIFICATION_STATUSES.pending;
+  const statusInfo =
+    VERIFICATION_STATUSES[status] || VERIFICATION_STATUSES.pending;
 
   const sizes = {
     sm: "text-[9px] px-2 py-0.5 gap-1",
@@ -51,7 +52,9 @@ export default function VerificationStatus({
       {showIcon && (
         <span
           className={`material-symbols-outlined ${iconSizes[size]}`}
-          style={status === "approved" ? { fontVariationSettings: "'FILL' 1" } : {}}
+          style={
+            status === "approved" ? { fontVariationSettings: "'FILL' 1" } : {}
+          }
         >
           {statusInfo.icon}
         </span>

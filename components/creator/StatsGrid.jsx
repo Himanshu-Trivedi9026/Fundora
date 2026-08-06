@@ -7,7 +7,12 @@ import { staggerContainer, staggerItem } from "./SectionReveal";
  */
 export default function StatsGrid({ totalRaised, projectCount, backersCount }) {
   const stats = [
-    { icon: "payments", value: totalRaised, prefix: "₹", label: "Total Raised" },
+    {
+      icon: "payments",
+      value: totalRaised,
+      prefix: "₹",
+      label: "Total Raised",
+    },
     { icon: "rocket_launch", value: projectCount, label: "Projects Launched" },
     { icon: "group", value: backersCount, label: "Backers" },
   ];

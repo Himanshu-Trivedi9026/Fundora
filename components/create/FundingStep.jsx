@@ -132,7 +132,11 @@ export default function FundingStep({
         </div>
 
         {/* Right: Projection Card */}
-        <Card padding="md" animate={false} className="h-full flex flex-col justify-between">
+        <Card
+          padding="md"
+          animate={false}
+          className="h-full flex flex-col justify-between"
+        >
           <div className="space-y-3">
             <h4 className="font-geist text-base font-semibold text-on-surface">
               Projection

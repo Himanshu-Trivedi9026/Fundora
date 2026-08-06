@@ -13,7 +13,8 @@ export default withAuth(async function handler(req, res, user) {
   if (!process.env.OPENAI_API_KEY) {
     console.error("OPENAI_API_KEY is not configured in environment variables");
     return res.status(500).json({
-      error: "AI service is not configured. Please add OPENAI_API_KEY to your .env.local file.",
+      error:
+        "AI service is not configured. Please add OPENAI_API_KEY to your .env.local file.",
     });
   }
 
@@ -24,7 +25,8 @@ export default withAuth(async function handler(req, res, user) {
 
     if (!title || !category || !goal) {
       return res.status(400).json({
-        error: "Missing required fields: title, category, and goal are all required.",
+        error:
+          "Missing required fields: title, category, and goal are all required.",
       });
     }
 

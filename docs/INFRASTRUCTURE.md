@@ -20,25 +20,30 @@ Fundora's infrastructure layer provides production-grade observability, caching,
 
 ### Components
 
-| Module | File | Description |
-|--------|------|-------------|
-| Metrics Engine | `metricsEngine.js` | Metric recording, querying, dashboards |
-| Tracing Engine | `tracingEngine.js` | Distributed trace spans |
-| Health Monitor | `healthMonitor.js` | Component health checks |
-| Alert Manager | `alertManager.js` | Alert creation, thresholds, routing |
-| OpenTelemetry | `opentelemetry.js` | OpenTelemetry tracing, structured logging, metrics export |
+| Module         | File               | Description                                               |
+| -------------- | ------------------ | --------------------------------------------------------- |
+| Metrics Engine | `metricsEngine.js` | Metric recording, querying, dashboards                    |
+| Tracing Engine | `tracingEngine.js` | Distributed trace spans                                   |
+| Health Monitor | `healthMonitor.js` | Component health checks                                   |
+| Alert Manager  | `alertManager.js`  | Alert creation, thresholds, routing                       |
+| OpenTelemetry  | `opentelemetry.js` | OpenTelemetry tracing, structured logging, metrics export |
 
 ### OpenTelemetry Integration
 
 ```javascript
-import { enableTracing, startSpan, endSpan, structuredLog } from "../lib/observability/index.js";
+import {
+  enableTracing,
+  startSpan,
+  endSpan,
+  structuredLog,
+} from "../lib/observability/index.js";
 
 // Enable tracing
 enableTracing();
 
 // Create a trace span
 const span = startSpan("process-payment", {
-  attributes: { amount: 100, currency: "USD" }
+  attributes: { amount: 100, currency: "USD" },
 });
 
 // Add events
@@ -57,7 +62,10 @@ endSpan(span.spanId);
 ### Error Aggregation Hooks
 
 ```javascript
-import { registerErrorHook, runErrorHooks } from "../lib/observability/index.js";
+import {
+  registerErrorHook,
+  runErrorHooks,
+} from "../lib/observability/index.js";
 
 // Register a hook
 const unregister = registerErrorHook(async (error, context) => {
@@ -86,25 +94,35 @@ const prometheusOutput = formatMetricsForExport(metrics, "prometheus");
 
 ### Backends
 
-| Backend | Storage | Use Case |
-|---------|---------|----------|
-| `memory` | In-process Map | Development, single-instance |
-| `redis` | Redis | Production, distributed |
-| `database` | Supabase | Persistent cache with TTL |
+| Backend    | Storage        | Use Case                     |
+| ---------- | -------------- | ---------------------------- |
+| `memory`   | In-process Map | Development, single-instance |
+| `redis`    | Redis          | Production, distributed      |
+| `database` | Supabase       | Persistent cache with TTL    |
 
 ### Usage
 
 ```javascript
-import { get, set, getOrSet, acquireLock, checkRateLimit } from "../lib/cache/index.js";
+import {
+  get,
+  set,
+  getOrSet,
+  acquireLock,
+  checkRateLimit,
+} from "../lib/cache/index.js";
 
 // Basic caching
 await set("user:123", profileData, { ttl: 300 }); // 5 min TTL
 const profile = await get("user:123");
 
 // Cache-aside pattern
-const data = await getOrSet("expensive:query", async () => {
-  return await fetchExpensiveData();
-}, { ttl: 60 });
+const data = await getOrSet(
+  "expensive:query",
+  async () => {
+    return await fetchExpensiveData();
+  },
+  { ttl: 60 },
+);
 
 // Distributed locking
 const lock = await acquireLock("payment:order-456", { ttl: 30000 });
@@ -117,7 +135,10 @@ if (lock.success) {
 }
 
 // Rate limiting
-const rateCheck = await checkRateLimit("api:user-789", { maxRequests: 100, windowMs: 60000 });
+const rateCheck = await checkRateLimit("api:user-789", {
+  maxRequests: 100,
+  windowMs: 60000,
+});
 if (!rateCheck.success) {
   throw new Error("Rate limit exceeded");
 }
@@ -136,11 +157,15 @@ registerHandler("email.send", async (payload) => {
 });
 
 // Enqueue a job
-await enqueue("email.send", {
-  to: "user@example.com",
-  subject: "Welcome!",
-  body: "Thanks for joining",
-}, { priority: "high", maxRetries: 5 });
+await enqueue(
+  "email.send",
+  {
+    to: "user@example.com",
+    subject: "Welcome!",
+    body: "Thanks for joining",
+  },
+  { priority: "high", maxRetries: 5 },
+);
 
 // Process the queue
 await processQueue("default", { batchSize: 10 });
@@ -169,16 +194,20 @@ await createSchedule({
 
 ### Providers
 
-| Provider | Storage | Use Case |
-|----------|---------|----------|
-| `env` | Environment variables | Development, CI/CD |
-| `database` | Supabase `secrets` table | Production |
-| `vault` | External vault (HashiCorp, AWS) | Enterprise |
+| Provider   | Storage                         | Use Case           |
+| ---------- | ------------------------------- | ------------------ |
+| `env`      | Environment variables           | Development, CI/CD |
+| `database` | Supabase `secrets` table        | Production         |
+| `vault`    | External vault (HashiCorp, AWS) | Enterprise         |
 
 ### Usage
 
 ```javascript
-import { getSecret, rotateSecret, generateSecurityAudit } from "../lib/secrets/index.js";
+import {
+  getSecret,
+  rotateSecret,
+  generateSecurityAudit,
+} from "../lib/secrets/index.js";
 
 // Get a secret
 const apiKey = await getSecret("STRIPE_API_KEY", { provider: "database" });
@@ -200,7 +229,11 @@ if (audit.data.summary.critical > 0) {
 ### Connection Pool Management
 
 ```javascript
-import { configurePool, acquireConnection, releaseConnection } from "../lib/performance/index.js";
+import {
+  configurePool,
+  acquireConnection,
+  releaseConnection,
+} from "../lib/performance/index.js";
 
 // Configure pool
 configurePool({ maxConnections: 50, idleTimeout: 30000 });
@@ -287,17 +320,17 @@ const result = await executeRunbook("incident-response");
 
 ## API Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/health` | GET | Health check (liveness/readiness) |
-| `/api/health/database` | GET | Database-specific health |
-| `/api/metrics` | GET | Prometheus metrics |
-| `/api/diagnostics` | GET | System diagnostics |
-| `/api/infrastructure/health` | GET | Infrastructure health dashboard data |
-| `/api/infrastructure/cache` | GET/POST | Cache stats and management |
-| `/api/infrastructure/queues` | GET | Queue infrastructure status |
-| `/api/jobs` | GET/POST | Job queue listing and enqueue |
-| `/api/jobs/process` | POST | Process queues and scheduled jobs |
-| `/api/jobs/schedule` | GET/POST/PUT/DELETE | Scheduled job management |
-| `/api/deployments` | GET/POST | Deployment history and creation |
-| `/api/deployments/rollback` | POST | Rollback a deployment |
+| Endpoint                     | Method              | Description                          |
+| ---------------------------- | ------------------- | ------------------------------------ |
+| `/api/health`                | GET                 | Health check (liveness/readiness)    |
+| `/api/health/database`       | GET                 | Database-specific health             |
+| `/api/metrics`               | GET                 | Prometheus metrics                   |
+| `/api/diagnostics`           | GET                 | System diagnostics                   |
+| `/api/infrastructure/health` | GET                 | Infrastructure health dashboard data |
+| `/api/infrastructure/cache`  | GET/POST            | Cache stats and management           |
+| `/api/infrastructure/queues` | GET                 | Queue infrastructure status          |
+| `/api/jobs`                  | GET/POST            | Job queue listing and enqueue        |
+| `/api/jobs/process`          | POST                | Process queues and scheduled jobs    |
+| `/api/jobs/schedule`         | GET/POST/PUT/DELETE | Scheduled job management             |
+| `/api/deployments`           | GET/POST            | Deployment history and creation      |
+| `/api/deployments/rollback`  | POST                | Rollback a deployment                |

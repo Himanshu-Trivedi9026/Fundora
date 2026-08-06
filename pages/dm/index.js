@@ -43,7 +43,8 @@ export default function DMInbox() {
     try {
       const { data } = await supabase
         .from("dm_conversations")
-        .select(`
+        .select(
+          `
           id,
           user1,
           user2,
@@ -52,7 +53,8 @@ export default function DMInbox() {
             content,
             created_at
           )
-        `)
+        `,
+        )
         .or(`user1.eq.${userId},user2.eq.${userId}`)
         .order("created_at", { ascending: false });
 
@@ -71,7 +73,7 @@ export default function DMInbox() {
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "dm_messages" },
-        () => loadInbox()
+        () => loadInbox(),
       )
       .subscribe();
 
@@ -79,8 +81,7 @@ export default function DMInbox() {
   }, [userId, loadInbox]);
 
   function openThread(thread) {
-    const otherUser =
-      thread.user1 === userId ? thread.user2 : thread.user1;
+    const otherUser = thread.user1 === userId ? thread.user2 : thread.user1;
     router.push(`/dm/${otherUser}`);
   }
 
@@ -128,7 +129,10 @@ export default function DMInbox() {
             </div>
             <div className="space-y-2">
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="glass-card p-4 rounded-xl flex items-center gap-4">
+                <div
+                  key={i}
+                  className="glass-card p-4 rounded-xl flex items-center gap-4"
+                >
                   <div className="w-12 h-12 rounded-full shimmer shrink-0" />
                   <div className="flex-1 space-y-2">
                     <div className="h-4 w-1/3 shimmer rounded" />
@@ -159,7 +163,6 @@ export default function DMInbox() {
         </div>
 
         <div className="max-w-3xl mx-auto px-6">
-
           {/* ═══════════ HEADER ═══════════ */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -180,7 +183,12 @@ export default function DMInbox() {
               whileTap={{ scale: 0.95 }}
               className="w-10 h-10 rounded-xl bg-primary-container/20 flex items-center justify-center text-primary hover:bg-primary-container/30 transition-colors"
             >
-              <span className="material-symbols-outlined text-xl" aria-hidden="true">edit_square</span>
+              <span
+                className="material-symbols-outlined text-xl"
+                aria-hidden="true"
+              >
+                edit_square
+              </span>
             </motion.button>
           </motion.div>
 
@@ -188,11 +196,18 @@ export default function DMInbox() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+            transition={{
+              duration: 0.5,
+              delay: 0.1,
+              ease: [0.25, 0.46, 0.45, 0.94],
+            }}
             className="mb-6"
           >
             <div className="relative">
-              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl" aria-hidden="true">
+              <span
+                className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl"
+                aria-hidden="true"
+              >
                 search
               </span>
               <input
@@ -213,7 +228,10 @@ export default function DMInbox() {
               animate={{ opacity: 1, y: 0 }}
               className="glass-card p-12 rounded-xl text-center"
             >
-              <span className="material-symbols-outlined text-5xl text-on-surface-variant/30 block mb-4" aria-hidden="true">
+              <span
+                className="material-symbols-outlined text-5xl text-on-surface-variant/30 block mb-4"
+                aria-hidden="true"
+              >
                 {search ? "search_off" : "forum"}
               </span>
               <h3 className="font-geist text-lg font-semibold text-on-surface mb-2">
@@ -256,11 +274,17 @@ export default function DMInbox() {
                       {/* Avatar */}
                       <div className="relative shrink-0">
                         <div className="w-12 h-12 rounded-full overflow-hidden border border-outline-variant bg-surface-container-high flex items-center justify-center">
-                          <span className="material-symbols-outlined text-on-surface-variant/50 text-xl" aria-hidden="true">
+                          <span
+                            className="material-symbols-outlined text-on-surface-variant/50 text-xl"
+                            aria-hidden="true"
+                          >
                             person
                           </span>
                         </div>
-                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-surface-container rounded-full" aria-hidden="true" />
+                        <div
+                          className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-surface-container rounded-full"
+                          aria-hidden="true"
+                        />
                       </div>
 
                       {/* Content */}
@@ -283,7 +307,6 @@ export default function DMInbox() {
               })}
             </motion.div>
           )}
-
         </div>
       </main>
 

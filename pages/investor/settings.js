@@ -134,9 +134,21 @@ export default function InvestorSettings() {
               {[
                 { label: "Edit Profile", href: "/edit-profile", icon: "edit" },
                 { label: "Saved Projects", href: "/saved", icon: "bookmark" },
-                { label: "My Investments", href: "/investor/investments", icon: "account_balance" },
-                { label: "Payment History", href: "/investor/payment-history", icon: "receipt_long" },
-                { label: "My Receipts", href: "/investor/receipts", icon: "receipt" },
+                {
+                  label: "My Investments",
+                  href: "/investor/investments",
+                  icon: "account_balance",
+                },
+                {
+                  label: "Payment History",
+                  href: "/investor/payment-history",
+                  icon: "receipt_long",
+                },
+                {
+                  label: "My Receipts",
+                  href: "/investor/receipts",
+                  icon: "receipt",
+                },
                 { label: "Messages", href: "/dm", icon: "chat" },
               ].map((link) => (
                 <button

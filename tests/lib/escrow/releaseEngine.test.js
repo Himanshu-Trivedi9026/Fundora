@@ -35,7 +35,11 @@ vi.mock("../../../lib/escrow/escrowEvents", () => ({
   recordEscrowEvent: vi.fn().mockResolvedValue({ success: true }),
 }));
 
-import { releaseFunds, emergencyFreeze, emergencyCancel } from "../../../lib/escrow/releaseEngine";
+import {
+  releaseFunds,
+  emergencyFreeze,
+  emergencyCancel,
+} from "../../../lib/escrow/releaseEngine";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 
 describe("ReleaseEngine", () => {
@@ -62,7 +66,9 @@ describe("ReleaseEngine", () => {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               is: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: mockAccount, error: null }),
+                single: vi
+                  .fn()
+                  .mockResolvedValue({ data: mockAccount, error: null }),
               }),
             }),
           }),
@@ -72,7 +78,10 @@ describe("ReleaseEngine", () => {
             eq: vi.fn().mockReturnValue({
               eq: vi.fn().mockReturnValue({
                 select: vi.fn().mockReturnValue({
-                  single: vi.fn().mockResolvedValue({ data: { ...mockAccount, locked_balance: 500 }, error: null }),
+                  single: vi.fn().mockResolvedValue({
+                    data: { ...mockAccount, locked_balance: 500 },
+                    error: null,
+                  }),
                 }),
               }),
             }),
@@ -101,7 +110,9 @@ describe("ReleaseEngine", () => {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             is: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockAccount, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockAccount, error: null }),
             }),
           }),
         }),
@@ -120,7 +131,11 @@ describe("ReleaseEngine", () => {
 
   describe("emergencyFreeze", () => {
     it("should freeze escrow account", async () => {
-      const mockAccount = { id: "escrow-1", status: "active", campaign_id: "campaign-1" };
+      const mockAccount = {
+        id: "escrow-1",
+        status: "active",
+        campaign_id: "campaign-1",
+      };
 
       // 1. Fetch: select * eq id is deleted_at single
       // 2. Update: update {status: frozen} eq id eq status select single
@@ -129,7 +144,9 @@ describe("ReleaseEngine", () => {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               is: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: mockAccount, error: null }),
+                single: vi
+                  .fn()
+                  .mockResolvedValue({ data: mockAccount, error: null }),
               }),
             }),
           }),
@@ -139,14 +156,21 @@ describe("ReleaseEngine", () => {
             eq: vi.fn().mockReturnValue({
               eq: vi.fn().mockReturnValue({
                 select: vi.fn().mockReturnValue({
-                  single: vi.fn().mockResolvedValue({ data: { ...mockAccount, status: "frozen" }, error: null }),
+                  single: vi.fn().mockResolvedValue({
+                    data: { ...mockAccount, status: "frozen" },
+                    error: null,
+                  }),
                 }),
               }),
             }),
           }),
         });
 
-      const result = await emergencyFreeze("escrow-1", "Fraud detected", "admin-1");
+      const result = await emergencyFreeze(
+        "escrow-1",
+        "Fraud detected",
+        "admin-1",
+      );
       expect(result.success).toBe(true);
     });
   });
@@ -168,7 +192,9 @@ describe("ReleaseEngine", () => {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               is: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: mockAccount, error: null }),
+                single: vi
+                  .fn()
+                  .mockResolvedValue({ data: mockAccount, error: null }),
               }),
             }),
           }),
@@ -178,14 +204,21 @@ describe("ReleaseEngine", () => {
             eq: vi.fn().mockReturnValue({
               eq: vi.fn().mockReturnValue({
                 select: vi.fn().mockReturnValue({
-                  single: vi.fn().mockResolvedValue({ data: { ...mockAccount, status: "cancelled" }, error: null }),
+                  single: vi.fn().mockResolvedValue({
+                    data: { ...mockAccount, status: "cancelled" },
+                    error: null,
+                  }),
                 }),
               }),
             }),
           }),
         });
 
-      const result = await emergencyCancel("escrow-1", "Campaign cancelled", "admin-1");
+      const result = await emergencyCancel(
+        "escrow-1",
+        "Campaign cancelled",
+        "admin-1",
+      );
       expect(result.success).toBe(true);
     });
   });

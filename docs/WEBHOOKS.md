@@ -59,11 +59,11 @@ export const DELIVERY_STATUSES = ["pending", "delivered", "failed", "retrying"];
 
 ```js
 const RETRY_DELAYS = [
-  60 * 1000,              // 1 minute
-  5 * 60 * 1000,          // 5 minutes
-  30 * 60 * 1000,         // 30 minutes
-  2 * 60 * 60 * 1000,     // 2 hours
-  12 * 60 * 60 * 1000,    // 12 hours
+  60 * 1000, // 1 minute
+  5 * 60 * 1000, // 5 minutes
+  30 * 60 * 1000, // 30 minutes
+  2 * 60 * 60 * 1000, // 2 hours
+  12 * 60 * 60 * 1000, // 12 hours
 ];
 ```
 
@@ -76,16 +76,19 @@ Sign a payload using HMAC-SHA256. Accepts an object or string. Returns the hex-e
 ```js
 import { signPayload } from "@/lib/webhooks";
 
-const signature = signPayload({ event: "donation.received", data: { amount: 1000 } }, "whsec_...");
+const signature = signPayload(
+  { event: "donation.received", data: { amount: 1000 } },
+  "whsec_...",
+);
 // "a1b2c3d4e5f6..." (HMAC-SHA256 hex)
 ```
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `payload` | `object \| string` | Yes | The payload to sign (objects are JSON-stringified) |
-| `secret` | `string` | Yes | The webhook's signing secret |
+| Parameter | Type               | Required | Description                                        |
+| --------- | ------------------ | -------- | -------------------------------------------------- |
+| `payload` | `object \| string` | Yes      | The payload to sign (objects are JSON-stringified) |
+| `secret`  | `string`           | Yes      | The webhook's signing secret                       |
 
 **Returns:** `string` — HMAC-SHA256 hex digest.
 
@@ -104,11 +107,11 @@ const isValid = verifySignature(payload, receivedSignature, "whsec_...");
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `payload` | `object \| string` | Yes | The original payload |
-| `signature` | `string` | Yes | The signature to verify |
-| `secret` | `string` | Yes | The webhook's signing secret |
+| Parameter   | Type               | Required | Description                  |
+| ----------- | ------------------ | -------- | ---------------------------- |
+| `payload`   | `object \| string` | Yes      | The original payload         |
+| `signature` | `string`           | Yes      | The signature to verify      |
+| `secret`    | `string`           | Yes      | The webhook's signing secret |
 
 **Returns:** `boolean` — `true` if the signature matches.
 
@@ -140,7 +143,7 @@ import { createWebhook, WEBHOOK_EVENTS } from "@/lib/webhooks";
 
 const result = await createWebhook({
   userId: "user-uuid",
-  organizationId: "org-uuid",  // optional
+  organizationId: "org-uuid", // optional
   url: "https://myapp.com/webhooks/fundora",
   events: [
     WEBHOOK_EVENTS.DONATION_RECEIVED,
@@ -155,13 +158,13 @@ const result = await createWebhook({
 
 **Parameters:**
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `userId` | `string` | Yes | — | Owner user UUID |
-| `organizationId` | `string` | No | `null` | Organization UUID |
-| `url` | `string` | Yes | — | Endpoint URL (must be HTTPS in production) |
-| `events` | `string[]` | No | `[]` | Event types to subscribe to |
-| `description` | `string` | No | — | Human-readable description |
+| Parameter        | Type       | Required | Default | Description                                |
+| ---------------- | ---------- | -------- | ------- | ------------------------------------------ |
+| `userId`         | `string`   | Yes      | —       | Owner user UUID                            |
+| `organizationId` | `string`   | No       | `null`  | Organization UUID                          |
+| `url`            | `string`   | Yes      | —       | Endpoint URL (must be HTTPS in production) |
+| `events`         | `string[]` | No       | `[]`    | Event types to subscribe to                |
+| `description`    | `string`   | No       | —       | Human-readable description                 |
 
 **Validation:** All event types must be valid values from `WEBHOOK_EVENTS`.
 
@@ -192,20 +195,24 @@ const result = await createWebhook({
 Update a webhook's configuration. Only the owner can update.
 
 ```js
-const result = await updateWebhook("webhook-uuid", {
-  url: "https://myapp.com/webhooks/fundora-v2",
-  events: [WEBHOOK_EVENTS.DONATION_RECEIVED],
-  status: "active",
-}, user.id);
+const result = await updateWebhook(
+  "webhook-uuid",
+  {
+    url: "https://myapp.com/webhooks/fundora-v2",
+    events: [WEBHOOK_EVENTS.DONATION_RECEIVED],
+    status: "active",
+  },
+  user.id,
+);
 ```
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `webhookId` | `string` | Yes | Webhook UUID |
-| `updates` | `object` | Yes | Fields to update |
-| `userId` | `string` | Yes | Must be the webhook owner |
+| Parameter   | Type     | Required | Description               |
+| ----------- | -------- | -------- | ------------------------- |
+| `webhookId` | `string` | Yes      | Webhook UUID              |
+| `updates`   | `object` | Yes      | Fields to update          |
+| `userId`    | `string` | Yes      | Must be the webhook owner |
 
 **Allowed update fields:** `url`, `events`, `description`, `status`
 
@@ -227,8 +234,8 @@ List webhooks for an organization or user.
 
 ```js
 const result = await getWebhooks({
-  organizationId: "org-uuid",  // optional
-  userId: "user-uuid",         // optional
+  organizationId: "org-uuid", // optional
+  userId: "user-uuid", // optional
   limit: 50,
   offset: 0,
 });
@@ -247,7 +254,7 @@ Trigger webhook deliveries for a specific event type. Queries all active webhook
 import { triggerWebhook } from "@/lib/webhooks";
 
 const result = await triggerWebhook({
-  organizationId: "org-uuid",  // optional — scope to specific org
+  organizationId: "org-uuid", // optional — scope to specific org
   eventType: "donation.received",
   payload: {
     event: "donation.received",
@@ -266,13 +273,14 @@ const result = await triggerWebhook({
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `organizationId` | `string` | No | Scope to a specific organization |
-| `eventType` | `string` | Yes | Event type from `WEBHOOK_EVENTS` |
-| `payload` | `object` | Yes | Event payload (arbitrary JSON) |
+| Parameter        | Type     | Required | Description                      |
+| ---------------- | -------- | -------- | -------------------------------- |
+| `organizationId` | `string` | No       | Scope to a specific organization |
+| `eventType`      | `string` | Yes      | Event type from `WEBHOOK_EVENTS` |
+| `payload`        | `object` | Yes      | Event payload (arbitrary JSON)   |
 
 **Behavior:**
+
 1. Queries all active webhooks (optionally scoped to an organization).
 2. Filters to webhooks whose `events` array includes the `eventType`.
 3. Creates `webhook_deliveries` records with status `"pending"`.
@@ -293,10 +301,10 @@ const result = await testWebhook("webhook-uuid", user.id);
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `webhookId` | `string` | Yes | Webhook UUID |
-| `userId` | `string` | Yes | Must be the webhook owner |
+| Parameter   | Type     | Required | Description               |
+| ----------- | -------- | -------- | ------------------------- |
+| `webhookId` | `string` | Yes      | Webhook UUID              |
+| `userId`    | `string` | Yes      | Must be the webhook owner |
 
 **Test payload:**
 
@@ -322,9 +330,9 @@ const result = await deliverWebhook("delivery-uuid");
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `deliveryId` | `string` | Yes | Delivery UUID from `webhook_deliveries` |
+| Parameter    | Type     | Required | Description                             |
+| ------------ | -------- | -------- | --------------------------------------- |
+| `deliveryId` | `string` | Yes      | Delivery UUID from `webhook_deliveries` |
 
 **Flow:**
 
@@ -333,13 +341,13 @@ const result = await deliverWebhook("delivery-uuid");
 3. Sign the payload with HMAC-SHA256.
 4. POST to the webhook URL with the following headers:
 
-| Header | Value |
-|--------|-------|
-| `Content-Type` | `application/json` |
-| `X-Fundora-Signature` | HMAC-SHA256 hex signature |
-| `X-Fundora-Event` | Event type string |
-| `X-Fundora-Delivery-Id` | Delivery UUID |
-| `User-Agent` | `Fundora-Webhook/1.0` |
+| Header                  | Value                     |
+| ----------------------- | ------------------------- |
+| `Content-Type`          | `application/json`        |
+| `X-Fundora-Signature`   | HMAC-SHA256 hex signature |
+| `X-Fundora-Event`       | Event type string         |
+| `X-Fundora-Delivery-Id` | Delivery UUID             |
+| `User-Agent`            | `Fundora-Webhook/1.0`     |
 
 5. **On success (2xx):**
    - Mark delivery as `"delivered"`.
@@ -362,9 +370,9 @@ const result = await retryDelivery("delivery-uuid");
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `deliveryId` | `string` | Yes | Must be in `"failed"` status |
+| Parameter    | Type     | Required | Description                  |
+| ------------ | -------- | -------- | ---------------------------- |
+| `deliveryId` | `string` | Yes      | Must be in `"failed"` status |
 
 ---
 
@@ -374,7 +382,7 @@ List deliveries for a webhook.
 
 ```js
 const result = await getWebhookDeliveries("webhook-uuid", {
-  status: "failed",  // optional filter
+  status: "failed", // optional filter
   limit: 50,
   offset: 0,
 });
@@ -396,13 +404,13 @@ const result = await getPendingRetries();
 
 Webhook deliveries that fail are retried with exponential backoff:
 
-| Attempt | Delay | Cumulative Wait |
-|---------|-------|-----------------|
-| 1 | 1 minute | 1 min |
-| 2 | 5 minutes | 6 min |
-| 3 | 30 minutes | 36 min |
-| 4 | 2 hours | 2 hr 36 min |
-| 5 | 12 hours | 14 hr 36 min |
+| Attempt | Delay      | Cumulative Wait |
+| ------- | ---------- | --------------- |
+| 1       | 1 minute   | 1 min           |
+| 2       | 5 minutes  | 6 min           |
+| 3       | 30 minutes | 36 min          |
+| 4       | 2 hours    | 2 hr 36 min     |
+| 5       | 12 hours   | 14 hr 36 min    |
 
 After 5 failed attempts (default `max_attempts`), the delivery is marked as `"failed"` and the webhook's `failure_count` is incremented. When `failure_count` reaches 10, the webhook is automatically disabled (`status = "failed"`).
 
@@ -436,12 +444,12 @@ deliverWebhook() — POST to endpoint
 
 ## API Routes
 
-| Route | Method | Description |
-|-------|--------|-------------|
-| `/api/webhooks` | GET | List webhooks (`?mode=events` for available event types). Secrets stripped from response. |
-| `/api/webhooks` | POST | `create`, `update`, `delete` actions |
-| `/api/webhooks/deliveries` | GET | List deliveries for a webhook |
-| `/api/webhooks/test` | POST | Send a test ping to a webhook |
+| Route                      | Method | Description                                                                               |
+| -------------------------- | ------ | ----------------------------------------------------------------------------------------- |
+| `/api/webhooks`            | GET    | List webhooks (`?mode=events` for available event types). Secrets stripped from response. |
+| `/api/webhooks`            | POST   | `create`, `update`, `delete` actions                                                      |
+| `/api/webhooks/deliveries` | GET    | List deliveries for a webhook                                                             |
+| `/api/webhooks/test`       | POST   | Send a test ping to a webhook                                                             |
 
 ### GET `/api/webhooks?mode=events`
 
@@ -482,36 +490,36 @@ Returns the list of available webhook event types:
 
 ## Database Tables
 
-| Table | Description |
-|-------|-------------|
-| `webhooks` | Webhook registrations with URL, secret, events, failure tracking |
+| Table                | Description                                                               |
+| -------------------- | ------------------------------------------------------------------------- |
+| `webhooks`           | Webhook registrations with URL, secret, events, failure tracking          |
 | `webhook_deliveries` | Individual delivery attempts with status, retry scheduling, response data |
 
 ### Key Fields in `webhooks`
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `url` | `text` | Target endpoint URL |
-| `secret` | `text` | HMAC-SHA256 signing secret |
-| `events` | `text[]` | Subscribed event types |
-| `status` | `text` | `active`, `inactive`, or `failed` |
-| `failure_count` | `integer` | Consecutive failure count (auto-disables at 10) |
-| `last_triggered_at` | `timestamptz` | Last time webhooks were triggered |
-| `last_success_at` | `timestamptz` | Last successful delivery |
-| `last_error` | `text` | Last error message |
+| Field               | Type          | Description                                     |
+| ------------------- | ------------- | ----------------------------------------------- |
+| `url`               | `text`        | Target endpoint URL                             |
+| `secret`            | `text`        | HMAC-SHA256 signing secret                      |
+| `events`            | `text[]`      | Subscribed event types                          |
+| `status`            | `text`        | `active`, `inactive`, or `failed`               |
+| `failure_count`     | `integer`     | Consecutive failure count (auto-disables at 10) |
+| `last_triggered_at` | `timestamptz` | Last time webhooks were triggered               |
+| `last_success_at`   | `timestamptz` | Last successful delivery                        |
+| `last_error`        | `text`        | Last error message                              |
 
 ### Key Fields in `webhook_deliveries`
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `event_type` | `text` | Event that triggered this delivery |
-| `payload` | `jsonb` | The event payload |
-| `status` | `text` | `pending`, `delivered`, `failed`, or `retrying` |
-| `attempt_count` | `integer` | Number of delivery attempts |
-| `max_attempts` | `integer` | Maximum retries (default: 5) |
-| `next_retry_at` | `timestamptz` | When the next retry should occur |
-| `response_status` | `integer` | HTTP status of last attempt |
-| `error_message` | `text` | Error from last failed attempt |
+| Field             | Type          | Description                                     |
+| ----------------- | ------------- | ----------------------------------------------- |
+| `event_type`      | `text`        | Event that triggered this delivery              |
+| `payload`         | `jsonb`       | The event payload                               |
+| `status`          | `text`        | `pending`, `delivered`, `failed`, or `retrying` |
+| `attempt_count`   | `integer`     | Number of delivery attempts                     |
+| `max_attempts`    | `integer`     | Maximum retries (default: 5)                    |
+| `next_retry_at`   | `timestamptz` | When the next retry should occur                |
+| `response_status` | `integer`     | HTTP status of last attempt                     |
+| `error_message`   | `text`        | Error from last failed attempt                  |
 
 ## Tests
 

@@ -73,8 +73,8 @@ export default function DocumentUploader({
                   status: "uploaded",
                   document: result?.document || null,
                 }
-              : f
-          )
+              : f,
+          ),
         );
       } catch (err) {
         setUploadProgress((prev) => ({
@@ -85,12 +85,12 @@ export default function DocumentUploader({
           current.map((f) =>
             f.id === fileEntry.id
               ? { ...f, status: "error", error: err.message }
-              : f
-          )
+              : f,
+          ),
         );
       }
     },
-    [documentType, onFilesChange]
+    [documentType, onFilesChange],
   );
 
   const onDrop = useCallback(
@@ -136,7 +136,7 @@ export default function DocumentUploader({
         newFiles.forEach((f) => runUpload(f));
       }
     },
-    [files, onFilesChange, runUpload]
+    [files, onFilesChange, runUpload],
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -154,7 +154,7 @@ export default function DocumentUploader({
     const docId = target?.document?.id;
     if (docId) {
       deleteDocumentApi({ documentId: docId }).catch((err) =>
-        console.error("Remove document error:", err)
+        console.error("Remove document error:", err),
       );
     }
 
@@ -210,7 +210,9 @@ export default function DocumentUploader({
             cloud_upload
           </span>
           {isDragActive ? (
-            <p className="text-primary text-sm font-inter">Drop files here...</p>
+            <p className="text-primary text-sm font-inter">
+              Drop files here...
+            </p>
           ) : (
             <>
               <p className="text-on-surface-variant text-sm font-inter">

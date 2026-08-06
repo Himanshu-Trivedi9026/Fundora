@@ -3,8 +3,7 @@ const variants = {
     "bg-primary text-on-primary font-medium shadow-glow hover:bg-primary/90 hover:shadow-glow-lg",
   secondary:
     "bg-white/[0.04] border border-white/[0.08] text-on-surface-variant hover:bg-white/[0.08] hover:text-on-surface",
-  danger:
-    "bg-danger text-white hover:bg-danger/90",
+  danger: "bg-danger text-white hover:bg-danger/90",
   ghost:
     "bg-transparent text-on-surface-variant hover:text-on-surface hover:bg-white/[0.04]",
   icon: "bg-transparent text-on-surface-variant hover:text-on-surface p-2",

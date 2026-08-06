@@ -45,7 +45,10 @@ export default function WelcomeCard({
           <div className="px-6 md:px-8 py-4 border-t border-white/[0.06]">
             <ul className="space-y-2">
               {tips.map((tip, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-on-surface-variant">
+                <li
+                  key={i}
+                  className="flex items-start gap-2 text-sm text-on-surface-variant"
+                >
                   <span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">
                     lightbulb
                   </span>

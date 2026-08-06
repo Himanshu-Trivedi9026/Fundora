@@ -9,42 +9,51 @@ Phase 7 transforms Fundora into a regulated, self-governing platform. The implem
 ### Files Created
 
 #### Database Migration
+
 - `supabase/migrations/007_compliance_reputation_governance.sql` — 12 new tables with RLS policies, indexes, triggers, and utility functions
 
 #### Core Library Modules (16 files)
 
 **Compliance Engine:**
+
 - `lib/compliance/complianceEngine.js` — Case CRUD, lifecycle, assignment, escalation, statistics
 - `lib/compliance/complianceEvents.js` — Audit trail for compliance actions
 - `lib/compliance/index.js` — Barrel exports
 
 **Reputation Engine:**
+
 - `lib/reputation/reputationEngine.js` — Weighted scoring for creators, donors, and campaigns
 - `lib/reputation/index.js` — Barrel exports
 
 **Moderation Engine:**
+
 - `lib/moderation/moderationEngine.js` — Moderation case lifecycle, resolution, escalation
 - `lib/moderation/index.js` — Barrel exports
 
 **Appeals Engine:**
+
 - `lib/appeals/appealsEngine.js` — Appeal creation, review, decision, withdrawal
 - `lib/appeals/index.js` — Barrel exports
 
 **Notification Engine:**
+
 - `lib/notification/notificationEngine.js` — Notification CRUD, multi-channel delivery, preferences
 - `lib/notification/index.js` — Barrel exports
 
 **Policy Engine:**
+
 - `lib/policy/policyEngine.js` — Database-driven configurable policies with version history
 - `lib/policy/index.js` — Barrel exports
 
 **Platform Intelligence:**
+
 - `lib/platformIntelligence/analyticsEngine.js` — Platform health, trust distribution, fraud trends, metrics
 - `lib/platformIntelligence/index.js` — Barrel exports
 
 #### API Routes (11 files)
 
 **Admin Dashboards:**
+
 - `pages/api/admin/compliance-dashboard.js` — Compliance case management
 - `pages/api/admin/moderation-dashboard.js` — Moderation case management
 - `pages/api/admin/appeals-dashboard.js` — Appeal review management
@@ -52,6 +61,7 @@ Phase 7 transforms Fundora into a regulated, self-governing platform. The implem
 - `pages/api/admin/platform-analytics.js` — Platform metrics and health
 
 **User-Facing APIs:**
+
 - `pages/api/moderation/report.js` — Content/user report submission
 - `pages/api/appeals/index.js` — Appeal submission and management
 - `pages/api/notifications/index.js` — Notification CRUD
@@ -62,6 +72,7 @@ Phase 7 transforms Fundora into a regulated, self-governing platform. The implem
 #### UI Components (7 files)
 
 **Admin Dashboards:**
+
 - `components/admin/ComplianceDashboard.jsx` — Compliance case management UI
 - `components/admin/ModerationDashboard.jsx` — Moderation case management UI
 - `components/admin/AppealsDashboard.jsx` — Appeal review UI
@@ -69,17 +80,20 @@ Phase 7 transforms Fundora into a regulated, self-governing platform. The implem
 - `components/admin/PlatformAnalytics.jsx` — Platform metrics dashboard
 
 **User-Facing:**
+
 - `components/creator/ReputationCard.jsx` — Creator reputation score display
 - `components/notifications/NotificationCenter.jsx` — Notification list and preferences
 
 #### Pages (5 files)
 
 **Admin:**
+
 - `pages/admin/compliance.js` — Admin compliance dashboard page
 - `pages/admin/moderation.js` — Admin moderation dashboard page
 - `pages/admin/appeals.js` — Admin appeals dashboard page
 
 **User-Facing:**
+
 - `pages/notifications.js` — User notifications center page
 - `pages/creator/reputation.js` — Creator reputation profile page
 

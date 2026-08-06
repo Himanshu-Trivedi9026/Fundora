@@ -16,13 +16,17 @@ describe("Risk Engine", () => {
 
     it("returns a valid riskLevel", () => {
       const result = calculateRiskScore({});
-      expect(["minimal", "low", "medium", "high", "critical"]).toContain(result.riskLevel);
+      expect(["minimal", "low", "medium", "high", "critical"]).toContain(
+        result.riskLevel,
+      );
     });
 
     it("returns lastCalculated as ISO string", () => {
       const result = calculateRiskScore({});
       expect(result.lastCalculated).toBeTruthy();
-      expect(new Date(result.lastCalculated).toISOString()).toBe(result.lastCalculated);
+      expect(new Date(result.lastCalculated).toISOString()).toBe(
+        result.lastCalculated,
+      );
     });
 
     it("returns riskFactors breakdown", () => {
@@ -107,7 +111,10 @@ describe("Risk Engine", () => {
     });
 
     it("weights sum to 1.0", () => {
-      const total = Object.values(RISK_FACTORS).reduce((a, b) => a + b.weight, 0);
+      const total = Object.values(RISK_FACTORS).reduce(
+        (a, b) => a + b.weight,
+        0,
+      );
       expect(total).toBeCloseTo(1.0, 10);
     });
   });

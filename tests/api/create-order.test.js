@@ -1,4 +1,6 @@
-const mockCreateOrder = vi.fn().mockResolvedValue({ id: "order_test123", amount: 50000, currency: "INR" });
+const mockCreateOrder = vi
+  .fn()
+  .mockResolvedValue({ id: "order_test123", amount: 50000, currency: "INR" });
 
 vi.mock("razorpay", () => ({
   default: vi.fn(function () {
@@ -63,7 +65,11 @@ describe("POST /api/razorpay/create-order", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockCreateOrder.mockResolvedValue({ id: "order_test123", amount: 50000, currency: "INR" });
+    mockCreateOrder.mockResolvedValue({
+      id: "order_test123",
+      amount: 50000,
+      currency: "INR",
+    });
     vi.stubEnv("RAZORPAY_KEY_ID", "rzp_test_key");
     vi.stubEnv("RAZORPAY_KEY_SECRET", "rzp_test_secret");
 
@@ -79,7 +85,9 @@ describe("POST /api/razorpay/create-order", () => {
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
+        eq: vi
+          .fn()
+          .mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
@@ -198,7 +206,9 @@ describe("POST /api/razorpay/create-order", () => {
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
+        eq: vi
+          .fn()
+          .mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
@@ -221,7 +231,9 @@ describe("POST /api/razorpay/create-order", () => {
     await handler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ error: "Payment system not configured" });
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Payment system not configured",
+    });
     consoleSpy.mockRestore();
   });
 
@@ -234,7 +246,9 @@ describe("POST /api/razorpay/create-order", () => {
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
+        eq: vi
+          .fn()
+          .mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
@@ -250,7 +264,10 @@ describe("POST /api/razorpay/create-order", () => {
       error: null,
     });
     mockConfigMaybeSingle.mockResolvedValue({
-      data: { razorpay_key_id: "rzp_custom_key", razorpay_key_secret: "rzp_custom_secret" },
+      data: {
+        razorpay_key_id: "rzp_custom_key",
+        razorpay_key_secret: "rzp_custom_secret",
+      },
       error: null,
     });
 
@@ -276,7 +293,7 @@ describe("POST /api/razorpay/create-order", () => {
     await handler(req, res);
 
     expect(mockCreateOrder).toHaveBeenCalledWith(
-      expect.objectContaining({ amount: 1050, currency: "INR" })
+      expect.objectContaining({ amount: 1050, currency: "INR" }),
     );
   });
 

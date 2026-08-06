@@ -22,7 +22,8 @@ export default withAuth(async function handler(req, res, user) {
     /* ---------- FETCH DONATION ---------- */
     const { data, error } = await supabaseAdmin
       .from("public_donations")
-      .select(`
+      .select(
+        `
         id,
         amount,
         created_at,
@@ -30,7 +31,8 @@ export default withAuth(async function handler(req, res, user) {
         projects:project_id (
           title
         )
-      `)
+      `,
+      )
       .eq("id", donationId)
       .eq("payer_id", user.id)
       .eq("status", "paid")
@@ -63,7 +65,6 @@ export default withAuth(async function handler(req, res, user) {
       success: true,
       receipt,
     });
-
   } catch (err) {
     console.error("Receipt API Error:", err);
 

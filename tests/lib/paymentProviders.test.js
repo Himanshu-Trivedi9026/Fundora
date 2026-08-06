@@ -23,7 +23,7 @@ describe("Payment Provider Adapter", () => {
   it("should compute processing fees", () => {
     const amount = 1000;
     const stripeFee = amount * 0.025;
-    const paypalFee = amount * 0.029 + 0.30;
+    const paypalFee = amount * 0.029 + 0.3;
 
     expect(stripeFee).toBe(25);
     expect(paypalFee).toBe(29.3);
@@ -44,7 +44,9 @@ describe("Base Provider Contract", () => {
 
   it("should require all contract methods", () => {
     const provider = {};
-    const missing = requiredMethods.filter((m) => typeof provider[m] !== "function");
+    const missing = requiredMethods.filter(
+      (m) => typeof provider[m] !== "function",
+    );
 
     expect(missing).toHaveLength(requiredMethods.length); // All missing — not implemented
   });
@@ -53,7 +55,10 @@ describe("Base Provider Contract", () => {
 describe("Provider Registry", () => {
   it("should register and retrieve providers", () => {
     const registry = new Map();
-    const mockProvider = { supportedCurrencies: ["USD", "INR"], supportedCountries: ["US", "IN"] };
+    const mockProvider = {
+      supportedCurrencies: ["USD", "INR"],
+      supportedCountries: ["US", "IN"],
+    };
 
     registry.set("mock", mockProvider);
     expect(registry.get("mock").supportedCurrencies).toContain("USD");

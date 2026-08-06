@@ -313,7 +313,10 @@ describe("maskStoragePath", () => {
 
   it("reveals userId but masks everything else when both path and userId are provided", () => {
     const userId = "user-abc-123-def";
-    const result = maskStoragePath("verification-docs/user-abc-123-def/passport.enc", userId);
+    const result = maskStoragePath(
+      "verification-docs/user-abc-123-def/passport.enc",
+      userId,
+    );
 
     expect(result).toBe("verification-docs/user-abc-123-def/***");
     expect(result).toContain(userId);
@@ -322,7 +325,10 @@ describe("maskStoragePath", () => {
 
   it("masks file portion even when userId is provided", () => {
     const userId = "user-xyz-789";
-    const result = maskStoragePath("verification-docs/user-xyz-789/license.enc", userId);
+    const result = maskStoragePath(
+      "verification-docs/user-xyz-789/license.enc",
+      userId,
+    );
 
     expect(result).toBe("verification-docs/user-xyz-789/***");
     expect(result).toContain(userId);

@@ -34,8 +34,12 @@ export default function TeamMembers({ team }) {
 
             {/* Info */}
             <div className="flex-1 min-w-0">
-              <p className="text-on-surface font-inter text-sm font-semibold truncate">{member.name}</p>
-              <p className="text-on-surface-variant font-inter text-xs truncate">{member.role}</p>
+              <p className="text-on-surface font-inter text-sm font-semibold truncate">
+                {member.name}
+              </p>
+              <p className="text-on-surface-variant font-inter text-xs truncate">
+                {member.role}
+              </p>
             </div>
 
             {/* Email */}

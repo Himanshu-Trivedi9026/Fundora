@@ -1,7 +1,13 @@
 // GET /api/currency/rates — Get exchange rates
 // POST /api/currency/rates — Update exchange rate
 import { withAuth } from "../../../lib/withAuth.js";
-import { getCurrencies, getExchangeRate, getHistoricalRates, updateExchangeRate, convertAmount } from "../../../lib/currency/currencyEngine.js";
+import {
+  getCurrencies,
+  getExchangeRate,
+  getHistoricalRates,
+  updateExchangeRate,
+  convertAmount,
+} from "../../../lib/currency/currencyEngine.js";
 
 async function handler(req, res) {
   try {
@@ -31,7 +37,10 @@ async function handler(req, res) {
       case "POST": {
         const { fromCurrency, toCurrency, rate } = req.body;
         if (!fromCurrency || !toCurrency || rate === undefined) {
-          return res.status(400).json({ success: false, error: "fromCurrency, toCurrency, rate required" });
+          return res.status(400).json({
+            success: false,
+            error: "fromCurrency, toCurrency, rate required",
+          });
         }
 
         const result = await updateExchangeRate(fromCurrency, toCurrency, rate);
@@ -39,7 +48,9 @@ async function handler(req, res) {
       }
 
       default:
-        return res.status(405).json({ success: false, error: "Method not allowed" });
+        return res
+          .status(405)
+          .json({ success: false, error: "Method not allowed" });
     }
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });

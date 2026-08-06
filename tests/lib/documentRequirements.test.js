@@ -24,7 +24,12 @@ describe("Document Requirements Engine", () => {
 
     it("returns 4 documents for sole_proprietorship", () => {
       const docs = getRequiredDocuments("sole_proprietorship");
-      expect(docs).toEqual(["gst_certificate", "pan_card", "business_address_proof", "cancelled_cheque"]);
+      expect(docs).toEqual([
+        "gst_certificate",
+        "pan_card",
+        "business_address_proof",
+        "cancelled_cheque",
+      ]);
       expect(docs).toHaveLength(4);
     });
 
@@ -133,7 +138,7 @@ describe("Document Requirements Engine", () => {
     it("returns empty array when all required documents are provided", () => {
       const missing = getMissingDocuments(
         ["pan_card", "aadhaar_card", "address_proof"],
-        "individual"
+        "individual",
       );
       expect(missing).toEqual([]);
     });
@@ -151,7 +156,7 @@ describe("Document Requirements Engine", () => {
     it("returns empty array when extra (non-required) docs are provided", () => {
       const missing = getMissingDocuments(
         ["pan_card", "aadhaar_card", "address_proof", "extra_doc"],
-        "individual"
+        "individual",
       );
       expect(missing).toEqual([]);
     });
@@ -178,7 +183,7 @@ describe("Document Requirements Engine", () => {
     it("returns complete=true and 100% progress when all documents provided", () => {
       const result = checkDocumentCompletion(
         ["pan_card", "aadhaar_card", "address_proof"],
-        "individual"
+        "individual",
       );
       expect(result.complete).toBe(true);
       expect(result.missing).toEqual([]);
@@ -217,7 +222,7 @@ describe("Document Requirements Engine", () => {
     it("handles partial completion for partnership (5 required)", () => {
       const result = checkDocumentCompletion(
         ["partnership_deed", "gst_certificate"],
-        "partnership"
+        "partnership",
       );
       expect(result.complete).toBe(false);
       expect(result.total).toBe(5);
@@ -228,7 +233,7 @@ describe("Document Requirements Engine", () => {
     it("returns correct progress for sole_proprietorship with 3 of 4 docs", () => {
       const result = checkDocumentCompletion(
         ["gst_certificate", "pan_card", "cancelled_cheque"],
-        "sole_proprietorship"
+        "sole_proprietorship",
       );
       expect(result.complete).toBe(false);
       expect(result.progress).toBe(75);
@@ -258,7 +263,9 @@ describe("Document Requirements Engine", () => {
     });
 
     it("returns label for known document type 'certificate_of_incorporation'", () => {
-      expect(getDocumentLabel("certificate_of_incorporation")).toBe("Certificate of Incorporation");
+      expect(getDocumentLabel("certificate_of_incorporation")).toBe(
+        "Certificate of Incorporation",
+      );
     });
 
     it("returns label for 'moa'", () => {
@@ -289,19 +296,27 @@ describe("Document Requirements Engine", () => {
     });
 
     it("returns label for 'sole_proprietorship'", () => {
-      expect(getBusinessTypeLabel("sole_proprietorship")).toBe("Sole Proprietorship");
+      expect(getBusinessTypeLabel("sole_proprietorship")).toBe(
+        "Sole Proprietorship",
+      );
     });
 
     it("returns label for 'llp'", () => {
-      expect(getBusinessTypeLabel("llp")).toBe("Limited Liability Partnership (LLP)");
+      expect(getBusinessTypeLabel("llp")).toBe(
+        "Limited Liability Partnership (LLP)",
+      );
     });
 
     it("returns label for 'private_limited'", () => {
-      expect(getBusinessTypeLabel("private_limited")).toBe("Private Limited Company");
+      expect(getBusinessTypeLabel("private_limited")).toBe(
+        "Private Limited Company",
+      );
     });
 
     it("returns label for 'ngo'", () => {
-      expect(getBusinessTypeLabel("ngo")).toBe("Non-Governmental Organization (NGO)");
+      expect(getBusinessTypeLabel("ngo")).toBe(
+        "Non-Governmental Organization (NGO)",
+      );
     });
 
     it("returns label for 'startup'", () => {
@@ -309,7 +324,9 @@ describe("Document Requirements Engine", () => {
     });
 
     it("returns label for 'government'", () => {
-      expect(getBusinessTypeLabel("government")).toBe("Government Organization");
+      expect(getBusinessTypeLabel("government")).toBe(
+        "Government Organization",
+      );
     });
 
     it("returns the raw key for unknown business type", () => {

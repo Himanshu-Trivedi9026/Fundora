@@ -7,7 +7,12 @@
  *   <Skeleton.Card />
  */
 
-export function SkeletonBox({ width, height = 20, rounded = "rounded-lg", className = "" }) {
+export function SkeletonBox({
+  width,
+  height = 20,
+  rounded = "rounded-lg",
+  className = "",
+}) {
   return (
     <div
       aria-hidden="true"
@@ -36,14 +41,28 @@ export function SkeletonCard({ className = "" }) {
   return (
     <div aria-hidden="true" className={`glass-card p-6 space-y-4 ${className}`}>
       <div className="shimmer rounded-lg" style={{ width: 48, height: 48 }} />
-      <div className="shimmer rounded-md" style={{ width: "60%", height: 18 }} />
-      <div className="shimmer rounded-md" style={{ width: "100%", height: 14 }} />
-      <div className="shimmer rounded-md" style={{ width: "80%", height: 14 }} />
+      <div
+        className="shimmer rounded-md"
+        style={{ width: "60%", height: 18 }}
+      />
+      <div
+        className="shimmer rounded-md"
+        style={{ width: "100%", height: 14 }}
+      />
+      <div
+        className="shimmer rounded-md"
+        style={{ width: "80%", height: 14 }}
+      />
     </div>
   );
 }
 
-export default function Skeleton({ width, height = 20, rounded = "rounded-lg", className = "" }) {
+export default function Skeleton({
+  width,
+  height = 20,
+  rounded = "rounded-lg",
+  className = "",
+}) {
   return (
     <div
       aria-hidden="true"

@@ -32,42 +32,42 @@ Cases in `resolved` or `escalated` status cannot be assigned. Escalation automat
 
 ## Case Types
 
-| Constant | Value |
-|----------|-------|
-| `SPAM` | `"spam"` |
-| `HARASSMENT` | `"harassment"` |
-| `FRAUD` | `"fraud"` |
+| Constant                | Value                     |
+| ----------------------- | ------------------------- |
+| `SPAM`                  | `"spam"`                  |
+| `HARASSMENT`            | `"harassment"`            |
+| `FRAUD`                 | `"fraud"`                 |
 | `INAPPROPRIATE_CONTENT` | `"inappropriate_content"` |
-| `COPYRIGHT` | `"copyright"` |
-| `FAKE_CAMPAIGN` | `"fake_campaign"` |
-| `MISUSE_OF_FUNDS` | `"misuse_of_funds"` |
-| `VERIFICATION_ABUSE` | `"verification_abuse"` |
-| `OTHER` | `"other"` |
+| `COPYRIGHT`             | `"copyright"`             |
+| `FAKE_CAMPAIGN`         | `"fake_campaign"`         |
+| `MISUSE_OF_FUNDS`       | `"misuse_of_funds"`       |
+| `VERIFICATION_ABUSE`    | `"verification_abuse"`    |
+| `OTHER`                 | `"other"`                 |
 
 ## Case Statuses
 
-| Status | Description |
-|--------|-------------|
-| `open` | Case reported, awaiting assignment |
-| `in_review` | Assigned to moderator, under review |
-| `resolved` | Case resolved with action taken |
+| Status      | Description                              |
+| ----------- | ---------------------------------------- |
+| `open`      | Case reported, awaiting assignment       |
+| `in_review` | Assigned to moderator, under review      |
+| `resolved`  | Case resolved with action taken          |
 | `escalated` | Escalated to admin (priority = critical) |
-| `reopened` | Previously resolved case reopened |
+| `reopened`  | Previously resolved case reopened        |
 
 ## Moderation Actions
 
-| Action | Description |
-|--------|-------------|
-| `none` | No action taken |
-| `dismissed` | Report dismissed |
-| `warning` | Warning issued to reported user |
-| `content_removal` | Reported content removed |
-| `content_edit` | Content edited or modified |
-| `temporary_suspension` | Account temporarily suspended |
-| `permanent_ban` | Account permanently banned |
-| `account_restriction` | Account restricted |
-| `campaign_restriction` | Campaign restricted |
-| `escalated_to_admin` | Escalated to admin for review |
+| Action                 | Description                     |
+| ---------------------- | ------------------------------- |
+| `none`                 | No action taken                 |
+| `dismissed`            | Report dismissed                |
+| `warning`              | Warning issued to reported user |
+| `content_removal`      | Reported content removed        |
+| `content_edit`         | Content edited or modified      |
+| `temporary_suspension` | Account temporarily suspended   |
+| `permanent_ban`        | Account permanently banned      |
+| `account_restriction`  | Account restricted              |
+| `campaign_restriction` | Campaign restricted             |
+| `escalated_to_admin`   | Escalated to admin for review   |
 
 ## Key Functions
 
@@ -76,6 +76,7 @@ Cases in `resolved` or `escalated` status cannot be assigned. Escalation automat
 Creates a moderation case with auto-generated case number (MOD-YYYY-NNNNN).
 
 **Parameters:**
+
 - `caseType` (string, required) — Type from MODERATION_CASE_TYPES
 - `reporterId` (string, required) — Reporter's user ID
 - `reportedUserId` (string, optional) — User being reported
@@ -109,6 +110,7 @@ Assigns a moderator. Transitions status to `in_review`. Blocked if resolved or e
 Resolves a case with an action. Blocked if already resolved.
 
 **Parameters:**
+
 - `caseId` (string, required) — Case ID
 - `actionTaken` (string, required) — Action from MODERATION_ACTIONS
 - `resolution` (string, required) — Resolution description
@@ -144,37 +146,37 @@ Appeals have a **7-day review deadline** from submission.
 
 ### Appeal Types
 
-| Constant | Value |
-|----------|-------|
-| `ACCOUNT_SUSPENSION` | `"account_suspension"` |
-| `CAMPAIGN_REMOVAL` | `"campaign_removal"` |
-| `PAYMENT_DISPUTE` | `"payment_dispute"` |
-| `FRAUD_ALLEGATION` | `"fraud_allegation"` |
-| `CONTENT_REMOVAL` | `"content_removal"` |
+| Constant              | Value                   |
+| --------------------- | ----------------------- |
+| `ACCOUNT_SUSPENSION`  | `"account_suspension"`  |
+| `CAMPAIGN_REMOVAL`    | `"campaign_removal"`    |
+| `PAYMENT_DISPUTE`     | `"payment_dispute"`     |
+| `FRAUD_ALLEGATION`    | `"fraud_allegation"`    |
+| `CONTENT_REMOVAL`     | `"content_removal"`     |
 | `TRUST_SCORE_DISPUTE` | `"trust_score_dispute"` |
 | `MILESTONE_REJECTION` | `"milestone_rejection"` |
-| `PAYOUT_REJECTION` | `"payout_rejection"` |
-| `OTHER` | `"other"` |
+| `PAYOUT_REJECTION`    | `"payout_rejection"`    |
+| `OTHER`               | `"other"`               |
 
 ### Appeal Statuses
 
-| Status | Description |
-|--------|-------------|
-| `draft` | Draft (not yet submitted) |
-| `submitted` | Submitted, awaiting review |
-| `under_review` | Assigned to reviewer |
-| `evidence_requested` | Additional evidence requested |
-| `decided` | Decision made (uphold/overturn/modify/escalate) |
-| `closed` | Appeal closed |
-| `withdrawn` | Withdrawn by appellant |
+| Status               | Description                                     |
+| -------------------- | ----------------------------------------------- |
+| `draft`              | Draft (not yet submitted)                       |
+| `submitted`          | Submitted, awaiting review                      |
+| `under_review`       | Assigned to reviewer                            |
+| `evidence_requested` | Additional evidence requested                   |
+| `decided`            | Decision made (uphold/overturn/modify/escalate) |
+| `closed`             | Appeal closed                                   |
+| `withdrawn`          | Withdrawn by appellant                          |
 
 ### Appeal Decisions
 
-| Decision | Description |
-|----------|-------------|
-| `uphold` | Original decision upheld |
+| Decision   | Description                  |
+| ---------- | ---------------------------- |
+| `uphold`   | Original decision upheld     |
 | `overturn` | Original decision overturned |
-| `modify` | Original decision modified |
+| `modify`   | Original decision modified   |
 | `escalate` | Escalated to senior reviewer |
 
 ### Key Functions
@@ -212,10 +214,7 @@ import {
   escalateModerationCase,
 } from "../lib/moderation";
 
-import {
-  createAppeal,
-  reviewAppeal,
-} from "../lib/appeals";
+import { createAppeal, reviewAppeal } from "../lib/appeals";
 
 // Report content
 const report = await createModerationCase({

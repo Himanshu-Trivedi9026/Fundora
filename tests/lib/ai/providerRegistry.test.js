@@ -53,7 +53,9 @@ describe("Provider Registry", () => {
   describe("BaseModelProvider", () => {
     it("throws on initialize() if not overridden", async () => {
       const provider = new BaseModelProvider("test");
-      await expect(provider.initialize()).rejects.toThrow("initialize() must be implemented");
+      await expect(provider.initialize()).rejects.toThrow(
+        "initialize() must be implemented",
+      );
     });
 
     it("throws on chatCompletion() if not overridden", async () => {
@@ -82,7 +84,10 @@ describe("Provider Registry", () => {
 
       expect(provider.initialized).toBe(true);
       expect(provider.model).toBe("mock-model");
-      expect(logInfo).toHaveBeenCalledWith("ModelProvider", "Mock provider initialized");
+      expect(logInfo).toHaveBeenCalledWith(
+        "ModelProvider",
+        "Mock provider initialized",
+      );
     });
 
     it("chatCompletion returns a structured response with token counts", async () => {

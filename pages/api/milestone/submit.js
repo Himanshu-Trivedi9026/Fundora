@@ -7,7 +7,10 @@
 
 import { withAuth } from "../../../lib/withAuth";
 import { rateLimit } from "../../../lib/rateLimit";
-import { submitMilestone, getSubmissions } from "../../../lib/milestone/milestoneSubmission";
+import {
+  submitMilestone,
+  getSubmissions,
+} from "../../../lib/milestone/milestoneSubmission";
 import { logError } from "../../../lib/verification/secureLogger";
 
 const rl = rateLimit({ windowMs: 60_000, max: 10 });
@@ -28,7 +31,9 @@ export default withAuth(async function handler(req, res, user) {
         return res.status(500).json({ error: result.error });
       }
 
-      return res.status(200).json({ success: true, submissions: result.submissions });
+      return res
+        .status(200)
+        .json({ success: true, submissions: result.submissions });
     } catch (err) {
       logError("MilestoneSubmitAPI", "GET error", { error: err.message });
       return res.status(500).json({ error: "Failed to fetch submissions" });
@@ -39,10 +44,20 @@ export default withAuth(async function handler(req, res, user) {
     if (!rl(req, res)) return;
 
     try {
-      const { milestoneId, title, description, submissionType, files, links, progressNotes } = req.body;
+      const {
+        milestoneId,
+        title,
+        description,
+        submissionType,
+        files,
+        links,
+        progressNotes,
+      } = req.body;
 
       if (!milestoneId || !title) {
-        return res.status(400).json({ error: "milestoneId and title are required" });
+        return res
+          .status(400)
+          .json({ error: "milestoneId and title are required" });
       }
 
       const result = await submitMilestone({
@@ -60,10 +75,14 @@ export default withAuth(async function handler(req, res, user) {
         return res.status(400).json({ error: result.error });
       }
 
-      return res.status(201).json({ success: true, submission: result.submission });
+      return res
+        .status(201)
+        .json({ success: true, submission: result.submission });
     } catch (err) {
       logError("MilestoneSubmitAPI", "POST error", { error: err.message });
-      return res.status(500).json({ error: "Failed to submit milestone evidence" });
+      return res
+        .status(500)
+        .json({ error: "Failed to submit milestone evidence" });
     }
   }
 

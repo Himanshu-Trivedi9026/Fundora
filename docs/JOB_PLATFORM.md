@@ -37,6 +37,7 @@ The job platform provides reliable background job processing with priority queue
 ### 1. Priority Queues
 
 Jobs have priority levels (1-10):
+
 - `low` = 1
 - `normal` = 5
 - `high` = 8
@@ -58,12 +59,14 @@ Retry 5+ → 30s (capped)
 ### 3. Dead Letter Queue
 
 After exhausting max retries, jobs move to `dead_letter` status. They can be:
+
 - **Requeued**: Reset retries and return to pending
 - **Purged**: Permanently deleted
 
 ### 4. Scheduled Jobs
 
 Cron-based scheduling for recurring tasks:
+
 - Daily cleanup jobs
 - Periodic reports
 - Data sync operations
@@ -87,15 +90,19 @@ registerHandler("notification.push", async (payload, { jobId }) => {
 import { enqueue, enqueueBulk } from "../lib/jobs/index.js";
 
 // Single job
-await enqueue("email.send", {
-  to: "user@example.com",
-  template: "welcome",
-}, {
-  queueName: "mailers",
-  priority: "high",
-  maxRetries: 5,
-  scheduledAt: "2026-08-01T00:00:00Z",
-});
+await enqueue(
+  "email.send",
+  {
+    to: "user@example.com",
+    template: "welcome",
+  },
+  {
+    queueName: "mailers",
+    priority: "high",
+    maxRetries: 5,
+    scheduledAt: "2026-08-01T00:00:00Z",
+  },
+);
 
 // Bulk
 await enqueueBulk([
@@ -131,7 +138,11 @@ await purgeDeadLetters("default");
 ### Creating Schedules
 
 ```javascript
-import { createSchedule, toggleSchedule, listSchedules } from "../lib/jobs/index.js";
+import {
+  createSchedule,
+  toggleSchedule,
+  listSchedules,
+} from "../lib/jobs/index.js";
 
 // Create a daily schedule at midnight
 await createSchedule({
@@ -153,33 +164,33 @@ const { data: schedules } = await listSchedules({ isActive: true });
 
 ### `job_queue`
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | UUID | Primary key |
-| queue_name | TEXT | Queue identifier |
-| job_type | TEXT | Handler type identifier |
-| payload | JSONB | Job data |
-| priority | INTEGER | 1-10, higher = first |
-| status | TEXT | pending/running/completed/retrying/dead_letter/cancelled |
-| retry_count | INTEGER | Current retry attempt |
-| max_retries | INTEGER | Max retry attempts (default 3) |
-| last_error | TEXT | Last error message |
-| scheduled_at | TIMESTAMPTZ | Delayed execution |
-| started_at | TIMESTAMPTZ | When processing began |
-| completed_at | TIMESTAMPTZ | When processing ended |
+| Column       | Type        | Description                                              |
+| ------------ | ----------- | -------------------------------------------------------- |
+| id           | UUID        | Primary key                                              |
+| queue_name   | TEXT        | Queue identifier                                         |
+| job_type     | TEXT        | Handler type identifier                                  |
+| payload      | JSONB       | Job data                                                 |
+| priority     | INTEGER     | 1-10, higher = first                                     |
+| status       | TEXT        | pending/running/completed/retrying/dead_letter/cancelled |
+| retry_count  | INTEGER     | Current retry attempt                                    |
+| max_retries  | INTEGER     | Max retry attempts (default 3)                           |
+| last_error   | TEXT        | Last error message                                       |
+| scheduled_at | TIMESTAMPTZ | Delayed execution                                        |
+| started_at   | TIMESTAMPTZ | When processing began                                    |
+| completed_at | TIMESTAMPTZ | When processing ended                                    |
 
 ### `scheduled_jobs`
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | UUID | Primary key |
-| name | TEXT | Human-readable name |
-| job_type | TEXT | Handler to invoke |
-| schedule_cron | TEXT | Cron expression |
-| is_active | BOOLEAN | Whether schedule is enabled |
-| max_runs | INTEGER | Max executions (null = unlimited) |
-| run_count | INTEGER | Times executed |
-| next_run_at | TIMESTAMPTZ | Next scheduled execution |
+| Column        | Type        | Description                       |
+| ------------- | ----------- | --------------------------------- |
+| id            | UUID        | Primary key                       |
+| name          | TEXT        | Human-readable name               |
+| job_type      | TEXT        | Handler to invoke                 |
+| schedule_cron | TEXT        | Cron expression                   |
+| is_active     | BOOLEAN     | Whether schedule is enabled       |
+| max_runs      | INTEGER     | Max executions (null = unlimited) |
+| run_count     | INTEGER     | Times executed                    |
+| next_run_at   | TIMESTAMPTZ | Next scheduled execution          |
 
 ## Error Handling
 

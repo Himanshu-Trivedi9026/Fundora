@@ -3,7 +3,11 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { determineDecision, DECISION_MATRIX, TRIGGER_OVERRIDES } from "../../../lib/fraud/decisionEngine";
+import {
+  determineDecision,
+  DECISION_MATRIX,
+  TRIGGER_OVERRIDES,
+} from "../../../lib/fraud/decisionEngine";
 
 describe("DecisionEngine", () => {
   describe("determineDecision", () => {
@@ -133,7 +137,14 @@ describe("DecisionEngine", () => {
     });
 
     it("should only contain valid actions", () => {
-      const validActions = ["allow", "monitor", "manual_review", "limit", "block", "escalate"];
+      const validActions = [
+        "allow",
+        "monitor",
+        "manual_review",
+        "limit",
+        "block",
+        "escalate",
+      ];
       Object.values(DECISION_MATRIX).forEach((riskLevel) => {
         Object.values(riskLevel).forEach((action) => {
           expect(validActions).toContain(action);

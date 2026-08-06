@@ -15,7 +15,7 @@ describe("Agent Registry", () => {
     // Clean up any test instances
     const instances = listAgentInstances();
     instances.forEach((inst) => {
-      const id =inst.id || inst;
+      const id = inst.id || inst;
       removeAgentInstance(id);
     });
   });

@@ -31,11 +31,15 @@ export default function CreatorProfile() {
 
   // Clean up blob URLs when values change or component unmounts
   useEffect(() => {
-    return () => { if (photoPreview) URL.revokeObjectURL(photoPreview); };
+    return () => {
+      if (photoPreview) URL.revokeObjectURL(photoPreview);
+    };
   }, [photoPreview]);
 
   useEffect(() => {
-    return () => { if (qrPreview) URL.revokeObjectURL(qrPreview); };
+    return () => {
+      if (qrPreview) URL.revokeObjectURL(qrPreview);
+    };
   }, [qrPreview]);
 
   async function loadProfile() {
@@ -156,7 +160,10 @@ export default function CreatorProfile() {
 
             {/* PROFILE PHOTO */}
             <div>
-              <label htmlFor="cp-photo" className="block text-sm text-slate-300 mb-1">
+              <label
+                htmlFor="cp-photo"
+                className="block text-sm text-slate-300 mb-1"
+              >
                 Profile Photo
               </label>
 
@@ -198,7 +205,10 @@ export default function CreatorProfile() {
 
             {/* UPI QR */}
             <div>
-              <label htmlFor="cp-qr" className="block text-sm text-slate-300 mb-1">
+              <label
+                htmlFor="cp-qr"
+                className="block text-sm text-slate-300 mb-1"
+              >
                 UPI QR Code
               </label>
 

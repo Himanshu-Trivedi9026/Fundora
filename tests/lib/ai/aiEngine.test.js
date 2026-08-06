@@ -36,23 +36,36 @@ vi.mock("../../../lib/ai/providerRegistry.js", () => ({
   getActiveModelProvider: vi.fn().mockReturnValue({
     name: "mock-provider",
     defaultModel: "test-model",
-    chatCompletion: vi.fn().mockResolvedValue({ content: "AI response", tokens: 10, costCents: 1 }),
-    createEmbedding: vi.fn().mockResolvedValue({ embedding: Array(1536).fill(0.1) }),
+    chatCompletion: vi
+      .fn()
+      .mockResolvedValue({ content: "AI response", tokens: 10, costCents: 1 }),
+    createEmbedding: vi
+      .fn()
+      .mockResolvedValue({ embedding: Array(1536).fill(0.1) }),
   }),
 }));
 
 vi.mock("../../../lib/ai/tokenTracker.js", () => ({
   trackTokenUsage: vi.fn().mockResolvedValue({ success: true }),
-  checkUsageLimit: vi.fn().mockResolvedValue({ success: true, data: { allowed: true } }),
+  checkUsageLimit: vi
+    .fn()
+    .mockResolvedValue({ success: true, data: { allowed: true } }),
 }));
 
 vi.mock("../../../lib/ai/costTracker.js", () => ({
-  recordAICost: vi.fn().mockResolvedValue({ success: true, data: { costCents: 1 } }),
-  checkCostBudget: vi.fn().mockResolvedValue({ success: true, data: { withinBudget: true } }),
+  recordAICost: vi
+    .fn()
+    .mockResolvedValue({ success: true, data: { costCents: 1 } }),
+  checkCostBudget: vi
+    .fn()
+    .mockResolvedValue({ success: true, data: { withinBudget: true } }),
 }));
 
 vi.mock("../../../lib/ai/modelRouter.js", () => ({
-  routeModel: vi.fn().mockResolvedValue({ success: true, data: { provider: "mock", model: "test-model" } }),
+  routeModel: vi.fn().mockResolvedValue({
+    success: true,
+    data: { provider: "mock", model: "test-model" },
+  }),
 }));
 
 import {
@@ -63,7 +76,10 @@ import {
 } from "../../../lib/ai/aiEngine.js";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin.js";
 import { logAuditEvent } from "../../../lib/verification/auditLog.js";
-import { checkUsageLimit, trackTokenUsage } from "../../../lib/ai/tokenTracker.js";
+import {
+  checkUsageLimit,
+  trackTokenUsage,
+} from "../../../lib/ai/tokenTracker.js";
 import { recordAICost } from "../../../lib/ai/costTracker.js";
 import { routeModel } from "../../../lib/ai/modelRouter.js";
 import { getActiveModelProvider } from "../../../lib/ai/providerRegistry.js";
@@ -146,7 +162,7 @@ describe("AIEngine", () => {
       });
 
       expect(routeModel).toHaveBeenCalledWith(
-        expect.objectContaining({ taskType: "campaign_quality" })
+        expect.objectContaining({ taskType: "campaign_quality" }),
       );
     });
 

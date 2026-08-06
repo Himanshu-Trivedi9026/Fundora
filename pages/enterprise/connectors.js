@@ -48,9 +48,12 @@ export default function ConnectorsPage() {
         setConnectors((prev) =>
           prev.map((c) =>
             c.id === id
-              ? { ...c, status: action === "connect" ? "connected" : "disconnected" }
-              : c
-          )
+              ? {
+                  ...c,
+                  status: action === "connect" ? "connected" : "disconnected",
+                }
+              : c,
+          ),
         );
       }
     } catch {
@@ -64,8 +67,12 @@ export default function ConnectorsPage() {
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-2xl font-bold text-white">Enterprise Connectors</h1>
-              <p className="text-gray-400 mt-1">Connect your tools and services</p>
+              <h1 className="text-2xl font-bold text-white">
+                Enterprise Connectors
+              </h1>
+              <p className="text-gray-400 mt-1">
+                Connect your tools and services
+              </p>
             </div>
             <Button variant="primary" size="md">
               <span className="material-symbols-outlined text-[18px]">add</span>
@@ -89,10 +96,19 @@ export default function ConnectorsPage() {
 
           {error && (
             <GlassCard className="text-center py-12">
-              <span className="material-symbols-outlined text-4xl text-red-400 mb-3">error_outline</span>
-              <p className="text-red-400 text-lg font-medium">Failed to load connectors</p>
+              <span className="material-symbols-outlined text-4xl text-red-400 mb-3">
+                error_outline
+              </span>
+              <p className="text-red-400 text-lg font-medium">
+                Failed to load connectors
+              </p>
               <p className="text-gray-500 text-sm mt-1">{error}</p>
-              <Button variant="secondary" size="sm" className="mt-4" onClick={() => window.location.reload()}>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="mt-4"
+                onClick={() => window.location.reload()}
+              >
                 Retry
               </Button>
             </GlassCard>
@@ -100,9 +116,15 @@ export default function ConnectorsPage() {
 
           {!loading && !error && connectors.length === 0 && (
             <GlassCard className="text-center py-12">
-              <span className="material-symbols-outlined text-4xl text-gray-500 mb-3">api</span>
-              <p className="text-gray-400 text-lg font-medium">No connectors configured</p>
-              <p className="text-gray-600 text-sm mt-1">Connect Slack, GitHub, Discord and more to extend your workflow.</p>
+              <span className="material-symbols-outlined text-4xl text-gray-500 mb-3">
+                api
+              </span>
+              <p className="text-gray-400 text-lg font-medium">
+                No connectors configured
+              </p>
+              <p className="text-gray-600 text-sm mt-1">
+                Connect Slack, GitHub, Discord and more to extend your workflow.
+              </p>
             </GlassCard>
           )}
 
@@ -114,13 +136,18 @@ export default function ConnectorsPage() {
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg bg-white/[0.06] flex items-center justify-center">
                         <span className="material-symbols-outlined text-xl text-indigo-400">
-                          {PROVIDER_ICONS[conn.provider?.toLowerCase()] || PROVIDER_ICONS.default}
+                          {PROVIDER_ICONS[conn.provider?.toLowerCase()] ||
+                            PROVIDER_ICONS.default}
                         </span>
                       </div>
                       <div>
-                        <h3 className="text-white font-semibold text-sm capitalize">{conn.name || conn.provider}</h3>
+                        <h3 className="text-white font-semibold text-sm capitalize">
+                          {conn.name || conn.provider}
+                        </h3>
                         {conn.provider && (
-                          <span className="text-[11px] text-gray-500 capitalize">{conn.provider}</span>
+                          <span className="text-[11px] text-gray-500 capitalize">
+                            {conn.provider}
+                          </span>
                         )}
                       </div>
                     </div>
@@ -129,15 +156,16 @@ export default function ConnectorsPage() {
                         conn.status === "connected"
                           ? "bg-green-500/10 text-green-400"
                           : conn.status === "connecting"
-                          ? "bg-yellow-500/10 text-yellow-400"
-                          : "bg-gray-500/10 text-gray-400"
+                            ? "bg-yellow-500/10 text-yellow-400"
+                            : "bg-gray-500/10 text-gray-400"
                       }`}
                     >
                       {conn.status || "disconnected"}
                     </span>
                   </div>
                   <p className="text-gray-500 text-xs mb-4 flex-1">
-                    {conn.description || `Connect to ${conn.provider || conn.name} services`}
+                    {conn.description ||
+                      `Connect to ${conn.provider || conn.name} services`}
                   </p>
                   <div className="flex items-center gap-2 pt-3 border-t border-white/[0.06]">
                     {conn.status !== "connected" ? (
@@ -160,7 +188,9 @@ export default function ConnectorsPage() {
                       </Button>
                     )}
                     <Button variant="ghost" size="icon">
-                      <span className="material-symbols-outlined text-[18px]">settings</span>
+                      <span className="material-symbols-outlined text-[18px]">
+                        settings
+                      </span>
                     </Button>
                   </div>
                 </GlassCard>

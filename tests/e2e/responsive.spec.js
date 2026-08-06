@@ -39,7 +39,9 @@ test.describe("Mobile Layout (375px)", () => {
     await page.goto("/explore");
 
     // Search input should be visible
-    const searchInput = page.locator('input[type="search"], input[placeholder*="search" i]').first();
+    const searchInput = page
+      .locator('input[type="search"], input[placeholder*="search" i]')
+      .first();
     await expect(searchInput).toBeVisible();
 
     // No horizontal overflow
@@ -54,7 +56,11 @@ test.describe("Mobile Layout (375px)", () => {
     await page.goto("/");
 
     // Look for mobile menu button
-    const menuButton = page.locator('button[aria-label*="menu" i], button:has-text("Menu"), nav button').first();
+    const menuButton = page
+      .locator(
+        'button[aria-label*="menu" i], button:has-text("Menu"), nav button',
+      )
+      .first();
 
     if (await menuButton.isVisible().catch(() => false)) {
       // Click menu
@@ -64,7 +70,9 @@ test.describe("Mobile Layout (375px)", () => {
       await page.waitForTimeout(500);
 
       // Check for menu content
-      const menuContent = page.locator('[role="menu"], [class*="menu"], [class*="drawer"]').first();
+      const menuContent = page
+        .locator('[role="menu"], [class*="menu"], [class*="drawer"]')
+        .first();
       const isVisible = await menuContent.isVisible().catch(() => false);
 
       expect(isVisible || true).toBeTruthy();
@@ -79,7 +87,10 @@ test.describe("Tablet Layout (768px)", () => {
     await page.goto("/");
 
     // Check for proper layout
-    const hasContent = await page.locator("main, [class*='hero']").first().isVisible();
+    const hasContent = await page
+      .locator("main, [class*='hero']")
+      .first()
+      .isVisible();
     expect(hasContent).toBeTruthy();
 
     // No horizontal overflow
@@ -96,7 +107,10 @@ test.describe("Tablet Layout (768px)", () => {
     // Should show sidebar and content
     await page.waitForTimeout(2000);
 
-    const hasContent = await page.locator("main, [class*='explore']").first().isVisible();
+    const hasContent = await page
+      .locator("main, [class*='explore']")
+      .first()
+      .isVisible();
     expect(hasContent).toBeTruthy();
   });
 
@@ -129,7 +143,9 @@ test.describe("Desktop Layout (1280px)", () => {
     await page.waitForTimeout(2000);
 
     // Desktop should show filter sidebar
-    const sidebar = page.locator('[class*="sidebar"], [class*="Sidebar"], [class*="filter"]').first();
+    const sidebar = page
+      .locator('[class*="sidebar"], [class*="Sidebar"], [class*="filter"]')
+      .first();
     const isVisible = await sidebar.isVisible().catch(() => false);
 
     expect(isVisible || true).toBeTruthy();
@@ -163,7 +179,9 @@ test.describe("Responsive Images", () => {
       return imgs.map((img) => ({
         width: img.offsetWidth,
         naturalWidth: img.naturalWidth,
-        isResponsive: img.style.maxWidth === "100%" || img.classList.toString().includes("responsive"),
+        isResponsive:
+          img.style.maxWidth === "100%" ||
+          img.classList.toString().includes("responsive"),
       }));
     });
 

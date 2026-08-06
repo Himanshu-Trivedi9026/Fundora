@@ -7,7 +7,11 @@
 
 import { withAuth } from "../../../lib/withAuth";
 import { rateLimit } from "../../../lib/rateLimit";
-import { createPayoutRequest, getCreatorPayoutRequests, getCreatorBalance } from "../../../lib/payout/payoutEngine";
+import {
+  createPayoutRequest,
+  getCreatorPayoutRequests,
+  getCreatorBalance,
+} from "../../../lib/payout/payoutEngine";
 import { logError } from "../../../lib/verification/secureLogger";
 import { isCreatorVerified } from "../../../lib/verification/status";
 
@@ -56,7 +60,9 @@ export default withAuth(async function handler(req, res, user) {
       const { escrowAccountId, bankAccountId, amount } = req.body;
 
       if (!escrowAccountId || !bankAccountId || !amount) {
-        return res.status(400).json({ error: "escrowAccountId, bankAccountId, and amount are required" });
+        return res.status(400).json({
+          error: "escrowAccountId, bankAccountId, and amount are required",
+        });
       }
 
       /* A creator may only withdraw funds when their verification is approved. */

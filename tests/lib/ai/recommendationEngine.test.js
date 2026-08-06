@@ -126,16 +126,28 @@ describe("Recommendation Engine", () => {
         .mockReturnValueOnce(
           mockSelectEqOrderLimit({
             data: [
-              { campaign_id: "camp-old", amount: 100, created_at: now, campaign: { id: "camp-old", category: "technology", goal_amount: 5000, title: "Old" } },
+              {
+                campaign_id: "camp-old",
+                amount: 100,
+                created_at: now,
+                campaign: {
+                  id: "camp-old",
+                  category: "technology",
+                  goal_amount: 5000,
+                  title: "Old",
+                },
+              },
             ],
             error: null,
-          })
+          }),
         )
         // 2. fetchActiveCampaigns — candidates
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              limit: vi.fn().mockResolvedValue({ data: [MOCK_CAMPAIGN], error: null }),
+              limit: vi
+                .fn()
+                .mockResolvedValue({ data: [MOCK_CAMPAIGN], error: null }),
             }),
           }),
         })
@@ -153,7 +165,10 @@ describe("Recommendation Engine", () => {
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              gte: vi.fn().mockResolvedValue({ data: [{ id: "d1", amount: 50 }], error: null }),
+              gte: vi.fn().mockResolvedValue({
+                data: [{ id: "d1", amount: 50 }],
+                error: null,
+              }),
             }),
           }),
         })
@@ -168,9 +183,17 @@ describe("Recommendation Engine", () => {
           }),
         })
         // 6. fetchCampaignVelocity — campaign created_at
-        .mockReturnValueOnce(mockSelectSingle({ data: { created_at: MOCK_CAMPAIGN.created_at }, error: null }));
+        .mockReturnValueOnce(
+          mockSelectSingle({
+            data: { created_at: MOCK_CAMPAIGN.created_at },
+            error: null,
+          }),
+        );
 
-      const result = await getDonorRecommendations({ donorId: "donor-1", limit: 5 });
+      const result = await getDonorRecommendations({
+        donorId: "donor-1",
+        limit: 5,
+      });
 
       expect(result.success).toBe(true);
       expect(result.data).toBeInstanceOf(Array);
@@ -196,16 +219,28 @@ describe("Recommendation Engine", () => {
         .mockReturnValueOnce(
           mockSelectEqOrderLimit({
             data: [
-              { campaign_id: "camp-1", amount: 50, created_at: new Date().toISOString(), campaign: { id: "camp-1", category: "tech", goal_amount: 10000, title: "Camp1" } },
+              {
+                campaign_id: "camp-1",
+                amount: 50,
+                created_at: new Date().toISOString(),
+                campaign: {
+                  id: "camp-1",
+                  category: "tech",
+                  goal_amount: 10000,
+                  title: "Camp1",
+                },
+              },
             ],
             error: null,
-          })
+          }),
         )
         // Active campaigns — only camp-1 (which is already donated to)
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              limit: vi.fn().mockResolvedValue({ data: [MOCK_CAMPAIGN], error: null }),
+              limit: vi
+                .fn()
+                .mockResolvedValue({ data: [MOCK_CAMPAIGN], error: null }),
             }),
           }),
         })
@@ -224,7 +259,9 @@ describe("Recommendation Engine", () => {
 
       expect(result.success).toBe(true);
       // camp-1 was already donated to, so should be excluded
-      expect(result.data.find((r) => r.campaignId === "camp-1")).toBeUndefined();
+      expect(
+        result.data.find((r) => r.campaignId === "camp-1"),
+      ).toBeUndefined();
     });
   });
 
@@ -234,9 +271,15 @@ describe("Recommendation Engine", () => {
       supabaseAdmin.from
         .mockReturnValueOnce(
           mockSelectSingle({
-            data: { id: "camp-1", category: "technology", goal_amount: 10000, title: "Tech", creator_id: "creator-1" },
+            data: {
+              id: "camp-1",
+              category: "technology",
+              goal_amount: 10000,
+              title: "Tech",
+              creator_id: "creator-1",
+            },
             error: null,
-          })
+          }),
         )
         // 2. Fetch category donors
         .mockReturnValueOnce({
@@ -244,8 +287,16 @@ describe("Recommendation Engine", () => {
             neq: vi.fn().mockReturnValue({
               limit: vi.fn().mockResolvedValue({
                 data: [
-                  { donor_id: "d1", amount: 200, campaign: { category: "technology", goal_amount: 8000 } },
-                  { donor_id: "d2", amount: 100, campaign: { category: "health", goal_amount: 5000 } },
+                  {
+                    donor_id: "d1",
+                    amount: 200,
+                    campaign: { category: "technology", goal_amount: 8000 },
+                  },
+                  {
+                    donor_id: "d2",
+                    amount: 100,
+                    campaign: { category: "health", goal_amount: 5000 },
+                  },
                 ],
                 error: null,
               }),
@@ -253,7 +304,9 @@ describe("Recommendation Engine", () => {
           }),
         });
 
-      const result = await getCampaignDonorSuggestions({ campaignId: "camp-1" });
+      const result = await getCampaignDonorSuggestions({
+        campaignId: "camp-1",
+      });
 
       expect(result.success).toBe(true);
       expect(result.data).toBeInstanceOf(Array);
@@ -272,10 +325,12 @@ describe("Recommendation Engine", () => {
 
     it("should fail when campaign is not found", async () => {
       supabaseAdmin.from.mockReturnValueOnce(
-        mockSelectSingle({ data: null, error: { message: "not found" } })
+        mockSelectSingle({ data: null, error: { message: "not found" } }),
       );
 
-      const result = await getCampaignDonorSuggestions({ campaignId: "nonexistent" });
+      const result = await getCampaignDonorSuggestions({
+        campaignId: "nonexistent",
+      });
 
       expect(result.success).toBe(false);
       expect(result.error).toContain("Campaign not found");
@@ -288,9 +343,13 @@ describe("Recommendation Engine", () => {
       supabaseAdmin.from
         .mockReturnValueOnce(
           mockSelectSingle({
-            data: { ...MOCK_CAMPAIGN, description: "A tech campaign", tags: ["ai", "ml"] },
+            data: {
+              ...MOCK_CAMPAIGN,
+              description: "A tech campaign",
+              tags: ["ai", "ml"],
+            },
             error: null,
-          })
+          }),
         )
         // 2. Fetch all active campaigns for comparison
         .mockReturnValueOnce({
@@ -299,8 +358,24 @@ describe("Recommendation Engine", () => {
               neq: vi.fn().mockReturnValue({
                 limit: vi.fn().mockResolvedValue({
                   data: [
-                    { id: "camp-2", title: "Similar", category: "technology", goal_amount: 12000, current_amount: 5000, status: "active", tags: ["ai"] },
-                    { id: "camp-3", title: "Different", category: "arts", goal_amount: 3000, current_amount: 1000, status: "active", tags: [] },
+                    {
+                      id: "camp-2",
+                      title: "Similar",
+                      category: "technology",
+                      goal_amount: 12000,
+                      current_amount: 5000,
+                      status: "active",
+                      tags: ["ai"],
+                    },
+                    {
+                      id: "camp-3",
+                      title: "Different",
+                      category: "arts",
+                      goal_amount: 3000,
+                      current_amount: 1000,
+                      status: "active",
+                      tags: [],
+                    },
                   ],
                   error: null,
                 }),
@@ -347,7 +422,10 @@ describe("Recommendation Engine", () => {
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              gte: vi.fn().mockResolvedValue({ data: [{ id: "d1" }, { id: "d2" }, { id: "d3" }], error: null }),
+              gte: vi.fn().mockResolvedValue({
+                data: [{ id: "d1" }, { id: "d2" }, { id: "d3" }],
+                error: null,
+              }),
             }),
           }),
         })
@@ -356,13 +434,17 @@ describe("Recommendation Engine", () => {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               gte: vi.fn().mockReturnValue({
-                lt: vi.fn().mockResolvedValue({ data: [{ id: "d0" }], error: null }),
+                lt: vi
+                  .fn()
+                  .mockResolvedValue({ data: [{ id: "d0" }], error: null }),
               }),
             }),
           }),
         })
         // 4. fetchCampaignVelocity — campaign created_at
-        .mockReturnValueOnce(mockSelectSingle({ data: { created_at: createdAt }, error: null }));
+        .mockReturnValueOnce(
+          mockSelectSingle({ data: { created_at: createdAt }, error: null }),
+        );
 
       const result = await getTrendingCampaigns({ limit: 5 });
 
@@ -402,8 +484,22 @@ describe("Recommendation Engine", () => {
             eq: vi.fn().mockReturnValue({
               order: vi.fn().mockResolvedValue({
                 data: [
-                  { id: "c1", category: "technology", goal_amount: 10000, current_amount: 8000, status: "funded", created_at: new Date().toISOString() },
-                  { id: "c2", category: "technology", goal_amount: 5000, current_amount: 2000, status: "active", created_at: new Date().toISOString() },
+                  {
+                    id: "c1",
+                    category: "technology",
+                    goal_amount: 10000,
+                    current_amount: 8000,
+                    status: "funded",
+                    created_at: new Date().toISOString(),
+                  },
+                  {
+                    id: "c2",
+                    category: "technology",
+                    goal_amount: 5000,
+                    current_amount: 2000,
+                    status: "active",
+                    created_at: new Date().toISOString(),
+                  },
                 ],
                 error: null,
               }),
@@ -415,10 +511,12 @@ describe("Recommendation Engine", () => {
           mockSelectSingle({
             data: { trust_score: 0.8, total_raised: 10000, total_campaigns: 2 },
             error: null,
-          })
+          }),
         );
 
-      const result = await getCreatorRecommendations({ creatorId: "creator-1" });
+      const result = await getCreatorRecommendations({
+        creatorId: "creator-1",
+      });
 
       expect(result.success).toBe(true);
       expect(result.data.length).toBeGreaterThan(0);
@@ -467,13 +565,17 @@ describe("Recommendation Engine", () => {
       const result = await invalidateRecommendationCache({});
 
       expect(result.success).toBe(false);
-      expect(result.error).toContain("At least one of userId or type is required");
+      expect(result.error).toContain(
+        "At least one of userId or type is required",
+      );
     });
   });
 
   describe("constants", () => {
     it("should have valid recommendation types", () => {
-      expect(RECOMMENDATION_TYPES.CAMPAIGNS_FOR_DONOR).toBe("campaign_for_donor");
+      expect(RECOMMENDATION_TYPES.CAMPAIGNS_FOR_DONOR).toBe(
+        "campaign_for_donor",
+      );
       expect(RECOMMENDATION_TYPES.TRENDING).toBe("trending");
       expect(RECOMMENDATION_TYPES.SIMILAR_CAMPAIGNS).toBe("similar_campaigns");
     });

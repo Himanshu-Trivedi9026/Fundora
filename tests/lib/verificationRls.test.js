@@ -18,13 +18,7 @@ import { join } from "node:path";
  *      EXECUTE revoked from PUBLIC/authenticated.
  */
 
-const MIGRATIONS_DIR = join(
-  __dirname,
-  "..",
-  "..",
-  "supabase",
-  "migrations"
-);
+const MIGRATIONS_DIR = join(__dirname, "..", "..", "supabase", "migrations");
 
 // Policy names that grant a signed-in user a write (INSERT/UPDATE) on
 // verification state. Each name is unique and tied to a single table.
@@ -54,14 +48,14 @@ describe("Verification RLS hardening (migration 023)", () => {
 
   it("migration 023 exists and drops every forbidden self-write policy", () => {
     const hardened = migrations.find(
-      (m) => m.file === "023_verification_rls_harden.sql"
+      (m) => m.file === "023_verification_rls_harden.sql",
     );
     expect(hardened, "023_verification_rls_harden.sql must exist").toBeTruthy();
 
     for (const policy of FORBIDDEN_WRITE_POLICIES) {
       expect(
         hardened.sql.includes(`DROP POLICY IF EXISTS "${policy}"`),
-        `${hardened.file} must contain DROP POLICY IF EXISTS "${policy}"`
+        `${hardened.file} must contain DROP POLICY IF EXISTS "${policy}"`,
       ).toBe(true);
     }
   });
@@ -75,7 +69,9 @@ describe("Verification RLS hardening (migration 023)", () => {
 
     for (const policy of FORBIDDEN_WRITE_POLICIES) {
       const createFiles = byPolicy(new RegExp(`CREATE POLICY "${policy}"`));
-      const dropFiles = byPolicy(new RegExp(`DROP POLICY IF EXISTS "${policy}"`));
+      const dropFiles = byPolicy(
+        new RegExp(`DROP POLICY IF EXISTS "${policy}"`),
+      );
 
       // It must have been created in some legacy migration (the vulnerability),
       // and dropped by 023.
@@ -84,22 +80,28 @@ describe("Verification RLS hardening (migration 023)", () => {
 
       // Apply-order invariant: the last migration touching the policy must be
       // the DROP (create index < drop index), i.e. no later re-creation.
-      const lastCreateIdx = Math.max(...createFiles.map((f) => migrations.findIndex((m) => m.file === f)));
-      const lastDropIdx = Math.max(...dropFiles.map((f) => migrations.findIndex((m) => m.file === f)));
-      expect(lastCreateIdx, `${policy}: CREATE must precede DROP`).toBeLessThan(lastDropIdx);
+      const lastCreateIdx = Math.max(
+        ...createFiles.map((f) => migrations.findIndex((m) => m.file === f)),
+      );
+      const lastDropIdx = Math.max(
+        ...dropFiles.map((f) => migrations.findIndex((m) => m.file === f)),
+      );
+      expect(lastCreateIdx, `${policy}: CREATE must precede DROP`).toBeLessThan(
+        lastDropIdx,
+      );
     }
   });
 
   it("migration 023 revokes EXECUTE on recalculate_verification_level from PUBLIC/authenticated", () => {
     const hardened = migrations.find(
-      (m) => m.file === "023_verification_rls_harden.sql"
+      (m) => m.file === "023_verification_rls_harden.sql",
     );
     expect(hardened).toBeTruthy();
     expect(hardened.sql).toContain(
-      "REVOKE EXECUTE ON FUNCTION public.recalculate_verification_level(UUID) FROM PUBLIC;"
+      "REVOKE EXECUTE ON FUNCTION public.recalculate_verification_level(UUID) FROM PUBLIC;",
     );
     expect(hardened.sql).toContain(
-      "REVOKE EXECUTE ON FUNCTION public.recalculate_verification_level(UUID) FROM authenticated;"
+      "REVOKE EXECUTE ON FUNCTION public.recalculate_verification_level(UUID) FROM authenticated;",
     );
   });
 });

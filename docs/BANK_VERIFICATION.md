@@ -15,6 +15,7 @@ creator_verifications (1:1)
 ```
 
 **Tables:**
+
 - `bank_accounts` — Account holder, encrypted account number (BYTEA), IFSC, bank/branch, account type, UPI ID, is_primary, status
 - `bank_verifications` — Summary of bank verification status, total/verified counts
 
@@ -27,14 +28,14 @@ draft → pending → verified
                  → archived (soft delete)
 ```
 
-| Status | Description |
-|--------|-------------|
-| `draft` | Account created, details incomplete |
-| `pending` | Submitted for verification |
-| `verified` | Account verified and approved |
+| Status     | Description                          |
+| ---------- | ------------------------------------ |
+| `draft`    | Account created, details incomplete  |
+| `pending`  | Submitted for verification           |
+| `verified` | Account verified and approved        |
 | `rejected` | Verification rejected (can resubmit) |
-| `disabled` | User-initiated deactivation |
-| `archived` | Soft deleted, no longer active |
+| `disabled` | User-initiated deactivation          |
+| `archived` | Soft deleted, no longer active       |
 
 ### Account Types
 
@@ -49,6 +50,7 @@ draft → pending → verified
 Core bank account CRUD operations.
 
 **Functions:**
+
 - `createBankAccount(userId, accountData)` — Create with encrypted account number (starts in `draft` status)
 - `updateBankAccount(userId, accountId, updates)` — Update account details
 - `deleteBankAccount(userId, accountId)` — Soft delete (set status to `archived`)
@@ -65,6 +67,7 @@ Core bank account CRUD operations.
 Penny drop verification — sends ₹1 to verify bank account ownership.
 
 **Functions:**
+
 - `initiatePennyDrop(userId, accountId)` — Submit for penny drop verification
 - `checkPennyDropStatus(accountId)` — Check verification status
 - `handlePennyDropWebhook(payload)` — Process webhook callback
@@ -74,14 +77,15 @@ Penny drop verification — sends ₹1 to verify bank account ownership.
 
 ### `pages/api/verification/bank.js`
 
-| Method | Action | Auth | Rate Limit |
-|--------|--------|------|-----------|
-| `GET` | List bank accounts | Required | 10/min |
-| `POST` | Create bank account | Required | 10/min |
-| `PUT` | Update bank account | Required | 10/min |
-| `DELETE` | Archive bank account | Required | 10/min |
+| Method   | Action               | Auth     | Rate Limit |
+| -------- | -------------------- | -------- | ---------- |
+| `GET`    | List bank accounts   | Required | 10/min     |
+| `POST`   | Create bank account  | Required | 10/min     |
+| `PUT`    | Update bank account  | Required | 10/min     |
+| `DELETE` | Archive bank account | Required | 10/min     |
 
 **POST body:**
+
 ```json
 {
   "account_holder_name": "Rajesh Kumar",
@@ -96,12 +100,13 @@ Penny drop verification — sends ₹1 to verify bank account ownership.
 
 ### `pages/api/verification/bank-documents.js`
 
-| Method | Action | Auth | Rate Limit |
-|--------|--------|------|-----------|
-| `GET` | List bank documents | Required | 10/min |
-| `POST` | Upload bank document | Required | 10/min |
+| Method | Action               | Auth     | Rate Limit |
+| ------ | -------------------- | -------- | ---------- |
+| `GET`  | List bank documents  | Required | 10/min     |
+| `POST` | Upload bank document | Required | 10/min     |
 
 **Document types:**
+
 - `cancelled_cheque` — Cancelled cheque for account verification
 - `bank_statement` — Recent bank statement
 - `passbook` — Bank passbook (optional)
@@ -109,11 +114,12 @@ Penny drop verification — sends ₹1 to verify bank account ownership.
 
 ### `pages/api/verification/penny-drop.js`
 
-| Method | Action | Auth | Rate Limit |
-|--------|--------|------|-----------|
-| `POST` | Penny drop operations | Required | 10/min |
+| Method | Action                | Auth     | Rate Limit |
+| ------ | --------------------- | -------- | ---------- |
+| `POST` | Penny drop operations | Required | 10/min     |
 
 **POST body:**
+
 ```json
 {
   "action": "initiate | status | history",
@@ -126,11 +132,12 @@ Penny drop verification — sends ₹1 to verify bank account ownership.
 
 ### `pages/api/admin/bank-review.js`
 
-| Method | Action | Auth | Rate Limit |
-|--------|--------|------|-----------|
-| `POST` | Approve/reject/resubmit | Admin | 10/min |
+| Method | Action                  | Auth  | Rate Limit |
+| ------ | ----------------------- | ----- | ---------- |
+| `POST` | Approve/reject/resubmit | Admin | 10/min     |
 
 **POST body:**
+
 ```json
 {
   "action": "approve | reject | resubmit",
@@ -156,6 +163,7 @@ Penny drop verification — sends ₹1 to verify bank account ownership.
 ### Encryption
 
 Account numbers are encrypted before storage:
+
 ```js
 // lib/verification/bankVerification.js
 const encrypted = encryptMetadata(accountNumber);
@@ -165,6 +173,7 @@ const encrypted = encryptMetadata(accountNumber);
 ### Masking
 
 API responses use masked versions:
+
 ```js
 // maskAccountNumber("1234567890123456") → "************3456"
 // maskIFSC("HDFC0123456") → "HDFC*******"
@@ -204,15 +213,15 @@ Bank verification contributes to the trust score via configurable weights:
 
 ## File Locations
 
-| File | Purpose |
-|------|---------|
-| `lib/verification/bankVerification.js` | Core CRUD + validation |
-| `lib/verification/pennyDrop.js` | Penny drop verification |
-| `lib/verification/providers/bankVerificationProvider.js` | Mock provider |
-| `lib/verification/providers/pennyDropProvider.js` | Penny drop mock provider |
-| `pages/api/verification/bank.js` | Bank account API |
-| `pages/api/verification/bank-documents.js` | Bank document API |
-| `pages/api/verification/penny-drop.js` | Penny drop API |
-| `pages/api/admin/bank-review.js` | Admin bank review |
-| `components/verification/BankAccountCard.jsx` | Account card component |
-| `components/verification/BankAccountForm.jsx` | Account form component |
+| File                                                     | Purpose                  |
+| -------------------------------------------------------- | ------------------------ |
+| `lib/verification/bankVerification.js`                   | Core CRUD + validation   |
+| `lib/verification/pennyDrop.js`                          | Penny drop verification  |
+| `lib/verification/providers/bankVerificationProvider.js` | Mock provider            |
+| `lib/verification/providers/pennyDropProvider.js`        | Penny drop mock provider |
+| `pages/api/verification/bank.js`                         | Bank account API         |
+| `pages/api/verification/bank-documents.js`               | Bank document API        |
+| `pages/api/verification/penny-drop.js`                   | Penny drop API           |
+| `pages/api/admin/bank-review.js`                         | Admin bank review        |
+| `components/verification/BankAccountCard.jsx`            | Account card component   |
+| `components/verification/BankAccountForm.jsx`            | Account form component   |

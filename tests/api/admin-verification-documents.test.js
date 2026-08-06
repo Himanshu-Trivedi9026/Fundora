@@ -69,7 +69,10 @@ vi.mock("../../lib/supabaseAdmin", () => {
       from: vi.fn(() => ({
         createSignedUrl: vi.fn(async (path, seconds) => {
           calls.signedUrls.push({ path, seconds });
-          return { data: { signedUrl: `https://signed.example/${path}` }, error: null };
+          return {
+            data: { signedUrl: `https://signed.example/${path}` },
+            error: null,
+          };
         }),
       })),
     },
@@ -107,7 +110,10 @@ function mockReq(method = "GET", query = {}, headers = {}) {
 }
 
 function mockRes() {
-  const res = { status: vi.fn().mockReturnThis(), json: vi.fn().mockReturnThis() };
+  const res = {
+    status: vi.fn().mockReturnThis(),
+    json: vi.fn().mockReturnThis(),
+  };
   return res;
 }
 
@@ -133,7 +139,9 @@ describe("API — Admin Verification Documents", () => {
 
   it("returns 403 when the caller is not a platform admin", async () => {
     state.opts.role = "creator";
-    state.opts.documents = [{ id: "doc-1", user_id: "u1", document_type: "pan_card" }];
+    state.opts.documents = [
+      { id: "doc-1", user_id: "u1", document_type: "pan_card" },
+    ];
 
     const res = mockRes();
     await handler(mockReq("GET", {}, AUTH_HEADERS), res);
@@ -176,8 +184,18 @@ describe("API — Admin Verification Documents", () => {
   it("filters by documentId", async () => {
     state.opts.role = "platform_admin";
     state.opts.documents = [
-      { id: "doc-1", user_id: "u1", document_type: "pan_card", storage_path: "a.jpg" },
-      { id: "doc-2", user_id: "u1", document_type: "passport", storage_path: "b.jpg" },
+      {
+        id: "doc-1",
+        user_id: "u1",
+        document_type: "pan_card",
+        storage_path: "a.jpg",
+      },
+      {
+        id: "doc-2",
+        user_id: "u1",
+        document_type: "passport",
+        storage_path: "b.jpg",
+      },
     ];
 
     const res = mockRes();

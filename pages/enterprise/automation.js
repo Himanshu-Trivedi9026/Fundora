@@ -33,7 +33,7 @@ export default function AutomationPage() {
       });
       if (res.ok) {
         setRules((prev) =>
-          prev.map((r) => (r.id === id ? { ...r, status: newStatus } : r))
+          prev.map((r) => (r.id === id ? { ...r, status: newStatus } : r)),
         );
       }
     } catch {
@@ -47,8 +47,12 @@ export default function AutomationPage() {
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-2xl font-bold text-white">Automation Rules</h1>
-              <p className="text-gray-400 mt-1">Manage workflow automation and triggers</p>
+              <h1 className="text-2xl font-bold text-white">
+                Automation Rules
+              </h1>
+              <p className="text-gray-400 mt-1">
+                Manage workflow automation and triggers
+              </p>
             </div>
             <Button variant="primary" size="md">
               <span className="material-symbols-outlined text-[18px]">add</span>
@@ -70,10 +74,19 @@ export default function AutomationPage() {
 
           {error && (
             <GlassCard className="text-center py-12">
-              <span className="material-symbols-outlined text-4xl text-red-400 mb-3">error_outline</span>
-              <p className="text-red-400 text-lg font-medium">Failed to load automation rules</p>
+              <span className="material-symbols-outlined text-4xl text-red-400 mb-3">
+                error_outline
+              </span>
+              <p className="text-red-400 text-lg font-medium">
+                Failed to load automation rules
+              </p>
               <p className="text-gray-500 text-sm mt-1">{error}</p>
-              <Button variant="secondary" size="sm" className="mt-4" onClick={() => window.location.reload()}>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="mt-4"
+                onClick={() => window.location.reload()}
+              >
                 Retry
               </Button>
             </GlassCard>
@@ -81,26 +94,37 @@ export default function AutomationPage() {
 
           {!loading && !error && rules.length === 0 && (
             <GlassCard className="text-center py-12">
-              <span className="material-symbols-outlined text-4xl text-gray-500 mb-3">settings</span>
-              <p className="text-gray-400 text-lg font-medium">No automation rules yet</p>
-              <p className="text-gray-600 text-sm mt-1">Create your first rule to automate workflows.</p>
+              <span className="material-symbols-outlined text-4xl text-gray-500 mb-3">
+                settings
+              </span>
+              <p className="text-gray-400 text-lg font-medium">
+                No automation rules yet
+              </p>
+              <p className="text-gray-600 text-sm mt-1">
+                Create your first rule to automate workflows.
+              </p>
             </GlassCard>
           )}
 
           {!loading && !error && rules.length > 0 && (
             <div className="space-y-4">
               {rules.map((rule) => (
-                <GlassCard key={rule.id} className="flex items-center justify-between">
+                <GlassCard
+                  key={rule.id}
+                  className="flex items-center justify-between"
+                >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-1">
-                      <h3 className="text-white font-semibold text-sm truncate">{rule.name}</h3>
+                      <h3 className="text-white font-semibold text-sm truncate">
+                        {rule.name}
+                      </h3>
                       <span
                         className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
                           rule.status === "active"
                             ? "bg-green-500/10 text-green-400"
                             : rule.status === "paused"
-                            ? "bg-yellow-500/10 text-yellow-400"
-                            : "bg-gray-500/10 text-gray-400"
+                              ? "bg-yellow-500/10 text-yellow-400"
+                              : "bg-gray-500/10 text-gray-400"
                         }`}
                       >
                         {rule.status || "inactive"}
@@ -111,7 +135,8 @@ export default function AutomationPage() {
                     </p>
                     {rule.trigger && (
                       <p className="text-gray-600 text-[11px] mt-1">
-                        Trigger: <span className="text-gray-400">{rule.trigger}</span>
+                        Trigger:{" "}
+                        <span className="text-gray-400">{rule.trigger}</span>
                       </p>
                     )}
                   </div>
@@ -119,12 +144,16 @@ export default function AutomationPage() {
                     <button
                       onClick={() => toggleStatus(rule.id, rule.status)}
                       className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                        rule.status === "active" ? "bg-indigo-500" : "bg-white/[0.1]"
+                        rule.status === "active"
+                          ? "bg-indigo-500"
+                          : "bg-white/[0.1]"
                       }`}
                     >
                       <span
                         className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
-                          rule.status === "active" ? "translate-x-[18px]" : "translate-x-[2px]"
+                          rule.status === "active"
+                            ? "translate-x-[18px]"
+                            : "translate-x-[2px]"
                         }`}
                       />
                     </button>

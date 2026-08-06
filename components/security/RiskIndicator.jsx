@@ -8,12 +8,19 @@ import { motion } from "framer-motion";
  *   compact  — boolean, compact mode for sidebar (default: false)
  *   className — additional classes
  */
-export default function RiskIndicator({ score = 0, compact = false, className = "" }) {
+export default function RiskIndicator({
+  score = 0,
+  compact = false,
+  className = "",
+}) {
   // Inverse color: low risk = good (green), high risk = bad (red)
   const getColor = (s) => {
-    if (s <= 20) return { text: "text-success", bg: "bg-success", label: "Low Risk" };
-    if (s <= 40) return { text: "text-primary", bg: "bg-primary", label: "Moderate" };
-    if (s <= 60) return { text: "text-warning", bg: "bg-warning", label: "Elevated" };
+    if (s <= 20)
+      return { text: "text-success", bg: "bg-success", label: "Low Risk" };
+    if (s <= 40)
+      return { text: "text-primary", bg: "bg-primary", label: "Moderate" };
+    if (s <= 60)
+      return { text: "text-warning", bg: "bg-warning", label: "Elevated" };
     return { text: "text-danger", bg: "bg-danger", label: "High Risk" };
   };
 
@@ -37,7 +44,10 @@ export default function RiskIndicator({ score = 0, compact = false, className = 
       className={`glass-panel p-4 rounded-xl border border-white/5 space-y-3 ${className}`}
     >
       <div className="flex items-center gap-2">
-        <span className="material-symbols-outlined text-[16px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
+        <span
+          className="material-symbols-outlined text-[16px] text-primary"
+          style={{ fontVariationSettings: "'FILL' 1" }}
+        >
           shield
         </span>
         <span className="text-xs font-bold uppercase tracking-wider text-on-surface-variant font-inter">
@@ -47,10 +57,14 @@ export default function RiskIndicator({ score = 0, compact = false, className = 
 
       <div className="flex items-center justify-between">
         <div className="flex items-end gap-3">
-          <div className={`text-3xl font-bold font-geist ${colors.text}`}>{score}</div>
+          <div className={`text-3xl font-bold font-geist ${colors.text}`}>
+            {score}
+          </div>
           <div className="text-xs text-on-surface-variant pb-1">/100</div>
         </div>
-        <span className={`text-[10px] font-bold uppercase tracking-wider ${colors.text}`}>
+        <span
+          className={`text-[10px] font-bold uppercase tracking-wider ${colors.text}`}
+        >
           {colors.label}
         </span>
       </div>

@@ -41,7 +41,9 @@ export default function JobQueuePanel() {
         <div className="animate-pulse space-y-4">
           <div className="h-6 bg-gray-800 rounded w-1/4" />
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-            {[1, 2, 3, 4, 5].map((i) => <div key={i} className="h-16 bg-gray-800 rounded" />)}
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="h-16 bg-gray-800 rounded" />
+            ))}
           </div>
         </div>
       </div>
@@ -63,10 +65,17 @@ export default function JobQueuePanel() {
       <div className="p-6 border-b border-gray-800">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-white">Background Jobs</h3>
-            <p className="text-sm text-gray-400">Queue status and worker metrics</p>
+            <h3 className="text-lg font-semibold text-white">
+              Background Jobs
+            </h3>
+            <p className="text-sm text-gray-400">
+              Queue status and worker metrics
+            </p>
           </div>
-          <button onClick={fetchQueue} className="px-3 py-1.5 text-sm bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700">
+          <button
+            onClick={fetchQueue}
+            className="px-3 py-1.5 text-sm bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700"
+          >
             Refresh
           </button>
         </div>
@@ -75,20 +84,45 @@ export default function JobQueuePanel() {
       <div className="p-6 space-y-6">
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <StatCard label="Pending" value={summary?.pending} color="text-yellow-400" />
-          <StatCard label="Running" value={summary?.running} color="text-blue-400" />
-          <StatCard label="Dead Letter" value={summary?.deadLetter} color="text-red-400" />
-          <StatCard label="Completed" value={summary?.completed} color="text-green-400" />
-          <StatCard label="Active Handlers" value={summary?.activeHandlers} color="text-purple-400" />
+          <StatCard
+            label="Pending"
+            value={summary?.pending}
+            color="text-yellow-400"
+          />
+          <StatCard
+            label="Running"
+            value={summary?.running}
+            color="text-blue-400"
+          />
+          <StatCard
+            label="Dead Letter"
+            value={summary?.deadLetter}
+            color="text-red-400"
+          />
+          <StatCard
+            label="Completed"
+            value={summary?.completed}
+            color="text-green-400"
+          />
+          <StatCard
+            label="Active Handlers"
+            value={summary?.activeHandlers}
+            color="text-purple-400"
+          />
         </div>
 
         {/* Handlers */}
         <div>
-          <h4 className="text-sm font-medium text-gray-300 mb-2">Registered Handlers</h4>
+          <h4 className="text-sm font-medium text-gray-300 mb-2">
+            Registered Handlers
+          </h4>
           {handlers && handlers.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {handlers.map((h) => (
-                <span key={h} className="px-3 py-1 bg-gray-800 rounded-full text-xs text-gray-300">
+                <span
+                  key={h}
+                  className="px-3 py-1 bg-gray-800 rounded-full text-xs text-gray-300"
+                >
                   {h}
                 </span>
               ))}
@@ -101,7 +135,9 @@ export default function JobQueuePanel() {
         {/* Recent Completed Jobs */}
         {recentCompleted && recentCompleted.length > 0 && (
           <div>
-            <h4 className="text-sm font-medium text-gray-300 mb-2">Recently Completed</h4>
+            <h4 className="text-sm font-medium text-gray-300 mb-2">
+              Recently Completed
+            </h4>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
@@ -119,7 +155,9 @@ export default function JobQueuePanel() {
                       <td className="py-2 text-gray-400">{job.queue_name}</td>
                       <td className="py-2 text-gray-400">{job.priority}</td>
                       <td className="py-2 text-gray-400">
-                        {job.completed_at ? new Date(job.completed_at).toLocaleString() : "—"}
+                        {job.completed_at
+                          ? new Date(job.completed_at).toLocaleString()
+                          : "—"}
                       </td>
                     </tr>
                   ))}

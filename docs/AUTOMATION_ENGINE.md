@@ -33,26 +33,26 @@ All functions follow the "never throw" pattern and return `{ success: boolean, d
 
 ## Trigger Types
 
-| Type | Constant | Description | When to Use |
-|------|----------|-------------|-------------|
-| Event | `event` | Fires on platform events (donation, campaign creation, etc.) | Real-time reactions |
+| Type     | Constant   | Description                                                            | When to Use                   |
+| -------- | ---------- | ---------------------------------------------------------------------- | ----------------------------- |
+| Event    | `event`    | Fires on platform events (donation, campaign creation, etc.)           | Real-time reactions           |
 | Schedule | `schedule` | Fires on a time interval (configurable in `scheduleConfig.intervalMs`) | Periodic maintenance, reports |
-| Manual | `manual` | Fires only when explicitly triggered via API | On-demand workflows |
-| Webhook | `webhook` | Fires when an external webhook is received | Third-party integrations |
+| Manual   | `manual`   | Fires only when explicitly triggered via API                           | On-demand workflows           |
+| Webhook  | `webhook`  | Fires when an external webhook is received                             | Third-party integrations      |
 
 ## Condition Types
 
 Conditions are evaluated against a context object. All top-level conditions must match (AND semantics). Nested `and`/`or` conditions are supported for complex logic.
 
-| Type | Constant | Parameters | Logic |
-|------|----------|-----------|-------|
-| Equals | `equals` | `field`, `value` | `context[field] === value` |
-| Not Equals | `not_equals` | `field`, `value` | `context[field] !== value` |
-| Greater Than | `greater_than` | `field`, `value` | `context[field] > value` |
-| Less Than | `less_than` | `field`, `value` | `context[field] < value` |
-| Contains | `contains` | `field`, `value` | `String(context[field]).includes(value)` |
-| AND | `and` | `conditions[]` | All sub-conditions must match |
-| OR | `or` | `conditions[]` | At least one sub-condition must match |
+| Type         | Constant       | Parameters       | Logic                                    |
+| ------------ | -------------- | ---------------- | ---------------------------------------- |
+| Equals       | `equals`       | `field`, `value` | `context[field] === value`               |
+| Not Equals   | `not_equals`   | `field`, `value` | `context[field] !== value`               |
+| Greater Than | `greater_than` | `field`, `value` | `context[field] > value`                 |
+| Less Than    | `less_than`    | `field`, `value` | `context[field] < value`                 |
+| Contains     | `contains`     | `field`, `value` | `String(context[field]).includes(value)` |
+| AND          | `and`          | `conditions[]`   | All sub-conditions must match            |
+| OR           | `or`           | `conditions[]`   | At least one sub-condition must match    |
 
 ### Nested Conditions Example
 
@@ -73,15 +73,15 @@ Conditions are evaluated against a context object. All top-level conditions must
 
 Actions execute sequentially. If any action fails (returns `status: "error"`), execution stops immediately (fail-fast).
 
-| Type | Constant | Config Fields | Description |
-|------|----------|---------------|-------------|
-| Send Notification | `send_notification` | `userId`, `notificationType`, `title`, `message`, `metadata` | Creates a notification record |
-| Update Entity | `update_entity` | `entityType`, `entityId`, `updates` | Updates any database entity |
-| Call API | `call_api` | `url`, `method`, `body`, `headers` | Makes an external HTTP request |
-| Run AI | `run_ai` | `taskType`, ... | Triggers an AI operation (placeholder for background processing) |
-| Send Webhook | `send_webhook` | `url`, `payload`, `secret` | Sends a webhook with optional HMAC signature |
-| Update Status | `update_status` | `entityType`, `entityId`, `statusField`, `statusValue` | Updates a specific status field |
-| Create Task | `create_task` | `title`, `description`, `assigneeId`, `priority`, `dueDate` | Creates a pending task |
+| Type              | Constant            | Config Fields                                                | Description                                                      |
+| ----------------- | ------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------- |
+| Send Notification | `send_notification` | `userId`, `notificationType`, `title`, `message`, `metadata` | Creates a notification record                                    |
+| Update Entity     | `update_entity`     | `entityType`, `entityId`, `updates`                          | Updates any database entity                                      |
+| Call API          | `call_api`          | `url`, `method`, `body`, `headers`                           | Makes an external HTTP request                                   |
+| Run AI            | `run_ai`            | `taskType`, ...                                              | Triggers an AI operation (placeholder for background processing) |
+| Send Webhook      | `send_webhook`      | `url`, `payload`, `secret`                                   | Sends a webhook with optional HMAC signature                     |
+| Update Status     | `update_status`     | `entityType`, `entityId`, `statusField`, `statusValue`       | Updates a specific status field                                  |
+| Create Task       | `create_task`       | `title`, `description`, `assigneeId`, `priority`, `dueDate`  | Creates a pending task                                           |
 
 ## Execution Flow
 
@@ -111,14 +111,14 @@ triggerWorkflow()
 
 ### Run Statuses
 
-| Status | Meaning |
-|--------|---------|
-| `pending` | Created but not yet started |
-| `running` | Currently executing |
-| `completed` | All actions succeeded |
-| `failed` | Condition evaluation failed or all actions failed |
-| `partial_failure` | Some actions succeeded, some failed |
-| `skipped` | Conditions were not met |
+| Status            | Meaning                                           |
+| ----------------- | ------------------------------------------------- |
+| `pending`         | Created but not yet started                       |
+| `running`         | Currently executing                               |
+| `completed`       | All actions succeeded                             |
+| `failed`          | Condition evaluation failed or all actions failed |
+| `partial_failure` | Some actions succeeded, some failed               |
+| `skipped`         | Conditions were not met                           |
 
 ## CRUD Operations
 
@@ -126,16 +126,16 @@ triggerWorkflow()
 
 ```javascript
 createWorkflow({
-  name: "string",          // Required, max 255 chars
-  description: "string",   // Optional
-  triggerType: "event",    // Required: event|schedule|manual|webhook
-  conditions: [],          // Optional array of condition objects
-  actions: [],             // Optional array of action objects
-  retryConfig: {},         // Optional
-  scheduleConfig: {},      // Optional (for schedule triggers)
-  createdBy: "userId",    // Required
-  organizationId: "orgId"  // Optional
-})
+  name: "string", // Required, max 255 chars
+  description: "string", // Optional
+  triggerType: "event", // Required: event|schedule|manual|webhook
+  conditions: [], // Optional array of condition objects
+  actions: [], // Optional array of action objects
+  retryConfig: {}, // Optional
+  scheduleConfig: {}, // Optional (for schedule triggers)
+  createdBy: "userId", // Required
+  organizationId: "orgId", // Optional
+});
 ```
 
 ### Update
@@ -154,26 +154,26 @@ Allowed update fields: `name`, `description`, `trigger_type`, `conditions`, `act
 ### Delete
 
 ```javascript
-deleteWorkflow(workflowId, performedBy)
+deleteWorkflow(workflowId, performedBy);
 ```
 
 ### Enable / Disable
 
 ```javascript
-enableWorkflow(workflowId, performedBy)
-disableWorkflow(workflowId, performedBy)
+enableWorkflow(workflowId, performedBy);
+disableWorkflow(workflowId, performedBy);
 ```
 
 ### List
 
 ```javascript
 listWorkflows({
-  organizationId: "orgId",  // Optional filter
-  enabled: true,            // Optional filter
-  triggerType: "event",     // Optional filter
-  limit: 20,                // Default 20, max 100
-  offset: 0                 // Pagination
-})
+  organizationId: "orgId", // Optional filter
+  enabled: true, // Optional filter
+  triggerType: "event", // Optional filter
+  limit: 20, // Default 20, max 100
+  offset: 0, // Pagination
+});
 ```
 
 ## Retry Logic
@@ -181,7 +181,7 @@ listWorkflows({
 ### Manual Retry
 
 ```javascript
-retryWorkflowRun(runId, performedBy)
+retryWorkflowRun(runId, performedBy);
 ```
 
 - Only `failed` or `partial_failure` runs can be retried
@@ -204,9 +204,9 @@ createWorkflowTemplate({
   triggerType: "event",
   conditions: [],
   actions: [],
-  category: "general",     // Optional categorisation
-  createdBy: "userId"
-})
+  category: "general", // Optional categorisation
+  createdBy: "userId",
+});
 ```
 
 ### Instantiate from Template
@@ -231,7 +231,7 @@ Templates are stored in `workflow_templates` and create new workflow instances w
 ### Process Scheduled Workflows
 
 ```javascript
-processScheduledWorkflows()
+processScheduledWorkflows();
 ```
 
 This function is designed to be called by a cron job or scheduler:
@@ -252,35 +252,35 @@ getWorkflowRuns({
   workflowId: "uuid",
   limit: 20,
   offset: 0,
-  status: "completed"      // Optional filter
-})
+  status: "completed", // Optional filter
+});
 ```
 
 ### Get Single Run with Logs
 
 ```javascript
-getWorkflowRun(runId)
+getWorkflowRun(runId);
 // Returns run data + associated workflow_logs
 ```
 
 ## Audit Events
 
-| Event Type | Trigger |
-|------------|---------|
-| `workflow.created` | New workflow created |
-| `workflow.updated` | Workflow modified |
-| `workflow.deleted` | Workflow deleted |
-| `workflow.enabled` | Workflow enabled |
-| `workflow.disabled` | Workflow disabled |
-| `workflow.triggered` | Workflow executed |
-| `workflow.run.retried` | Failed run retried |
-| `workflow.template.created` | Template created |
+| Event Type                            | Trigger                        |
+| ------------------------------------- | ------------------------------ |
+| `workflow.created`                    | New workflow created           |
+| `workflow.updated`                    | Workflow modified              |
+| `workflow.deleted`                    | Workflow deleted               |
+| `workflow.enabled`                    | Workflow enabled               |
+| `workflow.disabled`                   | Workflow disabled              |
+| `workflow.triggered`                  | Workflow executed              |
+| `workflow.run.retried`                | Failed run retried             |
+| `workflow.template.created`           | Template created               |
 | `workflow.instantiated_from_template` | Workflow created from template |
 
 ## Database Tables
 
-| Table | Purpose |
-|-------|---------|
-| `workflow_templates` | Workflow definitions and templates |
-| `workflow_runs` | Execution records with status and timing |
-| `workflow_logs` | Step-level execution details |
+| Table                | Purpose                                  |
+| -------------------- | ---------------------------------------- |
+| `workflow_templates` | Workflow definitions and templates       |
+| `workflow_runs`      | Execution records with status and timing |
+| `workflow_logs`      | Step-level execution details             |

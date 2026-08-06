@@ -28,9 +28,7 @@ export default function EmailVerificationStep({ onNext }) {
         <div className="flex items-start gap-4">
           <div
             className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
-              emailVerified
-                ? "bg-success-muted"
-                : "bg-warning-muted"
+              emailVerified ? "bg-success-muted" : "bg-warning-muted"
             }`}
           >
             <span

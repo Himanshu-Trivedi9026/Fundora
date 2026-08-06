@@ -25,7 +25,9 @@ export default function FinalCTA() {
           transition={{ duration: 0.6, delay: 0.2 }}
         >
           <button
-            onClick={() => { router.push("/signup"); }}
+            onClick={() => {
+              router.push("/signup");
+            }}
             className="bg-primary text-on-primary px-10 py-5 rounded-full font-geist text-lg font-semibold shadow-xl shadow-primary/30 hover:opacity-90 hover:scale-[1.05] active:scale-[0.95] transition-all duration-200 cursor-pointer"
           >
             Get Early Access

@@ -78,7 +78,8 @@ describe("Audit Log", () => {
 
   describe("getAuditSummary (requires Supabase mock)", () => {
     it("is exported as a function", async () => {
-      const { getAuditSummary } = await import("../../lib/verification/auditLog");
+      const { getAuditSummary } =
+        await import("../../lib/verification/auditLog");
       expect(typeof getAuditSummary).toBe("function");
     });
   });
@@ -143,7 +144,8 @@ describe("Audit Log", () => {
     });
 
     it("getAuditSummary is exported and callable", async () => {
-      const { getAuditSummary } = await import("../../lib/verification/auditLog");
+      const { getAuditSummary } =
+        await import("../../lib/verification/auditLog");
       expect(typeof getAuditSummary).toBe("function");
     });
   });

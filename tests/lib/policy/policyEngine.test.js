@@ -69,7 +69,9 @@ describe("PolicyEngine", () => {
         .mockReturnValueOnce({
           insert: vi.fn().mockReturnValue({
             select: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockPolicy, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockPolicy, error: null }),
             }),
           }),
         });
@@ -107,7 +109,9 @@ describe("PolicyEngine", () => {
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: mockPolicy, error: null }),
+            single: vi
+              .fn()
+              .mockResolvedValue({ data: mockPolicy, error: null }),
           }),
         }),
       });
@@ -138,7 +142,9 @@ describe("PolicyEngine", () => {
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockPolicy, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockPolicy, error: null }),
             }),
           }),
         })
@@ -151,13 +157,20 @@ describe("PolicyEngine", () => {
           update: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               select: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: mockUpdated, error: null }),
+                single: vi
+                  .fn()
+                  .mockResolvedValue({ data: mockUpdated, error: null }),
               }),
             }),
           }),
         });
 
-      const result = await updatePolicyValue("policy-1", 40, "Increased threshold", "admin-1");
+      const result = await updatePolicyValue(
+        "policy-1",
+        40,
+        "Increased threshold",
+        "admin-1",
+      );
       expect(result.success).toBe(true);
       expect(result.data.version).toBe(2);
     });
@@ -179,7 +192,9 @@ describe("PolicyEngine", () => {
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: mockPolicy, error: null }),
+            single: vi
+              .fn()
+              .mockResolvedValue({ data: mockPolicy, error: null }),
           }),
         }),
       });
@@ -202,7 +217,9 @@ describe("PolicyEngine", () => {
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: mockPolicy, error: null }),
+            single: vi
+              .fn()
+              .mockResolvedValue({ data: mockPolicy, error: null }),
           }),
         }),
       });
@@ -216,7 +233,10 @@ describe("PolicyEngine", () => {
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: null, error: { message: "not found" } }),
+            single: vi.fn().mockResolvedValue({
+              data: null,
+              error: { message: "not found" },
+            }),
           }),
         }),
       });

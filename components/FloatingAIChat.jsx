@@ -21,7 +21,9 @@ export default function FloatingAIChat() {
     setLoading(true);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       const headers = {
         "Content-Type": "application/json",
       };
@@ -40,15 +42,9 @@ export default function FloatingAIChat() {
 
       const data = await res.json();
 
-      setMessages((prev) => [
-        ...prev,
-        { role: "ai", content: data.reply },
-      ]);
+      setMessages((prev) => [...prev, { role: "ai", content: data.reply }]);
     } catch {
-      setMessages((prev) => [
-        ...prev,
-        { role: "ai", content: "⚠️ AI error" },
-      ]);
+      setMessages((prev) => [...prev, { role: "ai", content: "⚠️ AI error" }]);
     }
 
     setLoading(false);
@@ -74,7 +70,6 @@ export default function FloatingAIChat() {
           aria-label="Fundora AI Chat"
           className="fixed bottom-20 right-6 w-80 h-[520px] bg-slate-900/80 backdrop-blur-xl text-white rounded-2xl shadow-2xl flex flex-col z-50 border border-slate-700 overflow-hidden"
         >
-
           {/* HEADER */}
           <div className="p-4 border-b border-slate-700 flex justify-between items-center bg-gradient-to-r from-purple-600/20 to-pink-500/20">
             <h2 className="font-semibold">🤖 Fundora AI</h2>
@@ -112,9 +107,7 @@ export default function FloatingAIChat() {
           {/* QUICK ACTIONS */}
           <div className="flex gap-2 p-3 border-t border-slate-700">
             <button
-              onClick={() =>
-                sendMessage("Recommend best projects to support")
-              }
+              onClick={() => sendMessage("Recommend best projects to support")}
               className="flex-1 bg-gradient-to-r from-pink-500 to-purple-600 py-2 rounded-lg text-xs hover:scale-105 transition"
             >
               🔥 Recommend
@@ -144,7 +137,6 @@ export default function FloatingAIChat() {
               Send
             </button>
           </div>
-
         </div>
       )}
     </>

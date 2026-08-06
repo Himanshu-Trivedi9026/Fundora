@@ -251,9 +251,33 @@ describe("ConversationMemory", () => {
               order: vi.fn().mockReturnValue({
                 range: vi.fn().mockResolvedValue({
                   data: [
-                    { id: "m1", role: "user", content: "Hello", model: null, token_count: null, cost_cents: null, created_at: "2025-07-01T10:00:00Z" },
-                    { id: "m2", role: "assistant", content: "Hi there!", model: "gpt-4", token_count: 10, cost_cents: 1, created_at: "2025-07-01T10:00:01Z" },
-                    { id: "m3", role: "user", content: "Help me", model: null, token_count: null, cost_cents: null, created_at: "2025-07-01T10:00:02Z" },
+                    {
+                      id: "m1",
+                      role: "user",
+                      content: "Hello",
+                      model: null,
+                      token_count: null,
+                      cost_cents: null,
+                      created_at: "2025-07-01T10:00:00Z",
+                    },
+                    {
+                      id: "m2",
+                      role: "assistant",
+                      content: "Hi there!",
+                      model: "gpt-4",
+                      token_count: 10,
+                      cost_cents: 1,
+                      created_at: "2025-07-01T10:00:01Z",
+                    },
+                    {
+                      id: "m3",
+                      role: "user",
+                      content: "Help me",
+                      model: null,
+                      token_count: null,
+                      cost_cents: null,
+                      created_at: "2025-07-01T10:00:02Z",
+                    },
                   ],
                   error: null,
                 }),
@@ -284,7 +308,15 @@ describe("ConversationMemory", () => {
               order: vi.fn().mockReturnValue({
                 range: vi.fn().mockResolvedValue({
                   data: [
-                    { id: "m1", role: "user", content: "msg1", model: null, token_count: null, cost_cents: null, created_at: "2025-07-01" },
+                    {
+                      id: "m1",
+                      role: "user",
+                      content: "msg1",
+                      model: null,
+                      token_count: null,
+                      cost_cents: null,
+                      created_at: "2025-07-01",
+                    },
                   ],
                   error: null,
                 }),
@@ -293,7 +325,10 @@ describe("ConversationMemory", () => {
           }),
         });
 
-      const result = await getConversationHistory("conv-1", { limit: 5, offset: 0 });
+      const result = await getConversationHistory("conv-1", {
+        limit: 5,
+        offset: 0,
+      });
 
       expect(result.success).toBe(true);
       expect(result.data.messages).toHaveLength(1);
@@ -328,8 +363,16 @@ describe("ConversationMemory", () => {
             eq: vi.fn().mockReturnValue({
               order: vi.fn().mockResolvedValue({
                 data: [
-                  { role: "user", content: "Short message", created_at: "2025-07-01" },
-                  { role: "assistant", content: "Short reply", created_at: "2025-07-01" },
+                  {
+                    role: "user",
+                    content: "Short message",
+                    created_at: "2025-07-01",
+                  },
+                  {
+                    role: "assistant",
+                    content: "Short reply",
+                    created_at: "2025-07-01",
+                  },
                 ],
                 error: null,
               }),
@@ -337,7 +380,9 @@ describe("ConversationMemory", () => {
           }),
         });
 
-      const result = await getConversationContext("conv-1", { maxTokens: 4000 });
+      const result = await getConversationContext("conv-1", {
+        maxTokens: 4000,
+      });
 
       expect(result.success).toBe(true);
       expect(result.data.messages).toHaveLength(2);
@@ -353,7 +398,10 @@ describe("ConversationMemory", () => {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               single: vi.fn().mockResolvedValue({
-                data: { summary: "Previous discussion about campaigns", summary_updated_at: "2025-07-01" },
+                data: {
+                  summary: "Previous discussion about campaigns",
+                  summary_updated_at: "2025-07-01",
+                },
                 error: null,
               }),
             }),
@@ -365,9 +413,21 @@ describe("ConversationMemory", () => {
             eq: vi.fn().mockReturnValue({
               order: vi.fn().mockResolvedValue({
                 data: [
-                  { role: "user", content: longContent, created_at: "2025-07-01T10:00:00Z" },
-                  { role: "assistant", content: longContent, created_at: "2025-07-01T10:00:01Z" },
-                  { role: "user", content: "Latest question", created_at: "2025-07-01T10:00:02Z" },
+                  {
+                    role: "user",
+                    content: longContent,
+                    created_at: "2025-07-01T10:00:00Z",
+                  },
+                  {
+                    role: "assistant",
+                    content: longContent,
+                    created_at: "2025-07-01T10:00:01Z",
+                  },
+                  {
+                    role: "user",
+                    content: "Latest question",
+                    created_at: "2025-07-01T10:00:02Z",
+                  },
                 ],
                 error: null,
               }),
@@ -380,7 +440,9 @@ describe("ConversationMemory", () => {
       expect(result.success).toBe(true);
       expect(result.data.tokenCount).toBeLessThanOrEqual(500);
       // Should include the most recent message
-      expect(result.data.messages.some((m) => m.content === "Latest question")).toBe(true);
+      expect(
+        result.data.messages.some((m) => m.content === "Latest question"),
+      ).toBe(true);
     });
 
     it("should return empty when conversation has no messages", async () => {
@@ -430,7 +492,11 @@ describe("ConversationMemory", () => {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               single: vi.fn().mockResolvedValue({
-                data: { id: "conv-1", user_id: "user-1", title: "My conversation" },
+                data: {
+                  id: "conv-1",
+                  user_id: "user-1",
+                  title: "My conversation",
+                },
                 error: null,
               }),
             }),
@@ -453,7 +519,7 @@ describe("ConversationMemory", () => {
           entityType: "ai_conversation",
           entityId: "conv-1",
           userId: "user-1",
-        })
+        }),
       );
     });
 
@@ -476,7 +542,11 @@ describe("ConversationMemory", () => {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: vi.fn().mockResolvedValue({
-              data: { id: "conv-1", user_id: "other-user", title: "Not my conversation" },
+              data: {
+                id: "conv-1",
+                user_id: "other-user",
+                title: "Not my conversation",
+              },
               error: null,
             }),
           }),

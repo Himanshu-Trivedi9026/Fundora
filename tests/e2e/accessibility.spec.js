@@ -50,7 +50,10 @@ test.describe("Keyboard Navigation", () => {
     }
 
     // Page should not crash
-    const hasContent = await page.locator("main, [class*='explore']").first().isVisible();
+    const hasContent = await page
+      .locator("main, [class*='explore']")
+      .first()
+      .isVisible();
     expect(hasContent).toBeTruthy();
   });
 });
@@ -87,7 +90,11 @@ test.describe("Focus Management", () => {
       const boxShadow = styles.boxShadow;
 
       // Check for focus indicators
-      return outline !== "none" || boxShadow !== "none" || el.classList.toString().includes("focus");
+      return (
+        outline !== "none" ||
+        boxShadow !== "none" ||
+        el.classList.toString().includes("focus")
+      );
     });
 
     // Focus should be visible (either outline or box-shadow)
@@ -162,7 +169,9 @@ test.describe("Form Accessibility", () => {
     await page.locator('button[type="submit"]').click();
 
     // Check for error announcement (aria-live or role="alert")
-    const errorAlert = page.locator('[role="alert"], [aria-live="assertive"], [aria-live="polite"]').first();
+    const errorAlert = page
+      .locator('[role="alert"], [aria-live="assertive"], [aria-live="polite"]')
+      .first();
 
     // Error should be announced (may not be visible yet)
     const hasAlert = await errorAlert.isVisible().catch(() => false);

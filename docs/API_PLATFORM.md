@@ -34,9 +34,9 @@ const hash = hashApiKey("fk_abc12345_...");
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `key` | `string` | Yes | The plaintext API key |
+| Parameter | Type     | Required | Description           |
+| --------- | -------- | -------- | --------------------- |
+| `key`     | `string` | Yes      | The plaintext API key |
 
 **Returns:** `string` — SHA-256 hex digest.
 
@@ -51,12 +51,12 @@ import { createApiKey } from "@/lib/apiPlatform";
 
 const result = await createApiKey({
   userId: "user-uuid",
-  organizationId: "org-uuid",  // optional
+  organizationId: "org-uuid", // optional
   name: "Production API Key",
-  scopes: ["campaigns:read", "donations:write"],  // optional, default: []
-  rateLimit: 100,              // optional, default: 100 requests
-  rateWindowMs: 60000,         // optional, default: 60 seconds
-  expiresAt: "2025-12-31T23:59:59Z",  // optional
+  scopes: ["campaigns:read", "donations:write"], // optional, default: []
+  rateLimit: 100, // optional, default: 100 requests
+  rateWindowMs: 60000, // optional, default: 60 seconds
+  expiresAt: "2025-12-31T23:59:59Z", // optional
 });
 
 // result.data.key — "fk_abc12345_..." — STORE THIS, it won't be shown again
@@ -64,15 +64,15 @@ const result = await createApiKey({
 
 **Parameters:**
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `userId` | `string` | Yes | — | Owner user UUID |
-| `organizationId` | `string` | No | `null` | Organization UUID |
-| `name` | `string` | Yes | — | Human-readable key name |
-| `scopes` | `string[]` | No | `[]` | Permission scopes |
-| `rateLimit` | `number` | No | `100` | Max requests per window |
-| `rateWindowMs` | `number` | No | `60000` | Rate limit window in ms |
-| `expiresAt` | `string` | No | `null` | ISO 8601 expiration timestamp |
+| Parameter        | Type       | Required | Default | Description                   |
+| ---------------- | ---------- | -------- | ------- | ----------------------------- |
+| `userId`         | `string`   | Yes      | —       | Owner user UUID               |
+| `organizationId` | `string`   | No       | `null`  | Organization UUID             |
+| `name`           | `string`   | Yes      | —       | Human-readable key name       |
+| `scopes`         | `string[]` | No       | `[]`    | Permission scopes             |
+| `rateLimit`      | `number`   | No       | `100`   | Max requests per window       |
+| `rateWindowMs`   | `number`   | No       | `60000` | Rate limit window in ms       |
+| `expiresAt`      | `string`   | No       | `null`  | ISO 8601 expiration timestamp |
 
 **Key Format:** `fk_{prefix}_{body}` where prefix is 8 hex chars and body is 64 hex chars (32 random bytes).
 
@@ -114,9 +114,9 @@ const result = await validateApiKey(hash);
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `keyHash` | `string` | Yes | SHA-256 hash of the API key |
+| Parameter | Type     | Required | Description                 |
+| --------- | -------- | -------- | --------------------------- |
+| `keyHash` | `string` | Yes      | SHA-256 hash of the API key |
 
 **Returns:**
 
@@ -143,10 +143,10 @@ const result = await revokeApiKey("key-uuid", "user-uuid");
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `keyId` | `string` | Yes | API key UUID |
-| `userId` | `string` | Yes | Must be the key owner |
+| Parameter | Type     | Required | Description           |
+| --------- | -------- | -------- | --------------------- |
+| `keyId`   | `string` | Yes      | API key UUID          |
+| `userId`  | `string` | Yes      | Must be the key owner |
 
 **Side effects:** Logs an `api_key_revoked` audit event.
 
@@ -158,24 +158,24 @@ List API keys for a user or organization.
 
 ```js
 const result = await listApiKeys({
-  userId: "user-uuid",         // optional
-  organizationId: "org-uuid",  // optional
-  status: "active",            // optional filter
-  limit: 50,                   // default: 50
-  offset: 0,                   // default: 0
+  userId: "user-uuid", // optional
+  organizationId: "org-uuid", // optional
+  status: "active", // optional filter
+  limit: 50, // default: 50
+  offset: 0, // default: 0
 });
 // result.data: ApiKey[] (without key hashes for security)
 ```
 
 **Parameters:**
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `userId` | `string` | No | — | Filter by owner |
-| `organizationId` | `string` | No | — | Filter by organization |
-| `status` | `string` | No | — | Filter by status |
-| `limit` | `number` | No | `50` | Pagination limit |
-| `offset` | `number` | No | `0` | Pagination offset |
+| Parameter        | Type     | Required | Default | Description            |
+| ---------------- | -------- | -------- | ------- | ---------------------- |
+| `userId`         | `string` | No       | —       | Filter by owner        |
+| `organizationId` | `string` | No       | —       | Filter by organization |
+| `status`         | `string` | No       | —       | Filter by status       |
+| `limit`          | `number` | No       | `50`    | Pagination limit       |
+| `offset`         | `number` | No       | `0`     | Pagination offset      |
 
 ---
 
@@ -208,33 +208,33 @@ await logApiRequest({
   method: "POST",
   path: "/api/campaigns",
   queryParams: { page: 1 },
-  requestBodyHash: "sha256...",  // optional
+  requestBodyHash: "sha256...", // optional
   responseStatus: 201,
   responseTimeMs: 142,
-  ipAddress: "192.168.1.1",     // automatically hashed
+  ipAddress: "192.168.1.1", // automatically hashed
   userAgent: "MyApp/1.0",
   scopeUsed: "campaigns:write",
-  errorMessage: null,           // set on errors
+  errorMessage: null, // set on errors
 });
 ```
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `apiKeyId` | `string` | No | API key UUID |
-| `userId` | `string` | No | User UUID |
-| `organizationId` | `string` | No | Organization UUID |
-| `method` | `string` | No | HTTP method (default: `"GET"`) |
-| `path` | `string` | No | Request path (default: `"/"`) |
-| `queryParams` | `object` | No | Query parameters |
-| `requestBodyHash` | `string` | No | SHA-256 hash of request body |
-| `responseStatus` | `number` | No | HTTP response status |
-| `responseTimeMs` | `number` | No | Response time in milliseconds |
-| `ipAddress` | `string` | No | Client IP (hashed before storage) |
-| `userAgent` | `string` | No | User-Agent header |
-| `scopeUsed` | `string` | No | API scope used for the request |
-| `errorMessage` | `string` | No | Error message if request failed |
+| Parameter         | Type     | Required | Description                       |
+| ----------------- | -------- | -------- | --------------------------------- |
+| `apiKeyId`        | `string` | No       | API key UUID                      |
+| `userId`          | `string` | No       | User UUID                         |
+| `organizationId`  | `string` | No       | Organization UUID                 |
+| `method`          | `string` | No       | HTTP method (default: `"GET"`)    |
+| `path`            | `string` | No       | Request path (default: `"/"`)     |
+| `queryParams`     | `object` | No       | Query parameters                  |
+| `requestBodyHash` | `string` | No       | SHA-256 hash of request body      |
+| `responseStatus`  | `number` | No       | HTTP response status              |
+| `responseTimeMs`  | `number` | No       | Response time in milliseconds     |
+| `ipAddress`       | `string` | No       | Client IP (hashed before storage) |
+| `userAgent`       | `string` | No       | User-Agent header                 |
+| `scopeUsed`       | `string` | No       | API scope used for the request    |
+| `errorMessage`    | `string` | No       | Error message if request failed   |
 
 **Note:** This function is fire-and-forget. Errors in logging do not propagate to the caller.
 
@@ -246,11 +246,11 @@ Query API logs with filters.
 
 ```js
 const result = await getApiLogs({
-  apiKeyId: "key-uuid",       // optional
-  userId: "user-uuid",        // optional
+  apiKeyId: "key-uuid", // optional
+  userId: "user-uuid", // optional
   organizationId: "org-uuid", // optional
-  method: "POST",             // optional
-  responseStatus: 429,        // optional
+  method: "POST", // optional
+  responseStatus: 429, // optional
   startDate: "2024-01-01T00:00:00Z",
   endDate: "2024-01-31T23:59:59Z",
   limit: 100,
@@ -266,11 +266,11 @@ Get an aggregated usage summary by day. Returns total requests, successes, and e
 
 ```js
 const result = await getApiUsageSummary({
-  apiKeyId: "key-uuid",       // optional
+  apiKeyId: "key-uuid", // optional
   organizationId: "org-uuid", // optional
   startDate: "2024-01-01T00:00:00Z",
   endDate: "2024-01-31T23:59:59Z",
-  limit: 30,                  // number of days
+  limit: 30, // number of days
 });
 // result.data: [
 //   { date: "2024-01-15", total: 1523, success: 1498, errors: 25 },
@@ -292,11 +292,11 @@ import { createDeveloperApp } from "@/lib/apiPlatform";
 
 const result = await createDeveloperApp({
   userId: "user-uuid",
-  organizationId: "org-uuid",  // optional
+  organizationId: "org-uuid", // optional
   name: "My Integration App",
   description: "Integrates with Fundora campaigns",
-  appType: "web",              // optional, default: "web"
-  redirectUris: ["https://myapp.com/callback"],  // optional
+  appType: "web", // optional, default: "web"
+  redirectUris: ["https://myapp.com/callback"], // optional
 });
 
 // result.data.client_secret — "fks_..." — STORE THIS securely
@@ -304,14 +304,14 @@ const result = await createDeveloperApp({
 
 **Parameters:**
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `userId` | `string` | Yes | — | Owner user UUID |
-| `organizationId` | `string` | No | `null` | Organization UUID |
-| `name` | `string` | Yes | — | Application name |
-| `description` | `string` | No | — | Application description |
-| `appType` | `string` | No | `"web"` | One of: `"web"`, `"mobile"`, `"server"`, `"cli"`, `"other"` |
-| `redirectUris` | `string[]` | No | `[]` | OAuth redirect URIs |
+| Parameter        | Type       | Required | Default | Description                                                 |
+| ---------------- | ---------- | -------- | ------- | ----------------------------------------------------------- |
+| `userId`         | `string`   | Yes      | —       | Owner user UUID                                             |
+| `organizationId` | `string`   | No       | `null`  | Organization UUID                                           |
+| `name`           | `string`   | Yes      | —       | Application name                                            |
+| `description`    | `string`   | No       | —       | Application description                                     |
+| `appType`        | `string`   | No       | `"web"` | One of: `"web"`, `"mobile"`, `"server"`, `"cli"`, `"other"` |
+| `redirectUris`   | `string[]` | No       | `[]`    | OAuth redirect URIs                                         |
 
 **Client ID format:** 32 hex characters (16 random bytes).
 **Client Secret format:** `fks_` prefix + 64 hex characters (32 random bytes).
@@ -331,10 +331,10 @@ const result = await validateDeveloperApp("client-id", "fks_...");
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `clientId` | `string` | Yes | Application client ID |
-| `clientSecret` | `string` | Yes | Application client secret |
+| Parameter      | Type     | Required | Description               |
+| -------------- | -------- | -------- | ------------------------- |
+| `clientId`     | `string` | Yes      | Application client ID     |
+| `clientSecret` | `string` | Yes      | Application client secret |
 
 **Returns:**
 
@@ -366,8 +366,8 @@ List developer apps for a user or organization.
 
 ```js
 const result = await listDeveloperApps({
-  userId: "user-uuid",         // optional
-  organizationId: "org-uuid",  // optional
+  userId: "user-uuid", // optional
+  organizationId: "org-uuid", // optional
   limit: 50,
   offset: 0,
 });
@@ -438,12 +438,12 @@ Rate limiting is applied per API key using the key's configured `rate_limit` and
 
 **Rate limit headers:**
 
-| Header | Description |
-|--------|-------------|
-| `X-RateLimit-Limit` | Max requests per window |
-| `X-RateLimit-Remaining` | Remaining requests in current window |
-| `X-RateLimit-Reset` | Unix timestamp when the window resets |
-| `Retry-After` | Seconds until the next window (only on 429) |
+| Header                  | Description                                 |
+| ----------------------- | ------------------------------------------- |
+| `X-RateLimit-Limit`     | Max requests per window                     |
+| `X-RateLimit-Remaining` | Remaining requests in current window        |
+| `X-RateLimit-Reset`     | Unix timestamp when the window resets       |
+| `Retry-After`           | Seconds until the next window (only on 429) |
 
 ### Request Logging
 
@@ -462,13 +462,26 @@ All functions are re-exported from `lib/apiPlatform/index.js`:
 
 ```js
 // API Key Engine
-export { createApiKey, validateApiKey, revokeApiKey, listApiKeys, getApiKeyUsage, hashApiKey };
+export {
+  createApiKey,
+  validateApiKey,
+  revokeApiKey,
+  listApiKeys,
+  getApiKeyUsage,
+  hashApiKey,
+};
 
 // API Log Engine
 export { logApiRequest, getApiLogs, getApiUsageSummary };
 
 // Developer App Engine
-export { createDeveloperApp, validateDeveloperApp, revokeDeveloperApp, listDeveloperApps, getDeveloperApp };
+export {
+  createDeveloperApp,
+  validateDeveloperApp,
+  revokeDeveloperApp,
+  listDeveloperApps,
+  getDeveloperApp,
+};
 
 // Middleware
 export { withApiKey };
@@ -476,11 +489,11 @@ export { withApiKey };
 
 ## Database Tables
 
-| Table | Description |
-|-------|-------------|
-| `api_keys` | API key records with hashed key, prefix, scopes, rate limits, expiration |
-| `api_logs` | Append-only API request logs with response status and timing |
-| `developer_apps` | OAuth-ready application registrations with client credentials |
+| Table            | Description                                                              |
+| ---------------- | ------------------------------------------------------------------------ |
+| `api_keys`       | API key records with hashed key, prefix, scopes, rate limits, expiration |
+| `api_logs`       | Append-only API request logs with response status and timing             |
+| `developer_apps` | OAuth-ready application registrations with client credentials            |
 
 ### Key Indexes
 
@@ -492,10 +505,10 @@ export { withApiKey };
 
 ## API Routes
 
-| Route | Method | Description |
-|-------|--------|-------------|
-| `/api/api-platform/keys` | GET/POST | API key management (create, list, revoke) |
-| `/api/api-platform/logs` | GET | Query API logs and usage summaries |
+| Route                    | Method   | Description                                     |
+| ------------------------ | -------- | ----------------------------------------------- |
+| `/api/api-platform/keys` | GET/POST | API key management (create, list, revoke)       |
+| `/api/api-platform/logs` | GET      | Query API logs and usage summaries              |
 | `/api/api-platform/apps` | GET/POST | Developer app management (create, list, revoke) |
 
 ## Security Considerations

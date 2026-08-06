@@ -56,7 +56,9 @@ describe("Feature Flags", () => {
     });
 
     it("handles context with environment", async () => {
-      const result = await isEnabled("test-flag", { environment: "production" });
+      const result = await isEnabled("test-flag", {
+        environment: "production",
+      });
       expect(result).toBe(false);
     });
   });

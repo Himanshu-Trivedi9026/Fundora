@@ -19,7 +19,9 @@ test.describe("Landing Page Hero Section", () => {
     await page.goto("/");
 
     // Look for CTA buttons (Explore, Start Campaign, etc.)
-    const ctaButtons = page.locator("a, button").filter({ hasText: /explore|start|create|campaign/i });
+    const ctaButtons = page
+      .locator("a, button")
+      .filter({ hasText: /explore|start|create|campaign/i });
 
     // Should have at least one CTA
     const count = await ctaButtons.count();
@@ -56,7 +58,9 @@ test.describe("Landing Page Trending Projects", () => {
     await page.waitForTimeout(2000);
 
     // Look for project cards (common patterns)
-    const projectCards = page.locator('[class*="card"], [class*="project"]').first();
+    const projectCards = page
+      .locator('[class*="card"], [class*="project"]')
+      .first();
 
     // Either shows cards or shows empty state
     const hasContent = await projectCards.isVisible().catch(() => false);
@@ -98,7 +102,9 @@ test.describe("Landing Page Footer", () => {
     const footer = page.locator("footer");
 
     // Look for social links (Twitter, LinkedIn, GitHub, etc.)
-    const socialLinks = footer.locator('a[href*="twitter"], a[href*="linkedin"], a[href*="github"], a[href*="instagram"]');
+    const socialLinks = footer.locator(
+      'a[href*="twitter"], a[href*="linkedin"], a[href*="github"], a[href*="instagram"]',
+    );
     const socialCount = await socialLinks.count();
 
     // Should have at least some social links
@@ -111,7 +117,9 @@ test.describe("Landing Page Footer", () => {
     const footer = page.locator("footer");
 
     // Look for legal links (Privacy, Terms, etc.)
-    const legalLinks = footer.locator('a:has-text("Privacy"), a:has-text("Terms"), a:has-text("Policy")');
+    const legalLinks = footer.locator(
+      'a:has-text("Privacy"), a:has-text("Terms"), a:has-text("Policy")',
+    );
     const legalCount = await legalLinks.count();
 
     expect(legalCount).toBeGreaterThanOrEqual(0);
@@ -156,7 +164,10 @@ test.describe("Landing Page Performance", () => {
 
     // Filter out known acceptable errors (e.g., Supabase connection in dev)
     const criticalErrors = errors.filter(
-      (e) => !e.includes("Supabase") && !e.includes("fetch") && !e.includes("network")
+      (e) =>
+        !e.includes("Supabase") &&
+        !e.includes("fetch") &&
+        !e.includes("network"),
     );
 
     expect(criticalErrors).toHaveLength(0);

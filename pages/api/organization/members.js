@@ -39,12 +39,16 @@ export default withAuth(async function handler(req, res, user) {
       }
 
       // List members
-      const result = await getMembers(organizationId, {
-        role,
-        status,
-        limit: parseInt(limit, 10) || 50,
-        offset: parseInt(offset, 10) || 0,
-      }, user.id);
+      const result = await getMembers(
+        organizationId,
+        {
+          role,
+          status,
+          limit: parseInt(limit, 10) || 50,
+          offset: parseInt(offset, 10) || 0,
+        },
+        user.id,
+      );
 
       if (!result.success) {
         return res.status(500).json({ error: result.error });
@@ -69,7 +73,9 @@ export default withAuth(async function handler(req, res, user) {
 
       if (action === "add") {
         if (!organizationId || !userId) {
-          return res.status(400).json({ error: "organizationId and userId are required" });
+          return res
+            .status(400)
+            .json({ error: "organizationId and userId are required" });
         }
 
         const result = await addMember({
@@ -88,7 +94,9 @@ export default withAuth(async function handler(req, res, user) {
 
       if (action === "remove") {
         if (!organizationId || !userId) {
-          return res.status(400).json({ error: "organizationId and userId are required" });
+          return res
+            .status(400)
+            .json({ error: "organizationId and userId are required" });
         }
 
         const result = await removeMember(organizationId, userId, user.id);
@@ -101,10 +109,17 @@ export default withAuth(async function handler(req, res, user) {
 
       if (action === "update_role") {
         if (!organizationId || !userId || !role) {
-          return res.status(400).json({ error: "organizationId, userId, and role are required" });
+          return res
+            .status(400)
+            .json({ error: "organizationId, userId, and role are required" });
         }
 
-        const result = await updateMemberRole(organizationId, userId, role, user.id);
+        const result = await updateMemberRole(
+          organizationId,
+          userId,
+          role,
+          user.id,
+        );
         if (!result.success) {
           return res.status(400).json({ error: result.error });
         }

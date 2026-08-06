@@ -48,9 +48,10 @@ export default withAuth(async function handler(req, res, user) {
     const categoryStats = {};
 
     projectList.forEach((p) => {
-      const cat = Array.isArray(p.categories) && p.categories.length > 0
-        ? p.categories[0]
-        : "Other";
+      const cat =
+        Array.isArray(p.categories) && p.categories.length > 0
+          ? p.categories[0]
+          : "Other";
 
       if (!categoryStats[cat]) {
         categoryStats[cat] = {
@@ -72,9 +73,10 @@ export default withAuth(async function handler(req, res, user) {
     const creatorCategorySuccess = {};
 
     creatorProjects.forEach((p) => {
-      const cat = Array.isArray(p.categories) && p.categories.length > 0
-        ? p.categories[0]
-        : "Other";
+      const cat =
+        Array.isArray(p.categories) && p.categories.length > 0
+          ? p.categories[0]
+          : "Other";
 
       if (!creatorCategorySuccess[cat]) {
         creatorCategorySuccess[cat] = {
@@ -95,9 +97,10 @@ export default withAuth(async function handler(req, res, user) {
       const proj = projectList.find((p) => p.id === d.project_id);
       if (!proj) return;
 
-      const cat = Array.isArray(proj.categories) && proj.categories.length > 0
-        ? proj.categories[0]
-        : "Other";
+      const cat =
+        Array.isArray(proj.categories) && proj.categories.length > 0
+          ? proj.categories[0]
+          : "Other";
 
       donorInterest[cat] = (donorInterest[cat] || 0) + d.amount;
     });

@@ -57,31 +57,40 @@ export default function PhoneVerificationStep({ onNext, onBack }) {
   }, [cooldown]);
 
   // Auto-advance to next OTP input
-  const handleOtpChange = useCallback((index, value) => {
-    if (!/^\d*$/.test(value)) return;
+  const handleOtpChange = useCallback(
+    (index, value) => {
+      if (!/^\d*$/.test(value)) return;
 
-    const newValues = [...otpValues];
-    newValues[index] = value.slice(-1);
-    setOtpValues(newValues);
-    setError("");
+      const newValues = [...otpValues];
+      newValues[index] = value.slice(-1);
+      setOtpValues(newValues);
+      setError("");
 
-    // Move to next input
-    if (value && index < 5) {
-      otpRefs.current[index + 1]?.focus();
-    }
-  }, [otpValues]);
+      // Move to next input
+      if (value && index < 5) {
+        otpRefs.current[index + 1]?.focus();
+      }
+    },
+    [otpValues],
+  );
 
   // Handle backspace
-  const handleOtpKeyDown = useCallback((index, e) => {
-    if (e.key === "Backspace" && !otpValues[index] && index > 0) {
-      otpRefs.current[index - 1]?.focus();
-    }
-  }, [otpValues]);
+  const handleOtpKeyDown = useCallback(
+    (index, e) => {
+      if (e.key === "Backspace" && !otpValues[index] && index > 0) {
+        otpRefs.current[index - 1]?.focus();
+      }
+    },
+    [otpValues],
+  );
 
   // Handle paste
   const handleOtpPaste = useCallback((e) => {
     e.preventDefault();
-    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    const pasted = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, 6);
     if (pasted.length === 0) return;
 
     const newValues = ["", "", "", "", "", ""];
@@ -119,7 +128,11 @@ export default function PhoneVerificationStep({ onNext, onBack }) {
         }
       }
     } catch (err) {
-      setError(err?.body?.error || err?.message || "An error occurred. Please try again.");
+      setError(
+        err?.body?.error ||
+          err?.message ||
+          "An error occurred. Please try again.",
+      );
     }
 
     setSending(false);
@@ -149,7 +162,11 @@ export default function PhoneVerificationStep({ onNext, onBack }) {
         otpRefs.current[0]?.focus();
       }
     } catch (err) {
-      setError(err?.body?.error || err?.message || "Verification failed. Please try again.");
+      setError(
+        err?.body?.error ||
+          err?.message ||
+          "Verification failed. Please try again.",
+      );
     }
 
     setVerifying(false);
@@ -308,7 +325,10 @@ export default function PhoneVerificationStep({ onNext, onBack }) {
               </p>
 
               {/* OTP Boxes */}
-              <div className="flex justify-center gap-2" onPaste={handleOtpPaste}>
+              <div
+                className="flex justify-center gap-2"
+                onPaste={handleOtpPaste}
+              >
                 {otpValues.map((value, idx) => (
                   <input
                     key={idx}
@@ -345,7 +365,9 @@ export default function PhoneVerificationStep({ onNext, onBack }) {
                 {attemptsUsed > 0 && (
                   <span className="text-xs text-danger font-inter">
                     {OTP_CONFIG.maxAttempts - attemptsUsed} attempt
-                    {OTP_CONFIG.maxAttempts - attemptsUsed !== 1 ? "s" : ""}{" "}
+                    {OTP_CONFIG.maxAttempts - attemptsUsed !== 1
+                      ? "s"
+                      : ""}{" "}
                     remaining
                   </span>
                 )}

@@ -22,7 +22,11 @@ import { withVerified } from "@/lib/withAuth";
 const USER = { id: "user-123", email: "x@y.com" };
 
 function createReq() {
-  return { method: "POST", headers: { authorization: "Bearer token-1" }, body: {} };
+  return {
+    method: "POST",
+    headers: { authorization: "Bearer token-1" },
+    body: {},
+  };
 }
 
 function createRes() {
@@ -43,7 +47,10 @@ function createRes() {
 
 /** Returns the withVerified-wrapped handler with a spy handler and fresh mocks. */
 function setup() {
-  supabaseAdmin.auth.getUser.mockResolvedValue({ data: { user: USER }, error: null });
+  supabaseAdmin.auth.getUser.mockResolvedValue({
+    data: { user: USER },
+    error: null,
+  });
   const handler = vi.fn(async (req, res, user) => {
     res.status(200).json({ ok: true, userId: user.id });
   });
@@ -61,7 +68,10 @@ beforeEach(() => {
 describe("withVerified", () => {
   it("lets an approved creator through and calls the handler", async () => {
     const { wrapped, handler } = setup();
-    mockVerificationResult({ data: { verification_status: "approved" }, error: null });
+    mockVerificationResult({
+      data: { verification_status: "approved" },
+      error: null,
+    });
     const req = createReq();
     const res = createRes();
 
@@ -74,7 +84,10 @@ describe("withVerified", () => {
 
   it("returns 403 for an unverified creator (pending)", async () => {
     const { wrapped, handler } = setup();
-    mockVerificationResult({ data: { verification_status: "pending" }, error: null });
+    mockVerificationResult({
+      data: { verification_status: "pending" },
+      error: null,
+    });
     const res = createRes();
 
     await wrapped(createReq(), res);
@@ -108,18 +121,28 @@ describe("withVerified", () => {
 
   it("scopes the verification lookup to the authenticated user's own row", async () => {
     const { wrapped } = setup();
-    mockVerificationResult({ data: { verification_status: "approved" }, error: null });
+    mockVerificationResult({
+      data: { verification_status: "approved" },
+      error: null,
+    });
 
     await wrapped(createReq(), createRes());
 
     expect(supabaseAdmin.from).toHaveBeenCalledWith("creator_verifications");
-    const selectCall = supabaseAdmin.from("creator_verifications").select.mock.calls[0][0];
+    const selectCall = supabaseAdmin.from("creator_verifications").select.mock
+      .calls[0][0];
     expect(selectCall).toContain("verification_status");
-    expect(supabaseAdmin.from("creator_verifications").eq).toHaveBeenCalledWith("user_id", USER.id);
+    expect(supabaseAdmin.from("creator_verifications").eq).toHaveBeenCalledWith(
+      "user_id",
+      USER.id,
+    );
   });
 
   it("returns 401 when not authenticated (withAuth path)", async () => {
-    supabaseAdmin.auth.getUser.mockResolvedValue({ data: { user: null }, error: null });
+    supabaseAdmin.auth.getUser.mockResolvedValue({
+      data: { user: null },
+      error: null,
+    });
     const handler = vi.fn();
     const wrapped = withVerified(handler);
     const res = createRes();

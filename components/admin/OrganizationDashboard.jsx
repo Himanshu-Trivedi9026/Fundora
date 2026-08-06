@@ -85,7 +85,13 @@ export default function OrganizationDashboard() {
       const json = await res.json();
       if (json.success) {
         setShowCreate(false);
-        setCreateForm({ name: "", slug: "", type: "company", description: "", website: "" });
+        setCreateForm({
+          name: "",
+          slug: "",
+          type: "company",
+          description: "",
+          website: "",
+        });
         fetchOrganizations();
       } else {
         setError(json.error);
@@ -102,7 +108,9 @@ export default function OrganizationDashboard() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Organizations</h1>
-          <p className="text-gray-500 mt-1">Manage enterprise organizations and teams</p>
+          <p className="text-gray-500 mt-1">
+            Manage enterprise organizations and teams
+          </p>
         </div>
         <button
           onClick={() => setShowCreate(true)}
@@ -115,7 +123,9 @@ export default function OrganizationDashboard() {
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
           {error}
-          <button onClick={() => setError(null)} className="ml-2 underline">Dismiss</button>
+          <button onClick={() => setError(null)} className="ml-2 underline">
+            Dismiss
+          </button>
         </div>
       )}
 
@@ -155,30 +165,45 @@ export default function OrganizationDashboard() {
             <h2 className="text-xl font-bold mb-4">Create Organization</h2>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name *
+                </label>
                 <input
                   type="text"
                   value={createForm.name}
-                  onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
+                  onChange={(e) =>
+                    setCreateForm({ ...createForm, name: e.target.value })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Slug *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Slug *
+                </label>
                 <input
                   type="text"
                   value={createForm.slug}
-                  onChange={(e) => setCreateForm({ ...createForm, slug: e.target.value.replace(/[^a-z0-9-]/g, "-") })}
+                  onChange={(e) =>
+                    setCreateForm({
+                      ...createForm,
+                      slug: e.target.value.replace(/[^a-z0-9-]/g, "-"),
+                    })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Type
+                </label>
                 <select
                   value={createForm.type}
-                  onChange={(e) => setCreateForm({ ...createForm, type: e.target.value })}
+                  onChange={(e) =>
+                    setCreateForm({ ...createForm, type: e.target.value })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 >
                   <option value="company">Company</option>
@@ -191,19 +216,30 @@ export default function OrganizationDashboard() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Website
+                </label>
                 <input
                   type="url"
                   value={createForm.website}
-                  onChange={(e) => setCreateForm({ ...createForm, website: e.target.value })}
+                  onChange={(e) =>
+                    setCreateForm({ ...createForm, website: e.target.value })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
+                </label>
                 <textarea
                   value={createForm.description}
-                  onChange={(e) => setCreateForm({ ...createForm, description: e.target.value })}
+                  onChange={(e) =>
+                    setCreateForm({
+                      ...createForm,
+                      description: e.target.value,
+                    })
+                  }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   rows={3}
                 />
@@ -231,21 +267,32 @@ export default function OrganizationDashboard() {
 
       {/* Organizations Grid */}
       {loading ? (
-        <div className="text-center py-12 text-gray-500">Loading organizations...</div>
+        <div className="text-center py-12 text-gray-500">
+          Loading organizations...
+        </div>
       ) : orgs.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">No organizations found</div>
+        <div className="text-center py-12 text-gray-500">
+          No organizations found
+        </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {orgs.map((org) => (
-            <div key={org.id} className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+            <div
+              key={org.id}
+              className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow"
+            >
               <div className="flex items-start justify-between mb-3">
                 <h3 className="font-semibold text-gray-900">{org.name}</h3>
-                <span className={`text-xs px-2 py-1 rounded-full ${STATUS_COLORS[org.status] || STATUS_COLORS.active}`}>
+                <span
+                  className={`text-xs px-2 py-1 rounded-full ${STATUS_COLORS[org.status] || STATUS_COLORS.active}`}
+                >
                   {org.status}
                 </span>
               </div>
               <div className="flex items-center gap-2 mb-3">
-                <span className={`text-xs px-2 py-1 rounded-full ${TYPE_COLORS[org.type] || TYPE_COLORS.other}`}>
+                <span
+                  className={`text-xs px-2 py-1 rounded-full ${TYPE_COLORS[org.type] || TYPE_COLORS.other}`}
+                >
                   {org.type}
                 </span>
                 {org.industry && (
@@ -253,7 +300,9 @@ export default function OrganizationDashboard() {
                 )}
               </div>
               {org.description && (
-                <p className="text-sm text-gray-600 mb-3 line-clamp-2">{org.description}</p>
+                <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                  {org.description}
+                </p>
               )}
               <div className="text-xs text-gray-400 flex items-center justify-between">
                 <span>Created {formatDate(org.created_at)}</span>

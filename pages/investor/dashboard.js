@@ -71,7 +71,11 @@ export default function InvestorDashboard() {
     return (
       <PageLayout>
         <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#0d0d15] to-[#0a0a0f] flex items-center justify-center">
-          <div role="status" aria-label="Checking authentication" className="text-on-surface-variant text-lg">
+          <div
+            role="status"
+            aria-label="Checking authentication"
+            className="text-on-surface-variant text-lg"
+          >
             Checking authentication...
           </div>
         </div>
@@ -81,7 +85,9 @@ export default function InvestorDashboard() {
 
   if (!user) return null;
 
-  const hasInvestments = stats ? stats.totalInvested > 0 || stats.projectsFunded > 0 : false;
+  const hasInvestments = stats
+    ? stats.totalInvested > 0 || stats.projectsFunded > 0
+    : false;
   const statsRef = stats || {
     totalInvested: 0,
     projectsFunded: 0,
@@ -111,17 +117,57 @@ export default function InvestorDashboard() {
       ];
 
   const quickActions = [
-    { label: "Explore Projects", href: "/explore", icon: "explore", description: "Discover new campaigns" },
-    { label: "Saved Projects", href: "/saved", icon: "bookmark", description: "View your saved projects" },
-    { label: "Analytics", href: "/investor/analytics", icon: "insights", description: "Track your performance" },
-    { label: "My Investments", href: "/investor/investments", icon: "account_balance", description: "Review your donations" },
+    {
+      label: "Explore Projects",
+      href: "/explore",
+      icon: "explore",
+      description: "Discover new campaigns",
+    },
+    {
+      label: "Saved Projects",
+      href: "/saved",
+      icon: "bookmark",
+      description: "View your saved projects",
+    },
+    {
+      label: "Analytics",
+      href: "/investor/analytics",
+      icon: "insights",
+      description: "Track your performance",
+    },
+    {
+      label: "My Investments",
+      href: "/investor/investments",
+      icon: "account_balance",
+      description: "Review your donations",
+    },
   ];
 
   const portfolioCards = [
-    { label: "Total Invested", value: formatINR(statsRef.totalInvested), icon: "account_balance", color: "text-primary" },
-    { label: "Projects Funded", value: statsRef.projectsFunded, icon: "rocket_launch", color: "text-success" },
-    { label: "Saved Projects", value: savedProjects, icon: "bookmark", color: "text-warning" },
-    { label: "Followers", value: followers, icon: "people", color: "text-[#f472b6]" },
+    {
+      label: "Total Invested",
+      value: formatINR(statsRef.totalInvested),
+      icon: "account_balance",
+      color: "text-primary",
+    },
+    {
+      label: "Projects Funded",
+      value: statsRef.projectsFunded,
+      icon: "rocket_launch",
+      color: "text-success",
+    },
+    {
+      label: "Saved Projects",
+      value: savedProjects,
+      icon: "bookmark",
+      color: "text-warning",
+    },
+    {
+      label: "Followers",
+      value: followers,
+      icon: "people",
+      color: "text-[#f472b6]",
+    },
   ];
 
   const insights = deriveAiInsights({
@@ -143,7 +189,9 @@ export default function InvestorDashboard() {
         action={
           <Link href="/explore">
             <Button variant="primary">
-              <span className="material-symbols-outlined text-[18px]">explore</span>
+              <span className="material-symbols-outlined text-[18px]">
+                explore
+              </span>
               Explore Projects
             </Button>
           </Link>
@@ -157,7 +205,12 @@ export default function InvestorDashboard() {
       <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#0d0d15] to-[#0a0a0f]">
         <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
           {/* Breadcrumbs */}
-          <Breadcrumbs items={[{ label: "Investor", href: "/investor/dashboard" }, { label: "Overview" }]} />
+          <Breadcrumbs
+            items={[
+              { label: "Investor", href: "/investor/dashboard" },
+              { label: "Overview" },
+            ]}
+          />
 
           {/* Welcome Card */}
           <WelcomeCard
@@ -170,7 +223,12 @@ export default function InvestorDashboard() {
           <div className="fade-in-up" style={{ animationDelay: "0.06s" }}>
             <div>
               <h3 className="text-sm font-semibold text-on-surface font-geist mb-3 flex items-center gap-2">
-                <span className="material-symbols-outlined text-[18px] text-primary" aria-hidden="true">bolt</span>
+                <span
+                  className="material-symbols-outlined text-[18px] text-primary"
+                  aria-hidden="true"
+                >
+                  bolt
+                </span>
                 Quick Actions
               </h3>
               <QuickActions actions={quickActions} />
@@ -178,9 +236,18 @@ export default function InvestorDashboard() {
           </div>
 
           {loading ? (
-            <SectionCard title="Portfolio Overview" icon="account_balance" loading={loading} />
+            <SectionCard
+              title="Portfolio Overview"
+              icon="account_balance"
+              loading={loading}
+            />
           ) : error ? (
-            <SectionCard title="Portfolio Overview" icon="account_balance" error={error} onRetry={loadDashboardData} />
+            <SectionCard
+              title="Portfolio Overview"
+              icon="account_balance"
+              error={error}
+              onRetry={loadDashboardData}
+            />
           ) : !hasInvestments ? (
             /* Onboarding — a single empty state for new investors; the
                Recommended Projects section below still encourages discovery. */
@@ -196,7 +263,9 @@ export default function InvestorDashboard() {
                   emptyAction={
                     <Link href="/explore">
                       <Button variant="primary">
-                        <span className="material-symbols-outlined text-[18px]">explore</span>
+                        <span className="material-symbols-outlined text-[18px]">
+                          explore
+                        </span>
                         Explore Projects
                       </Button>
                     </Link>
@@ -238,7 +307,12 @@ export default function InvestorDashboard() {
                           <p className="text-on-surface-variant text-xs font-inter uppercase tracking-wider">
                             Confidence
                           </p>
-                          <span className="material-symbols-outlined text-[18px] text-primary" aria-hidden="true">verified</span>
+                          <span
+                            className="material-symbols-outlined text-[18px] text-primary"
+                            aria-hidden="true"
+                          >
+                            verified
+                          </span>
                         </div>
                         <p className="text-2xl font-bold text-on-surface font-geist">
                           {insights.confidence}%
@@ -266,7 +340,9 @@ export default function InvestorDashboard() {
                           Top Pick
                         </p>
                         {insights.topPick ? (
-                          <Link href={`/projects/${insights.topPick.project.id}`}>
+                          <Link
+                            href={`/projects/${insights.topPick.project.id}`}
+                          >
                             <h4 className="text-lg font-semibold text-on-surface font-geist hover:text-primary transition-colors">
                               {insights.topPick.project.title}
                             </h4>
@@ -284,7 +360,8 @@ export default function InvestorDashboard() {
                             : "Back a project to unlock insights"}
                         </p>
                         <p className="text-xs text-on-surface-variant font-inter">
-                          {statsRef.completedCount} contribution{statsRef.completedCount === 1 ? "" : "s"}
+                          {statsRef.completedCount} contribution
+                          {statsRef.completedCount === 1 ? "" : "s"}
                         </p>
                       </div>
                     </div>
@@ -308,19 +385,31 @@ export default function InvestorDashboard() {
                   emptyAction={
                     <Link href="/explore">
                       <Button variant="primary">
-                        <span className="material-symbols-outlined text-[18px]">explore</span>
+                        <span className="material-symbols-outlined text-[18px]">
+                          explore
+                        </span>
                         Explore Projects
                       </Button>
                     </Link>
                   }
-                  viewAllLink={recentDonations.length > 0 ? "/investor/investments" : undefined}
+                  viewAllLink={
+                    recentDonations.length > 0
+                      ? "/investor/investments"
+                      : undefined
+                  }
                 >
                   <div className="space-y-2">
                     {recentDonations.slice(0, 5).map((donation) => (
-                      <Link key={donation.id} href={`/projects/${donation.project_id}`}>
+                      <Link
+                        key={donation.id}
+                        href={`/projects/${donation.project_id}`}
+                      >
                         <div className="flex items-center gap-4 p-3 rounded-lg hover:bg-white/[0.03] transition-colors">
                           <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
-                            <span className="material-symbols-outlined text-primary text-[20px]" aria-hidden="true">
+                            <span
+                              className="material-symbols-outlined text-primary text-[20px]"
+                              aria-hidden="true"
+                            >
                               payments
                             </span>
                           </div>
@@ -329,11 +418,14 @@ export default function InvestorDashboard() {
                               {donation.projects?.title || "Unknown Project"}
                             </p>
                             <p className="text-xs text-on-surface-variant">
-                              {new Date(donation.created_at).toLocaleDateString("en-US", {
-                                year: "numeric",
-                                month: "short",
-                                day: "numeric",
-                              })}
+                              {new Date(donation.created_at).toLocaleDateString(
+                                "en-US",
+                                {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                },
+                              )}
                             </p>
                           </div>
                           <div className="text-right">
@@ -345,8 +437,8 @@ export default function InvestorDashboard() {
                                 donation.status === "paid"
                                   ? "text-success"
                                   : donation.status === "pending"
-                                  ? "text-warning"
-                                  : "text-on-surface-variant"
+                                    ? "text-warning"
+                                    : "text-on-surface-variant"
                               }`}
                             >
                               {donation.status || "N/A"}
@@ -370,7 +462,9 @@ export default function InvestorDashboard() {
                   emptyAction={
                     <Link href="/explore">
                       <Button variant="primary">
-                        <span className="material-symbols-outlined text-[18px]">explore</span>
+                        <span className="material-symbols-outlined text-[18px]">
+                          explore
+                        </span>
                         Explore Projects
                       </Button>
                     </Link>
@@ -394,11 +488,16 @@ export default function InvestorDashboard() {
                             key={`reason-${rec.project.id}`}
                             className="flex items-start gap-2 px-3 py-2 rounded-lg bg-white/[0.02] text-xs text-on-surface-variant font-inter"
                           >
-                            <span className="material-symbols-outlined text-[16px] text-primary shrink-0 mt-0.5" aria-hidden="true">
+                            <span
+                              className="material-symbols-outlined text-[16px] text-primary shrink-0 mt-0.5"
+                              aria-hidden="true"
+                            >
                               auto_awesome
                             </span>
                             <span>
-                              <span className="text-on-surface font-medium">{rec.project.title}:</span>{" "}
+                              <span className="text-on-surface font-medium">
+                                {rec.project.title}:
+                              </span>{" "}
                               {rec.reasons.join(" · ")}
                             </span>
                           </div>
@@ -420,7 +519,9 @@ export default function InvestorDashboard() {
                   emptyAction={
                     <Link href="/explore">
                       <Button variant="primary">
-                        <span className="material-symbols-outlined text-[18px]">explore</span>
+                        <span className="material-symbols-outlined text-[18px]">
+                          explore
+                        </span>
                         Explore Projects
                       </Button>
                     </Link>
@@ -431,22 +532,32 @@ export default function InvestorDashboard() {
                       <Link key={p.id} href={`/projects/${p.id}`}>
                         <div className="flex items-center gap-4 p-3 rounded-lg hover:bg-white/[0.03] transition-colors">
                           <div className="w-10 h-10 rounded-lg bg-success/20 flex items-center justify-center shrink-0">
-                            <span className="material-symbols-outlined text-success text-[20px]" aria-hidden="true">
+                            <span
+                              className="material-symbols-outlined text-success text-[20px]"
+                              aria-hidden="true"
+                            >
                               account_balance
                             </span>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-on-surface truncate">{p.title}</p>
+                            <p className="text-sm font-medium text-on-surface truncate">
+                              {p.title}
+                            </p>
                             <p className="text-xs text-on-surface-variant">
-                              {new Date(p.lastDonatedAt).toLocaleDateString("en-US", {
-                                year: "numeric",
-                                month: "short",
-                                day: "numeric",
-                              })}
+                              {new Date(p.lastDonatedAt).toLocaleDateString(
+                                "en-US",
+                                {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                },
+                              )}
                             </p>
                           </div>
                           <div className="text-right shrink-0">
-                            <p className="text-sm font-semibold text-success">+{formatINR(p.invested)}</p>
+                            <p className="text-sm font-semibold text-success">
+                              +{formatINR(p.invested)}
+                            </p>
                           </div>
                         </div>
                       </Link>

@@ -36,9 +36,10 @@ const cardScale = {
 
 /* ─── Helpers ─── */
 function generateTxnId(id) {
-  const hex = typeof id === "string"
-    ? id.replace(/-/g, "").slice(0, 8).toUpperCase()
-    : String(id).padStart(4, "0");
+  const hex =
+    typeof id === "string"
+      ? id.replace(/-/g, "").slice(0, 8).toUpperCase()
+      : String(id).padStart(4, "0");
   return `FD-${hex.slice(0, 4)}-${hex.slice(4, 8) || "0000"}`;
 }
 
@@ -80,7 +81,8 @@ export default function MyPayments() {
 
     const { data, error } = await supabase
       .from("public_donations")
-      .select(`
+      .select(
+        `
         id,
         amount,
         status,
@@ -90,7 +92,8 @@ export default function MyPayments() {
           id,
           title
         )
-      `)
+      `,
+      )
       .eq("payer_id", user.id)
       .order("created_at", { ascending: false });
 
@@ -108,7 +111,9 @@ export default function MyPayments() {
   /* ================= DOWNLOAD RECEIPT ================= */
   async function downloadReceipt(payment) {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session?.access_token) {
         alert("Please login again");
         return;
@@ -191,7 +196,11 @@ export default function MyPayments() {
       <div className="min-h-screen flex flex-col bg-surface-dim">
         <Navbar />
         <main className="flex-1 pt-32 pb-24">
-          <div className="max-w-7xl mx-auto px-6 lg:px-16" role="status" aria-label="Loading payments">
+          <div
+            className="max-w-7xl mx-auto px-6 lg:px-16"
+            role="status"
+            aria-label="Loading payments"
+          >
             {/* Header skeleton */}
             <div className="mb-12 flex justify-between items-end">
               <div className="space-y-3">
@@ -246,7 +255,6 @@ export default function MyPayments() {
         </div>
 
         <div className="max-w-7xl mx-auto px-6 lg:px-16">
-
           {/* ═══════════ HEADER ═══════════ */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -273,7 +281,10 @@ export default function MyPayments() {
               transition={{ duration: 0.4, delay: 0.2 }}
               className="flex items-center gap-3 bg-surface-container-high px-6 py-3 rounded-full border border-outline-variant/20"
             >
-              <span className="material-symbols-outlined text-primary text-xl" aria-hidden="true">
+              <span
+                className="material-symbols-outlined text-primary text-xl"
+                aria-hidden="true"
+              >
                 receipt_long
               </span>
               <span className="font-inter text-sm text-on-surface">
@@ -292,7 +303,10 @@ export default function MyPayments() {
               animate={{ opacity: 1, y: 0 }}
               className="glass-card p-16 rounded-xl text-center"
             >
-              <span className="material-symbols-outlined text-6xl text-on-surface-variant/30 block mb-4" aria-hidden="true">
+              <span
+                className="material-symbols-outlined text-6xl text-on-surface-variant/30 block mb-4"
+                aria-hidden="true"
+              >
                 receipts
               </span>
               <h3 className="font-geist text-xl font-semibold text-on-surface mb-2">
@@ -357,11 +371,15 @@ export default function MyPayments() {
 
                         {/* Date + Time */}
                         <div className="flex items-center gap-2 text-on-surface-variant">
-                          <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                          <span
+                            className="material-symbols-outlined text-[18px]"
+                            aria-hidden="true"
+                          >
                             calendar_today
                           </span>
                           <span className="font-inter text-[13px]">
-                            {formatDate(p.created_at)} • {formatTime(p.created_at)}
+                            {formatDate(p.created_at)} •{" "}
+                            {formatTime(p.created_at)}
                           </span>
                         </div>
                       </div>
@@ -378,18 +396,25 @@ export default function MyPayments() {
                         }}
                         className="mt-8 w-full py-4 px-6 rounded-lg font-inter text-sm flex items-center justify-center gap-3 shadow-lg shadow-primary/10 transition-all"
                         style={{
-                          background: "linear-gradient(135deg, #a078ff 0%, #d0bcff 100%)",
+                          background:
+                            "linear-gradient(135deg, #a078ff 0%, #d0bcff 100%)",
                           color: "#340080",
                         }}
                       >
-                        <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
+                        <span
+                          className="material-symbols-outlined text-[20px]"
+                          aria-hidden="true"
+                        >
                           download
                         </span>
                         Download Receipt
                       </motion.button>
                     ) : (
                       <div className="mt-8 w-full py-4 px-6 rounded-lg bg-surface-container-high border border-outline-variant/30 text-on-surface-variant font-inter text-sm flex items-center justify-center gap-3 opacity-50 cursor-not-allowed">
-                        <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
+                        <span
+                          className="material-symbols-outlined text-[20px]"
+                          aria-hidden="true"
+                        >
                           lock
                         </span>
                         Download Receipt
@@ -410,7 +435,10 @@ export default function MyPayments() {
                   whileHover={{ scale: 1.1 }}
                   className="w-16 h-16 bg-surface-container-high rounded-full flex items-center justify-center mb-4"
                 >
-                  <span className="material-symbols-outlined text-primary text-[32px]" aria-hidden="true">
+                  <span
+                    className="material-symbols-outlined text-primary text-[32px]"
+                    aria-hidden="true"
+                  >
                     add
                   </span>
                 </motion.div>
@@ -456,7 +484,12 @@ export default function MyPayments() {
                 aria-label="Close payment details"
                 className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors"
               >
-                <span className="material-symbols-outlined text-lg" aria-hidden="true">close</span>
+                <span
+                  className="material-symbols-outlined text-lg"
+                  aria-hidden="true"
+                >
+                  close
+                </span>
               </motion.button>
 
               <h2 className="font-geist text-xl font-semibold text-on-surface mb-6">
@@ -500,7 +533,8 @@ export default function MyPayments() {
                     Date
                   </span>
                   <span className="text-on-surface font-inter">
-                    {formatDate(selectedPayment.created_at)} • {formatTime(selectedPayment.created_at)}
+                    {formatDate(selectedPayment.created_at)} •{" "}
+                    {formatTime(selectedPayment.created_at)}
                   </span>
                 </div>
 
@@ -521,7 +555,8 @@ export default function MyPayments() {
                   onClick={() => downloadReceipt(selectedPayment)}
                   className="mt-8 w-full py-4 px-6 rounded-lg font-inter text-sm flex items-center justify-center gap-3 shadow-lg shadow-primary/10 transition-all"
                   style={{
-                    background: "linear-gradient(135deg, #a078ff 0%, #d0bcff 100%)",
+                    background:
+                      "linear-gradient(135deg, #a078ff 0%, #d0bcff 100%)",
                     color: "#340080",
                   }}
                 >

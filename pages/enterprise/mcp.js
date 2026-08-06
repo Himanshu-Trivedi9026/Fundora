@@ -45,8 +45,12 @@ export default function MCPPage() {
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-2xl font-bold text-white">MCP Server Management</h1>
-              <p className="text-gray-400 mt-1">Manage model-context-protocol servers, tools, and configurations</p>
+              <h1 className="text-2xl font-bold text-white">
+                MCP Server Management
+              </h1>
+              <p className="text-gray-400 mt-1">
+                Manage model-context-protocol servers, tools, and configurations
+              </p>
             </div>
             <Button variant="primary" size="md">
               <span className="material-symbols-outlined text-[18px]">add</span>
@@ -57,25 +61,44 @@ export default function MCPPage() {
           {/* Server Info */}
           {serverInfo && (
             <GlassCard className="mb-6">
-              <h2 className="text-white font-semibold text-sm mb-3">Server Status</h2>
+              <h2 className="text-white font-semibold text-sm mb-3">
+                Server Status
+              </h2>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div>
-                  <p className="text-gray-500 text-[11px] uppercase tracking-wider">Status</p>
+                  <p className="text-gray-500 text-[11px] uppercase tracking-wider">
+                    Status
+                  </p>
                   <p className="text-green-400 text-sm font-medium mt-1">
-                    <span className="material-symbols-outlined text-[14px] align-text-bottom">check_circle</span> Online
+                    <span className="material-symbols-outlined text-[14px] align-text-bottom">
+                      check_circle
+                    </span>{" "}
+                    Online
                   </p>
                 </div>
                 <div>
-                  <p className="text-gray-500 text-[11px] uppercase tracking-wider">Name</p>
-                  <p className="text-white text-sm mt-1">{serverInfo.name || "MCP Server"}</p>
+                  <p className="text-gray-500 text-[11px] uppercase tracking-wider">
+                    Name
+                  </p>
+                  <p className="text-white text-sm mt-1">
+                    {serverInfo.name || "MCP Server"}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-gray-500 text-[11px] uppercase tracking-wider">Version</p>
-                  <p className="text-white text-sm mt-1">{serverInfo.version || "1.0.0"}</p>
+                  <p className="text-gray-500 text-[11px] uppercase tracking-wider">
+                    Version
+                  </p>
+                  <p className="text-white text-sm mt-1">
+                    {serverInfo.version || "1.0.0"}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-gray-500 text-[11px] uppercase tracking-wider">Tools</p>
-                  <p className="text-white text-sm mt-1">{tools.length} registered</p>
+                  <p className="text-gray-500 text-[11px] uppercase tracking-wider">
+                    Tools
+                  </p>
+                  <p className="text-white text-sm mt-1">
+                    {tools.length} registered
+                  </p>
                 </div>
               </div>
             </GlassCard>
@@ -98,10 +121,19 @@ export default function MCPPage() {
 
           {error && (
             <GlassCard className="text-center py-12">
-              <span className="material-symbols-outlined text-4xl text-red-400 mb-3">error_outline</span>
-              <p className="text-red-400 text-lg font-medium">Failed to load MCP servers</p>
+              <span className="material-symbols-outlined text-4xl text-red-400 mb-3">
+                error_outline
+              </span>
+              <p className="text-red-400 text-lg font-medium">
+                Failed to load MCP servers
+              </p>
               <p className="text-gray-500 text-sm mt-1">{error}</p>
-              <Button variant="secondary" size="sm" className="mt-4" onClick={() => window.location.reload()}>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="mt-4"
+                onClick={() => window.location.reload()}
+              >
                 Retry
               </Button>
             </GlassCard>
@@ -109,25 +141,39 @@ export default function MCPPage() {
 
           {!loading && !error && tools.length === 0 && !serverInfo && (
             <GlassCard className="text-center py-12">
-              <span className="material-symbols-outlined text-4xl text-gray-500 mb-3">dns</span>
-              <p className="text-gray-400 text-lg font-medium">No MCP servers connected</p>
-              <p className="text-gray-600 text-sm mt-1">Configure an MCP server to enable AI-powered tool execution.</p>
+              <span className="material-symbols-outlined text-4xl text-gray-500 mb-3">
+                dns
+              </span>
+              <p className="text-gray-400 text-lg font-medium">
+                No MCP servers connected
+              </p>
+              <p className="text-gray-600 text-sm mt-1">
+                Configure an MCP server to enable AI-powered tool execution.
+              </p>
             </GlassCard>
           )}
 
           {!loading && !error && (tools.length > 0 || serverInfo) && (
             <>
               {/* Connected Servers */}
-              <h2 className="text-white font-semibold text-sm mb-4">Connected Servers</h2>
+              <h2 className="text-white font-semibold text-sm mb-4">
+                Connected Servers
+              </h2>
               <div className="space-y-3 mb-8">
                 <GlassCard className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center">
-                      <span className="material-symbols-outlined text-[18px] text-indigo-400">dns</span>
+                      <span className="material-symbols-outlined text-[18px] text-indigo-400">
+                        dns
+                      </span>
                     </div>
                     <div>
-                      <h3 className="text-white text-sm font-medium">Default MCP Server</h3>
-                      <p className="text-gray-500 text-[11px]">{serverInfo?.name || "localhost"} ({tools.length} tools)</p>
+                      <h3 className="text-white text-sm font-medium">
+                        Default MCP Server
+                      </h3>
+                      <p className="text-gray-500 text-[11px]">
+                        {serverInfo?.name || "localhost"} ({tools.length} tools)
+                      </p>
                     </div>
                   </div>
                   <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-500/10 text-green-400">
@@ -139,13 +185,19 @@ export default function MCPPage() {
               {/* Available Tools */}
               {tools.length > 0 && (
                 <>
-                  <h2 className="text-white font-semibold text-sm mb-4">Available Tools ({tools.length})</h2>
+                  <h2 className="text-white font-semibold text-sm mb-4">
+                    Available Tools ({tools.length})
+                  </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {tools.map((tool, idx) => (
                       <GlassCard key={tool.name || idx} hover>
                         <div className="flex items-center gap-3 mb-2">
-                          <span className="material-symbols-outlined text-[18px] text-indigo-400">build</span>
-                          <h3 className="text-white text-sm font-medium truncate">{tool.name}</h3>
+                          <span className="material-symbols-outlined text-[18px] text-indigo-400">
+                            build
+                          </span>
+                          <h3 className="text-white text-sm font-medium truncate">
+                            {tool.name}
+                          </h3>
                         </div>
                         <p className="text-gray-500 text-xs line-clamp-2">
                           {tool.description || "No description"}
@@ -153,7 +205,11 @@ export default function MCPPage() {
                         {tool.inputSchema && (
                           <div className="mt-2 pt-2 border-t border-white/[0.06]">
                             <span className="text-[10px] text-gray-600">
-                              {Object.keys(tool.inputSchema?.properties || {}).length} parameter(s)
+                              {
+                                Object.keys(tool.inputSchema?.properties || {})
+                                  .length
+                              }{" "}
+                              parameter(s)
                             </span>
                           </div>
                         )}

@@ -20,7 +20,12 @@ vi.mock("@/lib/rateLimit.js", () => ({
 vi.mock("@/lib/automation/workflowEngine.js", () => ({
   listWorkflows: vi.fn().mockResolvedValue({
     success: true,
-    data: { workflows: [{ id: "wf-1", name: "Test" }], total: 1, limit: 20, offset: 0 },
+    data: {
+      workflows: [{ id: "wf-1", name: "Test" }],
+      total: 1,
+      limit: 20,
+      offset: 0,
+    },
   }),
   createWorkflow: vi.fn().mockResolvedValue({
     success: true,
@@ -44,7 +49,12 @@ vi.mock("@/lib/automation/workflowEngine.js", () => ({
   }),
   getWorkflowRuns: vi.fn().mockResolvedValue({
     success: true,
-    data: { runs: [{ id: "run-1", status: "completed" }], total: 1, limit: 20, offset: 0 },
+    data: {
+      runs: [{ id: "run-1", status: "completed" }],
+      total: 1,
+      limit: 20,
+      offset: 0,
+    },
   }),
   verifyWorkflowOwnership: vi.fn().mockResolvedValue({
     success: true,
@@ -71,7 +81,12 @@ import {
   verifyWorkflowOwnership,
 } from "@/lib/automation/workflowEngine.js";
 
-function createMockReq(method = "GET", body = {}, query = {}, user = { id: "test-user-id" }) {
+function createMockReq(
+  method = "GET",
+  body = {},
+  query = {},
+  user = { id: "test-user-id" },
+) {
   return { method, body, query, user };
 }
 
@@ -106,7 +121,7 @@ describe("/api/automation/workflows", () => {
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ workflows: expect.any(Array) })
+      expect.objectContaining({ workflows: expect.any(Array) }),
     );
     expect(listWorkflows).toHaveBeenCalled();
   });
@@ -123,34 +138,41 @@ describe("/api/automation/workflows", () => {
 
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ id: "wf-new" })
+      expect.objectContaining({ id: "wf-new" }),
     );
     expect(createWorkflow).toHaveBeenCalledWith(
-      expect.objectContaining({ name: "New Workflow" })
+      expect.objectContaining({ name: "New Workflow" }),
     );
   });
 
   it("should return 400 when name is missing on POST", async () => {
-    const req = createMockReq("POST", { trigger: "event", steps: [{ type: "test" }] });
+    const req = createMockReq("POST", {
+      trigger: "event",
+      steps: [{ type: "test" }],
+    });
     const res = createMockRes();
 
     await workflowsHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ error: expect.stringContaining("name") })
+      expect.objectContaining({ error: expect.stringContaining("name") }),
     );
   });
 
   it("should return 400 when steps is empty array", async () => {
-    const req = createMockReq("POST", { name: "Test", trigger: "event", steps: [] });
+    const req = createMockReq("POST", {
+      name: "Test",
+      trigger: "event",
+      steps: [],
+    });
     const res = createMockRes();
 
     await workflowsHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ error: expect.stringContaining("non-empty") })
+      expect.objectContaining({ error: expect.stringContaining("non-empty") }),
     );
   });
 
@@ -199,7 +221,7 @@ describe("/api/automation/workflows/[id]", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ error: expect.stringContaining("update") })
+      expect.objectContaining({ error: expect.stringContaining("update") }),
     );
   });
 
@@ -211,7 +233,7 @@ describe("/api/automation/workflows/[id]", () => {
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ message: expect.stringContaining("deleted") })
+      expect.objectContaining({ message: expect.stringContaining("deleted") }),
     );
   });
 
@@ -300,14 +322,18 @@ describe("/api/automation/workflows/[id]/trigger", () => {
   });
 
   it("should trigger a workflow on POST", async () => {
-    const req = createMockReq("POST", { input: { key: "value" } }, { id: "wf-1" });
+    const req = createMockReq(
+      "POST",
+      { input: { key: "value" } },
+      { id: "wf-1" },
+    );
     const res = createMockRes();
 
     await triggerHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(triggerWorkflow).toHaveBeenCalledWith(
-      expect.objectContaining({ workflowId: "wf-1" })
+      expect.objectContaining({ workflowId: "wf-1" }),
     );
   });
 
@@ -388,7 +414,7 @@ describe("/api/automation/workflows/[id]/runs", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ error: expect.stringContaining("status") })
+      expect.objectContaining({ error: expect.stringContaining("status") }),
     );
   });
 });

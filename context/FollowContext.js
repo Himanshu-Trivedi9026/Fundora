@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, useState, useMemo, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useMemo,
+  useCallback,
+} from "react";
 import { supabase } from "../lib/supabaseClient";
 
 const FollowContext = createContext(null);
@@ -15,11 +22,11 @@ export function FollowProvider({ children }) {
     });
 
     // Listen for auth state changes (login/logout)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setCurrentUser(session?.user || null);
-      }
-    );
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setCurrentUser(session?.user || null);
+    });
 
     return () => subscription?.unsubscribe();
   }, []);
@@ -40,7 +47,7 @@ export function FollowProvider({ children }) {
         .eq("follower_id", currentUser.id);
 
       if (!error && data) {
-        setFollowingIds(new Set(data.map(r => r.following_id)));
+        setFollowingIds(new Set(data.map((r) => r.following_id)));
       }
 
       setLoading(false);
@@ -49,42 +56,53 @@ export function FollowProvider({ children }) {
     loadFollowing();
   }, [currentUser]);
 
-  const follow = useCallback(async (userId) => {
-    if (!currentUser) return;
+  const follow = useCallback(
+    async (userId) => {
+      if (!currentUser) return;
 
-    await supabase.from("followers").insert({
-      follower_id: currentUser.id,
-      following_id: userId,
-    });
+      await supabase.from("followers").insert({
+        follower_id: currentUser.id,
+        following_id: userId,
+      });
 
-    setFollowingIds(prev => new Set([...prev, userId]));
-  }, [currentUser]);
+      setFollowingIds((prev) => new Set([...prev, userId]));
+    },
+    [currentUser],
+  );
 
-  const unfollow = useCallback(async (userId) => {
-    if (!currentUser) return;
+  const unfollow = useCallback(
+    async (userId) => {
+      if (!currentUser) return;
 
-    await supabase
-      .from("followers")
-      .delete()
-      .eq("follower_id", currentUser.id)
-      .eq("following_id", userId);
+      await supabase
+        .from("followers")
+        .delete()
+        .eq("follower_id", currentUser.id)
+        .eq("following_id", userId);
 
-    setFollowingIds(prev => {
-      const s = new Set(prev);
-      s.delete(userId);
-      return s;
-    });
-  }, [currentUser]);
+      setFollowingIds((prev) => {
+        const s = new Set(prev);
+        s.delete(userId);
+        return s;
+      });
+    },
+    [currentUser],
+  );
 
   // Memoize the value object to prevent unnecessary re-renders of consumers
-  const value = useMemo(() => ({
-    currentUser, followingIds, follow, unfollow, loading
-  }), [currentUser, followingIds, follow, unfollow, loading]);
+  const value = useMemo(
+    () => ({
+      currentUser,
+      followingIds,
+      follow,
+      unfollow,
+      loading,
+    }),
+    [currentUser, followingIds, follow, unfollow, loading],
+  );
 
   return (
-    <FollowContext.Provider value={value}>
-      {children}
-    </FollowContext.Provider>
+    <FollowContext.Provider value={value}>{children}</FollowContext.Provider>
   );
 }
 

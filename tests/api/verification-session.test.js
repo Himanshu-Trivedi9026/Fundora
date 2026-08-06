@@ -76,10 +76,16 @@ vi.mock("../../lib/supabaseAdmin", () => {
       resolve() {
         if (table === "verification_requests") {
           if (this._payload) {
-            return Promise.resolve({ data: { id: "req-1", ...this._payload }, error: opts.insertError ? { message: "insert failed" } : null });
+            return Promise.resolve({
+              data: { id: "req-1", ...this._payload },
+              error: opts.insertError ? { message: "insert failed" } : null,
+            });
           }
           if (existingRequest) {
-            return Promise.resolve({ data: existingRequest, error: opts.updateError ? { message: "update failed" } : null });
+            return Promise.resolve({
+              data: existingRequest,
+              error: opts.updateError ? { message: "update failed" } : null,
+            });
           }
           return Promise.resolve({ data: null, error: null });
         }
@@ -100,7 +106,9 @@ vi.mock("../../lib/supabaseAdmin", () => {
   };
 
   const supabaseAdmin = {
-    auth: { getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }) },
+    auth: {
+      getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
+    },
     from: vi.fn((table) => makeBuilder(table)),
   };
 
@@ -118,11 +126,20 @@ vi.mock("../../lib/supabaseAdmin", () => {
 // ─── Helpers ───
 
 function mockReq(method = "GET", body = {}, query = {}, headers = {}) {
-  return { method, body, query, headers, socket: { remoteAddress: "127.0.0.1" } };
+  return {
+    method,
+    body,
+    query,
+    headers,
+    socket: { remoteAddress: "127.0.0.1" },
+  };
 }
 
 function mockRes() {
-  const res = { status: vi.fn().mockReturnThis(), json: vi.fn().mockReturnThis() };
+  const res = {
+    status: vi.fn().mockReturnThis(),
+    json: vi.fn().mockReturnThis(),
+  };
   return res;
 }
 
@@ -161,7 +178,7 @@ describe("API — Verification Session", () => {
     await handler(
       mockReq("DELETE", { sessionId: "sess-1", action: "complete" }),
       res,
-      { id: "user-1" }
+      { id: "user-1" },
     );
 
     expect(sessionManager.completeSession).not.toHaveBeenCalled();
@@ -203,9 +220,12 @@ describe("API — Verification Session", () => {
 
     const res = mockRes();
     await handler(
-      mockReq("POST", { deviceMetadata: { browser: "chrome" }, requestId: "req-1" }),
+      mockReq("POST", {
+        deviceMetadata: { browser: "chrome" },
+        requestId: "req-1",
+      }),
       res,
-      { id: "user-1" }
+      { id: "user-1" },
     );
 
     expect(sessionManager.createSession).toHaveBeenCalledWith(
@@ -213,7 +233,7 @@ describe("API — Verification Session", () => {
       "req-1",
       { browser: "chrome" },
       "127.0.0.1",
-      undefined
+      undefined,
     );
     expect(res.status).toHaveBeenCalledWith(201);
   });
@@ -230,7 +250,7 @@ describe("API — Verification Session", () => {
         wizardState: { phoneVerified: true },
       }),
       res,
-      { id: "user-1" }
+      { id: "user-1" },
     );
 
     expect(sessionManager.updateSessionStep).toHaveBeenCalledWith(
@@ -238,14 +258,16 @@ describe("API — Verification Session", () => {
       "phone",
       ["email"],
       { phoneVerified: true },
-      "user-1"
+      "user-1",
     );
     expect(res.status).toHaveBeenCalledWith(200);
   });
 
   it("PATCH rejects missing sessionId/step", async () => {
     const res = mockRes();
-    await handler(mockReq("PATCH", { sessionId: "sess-1" }), res, { id: "user-1" });
+    await handler(mockReq("PATCH", { sessionId: "sess-1" }), res, {
+      id: "user-1",
+    });
     expect(res.status).toHaveBeenCalledWith(400);
   });
 
@@ -256,14 +278,19 @@ describe("API — Verification Session", () => {
     await handler(
       mockReq("DELETE", { sessionId: "sess-1", action: "complete" }),
       res,
-      { id: "user-1" }
+      { id: "user-1" },
     );
 
-    expect(sessionManager.completeSession).toHaveBeenCalledWith("sess-1", "user-1");
+    expect(sessionManager.completeSession).toHaveBeenCalledWith(
+      "sess-1",
+      "user-1",
+    );
     expect(res.status).toHaveBeenCalledWith(200);
 
     // New request row inserted (no existing request).
-    const inserted = state.calls.inserts.find((i) => i.table === "verification_requests");
+    const inserted = state.calls.inserts.find(
+      (i) => i.table === "verification_requests",
+    );
     expect(inserted).toBeTruthy();
     expect(inserted.payload).toMatchObject({
       user_id: "user-1",
@@ -277,19 +304,26 @@ describe("API — Verification Session", () => {
 
   it("DELETE complete updates an existing request instead of inserting", async () => {
     sessionManager.completeSession.mockResolvedValue({ success: true });
-    state.setExisting({ id: "req-old", user_id: "user-1", verification_type: "identity", metadata: {} });
+    state.setExisting({
+      id: "req-old",
+      user_id: "user-1",
+      verification_type: "identity",
+      metadata: {},
+    });
 
     const res = mockRes();
     await handler(
       mockReq("DELETE", { sessionId: "sess-1", action: "complete" }),
       res,
-      { id: "user-1" }
+      { id: "user-1" },
     );
 
     expect(
-      state.calls.inserts.some((i) => i.table === "verification_requests")
+      state.calls.inserts.some((i) => i.table === "verification_requests"),
     ).toBe(false);
-    const updated = state.calls.updates.find((i) => i.table === "verification_requests");
+    const updated = state.calls.updates.find(
+      (i) => i.table === "verification_requests",
+    );
     expect(updated).toBeTruthy();
     expect(updated.payload).toMatchObject({
       current_step: "complete",
@@ -300,7 +334,9 @@ describe("API — Verification Session", () => {
 
   it("DELETE complete requires a sessionId", async () => {
     const res = mockRes();
-    await handler(mockReq("DELETE", { action: "complete" }), res, { id: "user-1" });
+    await handler(mockReq("DELETE", { action: "complete" }), res, {
+      id: "user-1",
+    });
     expect(res.status).toHaveBeenCalledWith(400);
   });
 

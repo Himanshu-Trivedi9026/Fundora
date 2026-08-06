@@ -3,7 +3,13 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { recordFingerprint, getDeviceFingerprints, getDeviceStats, flagDevice, sanitizeDeviceResponse } from "../../../lib/fraud/deviceFingerprint";
+import {
+  recordFingerprint,
+  getDeviceFingerprints,
+  getDeviceStats,
+  flagDevice,
+  sanitizeDeviceResponse,
+} from "../../../lib/fraud/deviceFingerprint";
 
 // Mock supabaseAdmin
 const mockChain = {
@@ -12,7 +18,9 @@ const mockChain = {
   single: vi.fn(() => Promise.resolve({ data: null, error: null })),
   insert: vi.fn(() => ({
     select: vi.fn(() => ({
-      single: vi.fn(() => Promise.resolve({ data: { id: "new-id" }, error: null })),
+      single: vi.fn(() =>
+        Promise.resolve({ data: { id: "new-id" }, error: null }),
+      ),
     })),
   })),
   update: vi.fn(() => ({
@@ -47,7 +55,9 @@ describe("DeviceFingerprint", () => {
 
   describe("recordFingerprint", () => {
     it("should require userId", async () => {
-      const result = await recordFingerprint({ fingerprint: { browser: "Chrome" } });
+      const result = await recordFingerprint({
+        fingerprint: { browser: "Chrome" },
+      });
       expect(result.success).toBe(false);
       expect(result.error).toContain("Missing required fields");
     });

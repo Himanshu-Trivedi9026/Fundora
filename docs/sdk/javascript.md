@@ -180,15 +180,15 @@ All error responses follow a consistent JSON structure:
 
 ### HTTP Status Codes
 
-| Code | Meaning | Description |
-|------|---------|-------------|
-| `200` | OK | Request succeeded |
-| `201` | Created | Resource created successfully |
-| `400` | Bad Request | Invalid request body or missing required fields |
-| `401` | Unauthorized | Missing, invalid, or expired API key |
-| `405` | Method Not Allowed | HTTP method not supported on this endpoint |
-| `429` | Too Many Requests | Rate limit exceeded |
-| `500` | Internal Server Error | Unexpected server-side error |
+| Code  | Meaning               | Description                                     |
+| ----- | --------------------- | ----------------------------------------------- |
+| `200` | OK                    | Request succeeded                               |
+| `201` | Created               | Resource created successfully                   |
+| `400` | Bad Request           | Invalid request body or missing required fields |
+| `401` | Unauthorized          | Missing, invalid, or expired API key            |
+| `405` | Method Not Allowed    | HTTP method not supported on this endpoint      |
+| `429` | Too Many Requests     | Rate limit exceeded                             |
+| `500` | Internal Server Error | Unexpected server-side error                    |
 
 ### Handling Errors
 
@@ -236,11 +236,11 @@ Every API key has configurable rate limits (default: 100 requests per 60-second 
 
 Every response includes these headers:
 
-| Header | Description |
-|--------|-------------|
-| `X-RateLimit-Limit` | Maximum requests allowed per window |
-| `X-RateLimit-Remaining` | Remaining requests in the current window |
-| `X-RateLimit-Reset` | Unix timestamp (seconds) when the window resets |
+| Header                  | Description                                     |
+| ----------------------- | ----------------------------------------------- |
+| `X-RateLimit-Limit`     | Maximum requests allowed per window             |
+| `X-RateLimit-Remaining` | Remaining requests in the current window        |
+| `X-RateLimit-Reset`     | Unix timestamp (seconds) when the window resets |
 
 ### When Rate Limited (HTTP 429)
 
@@ -278,11 +278,19 @@ async function fetchWithRateLimit(endpoint, options = {}, retries = 3) {
   }
 
   // Check remaining quota for proactive throttling
-  const remaining = parseInt(response.headers.get("X-RateLimit-Remaining") || "100", 10);
+  const remaining = parseInt(
+    response.headers.get("X-RateLimit-Remaining") || "100",
+    10,
+  );
   if (remaining < 10) {
-    const resetAt = parseInt(response.headers.get("X-RateLimit-Reset") || "0", 10);
+    const resetAt = parseInt(
+      response.headers.get("X-RateLimit-Reset") || "0",
+      10,
+    );
     const waitTime = Math.max(0, resetAt - Math.floor(Date.now() / 1000));
-    console.warn(`Low rate limit remaining (${remaining}). Res${waitTime}s until reset.`);
+    console.warn(
+      `Low rate limit remaining (${remaining}). Res${waitTime}s until reset.`,
+    );
   }
 
   return response;
@@ -301,10 +309,10 @@ async function fetchWithRateLimit(endpoint, options = {}, retries = 3) {
 GET /api/campaigns
 ```
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `limit` | number | Max results per page (default: 50) |
-| `offset` | number | Pagination offset (default: 0) |
+| Parameter | Type   | Description                        |
+| --------- | ------ | ---------------------------------- |
+| `limit`   | number | Max results per page (default: 50) |
+| `offset`  | number | Pagination offset (default: 0)     |
 
 **Response:**
 
@@ -374,11 +382,11 @@ POST /api/donations
 GET /api/webhooks
 ```
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `organizationId` | string | Filter by organization |
-| `limit` | number | Max results (default: 50) |
-| `offset` | number | Pagination offset |
+| Parameter        | Type   | Description               |
+| ---------------- | ------ | ------------------------- |
+| `organizationId` | string | Filter by organization    |
+| `limit`          | number | Max results (default: 50) |
+| `offset`         | number | Pagination offset         |
 
 **Response:**
 
@@ -519,12 +527,12 @@ POST /api/webhooks/test
 GET /api/webhooks/deliveries?webhookId=uuid
 ```
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `webhookId` | string | **Required**. Webhook ID |
-| `status` | string | Filter by status: `delivered`, `failed`, `retrying` |
-| `limit` | number | Max results (default: 50) |
-| `offset` | number | Pagination offset |
+| Parameter   | Type   | Description                                         |
+| ----------- | ------ | --------------------------------------------------- |
+| `webhookId` | string | **Required**. Webhook ID                            |
+| `status`    | string | Filter by status: `delivered`, `failed`, `retrying` |
+| `limit`     | number | Max results (default: 50)                           |
+| `offset`    | number | Pagination offset                                   |
 
 #### Retry a Failed Delivery
 
@@ -551,12 +559,12 @@ POST /api/webhooks/deliveries
 GET /api/api-platform/keys
 ```
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `organizationId` | string | Filter by organization |
-| `status` | string | Filter: `active`, `revoked`, `expired` |
-| `limit` | number | Max results (default: 50) |
-| `offset` | number | Pagination offset |
+| Parameter        | Type   | Description                            |
+| ---------------- | ------ | -------------------------------------- |
+| `organizationId` | string | Filter by organization                 |
+| `status`         | string | Filter: `active`, `revoked`, `expired` |
+| `limit`          | number | Max results (default: 50)              |
+| `offset`         | number | Pagination offset                      |
 
 #### Create an API Key
 
@@ -676,16 +684,16 @@ POST /api/api-platform/apps
 GET /api/api-platform/logs
 ```
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `apiKeyId` | string | Filter by API key |
-| `organizationId` | string | Filter by organization |
-| `method` | string | Filter by HTTP method |
+| Parameter        | Type   | Description                    |
+| ---------------- | ------ | ------------------------------ |
+| `apiKeyId`       | string | Filter by API key              |
+| `organizationId` | string | Filter by organization         |
+| `method`         | string | Filter by HTTP method          |
 | `responseStatus` | number | Filter by response status code |
-| `startDate` | string | ISO 8601 start date |
-| `endDate` | string | ISO 8601 end date |
-| `limit` | number | Max results (default: 100) |
-| `offset` | number | Pagination offset |
+| `startDate`      | string | ISO 8601 start date            |
+| `endDate`        | string | ISO 8601 end date              |
+| `limit`          | number | Max results (default: 100)     |
+| `offset`         | number | Pagination offset              |
 
 #### Usage Summary
 
@@ -785,7 +793,7 @@ async function main() {
     // Create webhook
     const { data: webhook } = await createWebhook(
       "https://myapp.com/webhooks/fundora",
-      ["donation.received", "campaign.funded"]
+      ["donation.received", "campaign.funded"],
     );
     console.log("Created webhook:", webhook.id);
     console.log("Secret:", webhook.secret); // Store this securely!
@@ -831,7 +839,7 @@ function verifyWebhookSignature(payload, signature) {
 
   return crypto.timingSafeEqual(
     Buffer.from(expected, "utf8"),
-    Buffer.from(signature || "", "utf8")
+    Buffer.from(signature || "", "utf8"),
   );
 }
 
@@ -876,7 +884,7 @@ async function fetchAllCampaigns() {
 
   while (true) {
     const response = await fundoraFetch(
-      `/api/campaigns?limit=${limit}&offset=${offset}`
+      `/api/campaigns?limit=${limit}&offset=${offset}`,
     );
 
     allCampaigns.push(...response.data);

@@ -40,62 +40,67 @@ export default function CreatorProfile() {
     });
   }, []);
 
-  const loadProfile = useCallback(async (userId) => {
-    queueMicrotask(() => setLoading(true));
-    try {
-      const { data: profileRow } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId)
-        .maybeSingle();
-
-      const { data: projectRows } = await supabase
-        .from("projects")
-        .select("*")
-        .eq("owner_id", userId)
-        .order("created_at", { ascending: false });
-
-      const { count: followersCount } = await supabase
-        .from("followers")
-        .select("id", { count: "exact", head: true })
-        .eq("following_id", userId);
-
-      const { count: followingCount } = await supabase
-        .from("followers")
-        .select("id", { count: "exact", head: true })
-        .eq("follower_id", userId);
-
-      if (currentUserId && !followTouchedRef.current) {
-        const { data } = await supabase
-          .from("followers")
-          .select("id")
-          .eq("follower_id", currentUserId)
-          .eq("following_id", userId)
+  const loadProfile = useCallback(
+    async (userId) => {
+      queueMicrotask(() => setLoading(true));
+      try {
+        const { data: profileRow } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", userId)
           .maybeSingle();
 
-        setIsFollowing(!!data);
+        const { data: projectRows } = await supabase
+          .from("projects")
+          .select("*")
+          .eq("owner_id", userId)
+          .order("created_at", { ascending: false });
+
+        const { count: followersCount } = await supabase
+          .from("followers")
+          .select("id", { count: "exact", head: true })
+          .eq("following_id", userId);
+
+        const { count: followingCount } = await supabase
+          .from("followers")
+          .select("id", { count: "exact", head: true })
+          .eq("follower_id", userId);
+
+        if (currentUserId && !followTouchedRef.current) {
+          const { data } = await supabase
+            .from("followers")
+            .select("id")
+            .eq("follower_id", currentUserId)
+            .eq("following_id", userId)
+            .maybeSingle();
+
+          setIsFollowing(!!data);
+        }
+
+        // Fetch verification data (non-sensitive fields only)
+        const { data: verificationRow } = await supabase
+          .from("creator_verifications")
+          .select(
+            "verification_level, verification_status, trust_score, risk_score, email_verified, phone_verified, identity_verified, bank_verified, business_verified, selfie_verified",
+          )
+          .eq("user_id", userId)
+          .maybeSingle();
+
+        setVerification(verificationRow);
+
+        setProfile({
+          ...profileRow,
+          followers_count: followersCount || 0,
+          following_count: followingCount || 0,
+        });
+
+        setProjects(projectRows || []);
+      } finally {
+        queueMicrotask(() => setLoading(false));
       }
-
-      // Fetch verification data (non-sensitive fields only)
-      const { data: verificationRow } = await supabase
-        .from("creator_verifications")
-        .select("verification_level, verification_status, trust_score, risk_score, email_verified, phone_verified, identity_verified, bank_verified, business_verified, selfie_verified")
-        .eq("user_id", userId)
-        .maybeSingle();
-
-      setVerification(verificationRow);
-
-      setProfile({
-        ...profileRow,
-        followers_count: followersCount || 0,
-        following_count: followingCount || 0,
-      });
-
-      setProjects(projectRows || []);
-    } finally {
-      queueMicrotask(() => setLoading(false));
-    }
-  }, [currentUserId]);
+    },
+    [currentUserId],
+  );
 
   useEffect(() => {
     if (id && currentUserId !== undefined) {
@@ -108,7 +113,10 @@ export default function CreatorProfile() {
     e.preventDefault();
     e.stopPropagation();
 
-    if (!currentUserId) { router.push("/login"); return; }
+    if (!currentUserId) {
+      router.push("/login");
+      return;
+    }
     if (currentUserId === id) return;
 
     followTouchedRef.current = true;
@@ -166,33 +174,54 @@ export default function CreatorProfile() {
   /* ─── DERIVED DATA ─── */
   const totalRaised = useMemo(
     () => projects.reduce((sum, p) => sum + (p.pledged || 0), 0),
-    [projects]
+    [projects],
   );
 
   const achievements = useMemo(() => {
     const list = [];
     if (!profile) return list;
     if (projects.length >= 1)
-      list.push({ icon: "rocket_launch", title: "First Launch",
-        description: "Successfully launched their first project on Fundora." });
+      list.push({
+        icon: "rocket_launch",
+        title: "First Launch",
+        description: "Successfully launched their first project on Fundora.",
+      });
     if (projects.length >= 5)
-      list.push({ icon: "emoji_events", title: "Impact Leader",
-        description: "Launched 5+ projects, driving innovation forward." });
+      list.push({
+        icon: "emoji_events",
+        title: "Impact Leader",
+        description: "Launched 5+ projects, driving innovation forward.",
+      });
     if (profile.followers_count >= 100)
-      list.push({ icon: "workspace_premium", title: "Top 1% Creator",
-        description: "Recognized among the most followed creators on Fundora." });
+      list.push({
+        icon: "workspace_premium",
+        title: "Top 1% Creator",
+        description: "Recognized among the most followed creators on Fundora.",
+      });
     if (profile.followers_count >= 50)
-      list.push({ icon: "favorite", title: "Community Favorite",
-        description: "Beloved by 50+ backers and community members." });
+      list.push({
+        icon: "favorite",
+        title: "Community Favorite",
+        description: "Beloved by 50+ backers and community members.",
+      });
     if (totalRaised >= 10000)
-      list.push({ icon: "payments", title: "Legacy Milestone",
-        description: "Raised over ₹10,000 across all projects." });
+      list.push({
+        icon: "payments",
+        title: "Legacy Milestone",
+        description: "Raised over ₹10,000 across all projects.",
+      });
     if (projects.some((p) => p.pledged >= p.goal && p.goal > 0))
-      list.push({ icon: "emoji_events", title: "Fully Funded",
-        description: "Achieved 100% funding on at least one project." });
+      list.push({
+        icon: "emoji_events",
+        title: "Fully Funded",
+        description: "Achieved 100% funding on at least one project.",
+      });
     if (projects.length >= 3)
-      list.push({ icon: "public", title: "Global Architect",
-        description: "Created 3+ projects impacting diverse communities." });
+      list.push({
+        icon: "public",
+        title: "Global Architect",
+        description: "Created 3+ projects impacting diverse communities.",
+      });
     return list;
   }, [projects, profile, totalRaised]);
 
@@ -201,7 +230,11 @@ export default function CreatorProfile() {
     return (
       <div className="min-h-screen flex flex-col bg-surface-dim">
         <Navbar />
-        <div className="flex-1 flex items-center justify-center" role="status" aria-label="Loading creator profile">
+        <div
+          className="flex-1 flex items-center justify-center"
+          role="status"
+          aria-label="Loading creator profile"
+        >
           <span
             className="material-symbols-outlined animate-spin text-primary text-4xl"
             style={{ fontVariationSettings: "'FILL' 1" }}
@@ -220,7 +253,9 @@ export default function CreatorProfile() {
       <div className="min-h-screen flex flex-col bg-surface-dim">
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-on-surface-variant font-inter text-lg">Profile not found.</p>
+          <p className="text-on-surface-variant font-inter text-lg">
+            Profile not found.
+          </p>
         </div>
         <Footer />
       </div>
@@ -230,7 +265,7 @@ export default function CreatorProfile() {
   const avatar =
     profile.avatar_url ||
     `https://ui-avatars.com/api/?name=${encodeURIComponent(
-      profile.full_name || "User"
+      profile.full_name || "User",
     )}&background=0D8ABC&color=fff&size=256`;
 
   const banner =
@@ -252,8 +287,12 @@ export default function CreatorProfile() {
         <ProfileActions
           isOwner={currentUserId === profile.id}
           isFollowing={isFollowing}
-          onEdit={() => { router.push("/edit-profile"); }}
-          onMessage={() => { router.push(`/dm/${profile.id}`); }}
+          onEdit={() => {
+            router.push("/edit-profile");
+          }}
+          onMessage={() => {
+            router.push(`/dm/${profile.id}`);
+          }}
           onFollow={followUser}
           onUnfollow={unfollowUser}
         />
@@ -269,7 +308,9 @@ export default function CreatorProfile() {
               {currentUserId === profile.id && verification && (
                 <VerificationCard
                   verification={verification}
-                  onNavigate={() => { router.push("/creator/verification"); }}
+                  onNavigate={() => {
+                    router.push("/creator/verification");
+                  }}
                 />
               )}
             </>

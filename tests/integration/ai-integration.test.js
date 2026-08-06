@@ -73,14 +73,25 @@ vi.mock("../../lib/ai/modelRouter", () => ({
 }));
 
 vi.mock("../../lib/ai/tokenTracker", () => ({
-  trackTokenUsage: vi.fn().mockResolvedValue({ success: true, data: { id: "usage-1", costCents: 0.5 } }),
-  checkUsageLimit: vi.fn().mockResolvedValue({ success: true, data: { allowed: true } }),
-  getUsageStats: vi.fn().mockResolvedValue({ success: true, data: { totalTokens: 5000, totalCost: 10.0 } }),
+  trackTokenUsage: vi.fn().mockResolvedValue({
+    success: true,
+    data: { id: "usage-1", costCents: 0.5 },
+  }),
+  checkUsageLimit: vi
+    .fn()
+    .mockResolvedValue({ success: true, data: { allowed: true } }),
+  getUsageStats: vi.fn().mockResolvedValue({
+    success: true,
+    data: { totalTokens: 5000, totalCost: 10.0 },
+  }),
   calculateCost: vi.fn().mockReturnValue(0.5),
 }));
 
 vi.mock("../../lib/ai/costTracker", () => ({
-  recordAICost: vi.fn().mockResolvedValue({ success: true, data: { id: "cost-1", costCents: 0.5 } }),
+  recordAICost: vi.fn().mockResolvedValue({
+    success: true,
+    data: { id: "cost-1", costCents: 0.5 },
+  }),
   getCostSummary: vi.fn().mockResolvedValue({
     success: true,
     data: { totalCostCents: 5.0, byModel: {}, byOperation: {} },
@@ -100,8 +111,15 @@ import {
   addMessage,
   getConversationContext,
 } from "../../lib/ai/conversationMemory";
-import { createEmbedding, searchEmbeddings } from "../../lib/ai/embeddingEngine";
-import { indexKnowledgeArticle, searchKnowledge, chunkDocument } from "../../lib/ai/knowledgeEngine";
+import {
+  createEmbedding,
+  searchEmbeddings,
+} from "../../lib/ai/embeddingEngine";
+import {
+  indexKnowledgeArticle,
+  searchKnowledge,
+  chunkDocument,
+} from "../../lib/ai/knowledgeEngine";
 import { getSimilarCampaigns } from "../../lib/ai/recommendationEngine";
 import { batchPredict } from "../../lib/ai/predictionEngine";
 import { scoreCampaignQuality } from "../../lib/ai/campaignAI";
@@ -173,7 +191,7 @@ describe("AI Platform Integration", () => {
       expect.objectContaining({
         userId: "user-1",
         taskType: "campaign_quality",
-      })
+      }),
     );
 
     // Cost was recorded
@@ -181,7 +199,7 @@ describe("AI Platform Integration", () => {
       expect.objectContaining({
         userId: "user-1",
         taskType: "campaign_quality",
-      })
+      }),
     );
 
     // Result includes token and cost data
@@ -237,10 +255,16 @@ describe("AI Platform Integration", () => {
           }),
         };
       }
-      return { update: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }) };
+      return {
+        update: vi
+          .fn()
+          .mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
+      };
     });
     supabaseAdmin.from.mockImplementationOnce(() => ({
-      update: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
+      update: vi
+        .fn()
+        .mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
     }));
 
     const userMsg = await addMessage({
@@ -274,7 +298,11 @@ describe("AI Platform Integration", () => {
             eq: vi.fn().mockReturnValue({
               order: vi.fn().mockResolvedValue({
                 data: [
-                  { role: "user", content: "How do I improve my campaign?", created_at: new Date().toISOString() },
+                  {
+                    role: "user",
+                    content: "How do I improve my campaign?",
+                    created_at: new Date().toISOString(),
+                  },
                 ],
                 error: null,
               }),
@@ -344,7 +372,9 @@ describe("AI Platform Integration", () => {
     expect(result.data.chunkCount).toBeGreaterThan(1);
 
     // Verify chunking works standalone
-    const chunks = chunkDocument({ content: "Hello world. This is a test sentence for chunking." });
+    const chunks = chunkDocument({
+      content: "Hello world. This is a test sentence for chunking.",
+    });
     expect(chunks.success).toBe(true);
     expect(chunks.data.chunks.length).toBeGreaterThanOrEqual(1);
     expect(chunks.data.chunks[0].text).toBeTruthy();
@@ -382,8 +412,18 @@ describe("AI Platform Integration", () => {
     // Mock embedding search to return similar campaigns
     supabaseAdmin.rpc.mockResolvedValueOnce({
       data: [
-        { entity_id: "campaign-sim-1", entity_type: "campaign", similarity: 0.85, metadata: { inputPreview: "Similar tech campaign" } },
-        { entity_id: "campaign-sim-2", entity_type: "campaign", similarity: 0.72, metadata: { inputPreview: "Another tech project" } },
+        {
+          entity_id: "campaign-sim-1",
+          entity_type: "campaign",
+          similarity: 0.85,
+          metadata: { inputPreview: "Similar tech campaign" },
+        },
+        {
+          entity_id: "campaign-sim-2",
+          entity_type: "campaign",
+          similarity: 0.72,
+          metadata: { inputPreview: "Another tech project" },
+        },
       ],
       error: null,
     });
@@ -393,7 +433,11 @@ describe("AI Platform Integration", () => {
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
           single: vi.fn().mockResolvedValue({
-            data: { title: "Similar Tech", category: "technology", status: "active" },
+            data: {
+              title: "Similar Tech",
+              category: "technology",
+              status: "active",
+            },
             error: null,
           }),
         }),
@@ -412,9 +456,39 @@ describe("AI Platform Integration", () => {
 
   it("batchPredict processes predictions for multiple campaigns", async () => {
     const campaigns = [
-      { id: "c1", title: "Health App", goal_amount: 30000, current_amount: 15000, category: "health", created_at: "2025-01-01T00:00:00Z", donor_count: 50, update_count: 5, creator_id: "u1" },
-      { id: "c2", title: "Education Fund", goal_amount: 10000, current_amount: 2000, category: "education", created_at: "2025-06-01T00:00:00Z", donor_count: 10, update_count: 1, creator_id: "u2" },
-      { id: "c3", title: "Art Project", goal_amount: 5000, current_amount: 5000, category: "arts", created_at: "2025-03-01T00:00:00Z", donor_count: 80, update_count: 12, creator_id: "u3" },
+      {
+        id: "c1",
+        title: "Health App",
+        goal_amount: 30000,
+        current_amount: 15000,
+        category: "health",
+        created_at: "2025-01-01T00:00:00Z",
+        donor_count: 50,
+        update_count: 5,
+        creator_id: "u1",
+      },
+      {
+        id: "c2",
+        title: "Education Fund",
+        goal_amount: 10000,
+        current_amount: 2000,
+        category: "education",
+        created_at: "2025-06-01T00:00:00Z",
+        donor_count: 10,
+        update_count: 1,
+        creator_id: "u2",
+      },
+      {
+        id: "c3",
+        title: "Art Project",
+        goal_amount: 5000,
+        current_amount: 5000,
+        category: "arts",
+        created_at: "2025-03-01T00:00:00Z",
+        donor_count: 80,
+        update_count: 12,
+        creator_id: "u3",
+      },
     ];
 
     // Mock fetch for each campaign
@@ -524,7 +598,13 @@ describe("AI Platform Integration", () => {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               single: vi.fn().mockResolvedValue({
-                data: { id: "camp-1", title: "My Campaign", description: "Test", goal_amount: 10000, category: "technology" },
+                data: {
+                  id: "camp-1",
+                  title: "My Campaign",
+                  description: "Test",
+                  goal_amount: 10000,
+                  category: "technology",
+                },
                 error: null,
               }),
             }),
@@ -593,8 +673,12 @@ describe("AI Platform Integration", () => {
 
   it("provider failure is caught and returned as failure without crashing", async () => {
     const failingProvider = {
-      chatCompletion: vi.fn().mockRejectedValue(new Error("Provider rate limit exceeded")),
-      createEmbedding: vi.fn().mockRejectedValue(new Error("Provider unavailable")),
+      chatCompletion: vi
+        .fn()
+        .mockRejectedValue(new Error("Provider rate limit exceeded")),
+      createEmbedding: vi
+        .fn()
+        .mockRejectedValue(new Error("Provider unavailable")),
     };
     getActiveModelProvider.mockReturnValueOnce(failingProvider);
 
@@ -615,7 +699,7 @@ describe("AI Platform Integration", () => {
     expect(logAuditEvent).toHaveBeenCalledWith(
       expect.objectContaining({
         action: expect.stringContaining("failed"),
-      })
+      }),
     );
   });
 });

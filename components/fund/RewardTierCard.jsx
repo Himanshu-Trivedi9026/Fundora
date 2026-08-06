@@ -18,18 +18,24 @@ export default function RewardTierCard({ tier, selected, onSelect }) {
       {/* Left content */}
       <div className="space-y-1 flex-1">
         <div className="flex items-center gap-2">
-          <span className="font-bold text-lg text-on-surface font-geist">{tier.title}</span>
+          <span className="font-bold text-lg text-on-surface font-geist">
+            {tier.title}
+          </span>
           {tier.badge && (
             <span className="px-2 py-0.5 bg-primary/10 text-primary text-[10px] uppercase tracking-wider font-bold rounded font-inter">
               {tier.badge}
             </span>
           )}
         </div>
-        <p className="text-on-surface-variant text-sm font-inter">{tier.desc}</p>
+        <p className="text-on-surface-variant text-sm font-inter">
+          {tier.desc}
+        </p>
         <div className="flex items-center gap-4 mt-3">
           {tier.deliveryDate && (
             <span className="flex items-center gap-1 text-xs text-on-surface-variant font-inter">
-              <span className="material-symbols-outlined text-sm">schedule</span>
+              <span className="material-symbols-outlined text-sm">
+                schedule
+              </span>
               {tier.deliveryDate}
             </span>
           )}
@@ -47,7 +53,9 @@ export default function RewardTierCard({ tier, selected, onSelect }) {
         <div className="text-2xl font-bold text-primary font-geist">
           ₹{tier.amount.toLocaleString("en-IN")}
         </div>
-        <div className="text-xs text-on-surface-variant font-inter">Minimum Contribution</div>
+        <div className="text-xs text-on-surface-variant font-inter">
+          Minimum Contribution
+        </div>
       </div>
 
       {/* Selection indicator */}

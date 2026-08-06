@@ -3,7 +3,10 @@ import Razorpay from "razorpay";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 import { withAuth } from "../../../lib/withAuth";
 import { rateLimit } from "../../../lib/rateLimit";
-import { sendNotification, NOTIFICATION_TYPES } from "../../../lib/notification";
+import {
+  sendNotification,
+  NOTIFICATION_TYPES,
+} from "../../../lib/notification";
 import { isCreatorVerified } from "../../../lib/verification/status";
 
 const rl = rateLimit({ windowMs: 60_000, max: 10 });
@@ -47,9 +50,10 @@ export default withAuth(async function handler(req, res, user) {
       .maybeSingle();
 
     if (existing) {
-      return res
-        .status(409)
-        .json({ error: "This payment has already been processed", donationId: existing.id });
+      return res.status(409).json({
+        error: "This payment has already been processed",
+        donationId: existing.id,
+      });
     }
 
     const { data: project, error: projectError } = await supabaseAdmin
@@ -76,7 +80,9 @@ export default withAuth(async function handler(req, res, user) {
     const keyId =
       creatorConfig?.razorpay_key_id || process.env.RAZORPAY_KEY_ID || "";
     const keySecret =
-      creatorConfig?.razorpay_key_secret || process.env.RAZORPAY_KEY_SECRET || "";
+      creatorConfig?.razorpay_key_secret ||
+      process.env.RAZORPAY_KEY_SECRET ||
+      "";
 
     if (!keyId || !keySecret) {
       return res.status(500).json({ error: "Payment system not configured" });
@@ -117,7 +123,9 @@ export default withAuth(async function handler(req, res, user) {
       ]);
     } catch (fetchErr) {
       console.error("Razorpay fetch error:", fetchErr);
-      return res.status(400).json({ error: "Unable to verify payment with Razorpay" });
+      return res
+        .status(400)
+        .json({ error: "Unable to verify payment with Razorpay" });
     }
 
     // The payment must belong to this order.
@@ -127,16 +135,24 @@ export default withAuth(async function handler(req, res, user) {
 
     // The order must be bound to this project and payer (set at creation time).
     if (order.notes?.project_id !== projectId) {
-      return res.status(400).json({ error: "Order is not bound to this project" });
+      return res
+        .status(400)
+        .json({ error: "Order is not bound to this project" });
     }
     if (order.notes?.payer_id !== payerId) {
-      return res.status(400).json({ error: "Order is not bound to this payer" });
+      return res
+        .status(400)
+        .json({ error: "Order is not bound to this payer" });
     }
 
     // Use the amount Razorpay actually captured (paise → rupees), never the
     // client-supplied amount.
     const capturedAmount = Number(payment.amount) / 100;
-    if (!capturedAmount || capturedAmount <= 0 || !Number.isFinite(capturedAmount)) {
+    if (
+      !capturedAmount ||
+      capturedAmount <= 0 ||
+      !Number.isFinite(capturedAmount)
+    ) {
       return res.status(400).json({ error: "Payment amount is invalid" });
     }
 

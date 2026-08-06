@@ -28,52 +28,52 @@ Notifications are soft-deleted (not hard-deleted) for auditability.
 
 ## Notification Types
 
-| Constant | Value | Domain |
-|----------|-------|--------|
-| `CAMPAIGN_CREATED` | `"campaign_created"` | Campaign lifecycle |
-| `CAMPAIGN_FUNDED` | `"campaign_funded"` | Campaign lifecycle |
-| `CAMPAIGN_COMPLETED` | `"campaign_completed"` | Campaign lifecycle |
-| `CAMPAIGN_FAILED` | `"campaign_failed"` | Campaign lifecycle |
-| `DONATION_RECEIVED` | `"donation_received"` | Donations |
-| `DONATION_FAILED` | `"donation_failed"` | Donations |
-| `MILESTONE_SUBMITTED` | `"milestone_submitted"` | Milestones |
-| `MILESTONE_APPROVED` | `"milestone_approved"` | Milestones |
-| `MILESTONE_REJECTED` | `"milestone_rejected"` | Milestones |
-| `ESCROW_FUNDED` | `"escrow_funded"` | Escrow |
-| `ESCROW_RELEASED` | `"escrow_released"` | Escrow |
-| `ESCROW_REFUNDED` | `"escrow_refunded"` | Escrow |
-| `PAYOUT_REQUESTED` | `"payout_requested"` | Payouts |
-| `PAYOUT_COMPLETED` | `"payout_completed"` | Payouts |
-| `PAYOUT_FAILED` | `"payout_failed"` | Payouts |
-| `VERIFICATION_COMPLETED` | `"verification_completed"` | Verification |
-| `VERIFICATION_FAILED` | `"verification_failed"` | Verification |
-| `APPEAL_SUBMITTED` | `"appeal_submitted"` | Appeals |
-| `APPEAL_DECIDED` | `"appeal_decided"` | Appeals |
-| `FRAUD_ALERT` | `"fraud_alert"` | Security |
-| `COMPLIANCE_ALERT` | `"compliance_alert"` | Security |
-| `SYSTEM_ANNOUNCEMENT` | `"system_announcement"` | System |
-| `TRUST_SCORE_UPDATED` | `"trust_score_updated"` | Trust |
-| `ACCOUNT_SUSPENDED` | `"account_suspended"` | Account |
-| `ACCOUNT_REACTIVATED` | `"account_reactivated"` | Account |
+| Constant                 | Value                      | Domain             |
+| ------------------------ | -------------------------- | ------------------ |
+| `CAMPAIGN_CREATED`       | `"campaign_created"`       | Campaign lifecycle |
+| `CAMPAIGN_FUNDED`        | `"campaign_funded"`        | Campaign lifecycle |
+| `CAMPAIGN_COMPLETED`     | `"campaign_completed"`     | Campaign lifecycle |
+| `CAMPAIGN_FAILED`        | `"campaign_failed"`        | Campaign lifecycle |
+| `DONATION_RECEIVED`      | `"donation_received"`      | Donations          |
+| `DONATION_FAILED`        | `"donation_failed"`        | Donations          |
+| `MILESTONE_SUBMITTED`    | `"milestone_submitted"`    | Milestones         |
+| `MILESTONE_APPROVED`     | `"milestone_approved"`     | Milestones         |
+| `MILESTONE_REJECTED`     | `"milestone_rejected"`     | Milestones         |
+| `ESCROW_FUNDED`          | `"escrow_funded"`          | Escrow             |
+| `ESCROW_RELEASED`        | `"escrow_released"`        | Escrow             |
+| `ESCROW_REFUNDED`        | `"escrow_refunded"`        | Escrow             |
+| `PAYOUT_REQUESTED`       | `"payout_requested"`       | Payouts            |
+| `PAYOUT_COMPLETED`       | `"payout_completed"`       | Payouts            |
+| `PAYOUT_FAILED`          | `"payout_failed"`          | Payouts            |
+| `VERIFICATION_COMPLETED` | `"verification_completed"` | Verification       |
+| `VERIFICATION_FAILED`    | `"verification_failed"`    | Verification       |
+| `APPEAL_SUBMITTED`       | `"appeal_submitted"`       | Appeals            |
+| `APPEAL_DECIDED`         | `"appeal_decided"`         | Appeals            |
+| `FRAUD_ALERT`            | `"fraud_alert"`            | Security           |
+| `COMPLIANCE_ALERT`       | `"compliance_alert"`       | Security           |
+| `SYSTEM_ANNOUNCEMENT`    | `"system_announcement"`    | System             |
+| `TRUST_SCORE_UPDATED`    | `"trust_score_updated"`    | Trust              |
+| `ACCOUNT_SUSPENDED`      | `"account_suspended"`      | Account            |
+| `ACCOUNT_REACTIVATED`    | `"account_reactivated"`    | Account            |
 
 ## Channels
 
-| Channel | Description |
-|---------|-------------|
+| Channel  | Description                          |
+| -------- | ------------------------------------ |
 | `in_app` | In-app notification (always enabled) |
-| `email` | Email delivery |
-| `sms` | SMS delivery |
-| `push` | Push notification |
+| `email`  | Email delivery                       |
+| `sms`    | SMS delivery                         |
+| `push`   | Push notification                    |
 
 ## Digest Frequencies
 
-| Frequency | Description |
-|-----------|-------------|
-| `realtime` | Send immediately (default) |
-| `hourly` | Batched hourly |
-| `daily` | Batched daily |
-| `weekly` | Batched weekly |
-| `never` | Do not send digest notifications |
+| Frequency  | Description                      |
+| ---------- | -------------------------------- |
+| `realtime` | Send immediately (default)       |
+| `hourly`   | Batched hourly                   |
+| `daily`    | Batched daily                    |
+| `weekly`   | Batched weekly                   |
+| `never`    | Do not send digest notifications |
 
 ## Key Functions
 
@@ -82,6 +82,7 @@ Notifications are soft-deleted (not hard-deleted) for auditability.
 Creates a single notification.
 
 **Parameters:**
+
 - `userId` (string, required) — Target user ID
 - `notificationType` (string, required) — Type from NOTIFICATION_TYPES
 - `title` (string, required) — Notification title
@@ -117,6 +118,7 @@ Soft-deletes a notification (sets `deleted: true`). Ownership check enforced.
 Sends a notification across configured channels. Always creates an in-app notification. Email/SMS/Push are sent based on user's notification preferences.
 
 **Channel Resolution Logic:**
+
 1. Load user preferences
 2. Check global channel enable/disable (`email_enabled`, `sms_enabled`, `push_enabled`)
 3. Check type-specific preferences (`notification_types[type].email`, etc.)
@@ -149,6 +151,7 @@ Sends a notification across configured channels. Always creates an in-app notifi
 ```
 
 **Key design decisions:**
+
 - SMS is off by default globally but enabled for critical events (milestone approved/rejected, fraud alerts)
 - IN_APP is always force-enabled — even if a user disables it, `sendNotification` appends it back
 - Preferences are stored in `notification_preferences` table, scoped per `user_id`
@@ -166,58 +169,58 @@ Updates user's notification preferences via upsert. Logged as audit event `notif
 
 ### Notifications Table
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | UUID | Primary key |
-| `user_id` | UUID | Target user (FK → auth.users) |
-| `notification_type` | TEXT | Notification type |
-| `title` | TEXT | Title |
-| `body` | TEXT | Body text |
-| `data` | JSONB | Additional payload |
-| `read` | BOOLEAN | Read status |
-| `read_at` | TIMESTAMPTZ | When marked as read |
-| `channel` | TEXT | Delivery channel |
-| `sent_via` | TEXT[] | Channels sent via |
-| `delivered` | BOOLEAN | Delivery status |
-| `delivered_at` | TIMESTAMPTZ | When delivered |
-| `metadata` | JSONB | Extra metadata |
+| Column              | Type        | Description                   |
+| ------------------- | ----------- | ----------------------------- |
+| `id`                | UUID        | Primary key                   |
+| `user_id`           | UUID        | Target user (FK → auth.users) |
+| `notification_type` | TEXT        | Notification type             |
+| `title`             | TEXT        | Title                         |
+| `body`              | TEXT        | Body text                     |
+| `data`              | JSONB       | Additional payload            |
+| `read`              | BOOLEAN     | Read status                   |
+| `read_at`           | TIMESTAMPTZ | When marked as read           |
+| `channel`           | TEXT        | Delivery channel              |
+| `sent_via`          | TEXT[]      | Channels sent via             |
+| `delivered`         | BOOLEAN     | Delivery status               |
+| `delivered_at`      | TIMESTAMPTZ | When delivered                |
+| `metadata`          | JSONB       | Extra metadata                |
 
 ### Notification Preferences Table
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | UUID | Primary key |
-| `user_id` | UUID | Owner (unique) |
-| `email_enabled` | BOOLEAN | Global email toggle |
-| `sms_enabled` | BOOLEAN | Global SMS toggle |
-| `push_enabled` | BOOLEAN | Global push toggle |
-| `in_app_enabled` | BOOLEAN | Global in-app toggle |
-| `email_addresses` | TEXT[] | Email addresses |
-| `phone_numbers` | TEXT[] | Phone numbers |
-| `quiet_hours_start` | TIME | Quiet hours begin |
-| `quiet_hours_end` | TIME | Quiet hours end |
-| `timezone` | TEXT | User timezone |
-| `digest_frequency` | TEXT | Digest frequency |
-| `category_preferences` | JSONB | Per-category settings |
+| Column                 | Type    | Description           |
+| ---------------------- | ------- | --------------------- |
+| `id`                   | UUID    | Primary key           |
+| `user_id`              | UUID    | Owner (unique)        |
+| `email_enabled`        | BOOLEAN | Global email toggle   |
+| `sms_enabled`          | BOOLEAN | Global SMS toggle     |
+| `push_enabled`         | BOOLEAN | Global push toggle    |
+| `in_app_enabled`       | BOOLEAN | Global in-app toggle  |
+| `email_addresses`      | TEXT[]  | Email addresses       |
+| `phone_numbers`        | TEXT[]  | Phone numbers         |
+| `quiet_hours_start`    | TIME    | Quiet hours begin     |
+| `quiet_hours_end`      | TIME    | Quiet hours end       |
+| `timezone`             | TEXT    | User timezone         |
+| `digest_frequency`     | TEXT    | Digest frequency      |
+| `category_preferences` | JSONB   | Per-category settings |
 
 ## Platform Intelligence
 
 The platform intelligence engine (`lib/platformIntelligence/`) provides analytics for monitoring platform health:
 
-| Function | Description |
-|----------|-------------|
-| `calculatePlatformHealth()` | Composite health score (0–100) |
-| `calculateTrustDistribution()` | Trust score histogram |
-| `getFraudTrends()` | Fraud alerts over time |
-| `getEscrowStats()` | Escrow utilization metrics |
-| `getMilestoneCompletionStats()` | Milestone completion rates |
-| `getPayoutSuccessStats()` | Payout processing metrics |
-| `getUserGrowthStats()` | User growth over time |
-| `getCampaignPerformanceStats()` | Campaign funnel metrics |
-| `getVerificationStats()` | KYC/verification metrics |
-| `getEngagementMetrics()` | Engagement KPIs |
-| `getModerationStats()` | Moderation queue metrics |
-| `storeMetric()` / `getStoredMetrics()` | Metric persistence |
+| Function                               | Description                    |
+| -------------------------------------- | ------------------------------ |
+| `calculatePlatformHealth()`            | Composite health score (0–100) |
+| `calculateTrustDistribution()`         | Trust score histogram          |
+| `getFraudTrends()`                     | Fraud alerts over time         |
+| `getEscrowStats()`                     | Escrow utilization metrics     |
+| `getMilestoneCompletionStats()`        | Milestone completion rates     |
+| `getPayoutSuccessStats()`              | Payout processing metrics      |
+| `getUserGrowthStats()`                 | User growth over time          |
+| `getCampaignPerformanceStats()`        | Campaign funnel metrics        |
+| `getVerificationStats()`               | KYC/verification metrics       |
+| `getEngagementMetrics()`               | Engagement KPIs                |
+| `getModerationStats()`                 | Moderation queue metrics       |
+| `storeMetric()` / `getStoredMetrics()` | Metric persistence             |
 
 ## Usage Example
 

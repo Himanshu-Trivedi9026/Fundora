@@ -9,11 +9,13 @@ Phase 6 transforms Fundora into a platform with secure money flow. The implement
 ### Files Created
 
 #### Database Migration
+
 - `supabase/migrations/006_escrow_milestones_payouts.sql` — 9 new tables with RLS policies, indexes, and triggers
 
 #### Core Library Modules (13 files)
 
 **Escrow Engine:**
+
 - `lib/escrow/escrowAccount.js` — Account CRUD & status lifecycle
 - `lib/escrow/escrowLedger.js` — Immutable append-only ledger
 - `lib/escrow/escrowRules.js` — Business rules (pure functions)
@@ -26,36 +28,43 @@ Phase 6 transforms Fundora into a platform with secure money flow. The implement
 - `lib/escrow/index.js` — Barrel exports
 
 **Milestone System:**
+
 - `lib/milestone/milestoneEngine.js` — Milestone CRUD & lifecycle
 - `lib/milestone/milestoneSubmission.js` — Creator submissions
 - `lib/milestone/milestoneReview.js` — Donor reviews & voting
 - `lib/milestone/index.js` — Barrel exports
 
 **Payout System:**
+
 - `lib/payout/payoutEngine.js` — Payout management with fraud integration
 - `lib/payout/index.js` — Barrel exports
 
 #### API Routes (12 files)
 
 **Escrow:**
+
 - `pages/api/escrow/account.js` — GET/POST escrow accounts
 - `pages/api/escrow/ledger.js` — GET ledger entries, balance, summary
 - `pages/api/escrow/release.js` — POST release/freeze
 
 **Milestone:**
+
 - `pages/api/milestone/index.js` — GET/POST/PUT milestones
 - `pages/api/milestone/submit.js` — GET/POST submissions
 - `pages/api/milestone/review.js` — GET/POST reviews
 
 **Payout:**
+
 - `pages/api/payout/index.js` — GET/POST payout requests
 - `pages/api/payout/status.js` — GET payout status/history
 
 **Admin:**
+
 - `pages/api/admin/escrow-dashboard.js` — GET/POST admin escrow operations
 - `pages/api/admin/payout-review.js` — GET/POST payout approvals
 
 **Creator:**
+
 - `pages/api/creator/balance.js` — GET creator balance
 
 #### UI Components (6 files)
@@ -116,6 +125,7 @@ Phase 6 transforms Fundora into a platform with secure money flow. The implement
 ### 3. Optimistic Locking
 
 All concurrent operations use optimistic locking via status columns:
+
 ```javascript
 .eq("id", escrowAccountId)
 .eq("status", current.status) // Optimistic lock
@@ -131,6 +141,7 @@ All concurrent operations use optimistic locking via status columns:
 ### 5. Fraud-First Payouts
 
 Every payout request is evaluated by the fraud engine:
+
 - `payout_request` — Initial request
 - `payout_processing` — Before provider call
 - `payout_retry` — On retry attempts

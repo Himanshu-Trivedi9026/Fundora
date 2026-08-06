@@ -23,7 +23,10 @@ describe("Backup Engine", () => {
 
     const stats = {
       total: backups.length,
-      totalSizeBytes: backups.reduce((s, b) => s + Number(b.size_bytes || 0), 0),
+      totalSizeBytes: backups.reduce(
+        (s, b) => s + Number(b.size_bytes || 0),
+        0,
+      ),
       byStatus: {},
     };
 
@@ -41,7 +44,10 @@ describe("Backup Engine", () => {
 describe("Retention Engine", () => {
   it("should enforce max backup count", () => {
     const maxBackups = 30;
-    const backups = Array.from({ length: 35 }, (_, i) => ({ id: i, created_at: new Date() }));
+    const backups = Array.from({ length: 35 }, (_, i) => ({
+      id: i,
+      created_at: new Date(),
+    }));
 
     let kept = 0;
     const deleted = [];
@@ -70,9 +76,18 @@ describe("Retention Engine", () => {
 
   it("should estimate retention impact", () => {
     const backups = [
-      { created_at: new Date(Date.now() - 10 * 86400000).toISOString(), size_bytes: 5000 },
-      { created_at: new Date(Date.now() - 50 * 86400000).toISOString(), size_bytes: 3000 },
-      { created_at: new Date(Date.now() - 100 * 86400000).toISOString(), size_bytes: 2000 },
+      {
+        created_at: new Date(Date.now() - 10 * 86400000).toISOString(),
+        size_bytes: 5000,
+      },
+      {
+        created_at: new Date(Date.now() - 50 * 86400000).toISOString(),
+        size_bytes: 3000,
+      },
+      {
+        created_at: new Date(Date.now() - 100 * 86400000).toISOString(),
+        size_bytes: 2000,
+      },
     ];
 
     const retentionDays = 90;

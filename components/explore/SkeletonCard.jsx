@@ -3,7 +3,11 @@
  */
 export default function SkeletonCard() {
   return (
-    <div className="glass-card rounded-xl overflow-hidden flex flex-col h-full opacity-60" role="status" aria-label="Loading project card">
+    <div
+      className="glass-card rounded-xl overflow-hidden flex flex-col h-full opacity-60"
+      role="status"
+      aria-label="Loading project card"
+    >
       <div className="h-48 shimmer" aria-hidden="true" />
       <div className="p-6 space-y-4" aria-hidden="true">
         <div className="h-6 w-3/4 shimmer rounded" />

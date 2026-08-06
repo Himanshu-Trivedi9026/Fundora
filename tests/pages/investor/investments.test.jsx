@@ -1,6 +1,8 @@
 import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import InvestorInvestments, { INVESTMENTS_TIMEOUT_MS } from "../../../pages/investor/investments";
+import InvestorInvestments, {
+  INVESTMENTS_TIMEOUT_MS,
+} from "../../../pages/investor/investments";
 import { useRole } from "../../../context/RoleContext";
 import { ROLES } from "../../../lib/roles";
 import { clearInvestorCache } from "../../../lib/investor/investorData";
@@ -32,7 +34,11 @@ vi.mock("../../../components/PageLayout", () => ({
 
 function mockUseRoleValue(overrides = {}) {
   vi.mocked(useRole).mockReturnValue({
-    user: { id: "u1", email: "investor@fundora.dev", user_metadata: { full_name: "Investor One" } },
+    user: {
+      id: "u1",
+      email: "investor@fundora.dev",
+      user_metadata: { full_name: "Investor One" },
+    },
     profile: null,
     role: ROLES.INVESTOR,
     isAdmin: false,
@@ -68,7 +74,14 @@ function mockTables(payloads = {}) {
   });
 }
 
-const donation = (id, amount, status, project_id, created_at, overrides = {}) => ({
+const donation = (
+  id,
+  amount,
+  status,
+  project_id,
+  created_at,
+  overrides = {},
+) => ({
   id,
   amount,
   status,
@@ -94,8 +107,12 @@ describe("pages/investor/investments", () => {
     mockTables({
       public_donations: {
         data: [
-          donation("d1", 1000, "paid", "p1", "2026-05-01T10:00:00Z", { title: "Alpha Fund" }),
-          donation("d2", 2000, "pending", "p2", "2026-06-15T10:00:00Z", { title: "Beta Fund" }),
+          donation("d1", 1000, "paid", "p1", "2026-05-01T10:00:00Z", {
+            title: "Alpha Fund",
+          }),
+          donation("d2", 2000, "pending", "p2", "2026-06-15T10:00:00Z", {
+            title: "Beta Fund",
+          }),
         ],
       },
     });
@@ -106,7 +123,9 @@ describe("pages/investor/investments", () => {
     await waitFor(() => {
       expect(screen.getByText("Alpha Fund")).toBeInTheDocument();
     });
-    expect(screen.queryByText("Loading investments...")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Loading investments..."),
+    ).not.toBeInTheDocument();
 
     // Summary card: total sums every listed donation (₹ en-IN), projects = rows.
     expect(screen.getByText("Total Invested")).toBeInTheDocument();
@@ -130,7 +149,9 @@ describe("pages/investor/investments", () => {
     render(<InvestorInvestments />);
 
     await waitFor(() => {
-      expect(screen.getByText("You haven't invested in any projects yet.")).toBeInTheDocument();
+      expect(
+        screen.getByText("You haven't invested in any projects yet."),
+      ).toBeInTheDocument();
     });
 
     // Empty illustration icon and no summary card in the empty state.
@@ -150,10 +171,14 @@ describe("pages/investor/investments", () => {
     render(<InvestorInvestments />);
 
     await waitFor(() => {
-      expect(screen.getByText(/Failed to load your investments/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Failed to load your investments/i),
+      ).toBeInTheDocument();
     });
     expect(screen.getByRole("button", { name: /retry/i })).toBeInTheDocument();
-    expect(screen.queryByText("Loading investments...")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Loading investments..."),
+    ).not.toBeInTheDocument();
   });
 
   it("recovers after a failed load when Retry is pressed", async () => {
@@ -163,13 +188,21 @@ describe("pages/investor/investments", () => {
       if (calls === 1) {
         return mockQuery({ data: null, count: 0, error: new Error("boom") });
       }
-      return mockQuery({ data: [donation("d1", 5000, "paid", "p1", "2026-05-01", { title: "Alpha Fund" })] });
+      return mockQuery({
+        data: [
+          donation("d1", 5000, "paid", "p1", "2026-05-01", {
+            title: "Alpha Fund",
+          }),
+        ],
+      });
     });
 
     render(<InvestorInvestments />);
 
     await waitFor(() => {
-      expect(screen.getByText(/Failed to load your investments/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Failed to load your investments/i),
+      ).toBeInTheDocument();
     });
 
     await userEvent.click(screen.getByRole("button", { name: /retry/i }));
@@ -185,7 +218,9 @@ describe("pages/investor/investments", () => {
     vi.useFakeTimers();
     try {
       // A query that never settles.
-      m.mockFrom.mockImplementation(() => mockQuery({ data: [], count: 0, error: null }, { hang: true }));
+      m.mockFrom.mockImplementation(() =>
+        mockQuery({ data: [], count: 0, error: null }, { hang: true }),
+      );
 
       render(<InvestorInvestments />);
       expect(screen.getByText("Loading investments...")).toBeInTheDocument();
@@ -195,9 +230,15 @@ describe("pages/investor/investments", () => {
         await vi.advanceTimersByTimeAsync(INVESTMENTS_TIMEOUT_MS + 1000);
       });
 
-      expect(screen.queryByText("Loading investments...")).not.toBeInTheDocument();
-      expect(screen.getByText(/Failed to load your investments/i)).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /retry/i })).toBeInTheDocument();
+      expect(
+        screen.queryByText("Loading investments..."),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByText(/Failed to load your investments/i),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /retry/i }),
+      ).toBeInTheDocument();
     } finally {
       vi.useRealTimers();
     }

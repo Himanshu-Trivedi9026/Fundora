@@ -4,16 +4,21 @@ import { useEffect, useState } from "react";
 import { signOutUser } from "../lib/auth";
 import { useRouter } from "next/router";
 import { useRole } from "../context/RoleContext";
-import {
-  canStartProject,
-  startProjectHref,
-  canAccessArea,
-} from "../lib/roles";
+import { canStartProject, startProjectHref, canAccessArea } from "../lib/roles";
 
 /* Inline SVG icons — eliminates 2.2MB react-icons/fa + react-icons/fi from Navbar */
 function EnvelopeIcon({ size = 18 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <rect x="2" y="4" width="20" height="16" rx="2" />
       <path d="M22 7l-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
     </svg>
@@ -22,7 +27,16 @@ function EnvelopeIcon({ size = 18 }) {
 
 function ChartBarIcon({ size = 14 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M3 3v18h18" />
       <path d="M7 16V9" />
       <path d="M12 16V5" />
@@ -33,7 +47,16 @@ function ChartBarIcon({ size = 14 }) {
 
 function MenuIcon({ size = 22 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M4 6h16" />
       <path d="M4 12h16" />
       <path d="M4 18h16" />
@@ -45,14 +68,12 @@ function MenuIcon({ size = 22 }) {
    MENU ITEM HELPER (UI ONLY)
 ------------------------------------------- */
 function MenuItem({ href, onClick, label, danger }) {
-  const base =
-    "block w-full px-4 py-2.5 text-sm transition rounded-md mx-1";
+  const base = "block w-full px-4 py-2.5 text-sm transition rounded-md mx-1";
 
   const normal =
     "text-on-surface-variant hover:bg-surface-container-high/60 hover:text-on-surface";
 
-  const dangerStyle =
-    "text-danger hover:bg-danger-muted hover:text-danger";
+  const dangerStyle = "text-danger hover:bg-danger-muted hover:text-danger";
 
   if (href) {
     return (
@@ -79,9 +100,18 @@ function MenuItem({ href, onClick, label, danger }) {
 
 /* ─── Role Badge & Menu Definitions ─── */
 const ROLE_BADGE = {
-  platform_admin: { label: "Admin", class: "bg-amber-500/20 text-amber-400 border border-amber-500/20" },
-  creator: { label: "Creator", class: "bg-purple-500/20 text-purple-400 border border-purple-500/20" },
-  donor: { label: "Investor", class: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/20" },
+  platform_admin: {
+    label: "Admin",
+    class: "bg-amber-500/20 text-amber-400 border border-amber-500/20",
+  },
+  creator: {
+    label: "Creator",
+    class: "bg-purple-500/20 text-purple-400 border border-purple-500/20",
+  },
+  donor: {
+    label: "Investor",
+    class: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/20",
+  },
 };
 
 const ROLE_MENUS = {
@@ -123,7 +153,11 @@ const ROLE_MENUS = {
   ],
 };
 
-export default function Navbar({ onToggleFilters, onToggleSidebar, sidebarCollapsed }) {
+export default function Navbar({
+  onToggleFilters,
+  onToggleSidebar,
+  sidebarCollapsed,
+}) {
   const { user, profile, role, isAdmin, isCreator, isDonor } = useRole();
   const [menuOpen, setMenuOpen] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
@@ -139,26 +173,43 @@ export default function Navbar({ onToggleFilters, onToggleSidebar, sidebarCollap
   return (
     <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-surface-dim/80 backdrop-blur-xl shadow-[0_1px_0_rgba(255,255,255,0.04)]">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-
         {/* LEFT */}
         <div className="flex items-center gap-2">
           <button
             onClick={onToggleSidebar || onToggleFilters}
             className="text-on-surface-variant hover:text-on-surface p-2 rounded-md hover:bg-surface-container-high/50 transition-colors"
-            aria-label={onToggleSidebar ? (sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar") : "Open filters"}
+            aria-label={
+              onToggleSidebar
+                ? sidebarCollapsed
+                  ? "Expand sidebar"
+                  : "Collapse sidebar"
+                : "Open filters"
+            }
           >
             <MenuIcon size={22} />
           </button>
 
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Fundora" width={41} height={40} className="h-10 w-auto" priority />
-            <span className="text-xl font-semibold text-on-surface">Fundora</span>
+            <Image
+              src="/logo.png"
+              alt="Fundora"
+              width={41}
+              height={40}
+              className="h-10 w-auto"
+              priority
+            />
+            <span className="text-xl font-semibold text-on-surface">
+              Fundora
+            </span>
           </Link>
         </div>
 
         {/* CENTER */}
         <div className="hidden md:flex items-center gap-5 text-sm text-on-surface-variant">
-          <Link href="/explore" className="hover:text-primary transition-colors">
+          <Link
+            href="/explore"
+            className="hover:text-primary transition-colors"
+          >
             Explore
           </Link>
 
@@ -244,7 +295,6 @@ export default function Navbar({ onToggleFilters, onToggleSidebar, sidebarCollap
                     className="absolute right-0 mt-3 w-60 rounded-2xl glass-card
                               shadow-glass-lg overflow-hidden z-50"
                   >
-
                     {/* PROFILE HEADER + ROLE BADGE */}
                     <div className="px-4 py-3 border-b border-white/[0.06]">
                       <div className="flex items-center gap-3 mb-2">
@@ -265,7 +315,9 @@ export default function Navbar({ onToggleFilters, onToggleSidebar, sidebarCollap
                           </p>
                         </div>
                       </div>
-                      <span className={`inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded-full ${ROLE_BADGE[role]?.class || ROLE_BADGE.donor.class}`}>
+                      <span
+                        className={`inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded-full ${ROLE_BADGE[role]?.class || ROLE_BADGE.donor.class}`}
+                      >
                         {ROLE_BADGE[role]?.label || "Investor"}
                       </span>
                     </div>
@@ -273,7 +325,11 @@ export default function Navbar({ onToggleFilters, onToggleSidebar, sidebarCollap
                     {/* ROLE-SPECIFIC MENU ITEMS */}
                     <div className="py-1">
                       {(ROLE_MENUS[role] || ROLE_MENUS.donor).map((item) => (
-                        <MenuItem key={item.href} href={item.href} label={item.label} />
+                        <MenuItem
+                          key={item.href}
+                          href={item.href}
+                          label={item.label}
+                        />
                       ))}
                     </div>
 
@@ -285,7 +341,11 @@ export default function Navbar({ onToggleFilters, onToggleSidebar, sidebarCollap
                     </div>
 
                     <div className="py-1 border-t border-white/[0.06]">
-                      <MenuItem href="/account/delete" label="Delete Account" danger />
+                      <MenuItem
+                        href="/account/delete"
+                        label="Delete Account"
+                        danger
+                      />
 
                       <button
                         onClick={async () => {

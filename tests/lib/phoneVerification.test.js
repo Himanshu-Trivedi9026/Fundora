@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { generateOTP, hashOTP, OTP_CONFIG } from "../../lib/verification/phoneVerification";
+import {
+  generateOTP,
+  hashOTP,
+  OTP_CONFIG,
+} from "../../lib/verification/phoneVerification";
 
 describe("Phone Verification", () => {
   describe("generateOTP", () => {
@@ -165,7 +169,10 @@ describe("Phone Verification", () => {
       // We just verify the function doesn't filter it out
       let found = false;
       for (let i = 0; i < 5000; i++) {
-        if (generateOTP() === "000000") { found = true; break; }
+        if (generateOTP() === "000000") {
+          found = true;
+          break;
+        }
       }
       // Not asserting found — probability is very low. Just ensuring no crash.
       expect(typeof generateOTP()).toBe("string");

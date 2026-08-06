@@ -31,7 +31,11 @@ vi.mock("../../../lib/ai/providerRegistry.js", () => ({
   getActiveModelProvider: vi.fn().mockReturnValue({
     createEmbedding: vi.fn().mockResolvedValue({
       success: true,
-      data: { data: [{ embedding: Array(1536).fill(0.1), index: 0 }], model: "text-embedding-3-small", usage: { total_tokens: 10 } },
+      data: {
+        data: [{ embedding: Array(1536).fill(0.1), index: 0 }],
+        model: "text-embedding-3-small",
+        usage: { total_tokens: 10 },
+      },
     }),
   }),
 }));
@@ -59,7 +63,9 @@ describe("Embedding Engine", () => {
       supabaseAdmin.from.mockImplementation(() => ({
         insert: vi.fn().mockReturnValue({
           select: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: { id: "emb-1" }, error: null }),
+            single: vi
+              .fn()
+              .mockResolvedValue({ data: { id: "emb-1" }, error: null }),
           }),
         }),
       }));
@@ -76,7 +82,9 @@ describe("Embedding Engine", () => {
       supabaseAdmin.from.mockImplementation(() => ({
         insert: vi.fn().mockReturnValue({
           select: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: { id: "emb-1" }, error: null }),
+            single: vi
+              .fn()
+              .mockResolvedValue({ data: { id: "emb-1" }, error: null }),
           }),
         }),
       }));
@@ -88,8 +96,14 @@ describe("Embedding Engine", () => {
       });
 
       console.log("DEBUG result:", JSON.stringify(result));
-      console.log("DEBUG from mock calls:", supabaseAdmin.from.mock.calls.length);
-      console.log("DEBUG from mock last call:", supabaseAdmin.from.mock.lastCall);
+      console.log(
+        "DEBUG from mock calls:",
+        supabaseAdmin.from.mock.calls.length,
+      );
+      console.log(
+        "DEBUG from mock last call:",
+        supabaseAdmin.from.mock.lastCall,
+      );
       expect(result).toBeDefined();
     });
 
@@ -99,7 +113,9 @@ describe("Embedding Engine", () => {
       supabaseAdmin.from.mockImplementation(() => ({
         insert: vi.fn().mockReturnValue({
           select: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: { id: "emb-1" }, error: null }),
+            single: vi
+              .fn()
+              .mockResolvedValue({ data: { id: "emb-1" }, error: null }),
           }),
         }),
       }));
@@ -201,7 +217,11 @@ describe("Embedding Engine", () => {
       supabaseAdmin.from.mockImplementation(() => {
         insertCall++;
         if (insertCall === 1) {
-          return { insert: vi.fn().mockResolvedValue({ error: { message: "DB error" } }) };
+          return {
+            insert: vi
+              .fn()
+              .mockResolvedValue({ error: { message: "DB error" } }),
+          };
         }
         return { insert: vi.fn().mockResolvedValue({ error: null }) };
       });
@@ -231,7 +251,12 @@ describe("Embedding Engine", () => {
     it("should return vector search results with scores", async () => {
       supabaseAdmin.rpc.mockResolvedValueOnce({
         data: [
-          { entity_id: "c1", entity_type: "campaign", similarity: 0.92, metadata: { inputPreview: "hello" } },
+          {
+            entity_id: "c1",
+            entity_type: "campaign",
+            similarity: 0.92,
+            metadata: { inputPreview: "hello" },
+          },
         ],
         error: null,
       });
@@ -252,7 +277,13 @@ describe("Embedding Engine", () => {
         select: vi.fn().mockReturnValue({
           ilike: vi.fn().mockReturnValue({
             limit: vi.fn().mockResolvedValue({
-              data: [{ entity_id: "c2", entity_type: "campaign", metadata: { inputPreview: "fallback" } }],
+              data: [
+                {
+                  entity_id: "c2",
+                  entity_type: "campaign",
+                  metadata: { inputPreview: "fallback" },
+                },
+              ],
               error: null,
             }),
           }),
@@ -279,7 +310,9 @@ describe("Embedding Engine", () => {
       supabaseAdmin.from.mockImplementation(() => ({
         delete: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            eq: vi.fn().mockResolvedValue({ data: null, error: null, count: 3 }),
+            eq: vi
+              .fn()
+              .mockResolvedValue({ data: null, error: null, count: 3 }),
           }),
         }),
       }));
@@ -316,7 +349,13 @@ describe("Embedding Engine", () => {
                   order: vi.fn().mockReturnValue({
                     limit: vi.fn().mockResolvedValue({
                       data: [
-                        { id: "emb-1", entity_type: "campaign", entity_id: "c1", content_hash: "abc", metadata: { inputPreview: "old text" } },
+                        {
+                          id: "emb-1",
+                          entity_type: "campaign",
+                          entity_id: "c1",
+                          content_hash: "abc",
+                          metadata: { inputPreview: "old text" },
+                        },
                       ],
                       error: null,
                     }),
@@ -352,7 +391,13 @@ describe("Embedding Engine", () => {
               order: vi.fn().mockReturnValue({
                 limit: vi.fn().mockResolvedValue({
                   data: [
-                    { id: "emb-1", entity_type: "campaign", entity_id: "c1", content_hash: "abc", metadata: {} },
+                    {
+                      id: "emb-1",
+                      entity_type: "campaign",
+                      entity_id: "c1",
+                      content_hash: "abc",
+                      metadata: {},
+                    },
                   ],
                   error: null,
                 }),

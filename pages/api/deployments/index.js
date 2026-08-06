@@ -54,10 +54,20 @@ async function handleGet(req, res) {
 
 async function handlePost(req, res) {
   try {
-    const { version, branch, commitHash, environment, status, healthCheckPassed, rollback } = req.body;
+    const {
+      version,
+      branch,
+      commitHash,
+      environment,
+      status,
+      healthCheckPassed,
+      rollback,
+    } = req.body;
 
     if (!version || !environment) {
-      return res.status(400).json({ error: "version and environment are required" });
+      return res
+        .status(400)
+        .json({ error: "version and environment are required" });
     }
 
     const { data, error } = await supabaseAdmin

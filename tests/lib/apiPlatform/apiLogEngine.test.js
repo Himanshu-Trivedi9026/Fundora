@@ -28,7 +28,11 @@ vi.mock("../../../lib/verification/auditLog", () => ({
   hashIP: vi.fn().mockReturnValue("hashed-ip"),
 }));
 
-import { logApiRequest, getApiLogs, getApiUsageSummary } from "../../../lib/apiPlatform/apiLogEngine";
+import {
+  logApiRequest,
+  getApiLogs,
+  getApiUsageSummary,
+} from "../../../lib/apiPlatform/apiLogEngine";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 
 describe("APILogEngine", () => {

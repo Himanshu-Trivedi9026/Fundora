@@ -57,7 +57,7 @@ export default function CreatorProjects() {
         const { data, error: fetchError } = await supabase
           .from("projects")
           .select(
-            "id, title, description, thumbnail, pledged, goal, created_at"
+            "id, title, description, thumbnail, pledged, goal, created_at",
           )
           .eq("owner_id", user.id)
           .order("created_at", { ascending: false });
@@ -164,7 +164,8 @@ export default function CreatorProjects() {
                 // from the real funding columns instead.
                 const projectStatus =
                   goal > 0 && raised >= goal ? "funded" : "active";
-                const progressPercent = goal > 0 ? Math.min((raised / goal) * 100, 100) : 0;
+                const progressPercent =
+                  goal > 0 ? Math.min((raised / goal) * 100, 100) : 0;
 
                 return (
                   <GlassCard
@@ -188,7 +189,7 @@ export default function CreatorProjects() {
                               "bg-gradient-to-br",
                               "from-primary/20",
                               "via-surface-container",
-                              "to-surface-container-lowest"
+                              "to-surface-container-lowest",
                             );
                           }}
                         />

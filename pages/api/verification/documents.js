@@ -188,7 +188,9 @@ async function handlePost(req, res, user) {
     return res.status(400).json({ error: "documentType is required" });
   }
   if (!IDENTITY_DOCUMENT_TYPES.has(documentType)) {
-    return res.status(400).json({ error: `Unsupported document type: ${documentType}` });
+    return res
+      .status(400)
+      .json({ error: `Unsupported document type: ${documentType}` });
   }
 
   if (!files || files.length === 0) {
@@ -209,12 +211,13 @@ async function handlePost(req, res, user) {
     });
   }
 
-  const existingNames = (
-    await supabaseAdmin
-      .from("verification_documents")
-      .select("document_name")
-      .eq("user_id", user.id)
-  ).data?.map((d) => d.document_name) || [];
+  const existingNames =
+    (
+      await supabaseAdmin
+        .from("verification_documents")
+        .select("document_name")
+        .eq("user_id", user.id)
+    ).data?.map((d) => d.document_name) || [];
 
   // Only the first file is treated as the primary document for the selected
   // type (matches the single-document-per-type identity flow).
@@ -238,7 +241,9 @@ async function handlePost(req, res, user) {
     });
 
   if (uploadError) {
-    return res.status(500).json({ error: `Upload failed: ${uploadError.message}` });
+    return res
+      .status(500)
+      .json({ error: `Upload failed: ${uploadError.message}` });
   }
 
   // Replacement: remove the old object + row before inserting the new one.
@@ -291,7 +296,9 @@ async function handlePost(req, res, user) {
 async function handleGet(req, res, user) {
   const { data: documents, error } = await supabaseAdmin
     .from("verification_documents")
-    .select("id, verification_id, user_id, document_type, document_name, storage_bucket, storage_path, mime_type, file_size, status, uploaded_at, created_at, updated_at")
+    .select(
+      "id, verification_id, user_id, document_type, document_name, storage_bucket, storage_path, mime_type, file_size, status, uploaded_at, created_at, updated_at",
+    )
     .eq("user_id", user.id)
     .order("uploaded_at", { ascending: false });
 
@@ -304,7 +311,9 @@ async function handleGet(req, res, user) {
     const signed = await getSignedUrl(doc.storage_path);
     docs.push({
       ...sanitizeDoc(doc),
-      ...(signed.success ? { signedUrl: signed.url, signedUrlExpiresAt: signed.expiresAt } : {}),
+      ...(signed.success
+        ? { signedUrl: signed.url, signedUrlExpiresAt: signed.expiresAt }
+        : {}),
     });
   }
 

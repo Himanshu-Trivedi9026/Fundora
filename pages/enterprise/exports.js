@@ -115,26 +115,44 @@ export default function ExportsPage() {
       <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#0d0d15] to-[#0a0a0f]">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-white">Data Export Center</h1>
-            <p className="text-gray-400 mt-1">Export your data in various formats</p>
+            <h1 className="text-2xl font-bold text-white">
+              Data Export Center
+            </h1>
+            <p className="text-gray-400 mt-1">
+              Export your data in various formats
+            </p>
           </div>
 
           {error && (
             <GlassCard className="mb-6 flex items-center gap-3 border-red-500/20">
-              <span className="material-symbols-outlined text-red-400">error</span>
+              <span className="material-symbols-outlined text-red-400">
+                error
+              </span>
               <p className="text-red-400 text-sm flex-1">{error}</p>
-              <button onClick={() => setError(null)} className="text-gray-500 hover:text-gray-300">
-                <span className="material-symbols-outlined text-[18px]">close</span>
+              <button
+                onClick={() => setError(null)}
+                className="text-gray-500 hover:text-gray-300"
+              >
+                <span className="material-symbols-outlined text-[18px]">
+                  close
+                </span>
               </button>
             </GlassCard>
           )}
 
           {success && (
             <GlassCard className="mb-6 flex items-center gap-3 border-green-500/20">
-              <span className="material-symbols-outlined text-green-400">check_circle</span>
+              <span className="material-symbols-outlined text-green-400">
+                check_circle
+              </span>
               <p className="text-green-400 text-sm flex-1">{success}</p>
-              <button onClick={() => setSuccess(null)} className="text-gray-500 hover:text-gray-300">
-                <span className="material-symbols-outlined text-[18px]">close</span>
+              <button
+                onClick={() => setSuccess(null)}
+                className="text-gray-500 hover:text-gray-300"
+              >
+                <span className="material-symbols-outlined text-[18px]">
+                  close
+                </span>
               </button>
             </GlassCard>
           )}
@@ -144,15 +162,23 @@ export default function ExportsPage() {
               <GlassCard key={option.id} className="flex flex-col">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-xl text-indigo-400">{option.icon}</span>
+                    <span className="material-symbols-outlined text-xl text-indigo-400">
+                      {option.icon}
+                    </span>
                   </div>
                   <div>
-                    <h3 className="text-white font-semibold text-sm">{option.label}</h3>
+                    <h3 className="text-white font-semibold text-sm">
+                      {option.label}
+                    </h3>
                   </div>
                 </div>
-                <p className="text-gray-400 text-xs flex-1 mb-4">{option.description}</p>
+                <p className="text-gray-400 text-xs flex-1 mb-4">
+                  {option.description}
+                </p>
                 <div className="space-y-2 pt-3 border-t border-white/[0.06]">
-                  <p className="text-[11px] text-gray-500 font-medium uppercase tracking-wider">Export as</p>
+                  <p className="text-[11px] text-gray-500 font-medium uppercase tracking-wider">
+                    Export as
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     {option.formats.map((fmt) => (
                       <Button

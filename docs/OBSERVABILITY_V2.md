@@ -11,7 +11,13 @@ Phase 12 extends the Phase 10 observability engine with OpenTelemetry integratio
 Provides distributed tracing with span management:
 
 ```javascript
-import { enableTracing, createTrace, startSpan, endSpan, exportTrace } from "../lib/observability/index.js";
+import {
+  enableTracing,
+  createTrace,
+  startSpan,
+  endSpan,
+  exportTrace,
+} from "../lib/observability/index.js";
 
 // Enable distributed tracing
 enableTracing();
@@ -20,7 +26,7 @@ enableTracing();
 const traceId = createTrace({
   name: "process-payment",
   service: "fundora-payments",
-  attributes: { amount: 50.00, currency: "USD" },
+  attributes: { amount: 50.0, currency: "USD" },
 });
 
 // Start spans (returns auto-created trace if none provided)
@@ -70,7 +76,13 @@ Supports three formats:
 import { formatMetricsForExport } from "../lib/observability/index.js";
 
 const metrics = [
-  { name: "http_requests_total", help: "Total HTTP requests", type: "counter", value: 1500, labels: { method: "GET" } },
+  {
+    name: "http_requests_total",
+    help: "Total HTTP requests",
+    type: "counter",
+    value: 1500,
+    labels: { method: "GET" },
+  },
 ];
 
 // Prometheus format (default)
@@ -90,7 +102,10 @@ console.log(formatMetricsForExport(metrics, "datadog"));
 ### Error Aggregation Hooks
 
 ```javascript
-import { registerErrorHook, runErrorHooks } from "../lib/observability/index.js";
+import {
+  registerErrorHook,
+  runErrorHooks,
+} from "../lib/observability/index.js";
 
 // Register notification hooks
 const unregisterSlack = registerErrorHook(async (error, context) => {
@@ -129,6 +144,7 @@ scrape_configs:
 ### Grafana
 
 Use the Prometheus data source to visualize:
+
 - Connection pool metrics (`fundora_db_pool_*`)
 - Cache metrics (`fundora_cache_*`)
 - Endpoint metrics (`fundora_endpoint_*`)
@@ -146,12 +162,12 @@ instances:
 
 ## API Endpoints
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/health` | Application health (liveness/readiness) |
-| `GET /api/health/database` | Database connectivity health |
-| `GET /api/metrics` | Metrics in prometheus/json/datadog format |
-| `GET /api/diagnostics` | System health diagnostics |
+| Endpoint                   | Description                               |
+| -------------------------- | ----------------------------------------- |
+| `GET /api/health`          | Application health (liveness/readiness)   |
+| `GET /api/health/database` | Database connectivity health              |
+| `GET /api/metrics`         | Metrics in prometheus/json/datadog format |
+| `GET /api/diagnostics`     | System health diagnostics                 |
 
 ## Instrumentation Points
 
@@ -165,7 +181,11 @@ Key areas to add tracing in application code:
 
 ```javascript
 // Example: Instrument an API handler
-import { startSpan, endSpan, addSpanEvent } from "../lib/observability/index.js";
+import {
+  startSpan,
+  endSpan,
+  addSpanEvent,
+} from "../lib/observability/index.js";
 
 export default async function handler(req, res) {
   const span = startSpan(`${req.method} ${req.url}`, {
@@ -174,7 +194,9 @@ export default async function handler(req, res) {
 
   try {
     // ... handler logic ...
-    addSpanEvent(span.spanId, "handler.completed", { statusCode: res.statusCode });
+    addSpanEvent(span.spanId, "handler.completed", {
+      statusCode: res.statusCode,
+    });
   } catch (err) {
     addSpanEvent(span.spanId, "handler.error", { message: err.message });
     throw err;

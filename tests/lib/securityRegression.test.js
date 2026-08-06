@@ -15,14 +15,16 @@ import { describe, it, expect } from "vitest";
 describe("Security Regression — OTP Security", () => {
   describe("OTP is never returned in createOTP response", () => {
     it("createOTP is a function (old code returned OTP in response)", async () => {
-      const { createOTP } = await import("../../lib/verification/phoneVerification");
+      const { createOTP } =
+        await import("../../lib/verification/phoneVerification");
       expect(typeof createOTP).toBe("function");
     });
   });
 
   describe("generateOTP uses crypto.randomInt (not Math.random)", () => {
     it("generates cryptographically secure OTPs with good distribution", async () => {
-      const { generateOTP } = await import("../../lib/verification/phoneVerification");
+      const { generateOTP } =
+        await import("../../lib/verification/phoneVerification");
       const otps = new Set();
       for (let i = 0; i < 100; i++) {
         const otp = generateOTP();
@@ -36,7 +38,8 @@ describe("Security Regression — OTP Security", () => {
 
   describe("hashOTP returns { hash, salt } object", () => {
     it("returns object with hash and salt properties", async () => {
-      const { hashOTP } = await import("../../lib/verification/phoneVerification");
+      const { hashOTP } =
+        await import("../../lib/verification/phoneVerification");
       const result = hashOTP("123456");
       expect(typeof result).toBe("object");
       expect(result).toHaveProperty("hash");
@@ -46,7 +49,8 @@ describe("Security Regression — OTP Security", () => {
     });
 
     it("hash is a valid SHA-256 hex string (64 chars)", async () => {
-      const { hashOTP } = await import("../../lib/verification/phoneVerification");
+      const { hashOTP } =
+        await import("../../lib/verification/phoneVerification");
       const result = hashOTP("123456");
       expect(result.hash).toMatch(/^[a-f0-9]{64}$/);
     });
@@ -54,14 +58,16 @@ describe("Security Regression — OTP Security", () => {
 
   describe("verifyOTPHash uses timing-safe comparison", () => {
     it("returns true for matching OTP, false for non-matching", async () => {
-      const { hashOTP, verifyOTPHash } = await import("../../lib/verification/phoneVerification");
+      const { hashOTP, verifyOTPHash } =
+        await import("../../lib/verification/phoneVerification");
       const { hash: storedHash, salt } = hashOTP("123456");
       expect(verifyOTPHash("123456", storedHash, salt)).toBe(true);
       expect(verifyOTPHash("654321", storedHash, salt)).toBe(false);
     });
 
     it("returns false for null/undefined inputs", async () => {
-      const { verifyOTPHash } = await import("../../lib/verification/phoneVerification");
+      const { verifyOTPHash } =
+        await import("../../lib/verification/phoneVerification");
       expect(verifyOTPHash(null, "hash", "salt")).toBe(false);
       expect(verifyOTPHash("123456", null, "salt")).toBe(false);
     });
@@ -69,7 +75,8 @@ describe("Security Regression — OTP Security", () => {
 
   describe("OTP_CONFIG security parameters", () => {
     it("enforces max 3 attempts, 60s cooldown, 5min expiry", async () => {
-      const { OTP_CONFIG } = await import("../../lib/verification/phoneVerification");
+      const { OTP_CONFIG } =
+        await import("../../lib/verification/phoneVerification");
       expect(OTP_CONFIG.maxAttempts).toBe(3);
       expect(OTP_CONFIG.cooldownSeconds).toBe(60);
       expect(OTP_CONFIG.expiryMinutes).toBe(5);
@@ -86,7 +93,8 @@ describe("Security Regression — Encryption Key", () => {
     const originalKey = process.env.ENCRYPTION_KEY;
     delete process.env.ENCRYPTION_KEY;
     try {
-      const { encryptMetadata } = await import("../../lib/verification/metadataEncryption");
+      const { encryptMetadata } =
+        await import("../../lib/verification/metadataEncryption");
       expect(() => encryptMetadata({ test: "data" })).toThrow(/ENCRYPTION_KEY/);
     } finally {
       if (originalKey !== undefined) process.env.ENCRYPTION_KEY = originalKey;
@@ -97,7 +105,8 @@ describe("Security Regression — Encryption Key", () => {
     const originalKey = process.env.ENCRYPTION_KEY;
     process.env.ENCRYPTION_KEY = "tooshort";
     try {
-      const { encryptMetadata } = await import("../../lib/verification/metadataEncryption");
+      const { encryptMetadata } =
+        await import("../../lib/verification/metadataEncryption");
       expect(() => encryptMetadata({ test: "data" })).toThrow(/ENCRYPTION_KEY/);
     } finally {
       if (originalKey !== undefined) {
@@ -110,13 +119,17 @@ describe("Security Regression — Encryption Key", () => {
 
   it("encrypted payload includes version field for key rotation (requires Node crypto)", async () => {
     // Skip in jsdom — Node crypto.setAuthTagLength not available in browser env
-    if (typeof globalThis.process === "undefined" || typeof require === "undefined") {
+    if (
+      typeof globalThis.process === "undefined" ||
+      typeof require === "undefined"
+    ) {
       return;
     }
     const originalKey = process.env.ENCRYPTION_KEY;
     process.env.ENCRYPTION_KEY = "a".repeat(64);
     try {
-      const { encryptMetadata } = await import("../../lib/verification/metadataEncryption");
+      const { encryptMetadata } =
+        await import("../../lib/verification/metadataEncryption");
       const result = encryptMetadata({ test: "data" });
       // In Node.js env, this should succeed; in jsdom it may return null
       if (result !== null) {
@@ -139,10 +152,13 @@ describe("Security Regression — Encryption Key", () => {
     const originalKey = process.env.ENCRYPTION_KEY;
     delete process.env.ENCRYPTION_KEY;
     try {
-      const { decryptMetadata } = await import("../../lib/verification/metadataEncryption");
+      const { decryptMetadata } =
+        await import("../../lib/verification/metadataEncryption");
       // The fixed implementation throws immediately when key is missing (fail-fast)
       // instead of silently returning null with a broken key
-      expect(() => decryptMetadata({ ciphertext: "abc", iv: "def", tag: "ghi" })).toThrow(/ENCRYPTION_KEY/);
+      expect(() =>
+        decryptMetadata({ ciphertext: "abc", iv: "def", tag: "ghi" }),
+      ).toThrow(/ENCRYPTION_KEY/);
     } finally {
       if (originalKey !== undefined) process.env.ENCRYPTION_KEY = originalKey;
     }
@@ -154,7 +170,8 @@ describe("Security Regression — Encryption Key", () => {
 describe("Security Regression — Sanitization", () => {
   describe("sanitizeVerificationRequest strips device_metadata (not device)", () => {
     it("strips device_metadata key from metadata", async () => {
-      const { sanitizeVerificationRequest } = await import("../../lib/verification/metadataEncryption");
+      const { sanitizeVerificationRequest } =
+        await import("../../lib/verification/metadataEncryption");
       const req = {
         id: "req-1",
         metadata: {
@@ -170,7 +187,8 @@ describe("Security Regression — Sanitization", () => {
     });
 
     it("does NOT strip a 'device' key (which is not sensitive)", async () => {
-      const { sanitizeVerificationRequest } = await import("../../lib/verification/metadataEncryption");
+      const { sanitizeVerificationRequest } =
+        await import("../../lib/verification/metadataEncryption");
       const req = {
         id: "req-1",
         metadata: {
@@ -186,7 +204,8 @@ describe("Security Regression — Sanitization", () => {
 
   describe("sanitizeDocumentResponse strips sensitive fields", () => {
     it("strips provider_reference, storage_path, metadata_encrypted, metadata_hash", async () => {
-      const { sanitizeDocumentResponse } = await import("../../lib/verification/metadataEncryption");
+      const { sanitizeDocumentResponse } =
+        await import("../../lib/verification/metadataEncryption");
       const doc = {
         id: "doc-1",
         document_name: "pan_card.jpg",
@@ -207,7 +226,8 @@ describe("Security Regression — Sanitization", () => {
 
   describe("sanitizeSessionResponse strips sensitive fields", () => {
     it("strips device_metadata, ip_address_hash, wizard_state", async () => {
-      const { sanitizeSessionResponse } = await import("../../lib/verification/metadataEncryption");
+      const { sanitizeSessionResponse } =
+        await import("../../lib/verification/metadataEncryption");
       const session = {
         id: "sess-1",
         device_metadata: { browser: "Chrome" },
@@ -274,14 +294,16 @@ describe("Security Regression — Audit Log", () => {
 describe("Security Regression — Session Manager Authorization", () => {
   describe("createSession requires userId", () => {
     it("rejects null userId", async () => {
-      const { createSession } = await import("../../lib/verification/sessionManager");
+      const { createSession } =
+        await import("../../lib/verification/sessionManager");
       const result = await createSession(null);
       expect(result.success).toBe(false);
       expect(result.error).toContain("User ID is required");
     });
 
     it("rejects empty string userId", async () => {
-      const { createSession } = await import("../../lib/verification/sessionManager");
+      const { createSession } =
+        await import("../../lib/verification/sessionManager");
       const result = await createSession("");
       expect(result.success).toBe(false);
       expect(result.error).toContain("User ID is required");
@@ -290,21 +312,24 @@ describe("Security Regression — Session Manager Authorization", () => {
 
   describe("resumeSession requires both sessionId and userId", () => {
     it("rejects null sessionId", async () => {
-      const { resumeSession } = await import("../../lib/verification/sessionManager");
+      const { resumeSession } =
+        await import("../../lib/verification/sessionManager");
       const result = await resumeSession(null, "user-1");
       expect(result.success).toBe(false);
       expect(result.error).toContain("Session ID is required");
     });
 
     it("rejects null userId", async () => {
-      const { resumeSession } = await import("../../lib/verification/sessionManager");
+      const { resumeSession } =
+        await import("../../lib/verification/sessionManager");
       const result = await resumeSession("sess-1", null);
       expect(result.success).toBe(false);
       expect(result.error).toContain("User ID is required");
     });
 
     it("rejects empty userId", async () => {
-      const { resumeSession } = await import("../../lib/verification/sessionManager");
+      const { resumeSession } =
+        await import("../../lib/verification/sessionManager");
       const result = await resumeSession("sess-1", "");
       expect(result.success).toBe(false);
       expect(result.error).toContain("User ID is required");
@@ -313,14 +338,16 @@ describe("Security Regression — Session Manager Authorization", () => {
 
   describe("completeSession requires userId", () => {
     it("rejects null sessionId", async () => {
-      const { completeSession } = await import("../../lib/verification/sessionManager");
+      const { completeSession } =
+        await import("../../lib/verification/sessionManager");
       const result = await completeSession(null, "user-1");
       expect(result.success).toBe(false);
       expect(result.error).toContain("Session ID is required");
     });
 
     it("rejects null userId", async () => {
-      const { completeSession } = await import("../../lib/verification/sessionManager");
+      const { completeSession } =
+        await import("../../lib/verification/sessionManager");
       const result = await completeSession("sess-1", null);
       expect(result.success).toBe(false);
       expect(result.error).toContain("User ID is required");
@@ -329,7 +356,8 @@ describe("Security Regression — Session Manager Authorization", () => {
 
   describe("getSessionProgress requires userId", () => {
     it("rejects null userId", async () => {
-      const { getSessionProgress } = await import("../../lib/verification/sessionManager");
+      const { getSessionProgress } =
+        await import("../../lib/verification/sessionManager");
       const result = await getSessionProgress(null);
       expect(result.success).toBe(false);
       expect(result.error).toContain("User ID is required");
@@ -354,14 +382,16 @@ describe("Security Regression — Manual Review Authorization", () => {
 
   describe("assignReviewer requires reviewerId", () => {
     it("rejects when requestId is missing", async () => {
-      const { assignReviewer } = await import("../../lib/verification/manualReview");
+      const { assignReviewer } =
+        await import("../../lib/verification/manualReview");
       const result = await assignReviewer(null, "reviewer-1");
       expect(result.success).toBe(false);
       expect(result.error).toContain("required");
     });
 
     it("rejects when reviewerId is missing", async () => {
-      const { assignReviewer } = await import("../../lib/verification/manualReview");
+      const { assignReviewer } =
+        await import("../../lib/verification/manualReview");
       const result = await assignReviewer("req-1", null);
       expect(result.success).toBe(false);
       expect(result.error).toContain("required");
@@ -370,7 +400,8 @@ describe("Security Regression — Manual Review Authorization", () => {
 
   describe("rejectRequest requires all parameters", () => {
     it("rejects when reason is missing", async () => {
-      const { rejectRequest } = await import("../../lib/verification/manualReview");
+      const { rejectRequest } =
+        await import("../../lib/verification/manualReview");
       const result = await rejectRequest("req-1", "reviewer-1", null);
       expect(result.success).toBe(false);
       expect(result.error).toContain("required");
@@ -379,7 +410,8 @@ describe("Security Regression — Manual Review Authorization", () => {
 
   describe("getRequestDetails validates input", () => {
     it("rejects when requestId is missing", async () => {
-      const { getRequestDetails } = await import("../../lib/verification/manualReview");
+      const { getRequestDetails } =
+        await import("../../lib/verification/manualReview");
       const result = await getRequestDetails(null);
       expect(result.success).toBe(false);
       expect(result.error).toContain("required");
@@ -388,14 +420,16 @@ describe("Security Regression — Manual Review Authorization", () => {
 
   describe("updateReviewPriority validates input", () => {
     it("rejects when requestId is missing", async () => {
-      const { updateReviewPriority } = await import("../../lib/verification/manualReview");
+      const { updateReviewPriority } =
+        await import("../../lib/verification/manualReview");
       const result = await updateReviewPriority(null, "high");
       expect(result.success).toBe(false);
       expect(result.error).toContain("required");
     });
 
     it("rejects invalid priority values", async () => {
-      const { updateReviewPriority } = await import("../../lib/verification/manualReview");
+      const { updateReviewPriority } =
+        await import("../../lib/verification/manualReview");
       const result = await updateReviewPriority("req-1", "invalid");
       expect(result.success).toBe(false);
       expect(result.error).toContain("Invalid priority");
@@ -412,7 +446,8 @@ describe("Security Regression — Storage Security", () => {
   });
 
   it("validateExtension is exported as a function", async () => {
-    const { validateExtension } = await import("../../lib/verification/storage");
+    const { validateExtension } =
+      await import("../../lib/verification/storage");
     expect(typeof validateExtension).toBe("function");
   });
 
@@ -422,7 +457,8 @@ describe("Security Regression — Storage Security", () => {
   });
 
   it("SIGNED_URL_EXPIRY_SECONDS is 3600 (1 hour max)", async () => {
-    const { SIGNED_URL_EXPIRY_SECONDS } = await import("../../lib/verification/storage");
+    const { SIGNED_URL_EXPIRY_SECONDS } =
+      await import("../../lib/verification/storage");
     expect(SIGNED_URL_EXPIRY_SECONDS).toBe(3600);
   });
 });
@@ -432,42 +468,48 @@ describe("Security Regression — Storage Security", () => {
 describe("Security Regression — Secure Logger", () => {
   describe("redaction patterns", () => {
     it("redacts 6-digit OTPs", async () => {
-      const { redactString } = await import("../../lib/verification/secureLogger");
+      const { redactString } =
+        await import("../../lib/verification/secureLogger");
       const result = redactString("Your OTP is 123456");
       expect(result).not.toContain("123456");
       expect(result).toContain("[OTP_REDACTED]");
     });
 
     it("redacts PAN card numbers (ABCDE1234F)", async () => {
-      const { redactString } = await import("../../lib/verification/secureLogger");
+      const { redactString } =
+        await import("../../lib/verification/secureLogger");
       const result = redactString("PAN: ABCDE1234F");
       expect(result).not.toContain("ABCDE1234F");
       expect(result).toContain("[PAN_REDACTED]");
     });
 
     it("redacts Aadhaar numbers (12-digit)", async () => {
-      const { redactString } = await import("../../lib/verification/secureLogger");
+      const { redactString } =
+        await import("../../lib/verification/secureLogger");
       const result = redactString("Aadhaar: 1234 5678 9012");
       expect(result).not.toContain("1234 5678 9012");
       expect(result).toContain("[AADHAAR_REDACTED]");
     });
 
     it("redacts storage paths", async () => {
-      const { redactString } = await import("../../lib/verification/secureLogger");
+      const { redactString } =
+        await import("../../lib/verification/secureLogger");
       const result = redactString("Path: verification-docs/user123/file.jpg");
       expect(result).not.toContain("user123");
       expect(result).toContain("[STORAGE_REDACTED]");
     });
 
     it("redacts Bearer tokens", async () => {
-      const { redactString } = await import("../../lib/verification/secureLogger");
+      const { redactString } =
+        await import("../../lib/verification/secureLogger");
       const result = redactString("Authorization: Bearer abc123def456");
       expect(result).not.toContain("abc123def456");
       expect(result).toContain("[TOKEN_REDACTED]");
     });
 
     it("partially redacts email addresses", async () => {
-      const { redactString } = await import("../../lib/verification/secureLogger");
+      const { redactString } =
+        await import("../../lib/verification/secureLogger");
       const result = redactString("Email: test@example.com");
       expect(result).toContain("***");
       expect(result).toContain("test");
@@ -477,7 +519,8 @@ describe("Security Regression — Secure Logger", () => {
 
   describe("redactObject strips sensitive keys", () => {
     it("redacts known sensitive keys entirely", async () => {
-      const { redactObject } = await import("../../lib/verification/secureLogger");
+      const { redactObject } =
+        await import("../../lib/verification/secureLogger");
       const result = redactObject({
         otp: "123456",
         otp_hash: "abc123",
@@ -517,7 +560,8 @@ describe("Security Regression — Secure Logger", () => {
     });
 
     it("has at least 8 redaction patterns", async () => {
-      const { REDACTION_PATTERNS } = await import("../../lib/verification/secureLogger");
+      const { REDACTION_PATTERNS } =
+        await import("../../lib/verification/secureLogger");
       expect(REDACTION_PATTERNS.length).toBeGreaterThanOrEqual(8);
     });
   });
@@ -539,11 +583,14 @@ describe("Security Regression — Notifications Security", () => {
   });
 
   it("exports NOTIFICATION_EVENTS with all Phase 3 events", async () => {
-    const { NOTIFICATION_EVENTS } = await import("../../lib/verification/notifications");
+    const { NOTIFICATION_EVENTS } =
+      await import("../../lib/verification/notifications");
     expect(NOTIFICATION_EVENTS.OTP_SENT).toBe("otp_sent");
     expect(NOTIFICATION_EVENTS.SESSION_STARTED).toBe("session_started");
     expect(NOTIFICATION_EVENTS.SELFIE_CAPTURED).toBe("selfie_captured");
-    expect(NOTIFICATION_EVENTS.MANUAL_REVIEW_ASSIGNED).toBe("manual_review_assigned");
+    expect(NOTIFICATION_EVENTS.MANUAL_REVIEW_ASSIGNED).toBe(
+      "manual_review_assigned",
+    );
   });
 
   it("notification functions use secureLogger (not console.log)", async () => {

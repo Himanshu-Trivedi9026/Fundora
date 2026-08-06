@@ -14,6 +14,7 @@ Phase 12 transforms Fundora into a production-grade cloud-native platform with c
 File: `supabase/migrations/012_infrastructure.sql`
 
 7 new tables:
+
 - `job_queue` — Background job processing with priority, retry, and scheduling
 - `scheduled_jobs` — Cron-based recurring job definitions
 - `cache_metadata` — TTL tracking, hit/miss counters, persistent cache
@@ -101,24 +102,25 @@ Module: `lib/recovery/`
 
 16 new API endpoints:
 
-| Route | Methods | Purpose |
-|-------|---------|---------|
-| `/api/health` | GET | Application health check |
-| `/api/health/database` | GET | Database health |
-| `/api/metrics` | GET | Prometheus/JSON/DD metrics |
-| `/api/diagnostics` | GET | System diagnostics |
-| `/api/infrastructure/health` | GET | Health dashboard data |
-| `/api/infrastructure/cache` | GET/POST | Cache management |
-| `/api/infrastructure/queues` | GET | Queue status |
-| `/api/jobs` | GET/POST | Job CRUD |
-| `/api/jobs/process` | POST | Queue processing |
-| `/api/jobs/schedule` | GET/POST/PUT/DELETE | Scheduled jobs |
-| `/api/deployments` | GET/POST | Deployment history |
-| `/api/deployments/rollback` | POST | Deployment rollback |
+| Route                        | Methods             | Purpose                    |
+| ---------------------------- | ------------------- | -------------------------- |
+| `/api/health`                | GET                 | Application health check   |
+| `/api/health/database`       | GET                 | Database health            |
+| `/api/metrics`               | GET                 | Prometheus/JSON/DD metrics |
+| `/api/diagnostics`           | GET                 | System diagnostics         |
+| `/api/infrastructure/health` | GET                 | Health dashboard data      |
+| `/api/infrastructure/cache`  | GET/POST            | Cache management           |
+| `/api/infrastructure/queues` | GET                 | Queue status               |
+| `/api/jobs`                  | GET/POST            | Job CRUD                   |
+| `/api/jobs/process`          | POST                | Queue processing           |
+| `/api/jobs/schedule`         | GET/POST/PUT/DELETE | Scheduled jobs             |
+| `/api/deployments`           | GET/POST            | Deployment history         |
+| `/api/deployments/rollback`  | POST                | Deployment rollback        |
 
 ### Part 11 — Admin Dashboards
 
 5 new components under `components/admin/InfrastructureDashboard/`:
+
 - `SystemHealthPanel.jsx` — Database, cache, component health, recent deployments
 - `DeploymentList.jsx` — Full deployment history with rollback support
 - `JobQueuePanel.jsx` — Queue stats, handlers, recent completions
@@ -131,25 +133,25 @@ Updated `pages/admin/infrastructure.js` with tabbed interface linking all 5 comp
 
 6 new test files with comprehensive coverage:
 
-| Test File | Tests |
-|-----------|-------|
-| `tests/lib/cache/cacheEngine.test.js` | Memory backend, TTL, locking, rate limiting, cleanup |
-| `tests/lib/jobs/jobQueue.test.js` | Handler registration, enqueue, schedules |
+| Test File                                       | Tests                                                          |
+| ----------------------------------------------- | -------------------------------------------------------------- |
+| `tests/lib/cache/cacheEngine.test.js`           | Memory backend, TTL, locking, rate limiting, cleanup           |
+| `tests/lib/jobs/jobQueue.test.js`               | Handler registration, enqueue, schedules                       |
 | `tests/lib/observability/opentelemetry.test.js` | Trace/span lifecycle, events, attributes, error hooks, logging |
-| `tests/lib/secrets/secretsManager.test.js` | CRUD, rotation, expiry, credential validation, audit |
-| `tests/lib/performance/poolManager.test.js` | Pool operations, endpoint metrics, health check, persistence |
-| `tests/lib/recovery/recoveryManager.test.js` | Backup verification, restore, plans, failover, runbooks |
+| `tests/lib/secrets/secretsManager.test.js`      | CRUD, rotation, expiry, credential validation, audit           |
+| `tests/lib/performance/poolManager.test.js`     | Pool operations, endpoint metrics, health check, persistence   |
+| `tests/lib/recovery/recoveryManager.test.js`    | Backup verification, restore, plans, failover, runbooks        |
 
 ### Part 13 — Documentation
 
-| Document | Content |
-|----------|---------|
-| `docs/DEPLOYMENT.md` | Docker, K8s, Helm deployment guides, CI/CD, rollback |
-| `docs/INFRASTRUCTURE.md` | Full infrastructure guide with code examples |
-| `docs/JOB_PLATFORM.md` | Job queue architecture, usage, retry engine |
-| `docs/OBSERVABILITY_V2.md` | OpenTelemetry, tracing, metrics export, error hooks |
-| `docs/DISASTER_RECOVERY.md` | Backup verification, restore, failover, runbooks |
-| `docs/PHASE12_REPORT.md` | This report |
+| Document                    | Content                                              |
+| --------------------------- | ---------------------------------------------------- |
+| `docs/DEPLOYMENT.md`        | Docker, K8s, Helm deployment guides, CI/CD, rollback |
+| `docs/INFRASTRUCTURE.md`    | Full infrastructure guide with code examples         |
+| `docs/JOB_PLATFORM.md`      | Job queue architecture, usage, retry engine          |
+| `docs/OBSERVABILITY_V2.md`  | OpenTelemetry, tracing, metrics export, error hooks  |
+| `docs/DISASTER_RECOVERY.md` | Backup verification, restore, failover, runbooks     |
+| `docs/PHASE12_REPORT.md`    | This report                                          |
 
 ## File Count
 

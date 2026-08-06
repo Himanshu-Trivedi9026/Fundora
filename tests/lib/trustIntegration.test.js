@@ -69,7 +69,16 @@ describe("Trust Integration — Verification Adjustments", () => {
     });
 
     it("all boost values are positive", () => {
-      const types = ["phone", "id", "bank", "business", "selfie", "address", "gst", "unknown"];
+      const types = [
+        "phone",
+        "id",
+        "bank",
+        "business",
+        "selfie",
+        "address",
+        "gst",
+        "unknown",
+      ];
       types.forEach((type) => {
         const result = applyVerificationApproval(0, type);
         expect(result).toBeGreaterThan(0);
@@ -137,7 +146,16 @@ describe("Trust Integration — Verification Adjustments", () => {
     });
 
     it("all penalties reduce the score", () => {
-      const types = ["phone", "id", "bank", "business", "selfie", "address", "gst", "unknown"];
+      const types = [
+        "phone",
+        "id",
+        "bank",
+        "business",
+        "selfie",
+        "address",
+        "gst",
+        "unknown",
+      ];
       types.forEach((type) => {
         const before = 50;
         const after = applyVerificationRejection(before, type);
@@ -191,15 +209,21 @@ describe("Trust Integration — Verification Adjustments", () => {
     });
 
     it("calculates bonus for private_limited (25 * 1.2 = 30)", () => {
-      expect(calculateBusinessTrustBonus({ business_type: "private_limited" })).toBe(30);
+      expect(
+        calculateBusinessTrustBonus({ business_type: "private_limited" }),
+      ).toBe(30);
     });
 
     it("calculates bonus for individual (25 * 0.8 = 20)", () => {
-      expect(calculateBusinessTrustBonus({ business_type: "individual" })).toBe(20);
+      expect(calculateBusinessTrustBonus({ business_type: "individual" })).toBe(
+        20,
+      );
     });
 
     it("defaults to 1.0 multiplier for unknown type", () => {
-      expect(calculateBusinessTrustBonus({ business_type: "unknown" })).toBe(25);
+      expect(calculateBusinessTrustBonus({ business_type: "unknown" })).toBe(
+        25,
+      );
     });
   });
 
@@ -213,7 +237,9 @@ describe("Trust Integration — Verification Adjustments", () => {
     });
 
     it("adds penny drop bonus when successful (20 + 10 = 30)", () => {
-      expect(calculateBankTrustBonus({ penny_drop_status: "success" })).toBe(30);
+      expect(calculateBankTrustBonus({ penny_drop_status: "success" })).toBe(
+        30,
+      );
     });
 
     it("does not add penny drop bonus when failed", () => {

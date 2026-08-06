@@ -69,7 +69,9 @@ describe("Escrow API Routes", () => {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             is: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockAccount, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockAccount, error: null }),
             }),
           }),
         }),

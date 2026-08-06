@@ -39,10 +39,8 @@ export function collectMetadata() {
     screen: {
       width: typeof window !== "undefined" ? window.screen?.width : 0,
       height: typeof window !== "undefined" ? window.screen?.height : 0,
-      colorDepth:
-        typeof window !== "undefined" ? window.screen?.colorDepth : 0,
-      pixelRatio:
-        typeof window !== "undefined" ? window.devicePixelRatio : 1,
+      colorDepth: typeof window !== "undefined" ? window.screen?.colorDepth : 0,
+      pixelRatio: typeof window !== "undefined" ? window.devicePixelRatio : 1,
     },
     timezone: {
       name: Intl.DateTimeFormat().resolvedOptions().timeZone || "unknown",
@@ -51,8 +49,7 @@ export function collectMetadata() {
     capabilities: {
       webGL: !!getWebGLContext(),
       canvas: !!document.createElement("canvas").getContext,
-      touch:
-        typeof window !== "undefined" && "ontouchstart" in window,
+      touch: typeof window !== "undefined" && "ontouchstart" in window,
     },
     collectedAt: new Date().toISOString(),
   };

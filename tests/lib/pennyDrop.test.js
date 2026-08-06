@@ -41,7 +41,9 @@ vi.mock("../../lib/verification/secureLogger", () => ({
 }));
 
 const mockProvider = {
-  submitVerification: vi.fn().mockResolvedValue({ referenceId: "test_ref_123", status: "initiated" }),
+  submitVerification: vi
+    .fn()
+    .mockResolvedValue({ referenceId: "test_ref_123", status: "initiated" }),
   checkStatus: vi.fn().mockResolvedValue({ status: "success" }),
   handleWebhook: vi.fn().mockResolvedValue({ status: "success" }),
   mapStatus: vi.fn((s) => s),
@@ -85,7 +87,15 @@ function setupMockChain(data = null, error = null) {
     limit: vi.fn().mockReturnThis(),
   });
 
-  return { mockSelect, mockEq, mockNeq, mockMaybeSingle, mockUpdate, mockInsert, mockOrder };
+  return {
+    mockSelect,
+    mockEq,
+    mockNeq,
+    mockMaybeSingle,
+    mockUpdate,
+    mockInsert,
+    mockOrder,
+  };
 }
 
 // ─── Tests ───
@@ -93,7 +103,10 @@ function setupMockChain(data = null, error = null) {
 describe("Penny Drop Verification", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockProvider.submitVerification.mockResolvedValue({ referenceId: "test_ref_123", status: "initiated" });
+    mockProvider.submitVerification.mockResolvedValue({
+      referenceId: "test_ref_123",
+      status: "initiated",
+    });
     mockProvider.checkStatus.mockResolvedValue({ status: "success" });
     mockProvider.handleWebhook.mockResolvedValue({ status: "success" });
     mockProvider.mapStatus.mockImplementation((s) => s);
@@ -177,7 +190,7 @@ describe("Penny Drop Verification", () => {
           entityType: "bank_account",
           entityId: "account-123",
           userId: "user-123",
-        })
+        }),
       );
     });
 
@@ -192,7 +205,11 @@ describe("Penny Drop Verification", () => {
 
       await initiatePennyDrop("user-123", "account-123");
 
-      expect(logInfo).toHaveBeenCalledWith("PennyDrop", "Penny drop initiated", expect.any(Object));
+      expect(logInfo).toHaveBeenCalledWith(
+        "PennyDrop",
+        "Penny drop initiated",
+        expect.any(Object),
+      );
     });
 
     it("returns error on provider failure", async () => {
@@ -203,7 +220,9 @@ describe("Penny Drop Verification", () => {
         account_holder_name: "John",
         ifsc_code: "HDFC0123456",
       });
-      mockProvider.submitVerification.mockRejectedValue(new Error("Provider unavailable"));
+      mockProvider.submitVerification.mockRejectedValue(
+        new Error("Provider unavailable"),
+      );
 
       const result = await initiatePennyDrop("user-123", "account-123");
 
@@ -276,7 +295,7 @@ describe("Penny Drop Verification", () => {
           eventType: "penny_drop.status_checked",
           entityType: "bank_account",
           entityId: "account-123",
-        })
+        }),
       );
     });
 
@@ -326,7 +345,9 @@ describe("Penny Drop Verification", () => {
       const result = await handlePennyDropWebhook({ referenceId: "ref_123" });
 
       expect(result.success).toBe(true);
-      expect(mockProvider.handleWebhook).toHaveBeenCalledWith({ referenceId: "ref_123" });
+      expect(mockProvider.handleWebhook).toHaveBeenCalledWith({
+        referenceId: "ref_123",
+      });
     });
 
     it("calls logAuditEvent on successful webhook processing", async () => {
@@ -343,13 +364,15 @@ describe("Penny Drop Verification", () => {
           entityType: "bank_account",
           entityId: "account-456",
           userId: "user-789",
-        })
+        }),
       );
     });
 
     it("returns success even when account not found by reference", async () => {
       setupMockChain(null, null);
-      const result = await handlePennyDropWebhook({ referenceId: "nonexistent_ref" });
+      const result = await handlePennyDropWebhook({
+        referenceId: "nonexistent_ref",
+      });
       expect(result.success).toBe(true);
     });
 
@@ -395,10 +418,22 @@ describe("Penny Drop Verification", () => {
 
     it("returns history data when available", async () => {
       const historyData = [
-        { id: "acc-1", account_holder_name: "John", status: "verified", penny_drop_status: "success" },
-        { id: "acc-2", account_holder_name: "Jane", status: "draft", penny_drop_status: "initiated" },
+        {
+          id: "acc-1",
+          account_holder_name: "John",
+          status: "verified",
+          penny_drop_status: "success",
+        },
+        {
+          id: "acc-2",
+          account_holder_name: "Jane",
+          status: "draft",
+          penny_drop_status: "initiated",
+        },
       ];
-      const mockOrder = vi.fn().mockResolvedValue({ data: historyData, error: null });
+      const mockOrder = vi
+        .fn()
+        .mockResolvedValue({ data: historyData, error: null });
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
@@ -414,7 +449,9 @@ describe("Penny Drop Verification", () => {
     });
 
     it("returns error on database failure", async () => {
-      const mockOrder = vi.fn().mockResolvedValue({ data: null, error: { message: "DB error" } });
+      const mockOrder = vi
+        .fn()
+        .mockResolvedValue({ data: null, error: { message: "DB error" } });
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),

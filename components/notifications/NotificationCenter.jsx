@@ -89,7 +89,9 @@ export default function NotificationCenter({ compact = false }) {
   // the API returns 401 — this was the original bug. Every request below
   // resolves the session first and attaches the header.
   const authFetch = useCallback(async (url, options = {}) => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session?.access_token) {
       setAuthError("You need to be logged in to view notifications.");
       return null;
@@ -115,7 +117,9 @@ export default function NotificationCenter({ compact = false }) {
         setNotifications(json.notifications || []);
         setUnreadCount(json.unreadCount || 0);
       }
-    } catch { /* ignore */ } finally {
+    } catch {
+      /* ignore */
+    } finally {
       setLoading(false);
     }
   }, [filter, compact, authFetch]);
@@ -127,23 +131,31 @@ export default function NotificationCenter({ compact = false }) {
   async function markRead(id) {
     try {
       await authFetch("/api/notifications", {
-        method: "POST", headers: { "Content-Type": "application/json" },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "mark_read", notificationId: id }),
       });
-      setNotifications((prev) => prev.map((n) => n.id === id ? { ...n, is_read: true } : n));
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)),
+      );
       setUnreadCount((prev) => Math.max(0, prev - 1));
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   async function markAllRead() {
     try {
       await authFetch("/api/notifications", {
-        method: "POST", headers: { "Content-Type": "application/json" },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "mark_all_read" }),
       });
       setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
       setUnreadCount(0);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   // Live schema uses `is_read`; be tolerant of both `read` and `is_read`.
@@ -159,9 +171,17 @@ export default function NotificationCenter({ compact = false }) {
   // Loading skeleton
   if (loading) {
     return (
-      <div className="space-y-3" role="status" aria-label="Loading notifications">
+      <div
+        className="space-y-3"
+        role="status"
+        aria-label="Loading notifications"
+      >
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-16 bg-surface-container-high rounded-xl shimmer" aria-hidden="true" />
+          <div
+            key={i}
+            className="h-16 bg-surface-container-high rounded-xl shimmer"
+            aria-hidden="true"
+          />
         ))}
       </div>
     );
@@ -173,16 +193,24 @@ export default function NotificationCenter({ compact = false }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           {!compact && (
-            <h2 className="text-xl font-bold text-on-surface font-geist">Notifications</h2>
+            <h2 className="text-xl font-bold text-on-surface font-geist">
+              Notifications
+            </h2>
           )}
           {unreadCount > 0 && (
-            <span className="bg-danger text-white text-xs font-bold px-2 py-0.5 rounded-full" aria-label={`${unreadCount} unread`}>
+            <span
+              className="bg-danger text-white text-xs font-bold px-2 py-0.5 rounded-full"
+              aria-label={`${unreadCount} unread`}
+            >
               {unreadCount}
             </span>
           )}
         </div>
         {unreadCount > 0 && !compact && (
-          <button onClick={markAllRead} className="text-sm text-primary hover:text-primary/80 transition-colors">
+          <button
+            onClick={markAllRead}
+            className="text-sm text-primary hover:text-primary/80 transition-colors"
+          >
             Mark all read
           </button>
         )}
@@ -198,7 +226,14 @@ export default function NotificationCenter({ compact = false }) {
       {/* Filter — hidden in compact mode */}
       {!compact && (
         <div className="flex gap-2 flex-wrap">
-          {["", "campaign_update", "donation_received", "system_alert", "new_message", "new_follower"].map((type) => (
+          {[
+            "",
+            "campaign_update",
+            "donation_received",
+            "system_alert",
+            "new_message",
+            "new_follower",
+          ].map((type) => (
             <button
               key={type}
               onClick={() => setFilter(type)}
@@ -217,10 +252,15 @@ export default function NotificationCenter({ compact = false }) {
       {/* Compact empty state */}
       {compact && displayNotifications.length === 0 && (
         <div className="text-center py-6">
-          <span className="material-symbols-outlined text-[32px] text-outline-variant mb-2" aria-hidden="true">
+          <span
+            className="material-symbols-outlined text-[32px] text-outline-variant mb-2"
+            aria-hidden="true"
+          >
             notifications_off
           </span>
-          <p className="text-sm text-on-surface-variant">No unread notifications</p>
+          <p className="text-sm text-on-surface-variant">
+            No unread notifications
+          </p>
         </div>
       )}
 
@@ -228,11 +268,16 @@ export default function NotificationCenter({ compact = false }) {
       <AnimatePresence>
         {!compact && displayNotifications.length === 0 ? (
           <div className="glass-card p-8 text-center">
-            <span className="material-symbols-outlined text-[40px] text-outline-variant mb-3" aria-hidden="true">
+            <span
+              className="material-symbols-outlined text-[40px] text-outline-variant mb-3"
+              aria-hidden="true"
+            >
               notifications_off
             </span>
             <p className="text-on-surface-variant text-sm">
-              {filter ? `No ${filter.replace(/_/g, " ")} notifications` : "No notifications yet"}
+              {filter
+                ? `No ${filter.replace(/_/g, " ")} notifications`
+                : "No notifications yet"}
             </p>
           </div>
         ) : (
@@ -250,7 +295,12 @@ export default function NotificationCenter({ compact = false }) {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -5 }}
                   onClick={() => unread && markRead(n.id)}
-                  onKeyDown={(e) => { if (unread && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); markRead(n.id); } }}
+                  onKeyDown={(e) => {
+                    if (unread && (e.key === "Enter" || e.key === " ")) {
+                      e.preventDefault();
+                      markRead(n.id);
+                    }
+                  }}
                   role="button"
                   tabIndex={0}
                   className={`glass-card p-4 cursor-pointer transition-all duration-200 ${
@@ -260,19 +310,36 @@ export default function NotificationCenter({ compact = false }) {
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    {unread && <span className="sr-only" role="status">Unread</span>}
-                    <span className="material-symbols-outlined text-[20px] text-primary mt-0.5 shrink-0" aria-hidden="true">
+                    {unread && (
+                      <span className="sr-only" role="status">
+                        Unread
+                      </span>
+                    )}
+                    <span
+                      className="material-symbols-outlined text-[20px] text-primary mt-0.5 shrink-0"
+                      aria-hidden="true"
+                    >
                       {icon}
                     </span>
-                    <span className="sr-only">{type.replace(/_/g, " ")} notification</span>
+                    <span className="sr-only">
+                      {type.replace(/_/g, " ")} notification
+                    </span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <p className={`text-sm font-medium truncate ${unread ? "text-on-surface" : "text-on-surface-variant"}`}>
+                        <p
+                          className={`text-sm font-medium truncate ${unread ? "text-on-surface" : "text-on-surface-variant"}`}
+                        >
                           {title}
                         </p>
-                        <span className="text-xs text-outline whitespace-nowrap shrink-0">{formatDate(n.created_at)}</span>
+                        <span className="text-xs text-outline whitespace-nowrap shrink-0">
+                          {formatDate(n.created_at)}
+                        </span>
                       </div>
-                      {body && <p className="text-sm text-on-surface-variant mt-1 truncate">{body}</p>}
+                      {body && (
+                        <p className="text-sm text-on-surface-variant mt-1 truncate">
+                          {body}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </motion.div>

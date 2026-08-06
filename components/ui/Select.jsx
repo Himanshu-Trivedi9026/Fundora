@@ -11,7 +11,7 @@ const Select = forwardRef(function Select(
     id,
     ...props
   },
-  ref
+  ref,
 ) {
   const inputId = id || props.name || label?.toLowerCase().replace(/\s+/g, "-");
 
@@ -56,7 +56,7 @@ const Select = forwardRef(function Select(
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>
-            )
+            ),
           )}
         </select>
 

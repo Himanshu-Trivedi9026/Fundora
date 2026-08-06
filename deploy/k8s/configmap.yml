@@ -1,5 +1,4 @@
 # Fundora — ConfigMap & Secrets
-
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -30,7 +29,7 @@ metadata:
     app: fundora
 type: Opaque
 stringData:
-  supabase-url: ""      # Set via: kubectl apply -f - < sealed-secret or external-secrets
+  supabase-url: "" # Set via: kubectl apply -f - < sealed-secret or external-secrets
   supabase-service-role-key: ""
   nextauth-secret: ""
   encryption-key: ""

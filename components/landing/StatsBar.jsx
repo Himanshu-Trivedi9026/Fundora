@@ -46,7 +46,9 @@ function AnimatedNumber({ target, prefix = "", suffix = "", decimals = 0 }) {
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6 }}
     >
-      {prefix}{display}{suffix}
+      {prefix}
+      {display}
+      {suffix}
     </motion.span>
   );
 }
@@ -154,10 +156,18 @@ export default function StatsBar({ initialStats = null }) {
   ];
 
   return (
-    <section className="py-12 border-y border-white/[0.06] bg-surface-container-lowest/50 backdrop-blur-sm" aria-label="Platform statistics">
+    <section
+      className="py-12 border-y border-white/[0.06] bg-surface-container-lowest/50 backdrop-blur-sm"
+      aria-label="Platform statistics"
+    >
       <div className="max-w-6xl mx-auto px-4 md:px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
         {statItems.map((s, i) => (
-          <div key={i} className="space-y-2" aria-live="polite" aria-atomic="true">
+          <div
+            key={i}
+            className="space-y-2"
+            aria-live="polite"
+            aria-atomic="true"
+          >
             {s.useFormatted ? (
               <motion.span
                 className="font-geist text-4xl md:text-5xl font-bold text-primary"

@@ -34,7 +34,7 @@ function deriveStoragePath(url) {
 // Lazy-load project chat widget
 const FloatingProjectChat = dynamic(
   () => import("../../components/FloatingProjectChat"),
-  { ssr: false }
+  { ssr: false },
 );
 
 export default function ProjectDetails() {
@@ -79,7 +79,9 @@ export default function ProjectDetails() {
         // Fetch creator's verification data (non-sensitive fields)
         const { data: verificationRow } = await supabase
           .from("creator_verifications")
-          .select("verification_level, verification_status, trust_score, risk_score, identity_verified")
+          .select(
+            "verification_level, verification_status, trust_score, risk_score, identity_verified",
+          )
           .eq("user_id", proj.owner_id)
           .maybeSingle();
 
@@ -132,7 +134,7 @@ export default function ProjectDetails() {
         },
         (payload) => {
           setProject(payload.new);
-        }
+        },
       )
       .subscribe();
 
@@ -148,7 +150,7 @@ export default function ProjectDetails() {
       videos: media.filter((m) => m.type === "video"),
       documents: media.filter((m) => m.type === "document"),
     }),
-    [media]
+    [media],
   );
 
   /* ================= LOADING STATE ================= */
@@ -256,7 +258,6 @@ export default function ProjectDetails() {
           {/* ═══════════ MAIN CONTENT GRID ═══════════ */}
           <div className="max-w-[1280px] mx-auto px-10 lg:px-16 relative z-10">
             <div className="grid grid-cols-12 gap-6 items-start pb-12">
-
               {/* ─── LEFT COLUMN: Primary Content ─── */}
               <div className="col-span-12 lg:col-span-8 space-y-8">
                 {project.thumbnail && (
@@ -297,15 +298,24 @@ export default function ProjectDetails() {
                   >
                     {videos.length > 0 && (
                       <div>
-                        <h3 className="font-geist text-lg font-semibold text-on-surface mb-3">Videos</h3>
+                        <h3 className="font-geist text-lg font-semibold text-on-surface mb-3">
+                          Videos
+                        </h3>
                         <div className="space-y-3">
                           {videos.map((vid) => (
                             <video
                               key={vid.id}
                               src={vid.url}
                               controls
-                              onClick={() => setPreview({ type: "video", url: vid.url })}
-                              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setPreview({ type: "video", url: vid.url }); } }}
+                              onClick={() =>
+                                setPreview({ type: "video", url: vid.url })
+                              }
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  setPreview({ type: "video", url: vid.url });
+                                }
+                              }}
                               className="cursor-pointer w-full rounded-xl border border-outline-variant/30"
                               aria-label={vid.name || "Project video"}
                             />
@@ -316,7 +326,9 @@ export default function ProjectDetails() {
 
                     {documents.length > 0 && (
                       <div>
-                        <h3 className="font-geist text-lg font-semibold text-on-surface mb-3">Documents</h3>
+                        <h3 className="font-geist text-lg font-semibold text-on-surface mb-3">
+                          Documents
+                        </h3>
                         <ul className="space-y-2">
                           {documents.map((doc) => (
                             <li key={doc.id}>
@@ -326,7 +338,12 @@ export default function ProjectDetails() {
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-2 text-primary font-inter text-sm hover:underline"
                               >
-                                <span className="material-symbols-outlined text-lg" aria-hidden="true">description</span>
+                                <span
+                                  className="material-symbols-outlined text-lg"
+                                  aria-hidden="true"
+                                >
+                                  description
+                                </span>
                                 {doc.name || "Open document (opens in new tab)"}
                               </a>
                             </li>
@@ -348,14 +365,15 @@ export default function ProjectDetails() {
                     isOwner={isOwner}
                     saved={saved}
                     onSave={handleSave}
-                    onEdit={() => { router.push(`/edit/${project.id}`); }}
+                    onEdit={() => {
+                      router.push(`/edit/${project.id}`);
+                    }}
                     onDelete={handleDelete}
                     creatorVerification={creatorVerification}
                   />
                   <SimilarProjects projects={similarProjects} />
                 </div>
               </aside>
-
             </div>
           </div>
         </main>

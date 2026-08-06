@@ -7,8 +7,16 @@ function cleanUrl(url) {
 }
 
 const socialLinks = [
-  { key: "website", icon: "language", label: (v) => v.replace(/https?:\/\//, "").slice(0, 30) },
-  { key: "twitter", icon: "alternate_email", label: (v) => "@" + v.split("/").pop() },
+  {
+    key: "website",
+    icon: "language",
+    label: (v) => v.replace(/https?:\/\//, "").slice(0, 30),
+  },
+  {
+    key: "twitter",
+    icon: "alternate_email",
+    label: (v) => "@" + v.split("/").pop(),
+  },
   { key: "linkedin", icon: "link", label: () => "LinkedIn" },
   { key: "github", icon: "code", label: () => "GitHub" },
   { key: "instagram", icon: "photo_camera", label: () => "Instagram" },
@@ -31,7 +39,10 @@ export default function SidebarConnect({ profile }) {
       viewport={{ once: true, margin: "-40px" }}
       className="glass-card p-5 rounded-xl"
     >
-      <motion.h3 variants={staggerItem} className="font-geist text-lg font-semibold text-on-surface mb-4">
+      <motion.h3
+        variants={staggerItem}
+        className="font-geist text-lg font-semibold text-on-surface mb-4"
+      >
         Connect
       </motion.h3>
       <div className="space-y-3">

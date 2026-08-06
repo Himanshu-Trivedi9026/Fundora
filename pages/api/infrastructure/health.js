@@ -1,5 +1,9 @@
 // API — Infrastructure health dashboard data
-import { checkDatabaseHealth, getPoolStats, getEndpointMetrics } from "../../../lib/performance/index.js";
+import {
+  checkDatabaseHealth,
+  getPoolStats,
+  getEndpointMetrics,
+} from "../../../lib/performance/index.js";
 import { getStats } from "../../../lib/cache/index.js";
 import { getActiveJobCount, listHandlers } from "../../../lib/jobs/index.js";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin.js";

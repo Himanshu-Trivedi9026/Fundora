@@ -16,10 +16,16 @@ test.describe("Verification Dashboard", () => {
     const response = await page.goto("/creator/verification");
 
     // Page should load (may redirect to login if not authenticated)
-    expect(response?.status() === 200 || response?.status() === 302 || response?.status() === 401).toBeTruthy();
+    expect(
+      response?.status() === 200 ||
+        response?.status() === 302 ||
+        response?.status() === 401,
+    ).toBeTruthy();
   });
 
-  test("verification page renders for authenticated users", async ({ page }) => {
+  test("verification page renders for authenticated users", async ({
+    page,
+  }) => {
     // This test requires authentication
     const testEmail = process.env.TEST_USER_EMAIL;
     const testPassword = process.env.TEST_USER_PASSWORD;
@@ -45,7 +51,10 @@ test.describe("Verification Dashboard", () => {
     await page.waitForTimeout(2000);
 
     // Check for verification content
-    const hasContent = await page.locator("main, [class*='verification']").first().isVisible();
+    const hasContent = await page
+      .locator("main, [class*='verification']")
+      .first()
+      .isVisible();
     expect(hasContent).toBeTruthy();
   });
 
@@ -70,7 +79,9 @@ test.describe("Verification Dashboard", () => {
     await page.waitForTimeout(2000);
 
     // Look for shield icon or verification level indicator
-    const shield = page.locator('[class*="shield"], [class*="Shield"], [class*="security"]').first();
+    const shield = page
+      .locator('[class*="shield"], [class*="Shield"], [class*="security"]')
+      .first();
     const isVisible = await shield.isVisible().catch(() => false);
 
     // Shield should be visible for authenticated user
@@ -98,7 +109,9 @@ test.describe("Verification Dashboard", () => {
     await page.waitForTimeout(2000);
 
     // Look for progress bar or step indicators
-    const progress = page.locator('[class*="progress"], [class*="Progress"], [role="progressbar"]').first();
+    const progress = page
+      .locator('[class*="progress"], [class*="Progress"], [role="progressbar"]')
+      .first();
     const isVisible = await progress.isVisible().catch(() => false);
 
     expect(isVisible || true).toBeTruthy();
@@ -125,7 +138,9 @@ test.describe("Verification Dashboard", () => {
     await page.waitForTimeout(2000);
 
     // Look for trust score
-    const trustScore = page.locator('[class*="trust"], [class*="Trust"]').first();
+    const trustScore = page
+      .locator('[class*="trust"], [class*="Trust"]')
+      .first();
     const isVisible = await trustScore.isVisible().catch(() => false);
 
     expect(isVisible || true).toBeTruthy();
@@ -146,7 +161,9 @@ test.describe("Creator Profile Verification", () => {
     await page.waitForTimeout(2000);
 
     // Look for verification badge
-    const badge = page.locator('[class*="badge"], [class*="Badge"], [class*="verified"]').first();
+    const badge = page
+      .locator('[class*="badge"], [class*="Badge"], [class*="verified"]')
+      .first();
     const isVisible = await badge.isVisible().catch(() => false);
 
     expect(isVisible || true).toBeTruthy();

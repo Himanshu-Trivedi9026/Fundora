@@ -3,7 +3,12 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { recordFraudEvent, getFraudEvents, getFraudEventSummary, getAllFraudEvents } from "../../../lib/fraud/fraudEvents";
+import {
+  recordFraudEvent,
+  getFraudEvents,
+  getFraudEventSummary,
+  getAllFraudEvents,
+} from "../../../lib/fraud/fraudEvents";
 
 // Mock supabaseAdmin
 vi.mock("../../../lib/supabaseAdmin", () => {
@@ -19,7 +24,9 @@ vi.mock("../../../lib/supabaseAdmin", () => {
     select: vi.fn(() => mockChain),
     insert: vi.fn(() => ({
       select: vi.fn(() => ({
-        single: vi.fn(() => Promise.resolve({ data: { id: "test-id" }, error: null })),
+        single: vi.fn(() =>
+          Promise.resolve({ data: { id: "test-id" }, error: null }),
+        ),
       })),
     })),
   };
@@ -83,7 +90,16 @@ describe("FraudEvents", () => {
     });
 
     it("should accept all valid event categories", async () => {
-      const validCategories = ["verification", "donation", "payout", "account", "campaign", "device", "behavior", "system"];
+      const validCategories = [
+        "verification",
+        "donation",
+        "payout",
+        "account",
+        "campaign",
+        "device",
+        "behavior",
+        "system",
+      ];
 
       for (const category of validCategories) {
         const result = await recordFraudEvent({

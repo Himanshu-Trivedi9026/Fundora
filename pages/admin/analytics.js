@@ -12,23 +12,37 @@ import PageLayout from "../../components/PageLayout";
 import { useRole } from "../../context/RoleContext";
 import LoadingSpinner from "../../components/ui/LoadingSpinner";
 
-const PlatformAnalytics = dynamic(() => import("../../components/admin/PlatformAnalytics"), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center min-h-[400px]" role="status" aria-label="Loading">
-      <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
-    </div>
-  ),
-});
+const PlatformAnalytics = dynamic(
+  () => import("../../components/admin/PlatformAnalytics"),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        className="flex items-center justify-center min-h-[400px]"
+        role="status"
+        aria-label="Loading"
+      >
+        <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    ),
+  },
+);
 
-const GlobalAnalyticsDashboard = dynamic(() => import("../../components/admin/GlobalAnalyticsDashboard"), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center min-h-[400px]" role="status" aria-label="Loading">
-      <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
-    </div>
-  ),
-});
+const GlobalAnalyticsDashboard = dynamic(
+  () => import("../../components/admin/GlobalAnalyticsDashboard"),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        className="flex items-center justify-center min-h-[400px]"
+        role="status"
+        aria-label="Loading"
+      >
+        <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    ),
+  },
+);
 
 export default function AnalyticsPage() {
   const router = useRouter();
@@ -51,14 +65,21 @@ export default function AnalyticsPage() {
     <PageLayout>
       <Head>
         <title>Platform Analytics — Fundora Admin</title>
-        <meta name="description" content="Platform health, trust distribution, and growth analytics" />
+        <meta
+          name="description"
+          content="Platform health, trust distribution, and growth analytics"
+        />
       </Head>
 
       <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#0d0d15] to-[#0a0a0f]">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-white">Platform Analytics</h1>
-            <p className="text-gray-400 text-sm mt-1">Monitor platform health, trends, and performance metrics</p>
+            <h1 className="text-2xl font-bold text-white">
+              Platform Analytics
+            </h1>
+            <p className="text-gray-400 text-sm mt-1">
+              Monitor platform health, trends, and performance metrics
+            </p>
 
             <div className="mt-4 flex gap-2">
               <button
@@ -84,7 +105,11 @@ export default function AnalyticsPage() {
             </div>
           </div>
 
-          {view === "platform" ? <PlatformAnalytics /> : <GlobalAnalyticsDashboard />}
+          {view === "platform" ? (
+            <PlatformAnalytics />
+          ) : (
+            <GlobalAnalyticsDashboard />
+          )}
         </div>
       </div>
     </PageLayout>

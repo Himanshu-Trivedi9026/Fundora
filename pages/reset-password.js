@@ -27,7 +27,16 @@ const fadeUp = {
 /* ─── SVG Icons ─── */
 function LockIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <rect x="3" y="11" width="18" height="11" rx="2" />
       <path d="M7 11V7a5 5 0 0 1 10 0v4" />
     </svg>
@@ -36,7 +45,16 @@ function LockIcon() {
 
 function ArrowIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M5 12h14" />
       <path d="M12 5l7 7-7 7" />
     </svg>
@@ -44,7 +62,10 @@ function ArrowIcon() {
 }
 
 /* ─── Input Component (with password visibility toggle) ─── */
-const FormInput = forwardRef(function FormInput({ id, label, type, placeholder, value, onChange, icon: Icon, autoComplete }, ref) {
+const FormInput = forwardRef(function FormInput(
+  { id, label, type, placeholder, value, onChange, icon: Icon, autoComplete },
+  ref,
+) {
   const [showPassword, setShowPassword] = useState(false);
   const isPassword = type === "password";
 
@@ -78,14 +99,32 @@ const FormInput = forwardRef(function FormInput({ id, label, type, placeholder, 
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
                 <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
                 <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24" />
                 <line x1="1" y1="1" x2="23" y2="23" />
               </svg>
             ) : (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                 <circle cx="12" cy="12" r="3" />
               </svg>
@@ -204,9 +243,16 @@ export default function ResetPasswordPage() {
             className="w-full max-w-md relative z-10"
           >
             {/* ─── Brand Identity ─── */}
-            <motion.div variants={fadeUp} className="flex flex-col items-center mb-10 text-center">
+            <motion.div
+              variants={fadeUp}
+              className="flex flex-col items-center mb-10 text-center"
+            >
               <div className="mb-6 p-4 rounded-2xl bg-surface-container-high border border-outline-variant/30">
-                <span className="material-symbols-outlined text-primary text-[40px]" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">
+                <span
+                  className="material-symbols-outlined text-primary text-[40px]"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                  aria-hidden="true"
+                >
                   password
                 </span>
               </div>
@@ -227,7 +273,8 @@ export default function ResetPasswordPage() {
                 backdropFilter: "blur(24px) saturate(1.2)",
                 WebkitBackdropFilter: "blur(24px) saturate(1.2)",
                 border: "1px solid rgba(73, 68, 84, 0.3)",
-                boxShadow: "0 8px 32px rgba(0, 0, 0, 0.37), inset 0 1px 0 rgba(255,255,255,0.04)",
+                boxShadow:
+                  "0 8px 32px rgba(0, 0, 0, 0.37), inset 0 1px 0 rgba(255,255,255,0.04)",
               }}
             >
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
@@ -235,21 +282,39 @@ export default function ResetPasswordPage() {
               <div className="p-8 md:p-10">
                 {/* Checking session */}
                 {checking && (
-                  <div className="flex flex-col items-center gap-3 py-8" role="status">
-                    <span className="material-symbols-outlined text-[28px] text-on-surface-variant animate-spin" aria-hidden="true">
+                  <div
+                    className="flex flex-col items-center gap-3 py-8"
+                    role="status"
+                  >
+                    <span
+                      className="material-symbols-outlined text-[28px] text-on-surface-variant animate-spin"
+                      aria-hidden="true"
+                    >
                       progress_activity
                     </span>
-                    <p className="text-sm font-inter text-on-surface-variant">Checking your reset link...</p>
+                    <p className="text-sm font-inter text-on-surface-variant">
+                      Checking your reset link...
+                    </p>
                   </div>
                 )}
 
                 {/* Invalid / expired token */}
                 {!checking && !validSession && (
-                  <div className="flex flex-col items-center gap-4 py-6 text-center" role="alert">
+                  <div
+                    className="flex flex-col items-center gap-4 py-6 text-center"
+                    role="alert"
+                  >
                     <div className="w-14 h-14 rounded-full bg-danger-muted border border-danger/20 flex items-center justify-center">
-                      <span className="material-symbols-outlined text-danger text-[28px]" aria-hidden="true">link_off</span>
+                      <span
+                        className="material-symbols-outlined text-danger text-[28px]"
+                        aria-hidden="true"
+                      >
+                        link_off
+                      </span>
                     </div>
-                    <p className="text-on-surface-variant font-inter text-sm leading-relaxed max-w-xs">{error}</p>
+                    <p className="text-on-surface-variant font-inter text-sm leading-relaxed max-w-xs">
+                      {error}
+                    </p>
                     <Link
                       href="/forgot-password"
                       className="text-primary hover:text-primary/80 font-inter text-sm font-medium transition-colors"
@@ -274,8 +339,15 @@ export default function ResetPasswordPage() {
                           aria-live="polite"
                         >
                           <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-danger-muted border border-danger/20">
-                            <span className="material-symbols-outlined text-danger text-[18px]" aria-hidden="true">error</span>
-                            <p className="text-danger text-sm font-inter">{error}</p>
+                            <span
+                              className="material-symbols-outlined text-danger text-[18px]"
+                              aria-hidden="true"
+                            >
+                              error
+                            </span>
+                            <p className="text-danger text-sm font-inter">
+                              {error}
+                            </p>
                           </div>
                         </motion.div>
                       )}
@@ -342,7 +414,12 @@ export default function ResetPasswordPage() {
                       role="status"
                     >
                       <div className="w-14 h-14 rounded-full bg-success-muted border border-success/20 flex items-center justify-center">
-                        <span className="material-symbols-outlined text-success text-[28px]" aria-hidden="true">check_circle</span>
+                        <span
+                          className="material-symbols-outlined text-success text-[28px]"
+                          aria-hidden="true"
+                        >
+                          check_circle
+                        </span>
                       </div>
                       <p className="text-on-surface font-inter text-sm leading-relaxed max-w-xs">
                         Your password has been updated successfully.

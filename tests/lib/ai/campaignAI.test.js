@@ -21,8 +21,12 @@ vi.mock("../../../lib/verification/secureLogger.js", () => ({
 }));
 
 vi.mock("../../../lib/ai/aiEngine.js", () => ({
-  completeAIRequest: vi.fn().mockResolvedValue({ success: true, data: { content: "AI suggestion" } }),
-  getAIConfig: vi.fn().mockResolvedValue({ success: true, data: { enabled: true } }),
+  completeAIRequest: vi
+    .fn()
+    .mockResolvedValue({ success: true, data: { content: "AI suggestion" } }),
+  getAIConfig: vi
+    .fn()
+    .mockResolvedValue({ success: true, data: { enabled: true } }),
 }));
 
 import {
@@ -45,13 +49,17 @@ function mockChain(terminalKey, terminalValue, eqCount = 0) {
     return { [terminalKey]: vi.fn().mockResolvedValue(terminalValue) };
   }
   return {
-    eq: vi.fn().mockReturnValue(mockChain(terminalKey, terminalValue, eqCount - 1)),
+    eq: vi
+      .fn()
+      .mockReturnValue(mockChain(terminalKey, terminalValue, eqCount - 1)),
   };
 }
 
 function mockFromChain(terminalKey, terminalValue, eqCount = 0) {
   return {
-    select: vi.fn().mockReturnValue(mockChain(terminalKey, terminalValue, eqCount)),
+    select: vi
+      .fn()
+      .mockReturnValue(mockChain(terminalKey, terminalValue, eqCount)),
   };
 }
 
@@ -78,11 +86,11 @@ describe("CampaignAI", () => {
       };
 
       supabaseAdmin.from.mockReturnValueOnce(
-        mockFromChain("single", { data: mockCampaign, error: null }, 1)
+        mockFromChain("single", { data: mockCampaign, error: null }, 1),
       );
       // creator_profiles query
       supabaseAdmin.from.mockReturnValueOnce(
-        mockFromChain("single", { data: { trust_score: 70 }, error: null }, 1)
+        mockFromChain("single", { data: { trust_score: 70 }, error: null }, 1),
       );
 
       const result = await scoreCampaignQuality({ campaignId: "camp-1" });
@@ -107,7 +115,11 @@ describe("CampaignAI", () => {
 
     it("returns error when campaign is not found", async () => {
       supabaseAdmin.from.mockReturnValueOnce(
-        mockFromChain("single", { data: null, error: { message: "not found" } }, 1)
+        mockFromChain(
+          "single",
+          { data: null, error: { message: "not found" } },
+          1,
+        ),
       );
 
       const result = await scoreCampaignQuality({ campaignId: "nonexistent" });
@@ -179,7 +191,9 @@ describe("CampaignAI", () => {
       expect(result.data.suggestions.length).toBeGreaterThan(0);
 
       // Short description should trigger length suggestion
-      expect(result.data.suggestions.some((s) => s.includes("short"))).toBe(true);
+      expect(result.data.suggestions.some((s) => s.includes("short"))).toBe(
+        true,
+      );
     });
 
     it("returns error when description is missing", async () => {
@@ -202,7 +216,9 @@ describe("CampaignAI", () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.data.improved.length).toBeGreaterThanOrEqual(longDesc.length);
+      expect(result.data.improved.length).toBeGreaterThanOrEqual(
+        longDesc.length,
+      );
     });
   });
 
@@ -217,8 +233,12 @@ describe("CampaignAI", () => {
 
       expect(result.success).toBe(true);
       expect(result.data.recommended).toBeGreaterThan(0);
-      expect(result.data.range.min).toBeLessThanOrEqual(result.data.recommended);
-      expect(result.data.range.max).toBeGreaterThanOrEqual(result.data.recommended);
+      expect(result.data.range.min).toBeLessThanOrEqual(
+        result.data.recommended,
+      );
+      expect(result.data.range.max).toBeGreaterThanOrEqual(
+        result.data.recommended,
+      );
       expect(typeof result.data.reason).toBe("string");
     });
 
@@ -250,7 +270,9 @@ describe("CampaignAI", () => {
       expect(personal.success).toBe(true);
       expect(nonprofit.success).toBe(true);
       // nonprofit multiplier (1.2) > personal multiplier (0.6)
-      expect(nonprofit.data.recommended).toBeGreaterThanOrEqual(personal.data.recommended);
+      expect(nonprofit.data.recommended).toBeGreaterThanOrEqual(
+        personal.data.recommended,
+      );
     });
   });
 
@@ -260,7 +282,8 @@ describe("CampaignAI", () => {
     it("returns matching categories from keywords", async () => {
       const result = await predictCategory({
         title: "AI Software Platform",
-        description: "Building an innovative machine learning and blockchain platform",
+        description:
+          "Building an innovative machine learning and blockchain platform",
       });
 
       expect(result.success).toBe(true);
@@ -286,7 +309,9 @@ describe("CampaignAI", () => {
     it("returns error when both title and description are missing", async () => {
       const result = await predictCategory({});
       expect(result.success).toBe(false);
-      expect(result.error).toBe("At least one of title or description is required");
+      expect(result.error).toBe(
+        "At least one of title or description is required",
+      );
     });
   });
 
@@ -313,10 +338,10 @@ describe("CampaignAI", () => {
       };
 
       supabaseAdmin.from.mockReturnValueOnce(
-        mockFromChain("single", { data: mockCampaign, error: null }, 1)
+        mockFromChain("single", { data: mockCampaign, error: null }, 1),
       );
       supabaseAdmin.from.mockReturnValueOnce(
-        mockFromChain("single", { data: mockCreator, error: null }, 1)
+        mockFromChain("single", { data: mockCreator, error: null }, 1),
       );
 
       const result = await observeCampaignRisk({ campaignId: "camp-risk" });
@@ -358,10 +383,10 @@ describe("CampaignAI", () => {
       };
 
       supabaseAdmin.from.mockReturnValueOnce(
-        mockFromChain("single", { data: mockCampaign, error: null }, 1)
+        mockFromChain("single", { data: mockCampaign, error: null }, 1),
       );
       supabaseAdmin.from.mockReturnValueOnce(
-        mockFromChain("single", { data: mockCreator, error: null }, 1)
+        mockFromChain("single", { data: mockCreator, error: null }, 1),
       );
 
       const result = await observeCampaignRisk({ campaignId: "camp-good" });
@@ -393,13 +418,16 @@ describe("CampaignAI", () => {
     it("returns error when both title and description are missing", async () => {
       const result = await generateSEOSuggestions({});
       expect(result.success).toBe(false);
-      expect(result.error).toBe("At least one of title or description is required");
+      expect(result.error).toBe(
+        "At least one of title or description is required",
+      );
     });
 
     it("adds category to keywords when missing from content", async () => {
       const result = await generateSEOSuggestions({
         title: "Help us build something great",
-        description: "We are building something meaningful for everyone to enjoy",
+        description:
+          "We are building something meaningful for everyone to enjoy",
         category: "arts",
       });
 
@@ -427,7 +455,7 @@ describe("CampaignAI", () => {
       };
 
       supabaseAdmin.from.mockReturnValueOnce(
-        mockFromChain("single", { data: mockCampaign, error: null }, 1)
+        mockFromChain("single", { data: mockCampaign, error: null }, 1),
       );
 
       const result = await analyzeCompleteness({ campaignId: "camp-inc" });
@@ -467,7 +495,7 @@ describe("CampaignAI", () => {
       };
 
       supabaseAdmin.from.mockReturnValueOnce(
-        mockFromChain("single", { data: mockCampaign, error: null }, 1)
+        mockFromChain("single", { data: mockCampaign, error: null }, 1),
       );
 
       const result = await analyzeCompleteness({ campaignId: "camp-full" });
@@ -506,15 +534,19 @@ describe("CampaignAI", () => {
         Object.assign(
           {
             select: vi.fn().mockReturnValue({
-              in: vi.fn().mockResolvedValue({ data: mockCampaigns, error: null }),
+              in: vi
+                .fn()
+                .mockResolvedValue({ data: mockCampaigns, error: null }),
             }),
           },
-          { select: vi.fn() }
-        )
+          { select: vi.fn() },
+        ),
       );
       // Fix: build proper chain for .in()
       supabaseAdmin.from.mockReset();
-      const mockIn = vi.fn().mockResolvedValue({ data: mockCampaigns, error: null });
+      const mockIn = vi
+        .fn()
+        .mockResolvedValue({ data: mockCampaigns, error: null });
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnValue({
           in: mockIn,

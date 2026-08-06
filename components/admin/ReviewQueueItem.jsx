@@ -89,11 +89,7 @@ const TYPE_ICONS = {
  *   onClick — () => void
  *   selected — boolean
  */
-export default function ReviewQueueItem({
-  item,
-  onClick,
-  selected = false,
-}) {
+export default function ReviewQueueItem({ item, onClick, selected = false }) {
   if (!item) return null;
 
   const status = STATUS_CONFIG[item.status] || STATUS_CONFIG.pending;
@@ -120,7 +116,9 @@ export default function ReviewQueueItem({
         {/* Type icon */}
         <div
           className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-            selected ? "bg-primary/20" : "bg-surface-container-high border border-outline-variant/30"
+            selected
+              ? "bg-primary/20"
+              : "bg-surface-container-high border border-outline-variant/30"
           }`}
         >
           <span
@@ -144,7 +142,8 @@ export default function ReviewQueueItem({
             </p>
 
             {/* Priority indicator */}
-            {(item.review_priority === "urgent" || item.review_priority === "high") && (
+            {(item.review_priority === "urgent" ||
+              item.review_priority === "high") && (
               <span
                 className={`material-symbols-outlined text-[12px] ${priority.color} ${
                   priority.pulse ? "animate-pulse" : ""

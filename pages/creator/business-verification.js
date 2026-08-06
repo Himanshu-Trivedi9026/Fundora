@@ -159,9 +159,7 @@ export default function BusinessVerification() {
                         Verification Status
                       </p>
                       <Badge
-                        variant={
-                          statusVariant[combined.status] || "default"
-                        }
+                        variant={statusVariant[combined.status] || "default"}
                         className="text-sm px-4 py-1.5"
                       >
                         {combined.status?.replace(/_/g, " ")}
@@ -171,11 +169,14 @@ export default function BusinessVerification() {
                   {combined.verified_at && (
                     <p className="text-gray-400 text-xs font-inter">
                       Verified on{" "}
-                      {new Date(combined.verified_at).toLocaleDateString("en-IN", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
+                      {new Date(combined.verified_at).toLocaleDateString(
+                        "en-IN",
+                        {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        },
+                      )}
                     </p>
                   )}
                 </div>
@@ -195,15 +196,23 @@ export default function BusinessVerification() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
                   <DetailRow
                     label="Business Name"
-                    value={combined.business_name || combined.company_name || "—"}
+                    value={
+                      combined.business_name || combined.company_name || "—"
+                    }
                   />
                   <DetailRow
                     label="Registration Number"
-                    value={combined.registration_number || combined.business_registration || "—"}
+                    value={
+                      combined.registration_number ||
+                      combined.business_registration ||
+                      "—"
+                    }
                   />
                   <DetailRow
                     label="Business Type"
-                    value={combined.business_type || combined.entity_type || "—"}
+                    value={
+                      combined.business_type || combined.entity_type || "—"
+                    }
                   />
                   <DetailRow
                     label="GST Number"
@@ -245,28 +254,36 @@ export default function BusinessVerification() {
                             {doc.type?.includes("identity")
                               ? "badge"
                               : doc.type?.includes("address")
-                              ? "home"
-                              : doc.type?.includes("registration")
-                              ? "article"
-                              : "description"}
+                                ? "home"
+                                : doc.type?.includes("registration")
+                                  ? "article"
+                                  : "description"}
                           </span>
                           <div>
                             <p className="text-white text-sm font-inter font-medium">
-                              {doc.name || doc.file_name || `Document ${idx + 1}`}
+                              {doc.name ||
+                                doc.file_name ||
+                                `Document ${idx + 1}`}
                             </p>
                             {doc.uploaded_at && (
                               <p className="text-gray-400 text-xs font-inter">
                                 Uploaded{" "}
-                                {new Date(doc.uploaded_at).toLocaleDateString("en-IN", {
-                                  day: "numeric",
-                                  month: "short",
-                                  year: "numeric",
-                                })}
+                                {new Date(doc.uploaded_at).toLocaleDateString(
+                                  "en-IN",
+                                  {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric",
+                                  },
+                                )}
                               </p>
                             )}
                           </div>
                         </div>
-                        <Badge variant="default" className="text-[11px] capitalize">
+                        <Badge
+                          variant="default"
+                          className="text-[11px] capitalize"
+                        >
                           {doc.status || doc.type || "document"}
                         </Badge>
                       </div>
@@ -276,7 +293,9 @@ export default function BusinessVerification() {
               )}
 
               {/* Verification Timeline / Notes */}
-              {(combined.notes || combined.admin_notes || combined.submitted_at) && (
+              {(combined.notes ||
+                combined.admin_notes ||
+                combined.submitted_at) && (
                 <GlassCard padding="md">
                   <div className="flex items-center gap-2 mb-5">
                     <span className="material-symbols-outlined text-primary text-[20px]">
@@ -344,13 +363,17 @@ function DetailRow({ label, value, fullWidth = false }) {
   );
 }
 
-function TimelineItem({ icon, label, date, color = "text-primary", isFirst = false }) {
+function TimelineItem({
+  icon,
+  label,
+  date,
+  color = "text-primary",
+  isFirst = false,
+}) {
   return (
     <div className="flex items-start gap-3">
       <div className="flex flex-col items-center">
-        <span
-          className={`material-symbols-outlined text-[18px] ${color}`}
-        >
+        <span className={`material-symbols-outlined text-[18px] ${color}`}>
           {icon}
         </span>
         {!isFirst && (

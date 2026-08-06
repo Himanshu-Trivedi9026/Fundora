@@ -21,7 +21,9 @@ vi.mock("../../lib/supabaseClient", () => ({
   supabase: {
     auth: {
       getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
-      getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
+      getSession: vi
+        .fn()
+        .mockResolvedValue({ data: { session: null }, error: null }),
       signOut: vi.fn().mockResolvedValue({ error: null }),
     },
     from: m.mockFrom,
@@ -96,14 +98,18 @@ describe("Navbar role-based navigation", () => {
       mockUseRoleValue({ user: null, role: ROLES.INVESTOR });
       render(<Navbar />);
 
-      expect(screen.queryByRole("link", { name: "Start a project" })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("link", { name: "Start a project" }),
+      ).not.toBeInTheDocument();
     });
 
     it("hides Start a project for investors", () => {
       mockUseRoleValue({ user: { id: "u1" }, role: ROLES.INVESTOR });
       render(<Navbar />);
 
-      expect(screen.queryByRole("link", { name: "Start a project" })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("link", { name: "Start a project" }),
+      ).not.toBeInTheDocument();
     });
 
     it("shows Start a project for creators and links to the creation flow", () => {
@@ -120,7 +126,9 @@ describe("Navbar role-based navigation", () => {
       mockUseRoleValue({ user: null, role: ROLES.INVESTOR, loading: true });
       render(<Navbar />);
 
-      expect(screen.queryByRole("link", { name: "Start a project" })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("link", { name: "Start a project" }),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -129,21 +137,28 @@ describe("Navbar role-based navigation", () => {
       mockUseRoleValue({ user: { id: "u1" }, role: ROLES.INVESTOR });
       render(<Navbar />);
 
-      expect(screen.queryByRole("button", { name: "Analytics" })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "Analytics" }),
+      ).not.toBeInTheDocument();
     });
 
     it("shows Analytics for creators", () => {
       mockUseRoleValue({ user: { id: "u2" }, role: ROLES.CREATOR });
       render(<Navbar />);
 
-      expect(screen.getByRole("button", { name: "Analytics" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Analytics" }),
+      ).toBeInTheDocument();
     });
   });
 
   describe("Creator account dropdown navigation", () => {
     /** Open the account dropdown and return the rendered menu links. */
     function openCreatorMenu() {
-      mockUseRoleValue({ user: { id: "u2", email: "creator@fundora.app" }, role: ROLES.CREATOR });
+      mockUseRoleValue({
+        user: { id: "u2", email: "creator@fundora.app" },
+        role: ROLES.CREATOR,
+      });
       render(<Navbar />);
       fireEvent.click(screen.getByRole("button", { name: "Account menu" }));
     }
@@ -174,7 +189,9 @@ describe("Navbar role-based navigation", () => {
       const settings = screen.getByRole("menuitem", { name: "Settings" });
       expect(settings).toHaveAttribute("href", "/edit-profile");
 
-      const deleteAcct = screen.getByRole("menuitem", { name: "Delete Account" });
+      const deleteAcct = screen.getByRole("menuitem", {
+        name: "Delete Account",
+      });
       expect(deleteAcct).toHaveAttribute("href", "/account/delete");
 
       // Logout is an action button (no href) — distinct from the navigation links.
@@ -187,9 +204,9 @@ describe("Navbar role-based navigation", () => {
       openCreatorMenu();
 
       const profileHref = "/creator/profile";
-      const menuLinks = screen.getAllByRole("menuitem").filter(
-        (el) => el.tagName === "A"
-      );
+      const menuLinks = screen
+        .getAllByRole("menuitem")
+        .filter((el) => el.tagName === "A");
       for (const link of menuLinks) {
         expect(link.getAttribute("href")).not.toBe(profileHref);
       }

@@ -34,7 +34,11 @@ import { hashIP } from "../../../lib/verification/auditLog";
 const rl = rateLimit({ windowMs: 60_000, max: 60 });
 
 function clientIp(req) {
-  return req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.socket?.remoteAddress || null;
+  return (
+    req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
+    req.socket?.remoteAddress ||
+    null
+  );
 }
 
 /**
@@ -42,7 +46,11 @@ function clientIp(req) {
  * in the existing admin review queue. Reuses the existing table + lifecycle —
  * this is the request record, not a new creation mechanism.
  */
-async function upsertVerificationRequest(userId, verificationId, metadata = {}) {
+async function upsertVerificationRequest(
+  userId,
+  verificationId,
+  metadata = {},
+) {
   const { data: existing } = await supabaseAdmin
     .from("verification_requests")
     .select("id")
@@ -102,7 +110,7 @@ export default withAuth(async function handler(req, res, user) {
         requestId || null,
         deviceMetadata || {},
         ipAddress,
-        req.headers["user-agent"]
+        req.headers["user-agent"],
       );
       if (!result.success) {
         return res.status(400).json({ error: result.error });
@@ -114,14 +122,16 @@ export default withAuth(async function handler(req, res, user) {
     if (req.method === "PATCH") {
       const { sessionId, step, completedSteps, wizardState } = req.body || {};
       if (!sessionId || !step) {
-        return res.status(400).json({ error: "sessionId and step are required" });
+        return res
+          .status(400)
+          .json({ error: "sessionId and step are required" });
       }
       const result = await updateSessionStep(
         sessionId,
         step,
         completedSteps || [],
         wizardState || {},
-        user.id
+        user.id,
       );
       if (!result.success) {
         return res.status(400).json({ error: result.error });
@@ -166,10 +176,13 @@ export default withAuth(async function handler(req, res, user) {
         const { error: requestError } = await upsertVerificationRequest(
           user.id,
           verification?.id || null,
-          { submitted_via: "wizard" }
+          { submitted_via: "wizard" },
         );
         if (requestError) {
-          console.error("Session complete: request upsert failed:", requestError.message);
+          console.error(
+            "Session complete: request upsert failed:",
+            requestError.message,
+          );
         }
 
         await logAuditEvent({

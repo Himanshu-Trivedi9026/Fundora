@@ -7,7 +7,11 @@
 
 import { withAuth } from "../../../lib/withAuth";
 import { rateLimit } from "../../../lib/rateLimit";
-import { createEscrowAccount, getEscrowAccountByCampaign, getEscrowAccountsByCreator } from "../../../lib/escrow/escrowAccount";
+import {
+  createEscrowAccount,
+  getEscrowAccountByCampaign,
+  getEscrowAccountsByCreator,
+} from "../../../lib/escrow/escrowAccount";
 import { logError } from "../../../lib/verification/secureLogger";
 
 const rl = rateLimit({ windowMs: 60_000, max: 10 });

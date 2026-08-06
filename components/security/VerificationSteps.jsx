@@ -9,7 +9,12 @@ import { motion } from "framer-motion";
  *   onStepClick  — (optional) callback when a step is clicked
  *   className    — additional classes
  */
-export default function VerificationSteps({ verification, history, onStepClick, className = "" }) {
+export default function VerificationSteps({
+  verification,
+  history,
+  onStepClick,
+  className = "",
+}) {
   if (!verification) return null;
 
   // Build a lookup of when each step was completed from history
@@ -76,7 +81,7 @@ export default function VerificationSteps({ verification, history, onStepClick, 
     },
   ];
 
-  const completedCount = steps.filter(s => s.completed).length;
+  const completedCount = steps.filter((s) => s.completed).length;
 
   function formatDate(dateStr) {
     if (!dateStr) return null;
@@ -95,7 +100,9 @@ export default function VerificationSteps({ verification, history, onStepClick, 
     <div className={`space-y-4 ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="font-geist text-sm font-semibold text-on-surface">Verification Timeline</h3>
+        <h3 className="font-geist text-sm font-semibold text-on-surface">
+          Verification Timeline
+        </h3>
         <span className="text-[10px] font-bold text-primary uppercase tracking-wider">
           {completedCount}/{steps.length} Complete
         </span>
@@ -119,11 +126,12 @@ export default function VerificationSteps({ verification, history, onStepClick, 
               {/* Dot on timeline */}
               <div
                 className={`absolute -left-10 top-3 w-[12px] h-[12px] rounded-full border-2 z-10
-                  ${step.completed
-                    ? "bg-success border-success shadow-[0_0_8px_rgba(52,211,153,0.4)]"
-                    : step.current
-                    ? "bg-primary border-primary shadow-[0_0_8px_rgba(196,168,255,0.4)] animate-pulse"
-                    : "bg-surface-container-high border-outline-variant/50"
+                  ${
+                    step.completed
+                      ? "bg-success border-success shadow-[0_0_8px_rgba(52,211,153,0.4)]"
+                      : step.current
+                        ? "bg-primary border-primary shadow-[0_0_8px_rgba(196,168,255,0.4)] animate-pulse"
+                        : "bg-surface-container-high border-outline-variant/50"
                   }
                 `}
               />
@@ -133,29 +141,41 @@ export default function VerificationSteps({ verification, history, onStepClick, 
                 onClick={() => onStepClick?.(step)}
                 disabled={!step.current && !step.completed}
                 className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left
-                  ${step.completed
-                    ? "bg-success-muted/20 border-success/10 hover:border-success/30"
-                    : step.current
-                    ? "bg-primary/5 border-primary/20 hover:border-primary/40 cursor-pointer"
-                    : "bg-surface-container-high/10 border-white/5 opacity-50 cursor-not-allowed"
+                  ${
+                    step.completed
+                      ? "bg-success-muted/20 border-success/10 hover:border-success/30"
+                      : step.current
+                        ? "bg-primary/5 border-primary/20 hover:border-primary/40 cursor-pointer"
+                        : "bg-surface-container-high/10 border-white/5 opacity-50 cursor-not-allowed"
                   }
                 `}
                 aria-label={`${step.label}: ${step.completed ? "Completed" : step.current ? "Current step" : "Locked"}`}
               >
                 {/* Icon */}
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0
-                  ${step.completed
-                    ? "bg-success/20"
-                    : step.current
-                    ? "bg-primary/20"
-                    : "bg-surface-container-high"
+                <div
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0
+                  ${
+                    step.completed
+                      ? "bg-success/20"
+                      : step.current
+                        ? "bg-primary/20"
+                        : "bg-surface-container-high"
                   }
-                `}>
+                `}
+                >
                   <span
                     className={`material-symbols-outlined text-[16px] ${
-                      step.completed ? "text-success" : step.current ? "text-primary" : "text-on-surface-variant/50"
+                      step.completed
+                        ? "text-success"
+                        : step.current
+                          ? "text-primary"
+                          : "text-on-surface-variant/50"
                     }`}
-                    style={step.completed ? { fontVariationSettings: "'FILL' 1" } : {}}
+                    style={
+                      step.completed
+                        ? { fontVariationSettings: "'FILL' 1" }
+                        : {}
+                    }
                   >
                     {step.completed ? "check_circle" : step.icon}
                   </span>
@@ -163,9 +183,15 @@ export default function VerificationSteps({ verification, history, onStepClick, 
 
                 {/* Text */}
                 <div className="flex-1 min-w-0">
-                  <div className={`text-sm font-inter font-medium ${
-                    step.completed ? "text-success" : step.current ? "text-on-surface" : "text-on-surface-variant"
-                  }`}>
+                  <div
+                    className={`text-sm font-inter font-medium ${
+                      step.completed
+                        ? "text-success"
+                        : step.current
+                          ? "text-on-surface"
+                          : "text-on-surface-variant"
+                    }`}
+                  >
                     {step.label}
                   </div>
                   <div className="text-[10px] text-on-surface-variant/70 font-inter truncate">
@@ -175,9 +201,15 @@ export default function VerificationSteps({ verification, history, onStepClick, 
 
                 {/* Status + Date */}
                 <div className="text-right shrink-0">
-                  <span className={`text-[9px] font-bold uppercase tracking-wider block ${
-                    step.completed ? "text-success" : step.current ? "text-primary" : "text-on-surface-variant/30"
-                  }`}>
+                  <span
+                    className={`text-[9px] font-bold uppercase tracking-wider block ${
+                      step.completed
+                        ? "text-success"
+                        : step.current
+                          ? "text-primary"
+                          : "text-on-surface-variant/30"
+                    }`}
+                  >
                     {step.completed ? "Done" : step.current ? "Next" : "Locked"}
                   </span>
                   {step.completed && dateStr && (

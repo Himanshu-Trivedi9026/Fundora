@@ -92,12 +92,17 @@ export default function VerificationWizard({ onClose }) {
     async (step, steps, state) => {
       if (!sessionId) return;
       try {
-        await updateSessionStepApi({ sessionId, step, completedSteps: steps, wizardState: state });
+        await updateSessionStepApi({
+          sessionId,
+          step,
+          completedSteps: steps,
+          wizardState: state,
+        });
       } catch (err) {
         console.error("Save step progress error:", err);
       }
     },
-    [sessionId]
+    [sessionId],
   );
 
   // Step index for navigation
@@ -114,7 +119,13 @@ export default function VerificationWizard({ onClose }) {
       setCurrentStep(nextStep);
       saveStepProgress(nextStep, newCompleted, wizardState);
     }
-  }, [currentStep, currentIndex, completedSteps, wizardState, saveStepProgress]);
+  }, [
+    currentStep,
+    currentIndex,
+    completedSteps,
+    wizardState,
+    saveStepProgress,
+  ]);
 
   // Navigate back
   const handleBack = useCallback(() => {
@@ -173,7 +184,9 @@ export default function VerificationWizard({ onClose }) {
           <IdentityVerificationStep
             onNext={handleNext}
             onBack={handleBack}
-            onStateChange={(state) => setWizardState((prev) => ({ ...prev, ...state }))}
+            onStateChange={(state) =>
+              setWizardState((prev) => ({ ...prev, ...state }))
+            }
           />
         );
       case "selfie":
@@ -181,7 +194,9 @@ export default function VerificationWizard({ onClose }) {
           <SelfieVerificationStep
             onNext={handleNext}
             onBack={handleBack}
-            onStateChange={(state) => setWizardState((prev) => ({ ...prev, ...state }))}
+            onStateChange={(state) =>
+              setWizardState((prev) => ({ ...prev, ...state }))
+            }
           />
         );
       case "review":
@@ -274,9 +289,7 @@ function ReviewStep({ request, onBack, onSubmit, submitting, wizardState }) {
             <IdentityCard type="pan" verified={false} />
           )}
           <SelfieCard
-            status={
-              wizardState.selfieUploaded ? "uploaded" : "pending"
-            }
+            status={wizardState.selfieUploaded ? "uploaded" : "pending"}
           />
         </div>
 
@@ -392,9 +405,7 @@ function CompletionStep({ onClose }) {
           className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-primary text-on-primary font-inter text-sm font-medium shadow-glow hover:bg-primary/90 hover:shadow-glow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           aria-label="Close verification wizard"
         >
-          <span className="material-symbols-outlined text-[18px]">
-            done
-          </span>
+          <span className="material-symbols-outlined text-[18px]">done</span>
           Done
         </button>
       </div>

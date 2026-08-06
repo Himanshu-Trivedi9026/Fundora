@@ -58,8 +58,8 @@ export default function UploadProgress({ progress = 0, status = "uploading" }) {
               status === "error"
                 ? "linear-gradient(90deg, #f87171, #fca5a5)"
                 : status === "complete"
-                ? "linear-gradient(90deg, #34d399, #6ee7b7)"
-                : "linear-gradient(90deg, #c4a8ff, #e0d4ff)",
+                  ? "linear-gradient(90deg, #34d399, #6ee7b7)"
+                  : "linear-gradient(90deg, #c4a8ff, #e0d4ff)",
           }}
         />
 
@@ -74,8 +74,8 @@ export default function UploadProgress({ progress = 0, status = "uploading" }) {
               status === "error"
                 ? "linear-gradient(90deg, #f87171, #fca5a5)"
                 : status === "complete"
-                ? "linear-gradient(90deg, #34d399, #6ee7b7)"
-                : "linear-gradient(90deg, #8b5cf6, #c4a8ff)",
+                  ? "linear-gradient(90deg, #34d399, #6ee7b7)"
+                  : "linear-gradient(90deg, #8b5cf6, #c4a8ff)",
           }}
         />
 

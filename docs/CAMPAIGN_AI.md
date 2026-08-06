@@ -14,14 +14,14 @@ Scores a campaign across six weighted dimensions, producing an overall score (0�
 
 ### Scoring Dimensions
 
-| Dimension | Weight | Scoring Criteria |
-|-----------|--------|------------------|
-| Title | 0.20 | Length (10–120 chars), power words, capitalisation, word count (3–15 words) |
-| Description | 0.25 | Length (100–5000 chars), paragraph structure, headings/bullets, sentence quality, personal pronouns, ALL CAPS ratio |
-| Media | 0.15 | Score scales with media count: 0 images = 0, 1 = 20, 2 = 40, 3 = 60, 4 = 80, 5+ = 100 |
-| Goal | 0.15 | Proximity to category average (ideal: 0.5×–2× average) |
-| Category | 0.10 | Keyword match count between category and title+description |
-| Creator Trust | 0.15 | Creator's platform trust score (0–100) |
+| Dimension     | Weight | Scoring Criteria                                                                                                    |
+| ------------- | ------ | ------------------------------------------------------------------------------------------------------------------- |
+| Title         | 0.20   | Length (10–120 chars), power words, capitalisation, word count (3–15 words)                                         |
+| Description   | 0.25   | Length (100–5000 chars), paragraph structure, headings/bullets, sentence quality, personal pronouns, ALL CAPS ratio |
+| Media         | 0.15   | Score scales with media count: 0 images = 0, 1 = 20, 2 = 40, 3 = 60, 4 = 80, 5+ = 100                               |
+| Goal          | 0.15   | Proximity to category average (ideal: 0.5×–2× average)                                                              |
+| Category      | 0.10   | Keyword match count between category and title+description                                                          |
+| Creator Trust | 0.15   | Creator's platform trust score (0–100)                                                                              |
 
 ### Title Scoring Details
 
@@ -82,15 +82,15 @@ Analyses a campaign description and generates improvement suggestions.
 
 ### Checks Performed
 
-| Check | Condition | Suggestion |
-|-------|-----------|------------|
-| Length | < 100 characters | "Your description is too short. Aim for at least 100 characters" |
-| Structure | < 2 paragraphs | "Break your description into multiple paragraphs" |
-| Personal touch | No first-person pronouns | "Add a personal touch using first-person language" |
-| Call to action | No CTA keywords | "Include a clear call to action encouraging donations" |
-| Goal mention | No dollar amount in text | "Mention your funding goal in the description" |
-| Impact | No benefit/impact keywords | "Describe the impact and benefits of your campaign" |
-| Media references | No visual keywords | "Reference your images or videos to engage readers" |
+| Check            | Condition                  | Suggestion                                                       |
+| ---------------- | -------------------------- | ---------------------------------------------------------------- |
+| Length           | < 100 characters           | "Your description is too short. Aim for at least 100 characters" |
+| Structure        | < 2 paragraphs             | "Break your description into multiple paragraphs"                |
+| Personal touch   | No first-person pronouns   | "Add a personal touch using first-person language"               |
+| Call to action   | No CTA keywords            | "Include a clear call to action encouraging donations"           |
+| Goal mention     | No dollar amount in text   | "Mention your funding goal in the description"                   |
+| Impact           | No benefit/impact keywords | "Describe the impact and benefits of your campaign"              |
+| Media references | No visual keywords         | "Reference your images or videos to engage readers"              |
 
 When structural issues are detected, the engine automatically restructures the description (e.g. splitting into paragraphs, appending a CTA).
 
@@ -102,27 +102,27 @@ Recommends a funding goal based on category averages and historical data.
 
 ### Category Averages
 
-| Category | Average Goal |
-|----------|-------------|
-| Technology | $25,000 |
-| Health | $50,000 |
-| Education | $15,000 |
-| Environment | $30,000 |
-| Arts | $10,000 |
-| Community | $20,000 |
-| Business | $35,000 |
-| Science | $40,000 |
+| Category    | Average Goal |
+| ----------- | ------------ |
+| Technology  | $25,000      |
+| Health      | $50,000      |
+| Education   | $15,000      |
+| Environment | $30,000      |
+| Arts        | $10,000      |
+| Community   | $20,000      |
+| Business    | $35,000      |
+| Science     | $40,000      |
 
 ### Campaign Type Multipliers
 
-| Type | Multiplier | Rationale |
-|------|-----------|-----------|
-| personal | 0.6× | Personal campaigns typically need less |
-| nonprofit | 1.2× | Organisations have larger operational costs |
-| creative | 0.8× | Creative projects often need moderate funding |
-| business | 1.1× | Business ventures require more capital |
-| technology | 1.3× | Tech projects are capital-intensive |
-| emergency | 0.5× | Emergency needs are typically urgent and smaller |
+| Type       | Multiplier | Rationale                                        |
+| ---------- | ---------- | ------------------------------------------------ |
+| personal   | 0.6×       | Personal campaigns typically need less           |
+| nonprofit  | 1.2×       | Organisations have larger operational costs      |
+| creative   | 0.8×       | Creative projects often need moderate funding    |
+| business   | 1.1×       | Business ventures require more capital           |
+| technology | 1.3×       | Tech projects are capital-intensive              |
+| emergency  | 0.5×       | Emergency needs are typically urgent and smaller |
 
 If similar campaigns are provided, the recommendation averages the category baseline with successful similar campaign goals. The result is rounded to the nearest $500 and includes a min/max range (0.5×–2×).
 
@@ -144,8 +144,8 @@ Confidence is calculated as `min(1, matchCount / 3)`. If no keywords match, defa
 [
   { category: "technology", confidence: 1.0 },
   { category: "business", confidence: 0.33 },
-  { category: "education", confidence: 0.33 }
-]
+  { category: "education", confidence: 0.33 },
+];
 ```
 
 ## Risk Observation
@@ -156,14 +156,14 @@ Non-blocking risk signal analysis. Does not reject campaigns — only observes a
 
 ### Risk Signals
 
-| Signal | Severity | Trigger Condition |
-|--------|----------|-------------------|
-| `unrealistic_goal` | medium | Goal > 5× category average |
-| `vague_description` | medium | Description < 100 characters |
-| `low_creator_trust` | high | Trust score < 30/100 |
-| `no_media` | low | Zero images or media attached |
-| `new_creator_high_goal` | medium | First campaign + goal > $10,000 |
-| `unverified_creator` | low | KYC status ≠ "verified" |
+| Signal                  | Severity | Trigger Condition               |
+| ----------------------- | -------- | ------------------------------- |
+| `unrealistic_goal`      | medium   | Goal > 5× category average      |
+| `vague_description`     | medium   | Description < 100 characters    |
+| `low_creator_trust`     | high     | Trust score < 30/100            |
+| `no_media`              | low      | Zero images or media attached   |
+| `new_creator_high_goal` | medium   | First campaign + goal > $10,000 |
+| `unverified_creator`    | low      | KYC status ≠ "verified"         |
 
 Each observation includes a description and a suggestion for improvement.
 
@@ -185,23 +185,23 @@ Checks campaign against required and optional fields.
 
 ### Required Fields
 
-| Field | Minimum Requirement |
-|-------|-------------------|
-| Title | ≥ 10 characters |
-| Description | ≥ 100 characters |
-| Funding goal | > 0 |
-| Category | Non-empty |
+| Field        | Minimum Requirement |
+| ------------ | ------------------- |
+| Title        | ≥ 10 characters     |
+| Description  | ≥ 100 characters    |
+| Funding goal | > 0                 |
+| Category     | Non-empty           |
 
 ### Optional Fields
 
-| Field | Benefit |
-|-------|---------|
-| Media/images | At least 1 image |
-| End date | Campaign deadline |
-| Tags | Searchability |
+| Field             | Benefit              |
+| ----------------- | -------------------- |
+| Media/images      | At least 1 image     |
+| End date          | Campaign deadline    |
+| Tags              | Searchability        |
 | Short description | Summary for listings |
-| Location | Geographic context |
-| Video URL | Engagement boost |
+| Location          | Geographic context   |
+| Video URL         | Engagement boost     |
 
 Completeness score = (completed fields / total fields) × 100.
 

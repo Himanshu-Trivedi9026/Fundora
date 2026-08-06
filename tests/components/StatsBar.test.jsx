@@ -38,8 +38,10 @@ function mockFixtures({ donations = [], projects = 0, team = 0 }) {
       order: m.mockOrder,
       limit: m.mockLimit,
       then: (resolve) => {
-        if (table === "public_donations") resolve({ data: donations, error: null });
-        else if (table === "projects") resolve({ data: null, count: projects, error: null });
+        if (table === "public_donations")
+          resolve({ data: donations, error: null });
+        else if (table === "projects")
+          resolve({ data: null, count: projects, error: null });
         else resolve({ data: null, count: team, error: null });
       },
     };
@@ -136,7 +138,11 @@ describe("StatsBar live platform statistics", () => {
   });
 
   it("reads live rows: donations, non-deleted project count, and team_members count", async () => {
-    mockFixtures({ donations: [{ amount: 500, status: "paid" }], projects: 7, team: 9 });
+    mockFixtures({
+      donations: [{ amount: 500, status: "paid" }],
+      projects: 7,
+      team: 9,
+    });
     render(<StatsBar />);
     await flushCountUp();
 
@@ -147,12 +153,18 @@ describe("StatsBar live platform statistics", () => {
 
       // Projects Launched counts only non-deleted rows.
       expect(supabase.from).toHaveBeenCalledWith("projects");
-      expect(m.mockSelect).toHaveBeenCalledWith("id", { count: "exact", head: true });
+      expect(m.mockSelect).toHaveBeenCalledWith("id", {
+        count: "exact",
+        head: true,
+      });
       expect(m.mockEq).toHaveBeenCalledWith("deleted", false);
 
       // Team Members is a real head-count of the existing schema.
       expect(supabase.from).toHaveBeenCalledWith("team_members");
-      expect(m.mockSelect).toHaveBeenCalledWith("*", { count: "exact", head: true });
+      expect(m.mockSelect).toHaveBeenCalledWith("*", {
+        count: "exact",
+        head: true,
+      });
     });
   });
 
@@ -161,9 +173,13 @@ describe("StatsBar live platform statistics", () => {
     await flushCountUp();
 
     await waitFor(() => {
-      expect(supabase.channel).toHaveBeenCalledWith("landing-stats-public_donations");
+      expect(supabase.channel).toHaveBeenCalledWith(
+        "landing-stats-public_donations",
+      );
       expect(supabase.channel).toHaveBeenCalledWith("landing-stats-projects");
-      expect(supabase.channel).toHaveBeenCalledWith("landing-stats-team_members");
+      expect(supabase.channel).toHaveBeenCalledWith(
+        "landing-stats-team_members",
+      );
       expect(m.mockOn).toHaveBeenCalledWith(
         "postgres_changes",
         { event: "*", schema: "public", table: "public_donations" },
@@ -198,7 +214,11 @@ describe("StatsBar live platform statistics", () => {
   });
 
   it("renders server-rendered stats without a mount fetch when initialStats is provided", async () => {
-    mockFixtures({ donations: [{ amount: 500, status: "paid" }], projects: 7, team: 9 });
+    mockFixtures({
+      donations: [{ amount: 500, status: "paid" }],
+      projects: 7,
+      team: 9,
+    });
     render(
       <StatsBar
         initialStats={{
@@ -224,6 +244,8 @@ describe("StatsBar live platform statistics", () => {
     expect(supabase.from).not.toHaveBeenCalledWith("team_members");
 
     // But the realtime subscription is still active so stats stay live.
-    expect(supabase.channel).toHaveBeenCalledWith("landing-stats-public_donations");
+    expect(supabase.channel).toHaveBeenCalledWith(
+      "landing-stats-public_donations",
+    );
   });
 });

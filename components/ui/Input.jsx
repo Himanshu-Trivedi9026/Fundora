@@ -1,16 +1,8 @@
 import { forwardRef } from "react";
 
 const Input = forwardRef(function Input(
-  {
-    label,
-    error,
-    hint,
-    prefix,
-    className = "",
-    id,
-    ...props
-  },
-  ref
+  { label, error, hint, prefix, className = "", id, ...props },
+  ref,
 ) {
   const inputId = id || props.name || label?.toLowerCase().replace(/\s+/g, "-");
 

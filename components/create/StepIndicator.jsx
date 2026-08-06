@@ -30,8 +30,8 @@ export default function StepIndicator({ currentStep }) {
                   isCompleted
                     ? "bg-primary border-primary text-on-primary"
                     : isActive
-                    ? "bg-surface-container-high border-primary text-primary"
-                    : "bg-surface-container-high border-outline-variant text-outline-variant"
+                      ? "bg-surface-container-high border-primary text-primary"
+                      : "bg-surface-container-high border-outline-variant text-outline-variant"
                 }`}
                 animate={{
                   scale: isActive ? 1.1 : 1,

@@ -48,7 +48,11 @@ export default withVerified(async function handler(req, res, user) {
     if (!short || typeof short !== "string" || !short.trim()) {
       return res.status(400).json({ error: "Short description is required" });
     }
-    if (!description || typeof description !== "string" || !description.trim()) {
+    if (
+      !description ||
+      typeof description !== "string" ||
+      !description.trim()
+    ) {
       return res.status(400).json({ error: "Description is required" });
     }
 

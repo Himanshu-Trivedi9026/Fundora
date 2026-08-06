@@ -71,7 +71,9 @@ export default function FraudDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-gray-400 font-inter">Loading fraud dashboard...</div>
+        <div className="text-gray-400 font-inter">
+          Loading fraud dashboard...
+        </div>
       </div>
     );
   }
@@ -80,7 +82,10 @@ export default function FraudDashboard() {
     return (
       <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6">
         <p className="text-red-400 font-inter">{error}</p>
-        <button onClick={fetchDashboard} className="mt-4 text-sm text-red-300 hover:text-red-200">
+        <button
+          onClick={fetchDashboard}
+          className="mt-4 text-sm text-red-300 hover:text-red-200"
+        >
           Retry
         </button>
       </div>
@@ -91,11 +96,15 @@ export default function FraudDashboard() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white font-geist">Fraud Center</h2>
+        <h2 className="text-2xl font-bold text-white font-geist">
+          Fraud Center
+        </h2>
         <div className="flex gap-3">
           <select
             value={filters.riskLevel}
-            onChange={(e) => setFilters((f) => ({ ...f, riskLevel: e.target.value }))}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, riskLevel: e.target.value }))
+            }
             className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm"
           >
             <option value="">All Risk Levels</option>
@@ -106,7 +115,9 @@ export default function FraudDashboard() {
           </select>
           <select
             value={filters.decision}
-            onChange={(e) => setFilters((f) => ({ ...f, decision: e.target.value }))}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, decision: e.target.value }))
+            }
             className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm"
           >
             <option value="">All Decisions</option>
@@ -151,7 +162,9 @@ export default function FraudDashboard() {
       {/* Profiles Table */}
       <div className="glass-panel rounded-xl overflow-hidden">
         <div className="p-4 border-b border-white/10">
-          <h3 className="text-lg font-semibold text-white font-geist">User Profiles</h3>
+          <h3 className="text-lg font-semibold text-white font-geist">
+            User Profiles
+          </h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -168,7 +181,10 @@ export default function FraudDashboard() {
             </thead>
             <tbody>
               {(data?.profiles || []).map((profile) => (
-                <tr key={profile.id} className="border-b border-white/5 hover:bg-white/5">
+                <tr
+                  key={profile.id}
+                  className="border-b border-white/5 hover:bg-white/5"
+                >
                   <td className="p-4">
                     <span className="text-white font-mono text-sm">
                       {profile.user_id.substring(0, 8)}...
@@ -237,7 +253,10 @@ function SummaryCard({ label, value, color, icon }) {
   return (
     <div className="glass-panel rounded-xl p-4">
       <div className="flex items-center gap-3">
-        <span className="material-symbols-outlined text-2xl" style={{ color: color || "#9ca3af" }}>
+        <span
+          className="material-symbols-outlined text-2xl"
+          style={{ color: color || "#9ca3af" }}
+        >
           {icon}
         </span>
         <div>
@@ -250,7 +269,14 @@ function SummaryCard({ label, value, color, icon }) {
 }
 
 function RiskScoreBadge({ score }) {
-  const level = score >= 76 ? "critical" : score >= 51 ? "high" : score >= 26 ? "medium" : "low";
+  const level =
+    score >= 76
+      ? "critical"
+      : score >= 51
+        ? "high"
+        : score >= 26
+          ? "medium"
+          : "low";
   return (
     <span
       className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
@@ -322,7 +348,9 @@ function UserDetailModal({ userId, onClose, onOverride }) {
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
       <div className="glass-panel rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
         <div className="p-6 border-b border-white/10 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-white font-geist">User Risk Profile</h3>
+          <h3 className="text-lg font-semibold text-white font-geist">
+            User Risk Profile
+          </h3>
           <button onClick={onClose} className="text-gray-400 hover:text-white">
             <span className="material-symbols-outlined">close</span>
           </button>
@@ -349,10 +377,15 @@ function UserDetailModal({ userId, onClose, onOverride }) {
             {/* Recent Events */}
             {detail.events?.length > 0 && (
               <div>
-                <h4 className="text-sm font-medium text-gray-400 mb-2">Recent Events</h4>
+                <h4 className="text-sm font-medium text-gray-400 mb-2">
+                  Recent Events
+                </h4>
                 <div className="space-y-2">
                   {detail.events.slice(0, 5).map((event) => (
-                    <div key={event.id} className="flex items-center justify-between text-sm">
+                    <div
+                      key={event.id}
+                      className="flex items-center justify-between text-sm"
+                    >
                       <span className="text-gray-300">{event.event_type}</span>
                       <span className="text-gray-500">
                         {new Date(event.created_at).toLocaleDateString()}
@@ -417,15 +450,21 @@ function OverrideModal({ userId, onClose, onComplete }) {
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
       <div className="glass-panel rounded-2xl max-w-md w-full">
         <div className="p-6 border-b border-white/10">
-          <h3 className="text-lg font-semibold text-white font-geist">Manual Override</h3>
+          <h3 className="text-lg font-semibold text-white font-geist">
+            Manual Override
+          </h3>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Override Type</label>
+            <label className="block text-sm text-gray-400 mb-1">
+              Override Type
+            </label>
             <select
               value={form.overrideType}
-              onChange={(e) => setForm((f) => ({ ...f, overrideType: e.target.value }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, overrideType: e.target.value }))
+              }
               className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white"
             >
               <option value="decision">Decision</option>
@@ -438,13 +477,19 @@ function OverrideModal({ userId, onClose, onComplete }) {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">New Value</label>
+            <label className="block text-sm text-gray-400 mb-1">
+              New Value
+            </label>
             <input
               type="text"
               value={form.newValue}
-              onChange={(e) => setForm((f) => ({ ...f, newValue: e.target.value }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, newValue: e.target.value }))
+              }
               className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white"
-              placeholder={form.overrideType === "risk_score" ? "0-100" : "allow/block/etc"}
+              placeholder={
+                form.overrideType === "risk_score" ? "0-100" : "allow/block/etc"
+              }
               required
             />
           </div>
@@ -453,7 +498,9 @@ function OverrideModal({ userId, onClose, onComplete }) {
             <label className="block text-sm text-gray-400 mb-1">Reason</label>
             <textarea
               value={form.reason}
-              onChange={(e) => setForm((f) => ({ ...f, reason: e.target.value }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, reason: e.target.value }))
+              }
               className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white h-20"
               placeholder="Reason for override..."
               required
@@ -465,7 +512,9 @@ function OverrideModal({ userId, onClose, onComplete }) {
               type="checkbox"
               id="permanent"
               checked={form.isPermanent}
-              onChange={(e) => setForm((f) => ({ ...f, isPermanent: e.target.checked }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, isPermanent: e.target.checked }))
+              }
               className="rounded"
             />
             <label htmlFor="permanent" className="text-sm text-gray-400">

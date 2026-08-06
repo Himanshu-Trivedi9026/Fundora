@@ -59,7 +59,7 @@ describe("POST /api/ai/agent", () => {
         Promise.resolve(
           JSON.stringify({
             choices: [{ message: { content: "Test reply" } }],
-          })
+          }),
         ),
     });
   });
@@ -148,7 +148,7 @@ describe("POST /api/ai/agent", () => {
           "Content-Type": "application/json",
         }),
         body: expect.stringContaining("Tell me about projects"),
-      })
+      }),
     );
   });
 

@@ -78,15 +78,59 @@ describe("AnalyticsEngine", () => {
       // 8. .from("compliance_cases").select("id", {count:"exact", head:true}).neq(...) → {count: 0}
       // 9. .from("trust_scores").select("score") → {data: [{score: 60}]}
       supabaseAdmin.from
-        .mockReturnValueOnce({ select: vi.fn().mockResolvedValue({ count: 5, data: null, error: null }) })
-        .mockReturnValueOnce({ select: vi.fn().mockReturnValue({ gte: vi.fn().mockResolvedValue({ count: 3, data: null, error: null }) }) })
-        .mockReturnValueOnce({ select: vi.fn().mockResolvedValue({ count: 2, data: null, error: null }) })
-        .mockReturnValueOnce({ select: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ count: 1, data: null, error: null }) }) })
-        .mockReturnValueOnce({ select: vi.fn().mockResolvedValue({ count: 10, data: null, error: null }) })
-        .mockReturnValueOnce({ select: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ data: [{ amount: 500 }], error: null }) }) })
-        .mockReturnValueOnce({ select: vi.fn().mockResolvedValue({ count: 0, data: null, error: null }) })
-        .mockReturnValueOnce({ select: vi.fn().mockReturnValue({ neq: vi.fn().mockResolvedValue({ count: 0, data: null, error: null }) }) })
-        .mockReturnValueOnce({ select: vi.fn().mockResolvedValue({ data: [{ score: 60 }], error: null }) });
+        .mockReturnValueOnce({
+          select: vi
+            .fn()
+            .mockResolvedValue({ count: 5, data: null, error: null }),
+        })
+        .mockReturnValueOnce({
+          select: vi.fn().mockReturnValue({
+            gte: vi
+              .fn()
+              .mockResolvedValue({ count: 3, data: null, error: null }),
+          }),
+        })
+        .mockReturnValueOnce({
+          select: vi
+            .fn()
+            .mockResolvedValue({ count: 2, data: null, error: null }),
+        })
+        .mockReturnValueOnce({
+          select: vi.fn().mockReturnValue({
+            eq: vi
+              .fn()
+              .mockResolvedValue({ count: 1, data: null, error: null }),
+          }),
+        })
+        .mockReturnValueOnce({
+          select: vi
+            .fn()
+            .mockResolvedValue({ count: 10, data: null, error: null }),
+        })
+        .mockReturnValueOnce({
+          select: vi.fn().mockReturnValue({
+            eq: vi
+              .fn()
+              .mockResolvedValue({ data: [{ amount: 500 }], error: null }),
+          }),
+        })
+        .mockReturnValueOnce({
+          select: vi
+            .fn()
+            .mockResolvedValue({ count: 0, data: null, error: null }),
+        })
+        .mockReturnValueOnce({
+          select: vi.fn().mockReturnValue({
+            neq: vi
+              .fn()
+              .mockResolvedValue({ count: 0, data: null, error: null }),
+          }),
+        })
+        .mockReturnValueOnce({
+          select: vi
+            .fn()
+            .mockResolvedValue({ data: [{ score: 60 }], error: null }),
+        });
 
       const result = await calculatePlatformHealth();
       expect(result.success).toBe(true);
@@ -169,9 +213,24 @@ describe("AnalyticsEngine", () => {
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockResolvedValue({
           data: [
-            { id: "p1", status: "completed", created_at: "2025-01-01T00:00:00Z", processed_at: "2025-01-01T00:30:00Z" },
-            { id: "p2", status: "completed", created_at: "2025-01-02T00:00:00Z", processed_at: "2025-01-02T00:45:00Z" },
-            { id: "p3", status: "failed", created_at: "2025-01-03T00:00:00Z", processed_at: null },
+            {
+              id: "p1",
+              status: "completed",
+              created_at: "2025-01-01T00:00:00Z",
+              processed_at: "2025-01-01T00:30:00Z",
+            },
+            {
+              id: "p2",
+              status: "completed",
+              created_at: "2025-01-02T00:00:00Z",
+              processed_at: "2025-01-02T00:45:00Z",
+            },
+            {
+              id: "p3",
+              status: "failed",
+              created_at: "2025-01-03T00:00:00Z",
+              processed_at: null,
+            },
           ],
           error: null,
         }),

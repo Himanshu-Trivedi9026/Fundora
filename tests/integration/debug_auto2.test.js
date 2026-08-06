@@ -29,7 +29,10 @@ vi.mock("../../lib/verification/auditLog", () => ({
 }));
 
 import { supabaseAdmin } from "../../lib/supabaseAdmin";
-import { executeActions, ACTION_TYPES } from "../../lib/automation/workflowEngine";
+import {
+  executeActions,
+  ACTION_TYPES,
+} from "../../lib/automation/workflowEngine";
 
 function mockInsertSingle(result) {
   return {
@@ -42,43 +45,84 @@ function mockInsertSingle(result) {
 }
 
 describe("debug auto2", () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   it("multiple actions", async () => {
     const actions = [
-      { type: ACTION_TYPES.SEND_NOTIFICATION, name: "step_1", config: { userId: "user-1", title: "First", message: "OK" } },
-      { type: ACTION_TYPES.UPDATE_STATUS, name: "step_2", config: { entityType: "public_donations", entityId: "don-1", statusField: "status", statusValue: "active" } },
-      { type: ACTION_TYPES.SEND_NOTIFICATION, name: "step_3", config: { userId: "user-2", title: "Third", message: "Should not run" } },
+      {
+        type: ACTION_TYPES.SEND_NOTIFICATION,
+        name: "step_1",
+        config: { userId: "user-1", title: "First", message: "OK" },
+      },
+      {
+        type: ACTION_TYPES.UPDATE_STATUS,
+        name: "step_2",
+        config: {
+          entityType: "public_donations",
+          entityId: "don-1",
+          statusField: "status",
+          statusValue: "active",
+        },
+      },
+      {
+        type: ACTION_TYPES.SEND_NOTIFICATION,
+        name: "step_3",
+        config: { userId: "user-2", title: "Third", message: "Should not run" },
+      },
     ];
-    const context = { workflowId: "wf-act", runId: "run-act", userId: "user-1" };
+    const context = {
+      workflowId: "wf-act",
+      runId: "run-act",
+      userId: "user-1",
+    };
 
     // Step 1: workflow_logs insert
-    supabaseAdmin.from.mockImplementationOnce(() => mockInsertSingle({ id: "log-1" }));
+    supabaseAdmin.from.mockImplementationOnce(() =>
+      mockInsertSingle({ id: "log-1" }),
+    );
     // Step 1: notifications insert
-    supabaseAdmin.from.mockImplementationOnce(() => mockInsertSingle({ id: "notif-1" }));
+    supabaseAdmin.from.mockImplementationOnce(() =>
+      mockInsertSingle({ id: "notif-1" }),
+    );
     // Step 1: workflow_logs update
     supabaseAdmin.from.mockImplementationOnce(() => ({
-      update: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
+      update: vi
+        .fn()
+        .mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
     }));
 
     // Step 2: workflow_logs insert
-    supabaseAdmin.from.mockImplementationOnce(() => mockInsertSingle({ id: "log-2" }));
+    supabaseAdmin.from.mockImplementationOnce(() =>
+      mockInsertSingle({ id: "log-2" }),
+    );
     // Step 2: UPDATE_STATUS — update entity succeeds
     supabaseAdmin.from.mockImplementationOnce(() => ({
-      update: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
+      update: vi
+        .fn()
+        .mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
     }));
     // Step 2: workflow_logs update
     supabaseAdmin.from.mockImplementationOnce(() => ({
-      update: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
+      update: vi
+        .fn()
+        .mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
     }));
 
     // Step 3: SEND_NOTIFICATION — workflow_logs insert
-    supabaseAdmin.from.mockImplementationOnce(() => mockInsertSingle({ id: "log-3" }));
+    supabaseAdmin.from.mockImplementationOnce(() =>
+      mockInsertSingle({ id: "log-3" }),
+    );
     // Step 3: notifications insert
-    supabaseAdmin.from.mockImplementationOnce(() => mockInsertSingle({ id: "notif-3" }));
+    supabaseAdmin.from.mockImplementationOnce(() =>
+      mockInsertSingle({ id: "notif-3" }),
+    );
     // Step 3: workflow_logs update
     supabaseAdmin.from.mockImplementationOnce(() => ({
-      update: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
+      update: vi
+        .fn()
+        .mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
     }));
 
     const result = await executeActions({ actions, context });

@@ -85,7 +85,7 @@ export default function DocumentPreview({ document: doc }) {
       try {
         const res = await fetch(
           `/api/admin/verification/documents?documentId=${doc.id}`,
-          { credentials: "include" }
+          { credentials: "include" },
         );
         if (!res.ok) return;
         const data = await res.json();
@@ -178,7 +178,9 @@ export default function DocumentPreview({ document: doc }) {
                     : "opacity-40 pointer-events-none"
                 }`}
                 aria-label="Download document"
-                title={canPreview ? "Download document" : "Signed URL unavailable"}
+                title={
+                  canPreview ? "Download document" : "Signed URL unavailable"
+                }
               >
                 <span className="material-symbols-outlined text-[14px] text-on-surface-variant">
                   download
@@ -191,7 +193,9 @@ export default function DocumentPreview({ document: doc }) {
                 disabled={!canPreview}
                 className="w-7 h-7 rounded-full bg-surface-container-high border border-outline-variant/30 flex items-center justify-center hover:bg-primary/10 hover:border-primary/30 transition-colors disabled:opacity-40 disabled:pointer-events-none"
                 aria-label="Preview document"
-                title={canPreview ? "Preview document" : "Signed URL unavailable"}
+                title={
+                  canPreview ? "Preview document" : "Signed URL unavailable"
+                }
               >
                 <span className="material-symbols-outlined text-[14px] text-on-surface-variant">
                   zoom_in

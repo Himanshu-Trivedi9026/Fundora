@@ -1,5 +1,9 @@
 // API — Cache infrastructure management
-import { getStats, clear, cleanupExpiredCache } from "../../../lib/cache/index.js";
+import {
+  getStats,
+  clear,
+  cleanupExpiredCache,
+} from "../../../lib/cache/index.js";
 import { withAuth } from "../../../lib/withAuth.js";
 
 async function handler(req, res) {

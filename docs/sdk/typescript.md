@@ -221,7 +221,8 @@ interface WebhookDeleteRequest {
   webhookId: string;
 }
 
-type WebhookRequest = WebhookCreateRequest | WebhookUpdateRequest | WebhookDeleteRequest;
+type WebhookRequest =
+  WebhookCreateRequest | WebhookUpdateRequest | WebhookDeleteRequest;
 
 interface WebhookPayload<T = Record<string, unknown>> {
   event: WebhookEvent | "test.ping";
@@ -412,7 +413,7 @@ interface RequestOptions {
 
 async function fundoraFetch<T>(
   path: string,
-  options: RequestOptions = {}
+  options: RequestOptions = {},
 ): Promise<T> {
   const { method = "GET", body, params, headers: extraHeaders } = options;
 
@@ -454,14 +455,16 @@ async function fundoraFetch<T>(
 ```typescript
 // Campaigns
 async function listCampaigns(
-  params?: ListCampaignsParams
+  params?: ListCampaignsParams,
 ): Promise<PaginatedResponse<Campaign>> {
-  return fundoraFetch<PaginatedResponse<Campaign>>("/api/campaigns", { params });
+  return fundoraFetch<PaginatedResponse<Campaign>>("/api/campaigns", {
+    params,
+  });
 }
 
 // Donations
 async function createDonation(
-  donation: CreateDonationRequest
+  donation: CreateDonationRequest,
 ): Promise<ApiResponse<Donation>> {
   return fundoraFetch<ApiResponse<Donation>>("/api/donations", {
     method: "POST",
@@ -471,13 +474,13 @@ async function createDonation(
 
 // Webhooks
 async function listWebhooks(
-  params?: PaginationParams & { organizationId?: string }
+  params?: PaginationParams & { organizationId?: string },
 ): Promise<PaginatedResponse<Webhook>> {
   return fundoraFetch<PaginatedResponse<Webhook>>("/api/webhooks", { params });
 }
 
 async function createWebhook(
-  req: Omit<WebhookCreateRequest, "action">
+  req: Omit<WebhookCreateRequest, "action">,
 ): Promise<ApiResponse<Webhook & { secret: string }>> {
   return fundoraFetch("/api/webhooks", {
     method: "POST",
@@ -487,7 +490,7 @@ async function createWebhook(
 
 async function updateWebhook(
   webhookId: string,
-  updates: WebhookUpdateRequest["updates"]
+  updates: WebhookUpdateRequest["updates"],
 ): Promise<ApiResponse<Webhook>> {
   return fundoraFetch("/api/webhooks", {
     method: "POST",
@@ -503,7 +506,7 @@ async function deleteWebhook(webhookId: string): Promise<{ success: true }> {
 }
 
 async function testWebhook(
-  webhookId: string
+  webhookId: string,
 ): Promise<ApiResponse<{ status: string; statusCode: number }>> {
   return fundoraFetch("/api/webhooks/test", {
     method: "POST",
@@ -522,7 +525,7 @@ async function testWebhook(
 class FundoraApiError extends Error {
   constructor(
     public readonly status: number,
-    public readonly body: ApiError | RateLimitError
+    public readonly body: ApiError | RateLimitError,
   ) {
     super(body.error);
     this.name = "FundoraApiError";
@@ -558,7 +561,7 @@ class FundoraApiError extends Error {
 ```typescript
 async function safeFundoraRequest<T>(
   path: string,
-  options?: RequestOptions
+  options?: RequestOptions,
 ): Promise<{ data: T; error: null } | { data: null; error: FundoraApiError }> {
   try {
     const data = await fundoraFetch<T>(path, options);
@@ -574,7 +577,7 @@ async function safeFundoraRequest<T>(
 // Usage
 const result = await safeFundoraRequest<PaginatedResponse<Campaign>>(
   "/api/campaigns",
-  { params: { limit: 10 } }
+  { params: { limit: 10 } },
 );
 
 if (result.error) {
@@ -605,7 +608,10 @@ interface RateLimitHeaders {
 function extractRateLimitHeaders(response: Response): RateLimitHeaders {
   return {
     limit: parseInt(response.headers.get("X-RateLimit-Limit") ?? "0", 10),
-    remaining: parseInt(response.headers.get("X-RateLimit-Remaining") ?? "0", 10),
+    remaining: parseInt(
+      response.headers.get("X-RateLimit-Remaining") ?? "0",
+      10,
+    ),
     reset: parseInt(response.headers.get("X-RateLimit-Reset") ?? "0", 10),
   };
 }
@@ -616,7 +622,7 @@ function extractRateLimitHeaders(response: Response): RateLimitHeaders {
 ```typescript
 async function throttledFetch<T>(
   path: string,
-  options?: RequestOptions
+  options?: RequestOptions,
 ): Promise<{ data: T; rateLimit: RateLimitHeaders }> {
   const response = await fetch(`${FUNDORA_API}${path}`, {
     method: options?.method ?? "GET",
@@ -677,7 +683,7 @@ class FundoraClient {
 
   private async request<T>(
     path: string,
-    options: RequestOptions = {}
+    options: RequestOptions = {},
   ): Promise<T> {
     const { method = "GET", body, params } = options;
 
@@ -730,40 +736,46 @@ class FundoraClient {
   async createWebhook(
     url: string,
     events: WebhookEvent[],
-    description?: string
+    description?: string,
   ) {
-    return this.request<
-      ApiResponse<Webhook & { secret: string }>
-    >("/api/webhooks", {
-      method: "POST",
-      body: { action: "create", url, events, description },
-    });
+    return this.request<ApiResponse<Webhook & { secret: string }>>(
+      "/api/webhooks",
+      {
+        method: "POST",
+        body: { action: "create", url, events, description },
+      },
+    );
   }
 
   async testWebhook(webhookId: string) {
-    return this.request<
-      ApiResponse<{ status: string; statusCode: number }>
-    >("/api/webhooks/test", {
-      method: "POST",
-      body: { webhookId },
-    });
+    return this.request<ApiResponse<{ status: string; statusCode: number }>>(
+      "/api/webhooks/test",
+      {
+        method: "POST",
+        body: { webhookId },
+      },
+    );
   }
 
   // API Keys
-  async createApiKey(name: string, options?: { scopes?: string[]; rateLimit?: number }) {
-    return this.request<
-      ApiResponse<ApiKey & { key: string }>
-    >("/api/api-platform/keys", {
-      method: "POST",
-      body: { action: "create", name, ...options },
-    });
+  async createApiKey(
+    name: string,
+    options?: { scopes?: string[]; rateLimit?: number },
+  ) {
+    return this.request<ApiResponse<ApiKey & { key: string }>>(
+      "/api/api-platform/keys",
+      {
+        method: "POST",
+        body: { action: "create", name, ...options },
+      },
+    );
   }
 
   // API Logs
   async getUsageSummary(params?: ApiLogsParams) {
     return this.request<ApiResponse<ApiUsageSummary[]>>(
       "/api/api-platform/logs",
-      { params: { ...params, mode: "summary" } }
+      { params: { ...params, mode: "summary" } },
     );
   }
 }
@@ -773,7 +785,7 @@ class FundoraClient {
 function verifyWebhookSignature(
   payload: string | object,
   signature: string,
-  secret: string
+  secret: string,
 ): boolean {
   const body = typeof payload === "string" ? payload : JSON.stringify(payload);
   const expected = crypto
@@ -783,7 +795,7 @@ function verifyWebhookSignature(
 
   return crypto.timingSafeEqual(
     Buffer.from(expected, "utf8"),
-    Buffer.from(signature, "utf8")
+    Buffer.from(signature, "utf8"),
   );
 }
 
@@ -797,14 +809,16 @@ async function main() {
   console.log(`${total} campaigns found`);
 
   for (const campaign of campaigns) {
-    console.log(`  ${campaign.title} — ${campaign.raisedAmount}/${campaign.goalAmount}`);
+    console.log(
+      `  ${campaign.title} — ${campaign.raisedAmount}/${campaign.goalAmount}`,
+    );
   }
 
   // Create webhook
   const { data: webhook } = await client.createWebhook(
     "https://myapp.com/webhooks",
     ["donation.received", "campaign.funded"],
-    "Production webhook"
+    "Production webhook",
   );
   console.log("Webhook created:", webhook.id);
   console.log("Store secret:", webhook.secret);
@@ -832,7 +846,8 @@ const WEBHOOK_SECRET = process.env.FUNDORA_WEBHOOK_SECRET!;
 
 app.post("/webhooks/fundora", (req, res) => {
   const signature = req.headers["x-fundora-signature"] as string;
-  const eventType = req.headers["x-fundora-event"] as WebhookEvent | "test.ping";
+  const eventType = req.headers["x-fundora-event"] as
+    WebhookEvent | "test.ping";
   const deliveryId = req.headers["x-fundora-delivery-id"] as string;
 
   // Verify signature
@@ -842,7 +857,9 @@ app.post("/webhooks/fundora", (req, res) => {
     .update(body)
     .digest("hex");
 
-  if (!crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature || ""))) {
+  if (
+    !crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature || ""))
+  ) {
     return res.status(401).json({ error: "Invalid signature" });
   }
 
@@ -851,7 +868,11 @@ app.post("/webhooks/fundora", (req, res) => {
 
   switch (eventType) {
     case "donation.received": {
-      const data = payload.data as { donationId: string; amount: number; currency: string };
+      const data = payload.data as {
+        donationId: string;
+        amount: number;
+        currency: string;
+      };
       console.log(`Donation received: ${data.amount} ${data.currency}`);
       break;
     }

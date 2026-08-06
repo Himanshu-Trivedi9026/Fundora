@@ -97,12 +97,17 @@ describe("GET/POST /api/creator/razorpay-config", () => {
     await handler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ error: "Failed to load Razorpay config" });
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Failed to load Razorpay config",
+    });
   });
 
   // ---- POST ----
   it("POST saves config with keyId and keySecret", async () => {
-    const req = createMockReq("POST", { keyId: "rzp_test_abc", keySecret: "secret_123" });
+    const req = createMockReq("POST", {
+      keyId: "rzp_test_abc",
+      keySecret: "secret_123",
+    });
     const res = createMockRes();
     await handler(req, res);
 
@@ -112,7 +117,7 @@ describe("GET/POST /api/creator/razorpay-config", () => {
         razorpay_key_id: "rzp_test_abc",
         razorpay_key_secret: "secret_123",
       }),
-      { onConflict: "creator_user_id" }
+      { onConflict: "creator_user_id" },
     );
     expect(res.json).toHaveBeenCalledWith({ success: true });
   });
@@ -123,7 +128,9 @@ describe("GET/POST /api/creator/razorpay-config", () => {
     await handler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ error: "keyId and keySecret are required" });
+    expect(res.json).toHaveBeenCalledWith({
+      error: "keyId and keySecret are required",
+    });
   });
 
   it("POST returns 400 when keySecret is missing", async () => {
@@ -143,14 +150,22 @@ describe("GET/POST /api/creator/razorpay-config", () => {
   });
 
   it("POST returns 500 on database error", async () => {
-    mockUpsert.mockResolvedValue({ data: null, error: { message: "db error" } });
+    mockUpsert.mockResolvedValue({
+      data: null,
+      error: { message: "db error" },
+    });
 
-    const req = createMockReq("POST", { keyId: "rzp_test", keySecret: "secret" });
+    const req = createMockReq("POST", {
+      keyId: "rzp_test",
+      keySecret: "secret",
+    });
     const res = createMockRes();
     await handler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ error: "Failed to save Razorpay config" });
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Failed to save Razorpay config",
+    });
   });
 
   // ---- METHOD ----

@@ -46,7 +46,9 @@ test.describe("Landing Page Navigation", () => {
     await page.goto("/");
 
     // Look for login link in navbar
-    const loginLink = page.locator('nav a[href="/login"], nav button:has-text("Login")').first();
+    const loginLink = page
+      .locator('nav a[href="/login"], nav button:has-text("Login")')
+      .first();
 
     // Click if visible
     if (await loginLink.isVisible()) {
@@ -62,7 +64,9 @@ test.describe("Landing Page Navigation", () => {
 });
 
 test.describe("Protected Page Redirects", () => {
-  test("redirect unauthenticated users from profile setup", async ({ page }) => {
+  test("redirect unauthenticated users from profile setup", async ({
+    page,
+  }) => {
     await page.goto("/creator/profile");
 
     // Should redirect to login or show auth error
@@ -90,7 +94,9 @@ test.describe("Protected Page Redirects", () => {
     expect(isOnLogin || isOnEditProfile).toBeTruthy();
   });
 
-  test("redirect unauthenticated users from followers page", async ({ page }) => {
+  test("redirect unauthenticated users from followers page", async ({
+    page,
+  }) => {
     await page.goto("/followers");
 
     // Wait for redirect
@@ -127,6 +133,8 @@ test.describe("Page Not Found", () => {
     const response = await page.goto("/non-existent-page-12345");
 
     // Should return 404 status or show 404 page
-    expect(response?.status() === 404 || response?.status() === 200).toBeTruthy();
+    expect(
+      response?.status() === 404 || response?.status() === 200,
+    ).toBeTruthy();
   });
 });

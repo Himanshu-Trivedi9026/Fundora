@@ -11,7 +11,11 @@ const stagger = {
 
 const fadeUp = {
   hidden: { opacity: 0, y: 15 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] } },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
+  },
 };
 
 /**
@@ -50,7 +54,12 @@ export default function GalleryGrid({ media, onPreview }) {
               variants={fadeUp}
               whileHover={{ scale: 1.02 }}
               onClick={() => onPreview({ type: "image", url: img.url })}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onPreview({ type: "image", url: img.url }); } }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onPreview({ type: "image", url: img.url });
+                }
+              }}
               role="button"
               tabIndex={0}
               className={`rounded-xl overflow-hidden border border-outline-variant/20 relative group cursor-pointer ${

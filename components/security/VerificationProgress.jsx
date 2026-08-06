@@ -40,7 +40,8 @@ export default function VerificationProgress({
             <div
               className="absolute inset-0"
               style={{
-                background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent)",
+                background:
+                  "linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent)",
                 animation: "shimmer 2s infinite",
               }}
             />
@@ -69,14 +70,22 @@ export default function VerificationProgress({
             <div
               key={l.level}
               className={`text-center flex flex-col items-center gap-1 ${
-                l.level <= currentLevel ? "text-primary" : "text-on-surface-variant/50"
+                l.level <= currentLevel
+                  ? "text-primary"
+                  : "text-on-surface-variant/50"
               }`}
             >
               <span
                 className={`material-symbols-outlined text-[14px] ${
-                  l.level <= currentLevel ? "text-primary" : "text-on-surface-variant/30"
+                  l.level <= currentLevel
+                    ? "text-primary"
+                    : "text-on-surface-variant/30"
                 }`}
-                style={l.level <= currentLevel ? { fontVariationSettings: "'FILL' 1" } : {}}
+                style={
+                  l.level <= currentLevel
+                    ? { fontVariationSettings: "'FILL' 1" }
+                    : {}
+                }
               >
                 {l.icon}
               </span>

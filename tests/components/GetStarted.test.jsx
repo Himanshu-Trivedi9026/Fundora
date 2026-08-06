@@ -56,10 +56,18 @@ describe("GetStarted role-selection page", () => {
       mockUseRole({ user: null });
       render(<GetStarted />);
 
-      expect(screen.getByRole("heading", { name: "I'm an Investor" })).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "I'm a Creator" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /Continue as Investor/i })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /Continue as Creator/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "I'm an Investor" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "I'm a Creator" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /Continue as Investor/i }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /Continue as Creator/i }),
+      ).toBeInTheDocument();
     });
 
     it("does not redirect a guest to a role home", () => {
@@ -75,7 +83,9 @@ describe("GetStarted role-selection page", () => {
       render(<GetStarted />);
 
       expect(
-        screen.getByRole("heading", { name: "Choose how you want to join Fundora" }),
+        screen.getByRole("heading", {
+          name: "Choose how you want to join Fundora",
+        }),
       ).toBeInTheDocument();
       expect(
         screen.getByText(/Pick the path that fits your goals/i),
@@ -101,7 +111,9 @@ describe("GetStarted role-selection page", () => {
       mockUseRole({ user: null });
       render(<GetStarted />);
 
-      await user.click(screen.getByRole("button", { name: /Continue as Investor/i }));
+      await user.click(
+        screen.getByRole("button", { name: /Continue as Investor/i }),
+      );
       expect(router.push).toHaveBeenCalledWith("/signup?role=donor");
     });
 
@@ -111,7 +123,9 @@ describe("GetStarted role-selection page", () => {
       mockUseRole({ user: null });
       render(<GetStarted />);
 
-      await user.click(screen.getByRole("button", { name: /Continue as Creator/i }));
+      await user.click(
+        screen.getByRole("button", { name: /Continue as Creator/i }),
+      );
       expect(router.push).toHaveBeenCalledWith("/signup?role=creator");
     });
   });
@@ -145,10 +159,18 @@ describe("GetStarted role-selection page", () => {
       mockUseRole({ user: { id: "u1" }, role: ROLES.INVESTOR });
       render(<GetStarted />);
 
-      expect(screen.queryByRole("heading", { name: "I'm an Investor" })).not.toBeInTheDocument();
-      expect(screen.queryByRole("heading", { name: "I'm a Creator" })).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: /Continue as Investor/i })).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: /Continue as Creator/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("heading", { name: "I'm an Investor" }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("heading", { name: "I'm a Creator" }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /Continue as Investor/i }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /Continue as Creator/i }),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -158,10 +180,16 @@ describe("GetStarted role-selection page", () => {
       mockUseRole({ user: null, loading: true });
       render(<GetStarted />);
 
-      expect(screen.getByRole("status", { name: "Loading" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("status", { name: "Loading" }),
+      ).toBeInTheDocument();
       expect(router.replace).not.toHaveBeenCalled();
-      expect(screen.queryByRole("heading", { name: "I'm an Investor" })).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: /Continue as Investor/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("heading", { name: "I'm an Investor" }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /Continue as Investor/i }),
+      ).not.toBeInTheDocument();
     });
   });
 });

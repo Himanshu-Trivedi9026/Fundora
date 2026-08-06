@@ -522,7 +522,10 @@ describe("Metadata Encryption — Document Sanitization", () => {
     });
 
     it("never exposes the original path", () => {
-      const result = maskStoragePath("verification-docs/abc123/docs/pan.jpg", "abc123");
+      const result = maskStoragePath(
+        "verification-docs/abc123/docs/pan.jpg",
+        "abc123",
+      );
       expect(result).not.toContain("pan.jpg");
     });
   });
@@ -567,19 +570,32 @@ describe("Metadata Encryption — Document Sanitization", () => {
     });
 
     it("strips provider_reference", () => {
-      const doc = { id: "d1", document_name: "test.jpg", provider_reference: "ref" };
+      const doc = {
+        id: "d1",
+        document_name: "test.jpg",
+        provider_reference: "ref",
+      };
       const result = sanitizeDocumentResponse(doc);
       expect(result.provider_reference).toBeUndefined();
     });
 
     it("strips storage_path", () => {
-      const doc = { id: "d1", document_name: "test.jpg", storage_path: "/path" };
+      const doc = {
+        id: "d1",
+        document_name: "test.jpg",
+        storage_path: "/path",
+      };
       const result = sanitizeDocumentResponse(doc);
       expect(result.storage_path).toBeUndefined();
     });
 
     it("strips metadata_encrypted and metadata_hash", () => {
-      const doc = { id: "d1", document_name: "test.jpg", metadata_encrypted: {}, metadata_hash: "abc" };
+      const doc = {
+        id: "d1",
+        document_name: "test.jpg",
+        metadata_encrypted: {},
+        metadata_hash: "abc",
+      };
       const result = sanitizeDocumentResponse(doc);
       expect(result.metadata_encrypted).toBeUndefined();
       expect(result.metadata_hash).toBeUndefined();
@@ -614,7 +630,11 @@ describe("Metadata Encryption — Document Sanitization", () => {
     it("strips device_metadata and ip_address from metadata", () => {
       const req = {
         id: "r1",
-        metadata: { device_metadata: { type: "mobile" }, ip_address: "192.168.1.1", user_agent: "Mozilla" },
+        metadata: {
+          device_metadata: { type: "mobile" },
+          ip_address: "192.168.1.1",
+          user_agent: "Mozilla",
+        },
       };
       const result = sanitizeVerificationRequest(req);
       expect(result.metadata.device_metadata).toBeUndefined();
@@ -623,7 +643,11 @@ describe("Metadata Encryption — Document Sanitization", () => {
     });
 
     it("preserves safe top-level fields", () => {
-      const req = { id: "r1", status: "pending", verification_type: "identity" };
+      const req = {
+        id: "r1",
+        status: "pending",
+        verification_type: "identity",
+      };
       const result = sanitizeVerificationRequest(req);
       expect(result.id).toBe("r1");
       expect(result.status).toBe("pending");

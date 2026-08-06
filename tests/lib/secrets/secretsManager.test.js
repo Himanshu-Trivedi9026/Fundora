@@ -4,9 +4,28 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 // Shared chain object supporting all query patterns
 const selectChain = {
   eq: vi.fn(() => ({
-    single: vi.fn(() => Promise.resolve({ data: { value: "db-secret-value", encrypted: false }, error: null })),
+    single: vi.fn(() =>
+      Promise.resolve({
+        data: { value: "db-secret-value", encrypted: false },
+        error: null,
+      }),
+    ),
   })),
-  order: vi.fn(() => Promise.resolve({ data: [{ key: "test-key", name: "Test Key", provider: "database", last_rotated_at: null, expires_at: null, created_at: new Date().toISOString() }], error: null })),
+  order: vi.fn(() =>
+    Promise.resolve({
+      data: [
+        {
+          key: "test-key",
+          name: "Test Key",
+          provider: "database",
+          last_rotated_at: null,
+          expires_at: null,
+          created_at: new Date().toISOString(),
+        },
+      ],
+      error: null,
+    }),
+  ),
   lte: vi.fn(() => ({
     gte: vi.fn(() => Promise.resolve({ data: [], error: null })),
   })),
@@ -117,12 +136,16 @@ describe("Secrets Manager", () => {
     });
 
     it("should reject incomplete supabase credentials", async () => {
-      const result = await validateCredentials("supabase", { url: "https://test.supabase.co" });
+      const result = await validateCredentials("supabase", {
+        url: "https://test.supabase.co",
+      });
       expect(result.success).toBe(false);
     });
 
     it("should validate openai credentials", async () => {
-      const result = await validateCredentials("openai", { apiKey: "sk-test12345678" });
+      const result = await validateCredentials("openai", {
+        apiKey: "sk-test12345678",
+      });
       expect(result.success).toBe(true);
       expect(result.data.keyPrefix).toBe("sk-test1...");
     });

@@ -30,7 +30,11 @@ export default function PluginManager() {
       const data = await res.json();
       if (data.success) {
         setPlugins((prev) =>
-          prev.map((p) => (p.id === pluginId ? { ...p, status: action === "enable" ? "active" : "inactive" } : p))
+          prev.map((p) =>
+            p.id === pluginId
+              ? { ...p, status: action === "enable" ? "active" : "inactive" }
+              : p,
+          ),
         );
       }
     } catch (err) {
@@ -56,11 +60,15 @@ export default function PluginManager() {
         </div>
         <div className="bg-gray-900/60 border border-gray-800 rounded-xl p-4">
           <p className="text-gray-400 text-sm">Active</p>
-          <p className="text-2xl font-bold text-green-400">{plugins.filter((p) => p.status === "active").length}</p>
+          <p className="text-2xl font-bold text-green-400">
+            {plugins.filter((p) => p.status === "active").length}
+          </p>
         </div>
         <div className="bg-gray-900/60 border border-gray-800 rounded-xl p-4">
           <p className="text-gray-400 text-sm">Inactive</p>
-          <p className="text-2xl font-bold text-gray-400">{plugins.filter((p) => p.status !== "active").length}</p>
+          <p className="text-2xl font-bold text-gray-400">
+            {plugins.filter((p) => p.status !== "active").length}
+          </p>
         </div>
       </div>
 
@@ -68,27 +76,43 @@ export default function PluginManager() {
       {plugins.length === 0 ? (
         <div className="bg-gray-900/40 border border-gray-800 rounded-xl p-12 text-center">
           <p className="text-gray-500 text-lg">No plugins installed yet</p>
-          <p className="text-gray-600 text-sm mt-2">Plugins will appear here once installed from the marketplace</p>
+          <p className="text-gray-600 text-sm mt-2">
+            Plugins will appear here once installed from the marketplace
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {plugins.map((plugin, i) => (
-            <div key={plugin.id || i} className="bg-gray-900/60 border border-gray-800 rounded-xl p-5">
+            <div
+              key={plugin.id || i}
+              className="bg-gray-900/60 border border-gray-800 rounded-xl p-5"
+            >
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <h3 className="text-white font-semibold">{plugin.name || "Unnamed Plugin"}</h3>
-                  <p className="text-gray-400 text-sm mt-1">{plugin.description || "No description"}</p>
+                  <h3 className="text-white font-semibold">
+                    {plugin.name || "Unnamed Plugin"}
+                  </h3>
+                  <p className="text-gray-400 text-sm mt-1">
+                    {plugin.description || "No description"}
+                  </p>
                 </div>
-                <span className={`px-2 py-1 rounded text-xs font-medium ${
-                  plugin.status === "active" ? "bg-green-900/50 text-green-400" : "bg-gray-700 text-gray-400"
-                }`}>
+                <span
+                  className={`px-2 py-1 rounded text-xs font-medium ${
+                    plugin.status === "active"
+                      ? "bg-green-900/50 text-green-400"
+                      : "bg-gray-700 text-gray-400"
+                  }`}
+                >
                   {plugin.status || "unknown"}
                 </span>
               </div>
               {plugin.permissions && plugin.permissions.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-3">
                   {plugin.permissions.map((perm, j) => (
-                    <span key={j} className="px-2 py-0.5 bg-gray-800 rounded text-xs text-gray-400">
+                    <span
+                      key={j}
+                      className="px-2 py-0.5 bg-gray-800 rounded text-xs text-gray-400"
+                    >
                       {perm}
                     </span>
                   ))}
@@ -96,7 +120,12 @@ export default function PluginManager() {
               )}
               <div className="flex gap-2">
                 <button
-                  onClick={() => handleAction(plugin.id, plugin.status === "active" ? "disable" : "enable")}
+                  onClick={() =>
+                    handleAction(
+                      plugin.id,
+                      plugin.status === "active" ? "disable" : "enable",
+                    )
+                  }
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     plugin.status === "active"
                       ? "bg-red-600/20 text-red-400 hover:bg-red-600/30"

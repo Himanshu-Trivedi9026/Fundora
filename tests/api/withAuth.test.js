@@ -77,7 +77,9 @@ describe("withAuth middleware", () => {
       error: { message: "Invalid JWT" },
     });
 
-    const req = createReq({ headers: { authorization: "Bearer validtoken123" } });
+    const req = createReq({
+      headers: { authorization: "Bearer validtoken123" },
+    });
     const res = createRes();
     const authedHandler = withAuth(handler);
 
@@ -95,7 +97,9 @@ describe("withAuth middleware", () => {
       error: null,
     });
 
-    const req = createReq({ headers: { authorization: "Bearer validtoken123" } });
+    const req = createReq({
+      headers: { authorization: "Bearer validtoken123" },
+    });
     const res = createRes();
     const authedHandler = withAuth(handler);
 
@@ -113,7 +117,9 @@ describe("withAuth middleware", () => {
       error: null,
     });
 
-    const req = createReq({ headers: { authorization: "Bearer validtoken123" } });
+    const req = createReq({
+      headers: { authorization: "Bearer validtoken123" },
+    });
     const res = createRes();
     const authedHandler = withAuth(handler);
 
@@ -131,7 +137,9 @@ describe("withAuth middleware", () => {
       error: null,
     });
 
-    const req = createReq({ headers: { authorization: "Bearer validtoken123" } });
+    const req = createReq({
+      headers: { authorization: "Bearer validtoken123" },
+    });
     const res = createRes();
     const authedHandler = withAuth(handler);
 
@@ -141,9 +149,13 @@ describe("withAuth middleware", () => {
   });
 
   it("returns 500 on exception", async () => {
-    supabaseAdmin.auth.getUser.mockRejectedValue(new Error("Unexpected failure"));
+    supabaseAdmin.auth.getUser.mockRejectedValue(
+      new Error("Unexpected failure"),
+    );
 
-    const req = createReq({ headers: { authorization: "Bearer validtoken123" } });
+    const req = createReq({
+      headers: { authorization: "Bearer validtoken123" },
+    });
     const res = createRes();
     const authedHandler = withAuth(handler);
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});

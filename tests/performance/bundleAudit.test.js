@@ -53,7 +53,7 @@ describe("Bundle Audit", () => {
   it("reports per-route first-load JS sizes (deduplicated shared chunks)", () => {
     const pages = manifest.pages;
     const routes = Object.keys(pages).filter(
-      (r) => !r.startsWith("/_") && !r.startsWith("/api/")
+      (r) => !r.startsWith("/_") && !r.startsWith("/api/"),
     );
 
     // Build a map of chunk sizes
@@ -93,7 +93,9 @@ describe("Bundle Audit", () => {
 
     console.log(`\n📊 Bundle Audit Report`);
     console.log(`   ──────────────────────────────────────────`);
-    console.log(`   Shared chunks: ${sharedChunks.size} (${formatKB(sharedTotalSize)}KB)`);
+    console.log(
+      `   Shared chunks: ${sharedChunks.size} (${formatKB(sharedTotalSize)}KB)`,
+    );
     console.log(`   Route-specific chunks: ${routeOnlyChunks.size}`);
     console.log(`   ──────────────────────────────────────────`);
 
@@ -107,13 +109,21 @@ describe("Bundle Audit", () => {
         }
       }
       const firstLoadKB = formatKB(sharedTotalSize + routeOnlySize);
-      routeSizes.push({ route, firstLoadKB: parseFloat(firstLoadKB), routeOnlyKB: parseFloat(formatKB(routeOnlySize)) });
-      console.log(`   📦 ${route.padEnd(30)} ${firstLoadKB}KB (route-only: ${formatKB(routeOnlySize)}KB)`);
+      routeSizes.push({
+        route,
+        firstLoadKB: parseFloat(firstLoadKB),
+        routeOnlyKB: parseFloat(formatKB(routeOnlySize)),
+      });
+      console.log(
+        `   📦 ${route.padEnd(30)} ${firstLoadKB}KB (route-only: ${formatKB(routeOnlySize)}KB)`,
+      );
     }
 
     console.log(`   ──────────────────────────────────────────`);
     console.log(`   Total unique JS chunks: ${chunkSizes.size}`);
-    console.log(`   Total JS size: ${formatKB(Array.from(chunkSizes.values()).reduce((a, b) => a + b, 0))}KB`);
+    console.log(
+      `   Total JS size: ${formatKB(Array.from(chunkSizes.values()).reduce((a, b) => a + b, 0))}KB`,
+    );
 
     // Report only — no arbitrary threshold assertions
     expect(routeSizes.length).toBeGreaterThan(0);
@@ -123,7 +133,7 @@ describe("Bundle Audit", () => {
   it("identifies largest shared chunks (optimization candidates)", () => {
     const pages = manifest.pages;
     const routes = Object.keys(pages).filter(
-      (r) => !r.startsWith("/_") && !r.startsWith("/api/")
+      (r) => !r.startsWith("/_") && !r.startsWith("/api/"),
     );
 
     const chunkRouteCount = new Map();
@@ -152,7 +162,9 @@ describe("Bundle Audit", () => {
 
     console.log(`\n📊 Largest Shared Chunks (optimization candidates):`);
     for (const chunk of sharedChunks.slice(0, 10)) {
-      console.log(`   ${chunk.file.padEnd(40)} ${chunk.sizeKB}KB (in ${chunk.routeCount} routes)`);
+      console.log(
+        `   ${chunk.file.padEnd(40)} ${chunk.sizeKB}KB (in ${chunk.routeCount} routes)`,
+      );
     }
 
     expect(sharedChunks.length).toBeGreaterThan(0);

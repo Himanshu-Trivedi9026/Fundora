@@ -25,7 +25,12 @@ vi.mock("../../../lib/verification/auditLog", () => ({
   hashIP: vi.fn().mockReturnValue("hashed-ip"),
 }));
 
-import { createMilestone, activateMilestone, getCampaignMilestones, cancelMilestone } from "../../../lib/milestone/milestoneEngine";
+import {
+  createMilestone,
+  activateMilestone,
+  getCampaignMilestones,
+  cancelMilestone,
+} from "../../../lib/milestone/milestoneEngine";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 
 describe("MilestoneEngine", () => {
@@ -51,7 +56,9 @@ describe("MilestoneEngine", () => {
       supabaseAdmin.from.mockReturnValue({
         insert: vi.fn().mockReturnValue({
           select: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: mockMilestone, error: null }),
+            single: vi
+              .fn()
+              .mockResolvedValue({ data: mockMilestone, error: null }),
           }),
         }),
       });
@@ -91,7 +98,9 @@ describe("MilestoneEngine", () => {
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockMilestone, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockMilestone, error: null }),
             }),
           }),
         })
@@ -99,7 +108,10 @@ describe("MilestoneEngine", () => {
           update: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               select: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: { ...mockMilestone, status: "active" }, error: null }),
+                single: vi.fn().mockResolvedValue({
+                  data: { ...mockMilestone, status: "active" },
+                  error: null,
+                }),
               }),
             }),
           }),
@@ -120,7 +132,9 @@ describe("MilestoneEngine", () => {
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: mockMilestone, error: null }),
+            single: vi
+              .fn()
+              .mockResolvedValue({ data: mockMilestone, error: null }),
           }),
         }),
       });
@@ -143,7 +157,9 @@ describe("MilestoneEngine", () => {
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockMilestone, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockMilestone, error: null }),
             }),
           }),
         })
@@ -151,7 +167,10 @@ describe("MilestoneEngine", () => {
           update: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               select: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: { ...mockMilestone, status: "cancelled" }, error: null }),
+                single: vi.fn().mockResolvedValue({
+                  data: { ...mockMilestone, status: "cancelled" },
+                  error: null,
+                }),
               }),
             }),
           }),
@@ -173,7 +192,9 @@ describe("MilestoneEngine", () => {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             order: vi.fn().mockReturnValue({
-              order: vi.fn().mockResolvedValue({ data: mockMilestones, error: null }),
+              order: vi
+                .fn()
+                .mockResolvedValue({ data: mockMilestones, error: null }),
             }),
           }),
         }),

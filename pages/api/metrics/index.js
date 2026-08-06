@@ -1,7 +1,10 @@
 // API — Metrics endpoint
 // Exposes metrics in Prometheus format for scraping
 
-import { getEndpointMetrics, getPoolStats } from "../../../lib/performance/index.js";
+import {
+  getEndpointMetrics,
+  getPoolStats,
+} from "../../../lib/performance/index.js";
 import { getStats } from "../../../lib/cache/index.js";
 import { formatMetricsForExport } from "../../../lib/observability/index.js";
 

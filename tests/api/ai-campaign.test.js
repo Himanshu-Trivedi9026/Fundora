@@ -36,7 +36,11 @@ import suggestHandler from "@/pages/api/ai/campaign/suggest.js";
 import { scoreCampaign } from "@/lib/ai/aiEngine.js";
 import { suggestCampaignTitle } from "@/lib/ai/promptEngine.js";
 
-function createMockReq(method = "POST", body = {}, user = { id: "test-user-id" }) {
+function createMockReq(
+  method = "POST",
+  body = {},
+  user = { id: "test-user-id" },
+) {
   return { method, body, user, query: {} };
 }
 
@@ -69,10 +73,10 @@ describe("POST /api/ai/campaign/score", () => {
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ score: 85 })
+      expect.objectContaining({ score: 85 }),
     );
     expect(scoreCampaign).toHaveBeenCalledWith(
-      expect.objectContaining({ campaignId: "camp-1" })
+      expect.objectContaining({ campaignId: "camp-1" }),
     );
   });
 
@@ -84,7 +88,7 @@ describe("POST /api/ai/campaign/score", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ error: expect.stringContaining("campaignId") })
+      expect.objectContaining({ error: expect.stringContaining("campaignId") }),
     );
   });
 
@@ -98,7 +102,10 @@ describe("POST /api/ai/campaign/score", () => {
   });
 
   it("should return 400 when engine fails", async () => {
-    scoreCampaign.mockResolvedValueOnce({ success: false, error: "Campaign not found" });
+    scoreCampaign.mockResolvedValueOnce({
+      success: false,
+      error: "Campaign not found",
+    });
 
     const req = createMockReq("POST", { campaignId: "camp-missing" });
     const res = createMockRes();
@@ -116,17 +123,23 @@ describe("POST /api/ai/campaign/suggest", () => {
   });
 
   it("should suggest titles on success", async () => {
-    const req = createMockReq("POST", { title: "My Project", category: "tech", goal: 10000 });
+    const req = createMockReq("POST", {
+      title: "My Project",
+      category: "tech",
+      goal: 10000,
+    });
     const res = createMockRes();
 
     await suggestHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ suggestions: expect.arrayContaining([expect.any(String)]) })
+      expect.objectContaining({
+        suggestions: expect.arrayContaining([expect.any(String)]),
+      }),
     );
     expect(suggestCampaignTitle).toHaveBeenCalledWith(
-      expect.objectContaining({ title: "My Project" })
+      expect.objectContaining({ title: "My Project" }),
     );
   });
 
@@ -138,7 +151,7 @@ describe("POST /api/ai/campaign/suggest", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ error: expect.stringContaining("title") })
+      expect.objectContaining({ error: expect.stringContaining("title") }),
     );
   });
 

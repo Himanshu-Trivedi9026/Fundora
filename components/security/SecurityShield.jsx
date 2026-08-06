@@ -60,7 +60,9 @@ export default function SecurityShield({
       {level >= 2 && (
         <div
           className={`absolute inset-0 rounded-full bg-gradient-to-b ${levelColors[level]} blur-xl opacity-60`}
-          style={level >= 5 ? { animation: "glowPulse 3s ease-in-out infinite" } : {}}
+          style={
+            level >= 5 ? { animation: "glowPulse 3s ease-in-out infinite" } : {}
+          }
         />
       )}
 

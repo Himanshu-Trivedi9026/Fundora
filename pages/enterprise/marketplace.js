@@ -35,8 +35,12 @@ export default function MarketplacePage() {
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-2xl font-bold text-white">Plugin & Template Marketplace</h1>
-              <p className="text-gray-400 mt-1">Discover plugins, templates, and integrations for your projects</p>
+              <h1 className="text-2xl font-bold text-white">
+                Plugin & Template Marketplace
+              </h1>
+              <p className="text-gray-400 mt-1">
+                Discover plugins, templates, and integrations for your projects
+              </p>
             </div>
             <span className="text-sm text-gray-500 bg-white/[0.04] px-3 py-1.5 rounded-full">
               {listings.length} listing{listings.length !== 1 ? "s" : ""}
@@ -58,10 +62,19 @@ export default function MarketplacePage() {
 
           {error && (
             <GlassCard className="text-center py-12">
-              <span className="material-symbols-outlined text-4xl text-red-400 mb-3">error_outline</span>
-              <p className="text-red-400 text-lg font-medium">Failed to load marketplace</p>
+              <span className="material-symbols-outlined text-4xl text-red-400 mb-3">
+                error_outline
+              </span>
+              <p className="text-red-400 text-lg font-medium">
+                Failed to load marketplace
+              </p>
               <p className="text-gray-500 text-sm mt-1">{error}</p>
-              <Button variant="secondary" size="sm" className="mt-4" onClick={() => window.location.reload()}>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="mt-4"
+                onClick={() => window.location.reload()}
+              >
                 Retry
               </Button>
             </GlassCard>
@@ -69,16 +82,26 @@ export default function MarketplacePage() {
 
           {!loading && !error && listings.length === 0 && (
             <GlassCard className="text-center py-12">
-              <span className="material-symbols-outlined text-4xl text-gray-500 mb-3">store</span>
-              <p className="text-gray-400 text-lg font-medium">No listings available yet</p>
-              <p className="text-gray-600 text-sm mt-1">Marketplace plugins and templates will appear here.</p>
+              <span className="material-symbols-outlined text-4xl text-gray-500 mb-3">
+                store
+              </span>
+              <p className="text-gray-400 text-lg font-medium">
+                No listings available yet
+              </p>
+              <p className="text-gray-600 text-sm mt-1">
+                Marketplace plugins and templates will appear here.
+              </p>
             </GlassCard>
           )}
 
           {!loading && !error && listings.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {listings.map((item) => (
-                <GlassCard key={item.id || item.name} hover className="flex flex-col">
+                <GlassCard
+                  key={item.id || item.name}
+                  hover
+                  className="flex flex-col"
+                >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
                       {item.icon && (
@@ -87,13 +110,19 @@ export default function MarketplacePage() {
                         </span>
                       )}
                       <div>
-                        <h3 className="text-white font-semibold text-sm">{item.name}</h3>
-                        <span className="text-xs text-gray-500 capitalize">{item.category || item.type || "Plugin"}</span>
+                        <h3 className="text-white font-semibold text-sm">
+                          {item.name}
+                        </h3>
+                        <span className="text-xs text-gray-500 capitalize">
+                          {item.category || item.type || "Plugin"}
+                        </span>
                       </div>
                     </div>
                     {item.rating && (
                       <div className="flex items-center gap-1 text-yellow-400 text-xs">
-                        <span className="material-symbols-outlined text-[14px]">star</span>
+                        <span className="material-symbols-outlined text-[14px]">
+                          star
+                        </span>
                         {item.rating}
                       </div>
                     )}
@@ -103,9 +132,15 @@ export default function MarketplacePage() {
                   </p>
                   <div className="flex items-center justify-between mt-auto pt-3 border-t border-white/[0.06]">
                     <span className="text-white font-semibold text-sm">
-                      {item.price ? (item.price === 0 ? "Free" : `$${item.price}`) : "Free"}
+                      {item.price
+                        ? item.price === 0
+                          ? "Free"
+                          : `$${item.price}`
+                        : "Free"}
                     </span>
-                    <Button variant="secondary" size="sm">View Details</Button>
+                    <Button variant="secondary" size="sm">
+                      View Details
+                    </Button>
                   </div>
                 </GlassCard>
               ))}

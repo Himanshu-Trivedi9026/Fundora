@@ -3,7 +3,13 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { calculateRiskScore, getRiskLevel, getRiskLevelInfo, RISK_WEIGHTS, RISK_LEVELS } from "../../../lib/fraud/riskScorer";
+import {
+  calculateRiskScore,
+  getRiskLevel,
+  getRiskLevelInfo,
+  RISK_WEIGHTS,
+  RISK_LEVELS,
+} from "../../../lib/fraud/riskScorer";
 
 describe("RiskScorer", () => {
   describe("calculateRiskScore", () => {
@@ -49,8 +55,20 @@ describe("RiskScorer", () => {
         },
         ruleResults: {
           triggered: [
-            { ruleId: "1", ruleName: "rapid_donations", category: "velocity", severity: "high", riskContribution: 15 },
-            { ruleId: "2", ruleName: "multiple_devices", category: "velocity", severity: "medium", riskContribution: 10 },
+            {
+              ruleId: "1",
+              ruleName: "rapid_donations",
+              category: "velocity",
+              severity: "high",
+              riskContribution: 15,
+            },
+            {
+              ruleId: "2",
+              ruleName: "multiple_devices",
+              category: "velocity",
+              severity: "medium",
+              riskContribution: 10,
+            },
           ],
         },
         trustScore: 10,
@@ -108,7 +126,11 @@ describe("RiskScorer", () => {
           disposableEmail: true,
         },
         ruleResults: {
-          triggered: Array(10).fill({ ruleId: "1", ruleName: "test", riskContribution: 15 }),
+          triggered: Array(10).fill({
+            ruleId: "1",
+            ruleName: "test",
+            riskContribution: 15,
+          }),
         },
         trustScore: 0,
         verificationLevel: 0,

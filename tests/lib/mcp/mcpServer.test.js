@@ -44,7 +44,10 @@ describe("MCP Server", () => {
     it("registers and retrieves a tool", () => {
       const def = {
         description: "A test tool",
-        inputSchema: { type: "object", properties: { foo: { type: "string" } } },
+        inputSchema: {
+          type: "object",
+          properties: { foo: { type: "string" } },
+        },
         handler: async () => ({ success: true, data: "ok" }),
       };
       registerTool("test_tool", def);
@@ -90,7 +93,7 @@ describe("MCP Server", () => {
     it("builds context with user info", () => {
       const ctx = buildContext(
         { id: "user-1", role: "admin", organization_id: "org-1" },
-        "org-1"
+        "org-1",
       );
       expect(ctx.user).toBeDefined();
       expect(ctx.user.id).toBe("user-1");

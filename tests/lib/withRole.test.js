@@ -22,7 +22,11 @@ import { ROLES } from "@/lib/roles";
 const USER = { id: "user-123", email: "x@y.com" };
 
 function createReq() {
-  return { method: "POST", headers: { authorization: "Bearer token-1" }, body: {} };
+  return {
+    method: "POST",
+    headers: { authorization: "Bearer token-1" },
+    body: {},
+  };
 }
 
 function createRes() {
@@ -43,7 +47,10 @@ function createRes() {
 
 /** Returns the withRole-wrapped handler with a spy handler and fresh mocks. */
 function setup(allowedRoles = [ROLES.ADMIN]) {
-  supabaseAdmin.auth.getUser.mockResolvedValue({ data: { user: USER }, error: null });
+  supabaseAdmin.auth.getUser.mockResolvedValue({
+    data: { user: USER },
+    error: null,
+  });
   const handler = vi.fn(async (req, res, user) => {
     res.status(200).json({ ok: true, userRole: req.userRole, userId: user.id });
   });
@@ -71,7 +78,11 @@ describe("withRole", () => {
     expect(handler.mock.calls[0][2].id).toBe(USER.id);
     expect(req.userRole).toBe(ROLES.ADMIN);
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res._body).toEqual({ ok: true, userRole: ROLES.ADMIN, userId: USER.id });
+    expect(res._body).toEqual({
+      ok: true,
+      userRole: ROLES.ADMIN,
+      userId: USER.id,
+    });
   });
 
   it("returns 403 for a role outside the allowed set", async () => {
@@ -132,11 +143,17 @@ describe("withRole", () => {
     expect(supabaseAdmin.from).toHaveBeenCalledWith("profiles");
     const selectCall = supabaseAdmin.from("profiles").select.mock.calls[0][0];
     expect(selectCall).toContain("role");
-    expect(supabaseAdmin.from("profiles").eq).toHaveBeenCalledWith("id", USER.id);
+    expect(supabaseAdmin.from("profiles").eq).toHaveBeenCalledWith(
+      "id",
+      USER.id,
+    );
   });
 
   it("returns 401 when not authenticated (withAuth path)", async () => {
-    supabaseAdmin.auth.getUser.mockResolvedValue({ data: { user: null }, error: null });
+    supabaseAdmin.auth.getUser.mockResolvedValue({
+      data: { user: null },
+      error: null,
+    });
     const handler = vi.fn();
     const wrapped = withRole(handler, [ROLES.ADMIN]);
     const res = createRes();

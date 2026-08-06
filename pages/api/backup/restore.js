@@ -1,7 +1,11 @@
 // POST /api/backup/restore — Initiate restore operation
 // GET /api/backup/restore — List restore operations
 import { withAuth } from "../../../lib/withAuth.js";
-import { initiateRestore, listRestoreOperations, getRestoreOperation } from "../../../lib/backup/restoreEngine.js";
+import {
+  initiateRestore,
+  listRestoreOperations,
+  getRestoreOperation,
+} from "../../../lib/backup/restoreEngine.js";
 
 async function handler(req, res) {
   try {
@@ -12,7 +16,9 @@ async function handler(req, res) {
           const result = await getRestoreOperation(restoreId);
           return res.status(200).json(result);
         }
-        const result = await listRestoreOperations({ organizationId: req.user?.organizationId });
+        const result = await listRestoreOperations({
+          organizationId: req.user?.organizationId,
+        });
         return res.status(200).json(result);
       }
 
@@ -26,7 +32,9 @@ async function handler(req, res) {
       }
 
       default:
-        return res.status(405).json({ success: false, error: "Method not allowed" });
+        return res
+          .status(405)
+          .json({ success: false, error: "Method not allowed" });
     }
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });

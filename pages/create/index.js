@@ -11,7 +11,11 @@ import ProjectDetailsStep from "../../components/create/ProjectDetailsStep";
 import AIGeneratorStep from "../../components/create/AIGeneratorStep";
 import MediaStep from "../../components/create/MediaStep";
 import FundingStep from "../../components/create/FundingStep";
-import { saveDraft, loadDraft, clearDraft } from "../../components/create/DraftManager";
+import {
+  saveDraft,
+  loadDraft,
+  clearDraft,
+} from "../../components/create/DraftManager";
 import { supabase } from "../../lib/supabaseClient";
 import { uploadFileToProject } from "../../lib/storage";
 
@@ -60,17 +64,19 @@ export default function CreateProject() {
     if (typeof window !== "undefined") {
       const draft = loadDraft();
       if (draft) {
-        queueMicrotask(() => setFormData({
-          ...initialFormData,
-          title: draft.title || "",
-          short: draft.short || "",
-          description: draft.description || "",
-          categories: draft.categories || [],
-          goal: draft.goal || "",
-          deadline: draft.deadline || "",
-          duration: draft.duration || null,
-          prototypeUrl: draft.prototypeUrl || "",
-        }));
+        queueMicrotask(() =>
+          setFormData({
+            ...initialFormData,
+            title: draft.title || "",
+            short: draft.short || "",
+            description: draft.description || "",
+            categories: draft.categories || [],
+            goal: draft.goal || "",
+            deadline: draft.deadline || "",
+            duration: draft.duration || null,
+            prototypeUrl: draft.prototypeUrl || "",
+          }),
+        );
         queueMicrotask(() => setTeam(draft.team || []));
         queueMicrotask(() => setDraftRestored(true));
       }
@@ -117,7 +123,7 @@ export default function CreateProject() {
       setErrors(newErrors);
       return Object.keys(newErrors).length === 0;
     },
-    [formData, thumbnailFile]
+    [formData, thumbnailFile],
   );
 
   /* ─── Navigation ─── */
@@ -206,7 +212,7 @@ export default function CreateProject() {
 
       if (publishRes.status === 403) {
         setPublishError(
-          "Creator verification is required before publishing. Please complete your verification first."
+          "Creator verification is required before publishing. Please complete your verification first.",
         );
         setLoading(false);
         return;
@@ -215,7 +221,7 @@ export default function CreateProject() {
       if (!publishRes.ok) {
         const publishErr = await publishRes.json().catch(() => ({}));
         setPublishError(
-          publishErr?.error || "Something went wrong. Please try again."
+          publishErr?.error || "Something went wrong. Please try again.",
         );
         setLoading(false);
         return;
@@ -227,7 +233,7 @@ export default function CreateProject() {
       const uploadedThumb = await uploadFileToProject(
         thumbnailFile,
         project.id,
-        "thumbnail"
+        "thumbnail",
       );
 
       /* STEP 5: Save thumbnail URL */
@@ -237,7 +243,9 @@ export default function CreateProject() {
         .eq("id", project.id);
 
       if (thumbUpdateError) {
-        throw new Error(`Failed to save thumbnail: ${thumbUpdateError.message}`);
+        throw new Error(
+          `Failed to save thumbnail: ${thumbUpdateError.message}`,
+        );
       }
 
       /* STEP 6: Upload media */
@@ -254,8 +262,8 @@ export default function CreateProject() {
             type: file.type.startsWith("image")
               ? "image"
               : file.type.startsWith("video")
-              ? "video"
-              : "document",
+                ? "video"
+                : "document",
           });
         } catch (err) {
           console.error("Media upload failed:", err);
@@ -273,7 +281,7 @@ export default function CreateProject() {
             project_id: project.id,
             name: t.name,
             role: t.role,
-          }))
+          })),
         );
       }
 
@@ -282,7 +290,9 @@ export default function CreateProject() {
       router.push(`/projects/${project.id}`);
     } catch (err) {
       console.error("Publish error:", err);
-      setPublishError(err?.message || "Something went wrong. Please try again.");
+      setPublishError(
+        err?.message || "Something went wrong. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
@@ -385,7 +395,10 @@ export default function CreateProject() {
                 className="text-on-surface-variant hover:text-on-surface transition-colors"
                 aria-label="Dismiss draft restored message"
               >
-                <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                <span
+                  className="material-symbols-outlined text-[18px]"
+                  aria-hidden="true"
+                >
                   close
                 </span>
               </button>
@@ -407,7 +420,10 @@ export default function CreateProject() {
               role="alert"
             >
               <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-red-400 text-[20px]" aria-hidden="true">
+                <span
+                  className="material-symbols-outlined text-red-400 text-[20px]"
+                  aria-hidden="true"
+                >
                   error
                 </span>
                 <p className="text-red-300 font-inter text-sm">
@@ -419,7 +435,10 @@ export default function CreateProject() {
                 className="text-red-400/60 hover:text-red-300 transition-colors"
                 aria-label="Dismiss error"
               >
-                <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                <span
+                  className="material-symbols-outlined text-[18px]"
+                  aria-hidden="true"
+                >
                   close
                 </span>
               </button>
@@ -428,9 +447,7 @@ export default function CreateProject() {
         </AnimatePresence>
 
         {/* Step Content with Animation */}
-        <AnimatePresence mode="wait">
-          {renderStep()}
-        </AnimatePresence>
+        <AnimatePresence mode="wait">{renderStep()}</AnimatePresence>
       </PageContainer>
 
       {/* Bottom Navigation */}

@@ -41,6 +41,7 @@ Any terminal state (fully_released, refunded, cancelled) → closed.
 Creates a new escrow account for a campaign.
 
 **Parameters:**
+
 - `campaignId` (string, required) — Campaign ID
 - `creatorId` (string, required) — Creator's user ID
 - `feePercentage` (number, required) — Platform fee percentage (0-100)
@@ -80,6 +81,7 @@ Closes an escrow account. Only allowed in terminal states.
 ### `canRelease(escrowAccount, amount)`
 
 Checks if a fund release is allowed:
+
 - Account is active or partially_released
 - Account is not frozen
 - Sufficient locked balance
@@ -87,12 +89,14 @@ Checks if a fund release is allowed:
 ### `canRefund(escrowAccount, amount)`
 
 Checks if a refund is allowed:
+
 - Account is not cancelled, closed, or fully_released
 - Sufficient locked balance
 
 ### `canPayout(escrowAccount, amount)`
 
 Checks if a payout is allowed:
+
 - Account is active or partially_released
 - Account is not frozen
 - Sufficient creator earnings

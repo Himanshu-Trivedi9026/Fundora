@@ -53,12 +53,13 @@ export default function AdminDashboard() {
     setLoading(true);
     setError(null);
     try {
-      const [healthRes, escrowRes, fraudRes, complianceRes] = await Promise.allSettled([
-        authFetch("/api/admin/platform-analytics?mode=health"),
-        authFetch("/api/admin/escrow-dashboard?mode=overview"),
-        authFetch("/api/admin/fraud-dashboard?mode=overview"),
-        authFetch("/api/admin/compliance-dashboard?mode=overview"),
-      ]);
+      const [healthRes, escrowRes, fraudRes, complianceRes] =
+        await Promise.allSettled([
+          authFetch("/api/admin/platform-analytics?mode=health"),
+          authFetch("/api/admin/escrow-dashboard?mode=overview"),
+          authFetch("/api/admin/fraud-dashboard?mode=overview"),
+          authFetch("/api/admin/compliance-dashboard?mode=overview"),
+        ]);
 
       if (healthRes.status === "fulfilled" && healthRes.value.ok) {
         const d = await healthRes.value.json();
@@ -98,7 +99,11 @@ export default function AdminDashboard() {
     return (
       <PageLayout>
         <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#0d0d15] to-[#0a0a0f] flex items-center justify-center">
-          <div role="status" aria-label="Checking authentication" className="text-on-surface-variant text-lg">
+          <div
+            role="status"
+            aria-label="Checking authentication"
+            className="text-on-surface-variant text-lg"
+          >
             Checking authentication...
           </div>
         </div>
@@ -113,8 +118,12 @@ export default function AdminDashboard() {
       label: "Platform Health",
       value: health?.status || "—",
       icon: "monitor_heart",
-      color: health?.status === "healthy" ? "text-success"
-        : health?.status === "degraded" ? "text-warning" : "text-danger",
+      color:
+        health?.status === "healthy"
+          ? "text-success"
+          : health?.status === "degraded"
+            ? "text-warning"
+            : "text-danger",
       href: "/admin/infrastructure",
     },
     {
@@ -169,14 +178,54 @@ export default function AdminDashboard() {
   ];
 
   const quickActions = [
-    { label: "Verification Queue", href: "/admin/verification-review", icon: "verified", description: "Review creator verifications" },
-    { label: "Fraud Center", href: "/admin/fraud", icon: "gpp_maybe", description: "Monitor fraud alerts" },
-    { label: "Escrow Monitoring", href: "/admin/escrow", icon: "account_balance", description: "Track escrow accounts" },
-    { label: "Compliance Center", href: "/admin/compliance", icon: "gavel", description: "Compliance overview" },
-    { label: "Platform Analytics", href: "/admin/analytics", icon: "analytics", description: "Deep analytics" },
-    { label: "Audit Logs", href: "/admin/audit-logs", icon: "history", description: "System audit trail" },
-    { label: "System Health", href: "/admin/infrastructure", icon: "monitoring", description: "Infrastructure status" },
-    { label: "Moderation", href: "/admin/moderation", icon: "shield", description: "Content moderation" },
+    {
+      label: "Verification Queue",
+      href: "/admin/verification-review",
+      icon: "verified",
+      description: "Review creator verifications",
+    },
+    {
+      label: "Fraud Center",
+      href: "/admin/fraud",
+      icon: "gpp_maybe",
+      description: "Monitor fraud alerts",
+    },
+    {
+      label: "Escrow Monitoring",
+      href: "/admin/escrow",
+      icon: "account_balance",
+      description: "Track escrow accounts",
+    },
+    {
+      label: "Compliance Center",
+      href: "/admin/compliance",
+      icon: "gavel",
+      description: "Compliance overview",
+    },
+    {
+      label: "Platform Analytics",
+      href: "/admin/analytics",
+      icon: "analytics",
+      description: "Deep analytics",
+    },
+    {
+      label: "Audit Logs",
+      href: "/admin/audit-logs",
+      icon: "history",
+      description: "System audit trail",
+    },
+    {
+      label: "System Health",
+      href: "/admin/infrastructure",
+      icon: "monitoring",
+      description: "Infrastructure status",
+    },
+    {
+      label: "Moderation",
+      href: "/admin/moderation",
+      icon: "shield",
+      description: "Content moderation",
+    },
   ];
 
   return (
@@ -184,7 +233,12 @@ export default function AdminDashboard() {
       <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#0d0d15] to-[#0a0a0f]">
         <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
           {/* Breadcrumbs */}
-          <Breadcrumbs items={[{ label: "Admin", href: "/admin/dashboard" }, { label: "Dashboard" }]} />
+          <Breadcrumbs
+            items={[
+              { label: "Admin", href: "/admin/dashboard" },
+              { label: "Dashboard" },
+            ]}
+          />
 
           {/* Welcome Card */}
           <WelcomeCard
@@ -199,47 +253,57 @@ export default function AdminDashboard() {
 
           {/* Platform Overview Stats */}
           <div className="fade-in-up" style={{ animationDelay: "0.06s" }}>
-          <SectionCard
-            title="Platform Overview"
-            icon="dashboard"
-            loading={loading}
-            error={error}
-            onRetry={loadAll}
-            empty={false}
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {statCards.map((card) => (
-                <Link key={card.label} href={card.href}>
-                  <div className="glass-card p-4 hover:border-primary/30 transition-all duration-200 cursor-pointer">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="text-on-surface-variant text-xs font-inter uppercase tracking-wider">
-                          {card.label}
-                        </p>
-                        <p className={`text-xl md:text-2xl font-bold font-geist mt-1 ${card.color}`}>
-                          {card.value}
-                        </p>
+            <SectionCard
+              title="Platform Overview"
+              icon="dashboard"
+              loading={loading}
+              error={error}
+              onRetry={loadAll}
+              empty={false}
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {statCards.map((card) => (
+                  <Link key={card.label} href={card.href}>
+                    <div className="glass-card p-4 hover:border-primary/30 transition-all duration-200 cursor-pointer">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="text-on-surface-variant text-xs font-inter uppercase tracking-wider">
+                            {card.label}
+                          </p>
+                          <p
+                            className={`text-xl md:text-2xl font-bold font-geist mt-1 ${card.color}`}
+                          >
+                            {card.value}
+                          </p>
+                        </div>
+                        <span
+                          className={`material-symbols-outlined text-[28px] ${card.color}`}
+                          aria-hidden="true"
+                        >
+                          {card.icon}
+                        </span>
                       </div>
-                      <span className={`material-symbols-outlined text-[28px] ${card.color}`} aria-hidden="true">
-                        {card.icon}
-                      </span>
                     </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </SectionCard>
+                  </Link>
+                ))}
+              </div>
+            </SectionCard>
           </div>
 
           {/* Admin Sections */}
           <div className="fade-in-up" style={{ animationDelay: "0.12s" }}>
-          <div>
-            <h3 className="text-sm font-semibold text-on-surface font-geist mb-3 flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px] text-primary" aria-hidden="true">settings</span>
-              Admin Sections
-            </h3>
-            <QuickActions actions={quickActions} />
-          </div>
+            <div>
+              <h3 className="text-sm font-semibold text-on-surface font-geist mb-3 flex items-center gap-2">
+                <span
+                  className="material-symbols-outlined text-[18px] text-primary"
+                  aria-hidden="true"
+                >
+                  settings
+                </span>
+                Admin Sections
+              </h3>
+              <QuickActions actions={quickActions} />
+            </div>
           </div>
         </div>
       </div>

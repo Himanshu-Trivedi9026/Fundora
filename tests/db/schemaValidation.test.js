@@ -209,8 +209,8 @@ describe("SQL Migration — Table existence", () => {
   );
 
   it("should not have unexpected verification tables missing from the expected list", () => {
-    const verificationTables = createdTables.filter((t) =>
-      t.startsWith("verification") || t === "creator_verifications",
+    const verificationTables = createdTables.filter(
+      (t) => t.startsWith("verification") || t === "creator_verifications",
     );
     // Log for visibility
     console.log(
@@ -236,13 +236,10 @@ describe("SQL Migration — Row Level Security", () => {
     "verification_history",
   ];
 
-  it.each(RLS_TABLES)(
-    "should enable RLS on %s",
-    (tableName) => {
-      const enabled = hasRlsEnabled(allSql, tableName);
-      expect(enabled).toBe(true);
-    },
-  );
+  it.each(RLS_TABLES)("should enable RLS on %s", (tableName) => {
+    const enabled = hasRlsEnabled(allSql, tableName);
+    expect(enabled).toBe(true);
+  });
 });
 
 describe("SQL Migration — CHECK constraints on status/priority columns", () => {
@@ -252,7 +249,10 @@ describe("SQL Migration — CHECK constraints on status/priority columns", () =>
     it("should have a CHECK on verification_level (0–5 range)", () => {
       const checks = allCheckConstraints(allSql, "creator_verifications");
       const levelCheck = checks.some(
-        (c) => c.includes("verification_level") && c.includes("0") && c.includes("5"),
+        (c) =>
+          c.includes("verification_level") &&
+          c.includes("0") &&
+          c.includes("5"),
       );
       expect(levelCheck).toBe(true);
     });
@@ -389,8 +389,7 @@ describe("SQL Migration — Foreign key references", () => {
     it("should reference auth.users(id)", () => {
       const fks = findForeignKeys(allSql, "creator_verifications");
       const userRef = fks.find(
-        (fk) =>
-          fk.column === "user_id" && fk.referencedTable === "auth.users",
+        (fk) => fk.column === "user_id" && fk.referencedTable === "auth.users",
       );
       expect(userRef).toBeDefined();
     });
@@ -400,8 +399,7 @@ describe("SQL Migration — Foreign key references", () => {
     it("should reference auth.users(id) via user_id", () => {
       const fks = findForeignKeys(allSql, "verification_requests");
       const userRef = fks.find(
-        (fk) =>
-          fk.column === "user_id" && fk.referencedTable === "auth.users",
+        (fk) => fk.column === "user_id" && fk.referencedTable === "auth.users",
       );
       expect(userRef).toBeDefined();
     });
@@ -421,8 +419,7 @@ describe("SQL Migration — Foreign key references", () => {
     it("should reference auth.users(id) via user_id", () => {
       const fks = findForeignKeys(allSql, "verification_sessions");
       const userRef = fks.find(
-        (fk) =>
-          fk.column === "user_id" && fk.referencedTable === "auth.users",
+        (fk) => fk.column === "user_id" && fk.referencedTable === "auth.users",
       );
       expect(userRef).toBeDefined();
     });
@@ -442,8 +439,7 @@ describe("SQL Migration — Foreign key references", () => {
     it("should reference auth.users(id) via user_id", () => {
       const fks = findForeignKeys(allSql, "verification_otp");
       const userRef = fks.find(
-        (fk) =>
-          fk.column === "user_id" && fk.referencedTable === "auth.users",
+        (fk) => fk.column === "user_id" && fk.referencedTable === "auth.users",
       );
       expect(userRef).toBeDefined();
     });
@@ -463,8 +459,7 @@ describe("SQL Migration — Foreign key references", () => {
     it("should reference auth.users(id) via user_id", () => {
       const fks = findForeignKeys(allSql, "verification_history");
       const userRef = fks.find(
-        (fk) =>
-          fk.column === "user_id" && fk.referencedTable === "auth.users",
+        (fk) => fk.column === "user_id" && fk.referencedTable === "auth.users",
       );
       expect(userRef).toBeDefined();
     });
@@ -484,8 +479,7 @@ describe("SQL Migration — Foreign key references", () => {
     it("should reference auth.users(id) via user_id", () => {
       const fks = findForeignKeys(allSql, "verification_documents");
       const userRef = fks.find(
-        (fk) =>
-          fk.column === "user_id" && fk.referencedTable === "auth.users",
+        (fk) => fk.column === "user_id" && fk.referencedTable === "auth.users",
       );
       expect(userRef).toBeDefined();
     });
@@ -495,8 +489,7 @@ describe("SQL Migration — Foreign key references", () => {
     it("should reference auth.users(id) via user_id", () => {
       const fks = findForeignKeys(allSql, "verification_audit_log");
       const userRef = fks.find(
-        (fk) =>
-          fk.column === "user_id" && fk.referencedTable === "auth.users",
+        (fk) => fk.column === "user_id" && fk.referencedTable === "auth.users",
       );
       expect(userRef).toBeDefined();
     });
@@ -553,9 +546,7 @@ describe("SQL Migration — Indexes on commonly queried columns", () => {
 
     it("should index review_priority", () => {
       const indexes = findIndexes(allSql, "verification_requests");
-      const match = indexes.some((i) =>
-        i.columns.includes("review_priority"),
-      );
+      const match = indexes.some((i) => i.columns.includes("review_priority"));
       expect(match).toBe(true);
     });
   });
@@ -601,8 +592,7 @@ describe("SQL Migration — Indexes on commonly queried columns", () => {
       const indexes = findIndexes(allSql, "verification_audit_log");
       const match = indexes.some(
         (i) =>
-          i.columns.includes("entity_type") &&
-          i.columns.includes("entity_id"),
+          i.columns.includes("entity_type") && i.columns.includes("entity_id"),
       );
       expect(match).toBe(true);
     });
@@ -629,9 +619,7 @@ describe("SQL Migration — Indexes on commonly queried columns", () => {
   describe("verification_history", () => {
     it("should index verification_id", () => {
       const indexes = findIndexes(allSql, "verification_history");
-      const match = indexes.some((i) =>
-        i.columns.includes("verification_id"),
-      );
+      const match = indexes.some((i) => i.columns.includes("verification_id"));
       expect(match).toBe(true);
     });
 
@@ -657,9 +645,7 @@ describe("SQL Migration — Indexes on commonly queried columns", () => {
   describe("verification_documents", () => {
     it("should index verification_id", () => {
       const indexes = findIndexes(allSql, "verification_documents");
-      const match = indexes.some((i) =>
-        i.columns.includes("verification_id"),
-      );
+      const match = indexes.some((i) => i.columns.includes("verification_id"));
       expect(match).toBe(true);
     });
 
@@ -677,9 +663,7 @@ describe("SQL Migration — Indexes on commonly queried columns", () => {
 
     it("should index document_type", () => {
       const indexes = findIndexes(allSql, "verification_documents");
-      const match = indexes.some((i) =>
-        i.columns.includes("document_type"),
-      );
+      const match = indexes.some((i) => i.columns.includes("document_type"));
       expect(match).toBe(true);
     });
   });

@@ -18,7 +18,7 @@ export default function MediaStep({
   // Memoize thumbnail preview URL to prevent blob URL leak on re-render
   const thumbnailPreview = useMemo(
     () => (thumbnailFile ? URL.createObjectURL(thumbnailFile) : null),
-    [thumbnailFile]
+    [thumbnailFile],
   );
 
   // Revoke blob URL on cleanup
@@ -41,7 +41,7 @@ export default function MediaStep({
       }
       setThumbnailFile(file);
     },
-    [setThumbnailFile]
+    [setThumbnailFile],
   );
 
   const handleThumbnailChange = (e) => {
@@ -95,7 +95,10 @@ export default function MediaStep({
         {/* Hero Image / Thumbnail */}
         <div className="space-y-3">
           <label className="block font-inter text-sm text-on-surface-variant">
-            Hero Image <span className="text-red-400 ml-0.5" aria-hidden="true">*</span>
+            Hero Image{" "}
+            <span className="text-red-400 ml-0.5" aria-hidden="true">
+              *
+            </span>
           </label>
 
           {thumbnailFile && thumbnailPreview ? (
@@ -139,7 +142,10 @@ export default function MediaStep({
               }`}
               aria-label="Upload hero image"
             >
-              <span className="material-symbols-outlined text-[48px] text-on-surface-variant group-hover:text-primary transition-colors mb-4" aria-hidden="true">
+              <span
+                className="material-symbols-outlined text-[48px] text-on-surface-variant group-hover:text-primary transition-colors mb-4"
+                aria-hidden="true"
+              >
                 {isDragOver ? "add_photo_alternate" : "image_search"}
               </span>
               <span className="font-geist text-base font-semibold text-on-surface mb-2">

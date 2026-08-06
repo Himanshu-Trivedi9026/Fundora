@@ -154,14 +154,21 @@ describe("Workflow Automation Integration", () => {
     // ── Step 1: Create ──
     supabaseAdmin.from.mockImplementationOnce(() =>
       mockInsertSingle({
-        data: { id: workflowId, name: "Lifecycle Test", enabled: true, trigger_type: "event" },
+        data: {
+          id: workflowId,
+          name: "Lifecycle Test",
+          enabled: true,
+          trigger_type: "event",
+        },
         error: null,
-      })
+      }),
     );
 
-    const createResult = await createWorkflow(makeWorkflow({
-      name: "Lifecycle Test",
-    }));
+    const createResult = await createWorkflow(
+      makeWorkflow({
+        name: "Lifecycle Test",
+      }),
+    );
 
     expect(createResult.success).toBe(true);
     expect(createResult.data).toBeDefined();
@@ -171,7 +178,7 @@ describe("Workflow Automation Integration", () => {
       mockUpdateSingle({
         data: { id: workflowId, enabled: true },
         error: null,
-      })
+      }),
     );
 
     const enableResult = await enableWorkflow(workflowId, "admin-1");
@@ -195,7 +202,7 @@ describe("Workflow Automation Integration", () => {
           ],
         },
         error: null,
-      })
+      }),
     );
 
     // workflow_runs insert
@@ -203,7 +210,7 @@ describe("Workflow Automation Integration", () => {
       mockInsertSingle({
         data: { id: runId, workflow_id: workflowId, status: "running" },
         error: null,
-      })
+      }),
     );
 
     // Action: notifications insert
@@ -211,7 +218,7 @@ describe("Workflow Automation Integration", () => {
       mockInsertSingle({
         data: { id: "notif-1" },
         error: null,
-      })
+      }),
     );
 
     // workflow_logs insert (step log)
@@ -219,7 +226,7 @@ describe("Workflow Automation Integration", () => {
       mockInsertSingle({
         data: { id: "log-1" },
         error: null,
-      })
+      }),
     );
 
     // workflow_logs update (step completed)
@@ -252,7 +259,7 @@ describe("Workflow Automation Integration", () => {
       mockSelectSingle({
         data: { id: runId, workflow_id: workflowId, status: "completed" },
         error: null,
-      })
+      }),
     );
     // Also fetch logs
     supabaseAdmin.from.mockImplementationOnce(() => ({
@@ -272,7 +279,7 @@ describe("Workflow Automation Integration", () => {
       mockUpdateSingle({
         data: { id: workflowId, enabled: false },
         error: null,
-      })
+      }),
     );
 
     const disableResult = await disableWorkflow(workflowId, "admin-1");
@@ -297,11 +304,14 @@ describe("Workflow Automation Integration", () => {
             { type: CONDITION_TYPES.EQUALS, field: "userRole", value: "admin" },
           ],
           actions: [
-            { type: ACTION_TYPES.SEND_NOTIFICATION, config: { title: "Admin alert" } },
+            {
+              type: ACTION_TYPES.SEND_NOTIFICATION,
+              config: { title: "Admin alert" },
+            },
           ],
         },
         error: null,
-      })
+      }),
     );
 
     // workflow_runs insert
@@ -309,7 +319,7 @@ describe("Workflow Automation Integration", () => {
       mockInsertSingle({
         data: { id: runId, workflow_id: workflowId, status: "running" },
         error: null,
-      })
+      }),
     );
 
     // workflow_runs update (status = skipped)
@@ -382,23 +392,29 @@ describe("Workflow Automation Integration", () => {
       },
     ];
 
-    const context = { workflowId: "wf-act", runId: "run-act", userId: "user-1" };
+    const context = {
+      workflowId: "wf-act",
+      runId: "run-act",
+      userId: "user-1",
+    };
 
     // Step 1: workflow_logs insert + notifications insert (success)
     supabaseAdmin.from.mockImplementationOnce(() =>
-      mockInsertSingle({ data: { id: "log-1" }, error: null })
+      mockInsertSingle({ data: { id: "log-1" }, error: null }),
     );
     supabaseAdmin.from.mockImplementationOnce(() =>
-      mockInsertSingle({ data: { id: "notif-1" }, error: null })
+      mockInsertSingle({ data: { id: "notif-1" }, error: null }),
     );
     // Step 1: workflow_logs update
     supabaseAdmin.from.mockImplementationOnce(() => ({
-      update: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
+      update: vi
+        .fn()
+        .mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
     }));
 
     // Step 2: workflow_logs insert + update entity FAILS
     supabaseAdmin.from.mockImplementationOnce(() =>
-      mockInsertSingle({ data: { id: "log-2" }, error: null })
+      mockInsertSingle({ data: { id: "log-2" }, error: null }),
     );
     supabaseAdmin.from.mockImplementationOnce(() => ({
       update: vi.fn().mockReturnValue({
@@ -414,7 +430,9 @@ describe("Workflow Automation Integration", () => {
     }));
     // Step 2: workflow_logs update (error status)
     supabaseAdmin.from.mockImplementationOnce(() => ({
-      update: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
+      update: vi
+        .fn()
+        .mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
     }));
 
     const result = await executeActions({ actions, context });
@@ -440,11 +458,14 @@ describe("Workflow Automation Integration", () => {
           name: "Welcome Notification",
           trigger_type: "event",
           actions: [
-            { type: ACTION_TYPES.SEND_NOTIFICATION, config: { title: "Welcome!" } },
+            {
+              type: ACTION_TYPES.SEND_NOTIFICATION,
+              config: { title: "Welcome!" },
+            },
           ],
         },
         error: null,
-      })
+      }),
     );
 
     const tplResult = await createWorkflowTemplate({
@@ -469,11 +490,14 @@ describe("Workflow Automation Integration", () => {
           trigger_type: "event",
           conditions: [],
           actions: [
-            { type: ACTION_TYPES.SEND_NOTIFICATION, config: { title: "Welcome!" } },
+            {
+              type: ACTION_TYPES.SEND_NOTIFICATION,
+              config: { title: "Welcome!" },
+            },
           ],
         },
         error: null,
-      })
+      }),
     );
 
     // Create workflow from template
@@ -485,7 +509,7 @@ describe("Workflow Automation Integration", () => {
           trigger_type: "event",
         },
         error: null,
-      })
+      }),
     );
 
     const instanceResult = await instantiateFromTemplate({
@@ -493,7 +517,10 @@ describe("Workflow Automation Integration", () => {
       customizations: {
         name: "Customized Welcome",
         actions: [
-          { type: ACTION_TYPES.SEND_NOTIFICATION, config: { title: "Custom Welcome!" } },
+          {
+            type: ACTION_TYPES.SEND_NOTIFICATION,
+            config: { title: "Custom Welcome!" },
+          },
         ],
       },
       createdBy: "admin-1",
@@ -522,7 +549,7 @@ describe("Workflow Automation Integration", () => {
           input: { userId: "user-1" },
         },
         error: null,
-      })
+      }),
     );
 
     // ── Retry: getWorkflow ──
@@ -535,11 +562,14 @@ describe("Workflow Automation Integration", () => {
           trigger_type: "event",
           conditions: [],
           actions: [
-            { type: ACTION_TYPES.SEND_NOTIFICATION, config: { title: "Retry!" } },
+            {
+              type: ACTION_TYPES.SEND_NOTIFICATION,
+              config: { title: "Retry!" },
+            },
           ],
         },
         error: null,
-      })
+      }),
     );
 
     // ── Retry: create new run ──
@@ -547,24 +577,28 @@ describe("Workflow Automation Integration", () => {
       mockInsertSingle({
         data: { id: newRunId, workflow_id: workflowId, status: "running" },
         error: null,
-      })
+      }),
     );
 
     // ── Retry: action execution (log insert first, then notification) ──
     supabaseAdmin.from.mockImplementationOnce(() =>
-      mockInsertSingle({ data: { id: "log-retry" }, error: null })
+      mockInsertSingle({ data: { id: "log-retry" }, error: null }),
     );
     // notification insert
     supabaseAdmin.from.mockImplementationOnce(() =>
-      mockInsertSingle({ data: { id: "notif-2" }, error: null })
+      mockInsertSingle({ data: { id: "notif-2" }, error: null }),
     );
     // workflow_logs update
     supabaseAdmin.from.mockImplementationOnce(() => ({
-      update: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
+      update: vi
+        .fn()
+        .mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
     }));
     // workflow_runs update (completed)
     supabaseAdmin.from.mockImplementationOnce(() => ({
-      update: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
+      update: vi
+        .fn()
+        .mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
     }));
 
     const retryResult = await retryWorkflowRun(originalRunId, "admin-1");
@@ -578,7 +612,7 @@ describe("Workflow Automation Integration", () => {
       mockSelectSingle({
         data: { id: "run-completed", status: "completed" },
         error: null,
-      })
+      }),
     );
 
     const invalidRetry = await retryWorkflowRun("run-completed", "admin-1");
@@ -609,7 +643,15 @@ describe("Workflow Automation Integration", () => {
                 },
                 conditions: [],
                 actions: [
-                  { type: ACTION_TYPES.UPDATE_STATUS, config: { entityType: "public_donations", entityId: "c1", statusField: "status", statusValue: "reviewed" } },
+                  {
+                    type: ACTION_TYPES.UPDATE_STATUS,
+                    config: {
+                      entityType: "public_donations",
+                      entityId: "c1",
+                      statusField: "status",
+                      statusValue: "reviewed",
+                    },
+                  },
                 ],
               },
               {
@@ -641,11 +683,19 @@ describe("Workflow Automation Integration", () => {
           trigger_type: "schedule",
           conditions: [],
           actions: [
-            { type: ACTION_TYPES.UPDATE_STATUS, config: { entityType: "public_donations", entityId: "c1", statusField: "status", statusValue: "reviewed" } },
+            {
+              type: ACTION_TYPES.UPDATE_STATUS,
+              config: {
+                entityType: "public_donations",
+                entityId: "c1",
+                statusField: "status",
+                statusValue: "reviewed",
+              },
+            },
           ],
         },
         error: null,
-      })
+      }),
     );
 
     // workflow_runs insert
@@ -653,30 +703,38 @@ describe("Workflow Automation Integration", () => {
       mockInsertSingle({
         data: { id: "run-sched-1", workflow_id: wfId1, status: "running" },
         error: null,
-      })
+      }),
     );
 
     // workflow_logs insert (first in executeActions loop)
     supabaseAdmin.from.mockImplementationOnce(() =>
-      mockInsertSingle({ data: { id: "log-sched" }, error: null })
+      mockInsertSingle({ data: { id: "log-sched" }, error: null }),
     );
 
     // Action: UPDATE_STATUS → update entity
     supabaseAdmin.from.mockImplementationOnce(() => ({
-      update: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
+      update: vi
+        .fn()
+        .mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
     }));
     // workflow_logs update
     supabaseAdmin.from.mockImplementationOnce(() => ({
-      update: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
+      update: vi
+        .fn()
+        .mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
     }));
     // workflow_runs update (completed)
     supabaseAdmin.from.mockImplementationOnce(() => ({
-      update: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
+      update: vi
+        .fn()
+        .mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
     }));
 
     // Update schedule_config with lastRunAt
     supabaseAdmin.from.mockImplementationOnce(() => ({
-      update: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
+      update: vi
+        .fn()
+        .mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
     }));
 
     const result = await processScheduledWorkflows();

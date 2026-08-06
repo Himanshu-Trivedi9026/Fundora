@@ -10,18 +10,18 @@ import { supabaseServer } from "../lib/supabaseServer";
 // Below-the-fold sections are code-split so their JS loads lazily after the
 // hero, while SSR keeps their HTML in the initial response (no layout shift,
 // no SEO loss). They hydrate into the exact same markup once loaded.
-const HowItWorks = dynamic(
-  () => import("../components/landing/HowItWorks"),
-  { ssr: true, loading: () => <HowItWorksSpacer /> },
-);
-const FinalCTA = dynamic(
-  () => import("../components/landing/FinalCTA"),
-  { ssr: true, loading: () => <FinalCTASpacer /> },
-);
-const Footer = dynamic(
-  () => import("../components/Footer"),
-  { ssr: true, loading: () => <FooterSpacer /> },
-);
+const HowItWorks = dynamic(() => import("../components/landing/HowItWorks"), {
+  ssr: true,
+  loading: () => <HowItWorksSpacer />,
+});
+const FinalCTA = dynamic(() => import("../components/landing/FinalCTA"), {
+  ssr: true,
+  loading: () => <FinalCTASpacer />,
+});
+const Footer = dynamic(() => import("../components/Footer"), {
+  ssr: true,
+  loading: () => <FooterSpacer />,
+});
 
 // ── Spacers reserve the section's vertical space so the lazy chunk swap
 //    below the fold causes no layout shift. ──
@@ -40,7 +40,8 @@ const structuredData = {
   "@type": "WebSite",
   name: "Fundora",
   url: "https://fundora.vercel.app",
-  description: "Fundora is an AI-powered crowdfunding platform where creators, innovators, and communities unite to transform ideas into reality.",
+  description:
+    "Fundora is an AI-powered crowdfunding platform where creators, innovators, and communities unite to transform ideas into reality.",
   potentialAction: {
     "@type": "SearchAction",
     target: "https://fundora.vercel.app/explore?q={search_term_string}",
@@ -88,9 +89,8 @@ export default function Home({ initialStats, initialTrending }) {
 }
 
 export async function getStaticProps() {
-  const { initialStats, initialTrending } = await loadLandingPageData(
-    supabaseServer,
-  );
+  const { initialStats, initialTrending } =
+    await loadLandingPageData(supabaseServer);
   return {
     props: { initialStats, initialTrending },
     // Public-only data: revalidate the cached HTML in the background every

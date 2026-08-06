@@ -142,7 +142,7 @@ export default function EditProject() {
         const uploadedThumb = await uploadFileToProject(
           newThumbnailFile,
           id,
-          "thumbnail"
+          "thumbnail",
         );
         if (uploadedThumb?.url) {
           // Remove the old thumbnail object from storage if it existed.
@@ -150,7 +150,11 @@ export default function EditProject() {
             const oldPath = deriveStoragePath(thumbnail);
             if (oldPath) {
               await supabase.storage
-                .from(oldPath.startsWith("project-thumbnails/") ? "project-thumbnails" : "projects")
+                .from(
+                  oldPath.startsWith("project-thumbnails/")
+                    ? "project-thumbnails"
+                    : "projects",
+                )
                 .remove([oldPath]);
             }
           }
@@ -177,8 +181,8 @@ export default function EditProject() {
           type: file.type.startsWith("image")
             ? "image"
             : file.type.startsWith("video")
-            ? "video"
-            : "document",
+              ? "video"
+              : "document",
         });
       }
 
@@ -195,7 +199,7 @@ export default function EditProject() {
             name: t.name,
             role: t.role,
             email: t.email,
-          }))
+          })),
         );
       }
 
@@ -209,7 +213,12 @@ export default function EditProject() {
     }
   }
 
-  if (!project) return <div className="p-6 text-white" role="status" aria-live="polite">Loading project...</div>;
+  if (!project)
+    return (
+      <div className="p-6 text-white" role="status" aria-live="polite">
+        Loading project...
+      </div>
+    );
 
   /* -------------------------------------------
     UI
@@ -222,17 +231,61 @@ export default function EditProject() {
         <h1 className="text-2xl font-bold text-white mb-6">Edit Project</h1>
 
         <div className="bg-slate-900/70 border border-slate-700 rounded-xl p-6 space-y-6">
-
-          <input className="input" value={title} onChange={(e)=>setTitle(e.target.value)} placeholder="Title" aria-label="Project title" autoComplete="off" />
-          <input className="input" value={short} onChange={(e)=>setShort(e.target.value)} placeholder="Short Description" aria-label="Short description" autoComplete="off" />
-          <textarea className="input" rows="5" value={description} onChange={(e)=>setDescription(e.target.value)} placeholder="Full Description" aria-label="Full description" autoComplete="off" />
+          <input
+            className="input"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Title"
+            aria-label="Project title"
+            autoComplete="off"
+          />
+          <input
+            className="input"
+            value={short}
+            onChange={(e) => setShort(e.target.value)}
+            placeholder="Short Description"
+            aria-label="Short description"
+            autoComplete="off"
+          />
+          <textarea
+            className="input"
+            rows="5"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Full Description"
+            aria-label="Full description"
+            autoComplete="off"
+          />
 
           <div className="grid grid-cols-2 gap-4">
-            <input className="input" type="number" value={goal} onChange={(e)=>setGoal(e.target.value)} placeholder="Goal ₹" aria-label="Funding goal in rupees" autoComplete="off" />
-            <input className="input" type="date" value={deadline} onChange={(e)=>setDeadline(e.target.value)} aria-label="Campaign deadline" autoComplete="off" />
+            <input
+              className="input"
+              type="number"
+              value={goal}
+              onChange={(e) => setGoal(e.target.value)}
+              placeholder="Goal ₹"
+              aria-label="Funding goal in rupees"
+              autoComplete="off"
+            />
+            <input
+              className="input"
+              type="date"
+              value={deadline}
+              onChange={(e) => setDeadline(e.target.value)}
+              aria-label="Campaign deadline"
+              autoComplete="off"
+            />
           </div>
 
-          <input className="input" value={prototypeUrl} onChange={(e)=>setPrototypeUrl(e.target.value)} placeholder="Prototype URL" aria-label="Prototype URL" type="url" autoComplete="url" />
+          <input
+            className="input"
+            value={prototypeUrl}
+            onChange={(e) => setPrototypeUrl(e.target.value)}
+            placeholder="Prototype URL"
+            aria-label="Prototype URL"
+            type="url"
+            autoComplete="url"
+          />
 
           <CategorySelector selected={categories} setSelected={setCategories} />
 
@@ -264,7 +317,11 @@ export default function EditProject() {
               )}
 
               <label className="cursor-pointer text-xs text-slate-300 bg-slate-800 border border-slate-700 rounded px-3 py-2 hover:bg-slate-700 transition">
-                {newThumbnailFile ? "Replace selected" : thumbnail ? "Replace thumbnail" : "Select thumbnail"}
+                {newThumbnailFile
+                  ? "Replace selected"
+                  : thumbnail
+                    ? "Replace thumbnail"
+                    : "Select thumbnail"}
                 <input
                   type="file"
                   accept="image/*"
@@ -297,7 +354,13 @@ export default function EditProject() {
               {media.map((m) => (
                 <div key={m.id} className="relative">
                   {m.type === "image" ? (
-                    <Image src={m.url} alt={m.name || "Project media"} width={200} height={150} className="rounded-lg border border-slate-700 w-full h-auto" />
+                    <Image
+                      src={m.url}
+                      alt={m.name || "Project media"}
+                      width={200}
+                      height={150}
+                      className="rounded-lg border border-slate-700 w-full h-auto"
+                    />
                   ) : (
                     <div className="p-3 bg-slate-800 rounded text-xs text-white">
                       {m.type.toUpperCase()}
@@ -315,12 +378,15 @@ export default function EditProject() {
             </div>
 
             <p className="text-xs text-slate-400 mt-2">
-              Tip: Set your project thumbnail above. Gallery images are shown separately.
+              Tip: Set your project thumbnail above. Gallery images are shown
+              separately.
             </p>
           </div>
 
           {/* UPLOAD NEW MEDIA */}
-          <label className="text-sm text-slate-300 block mb-1">Upload New Media</label>
+          <label className="text-sm text-slate-300 block mb-1">
+            Upload New Media
+          </label>
           <input
             type="file"
             multiple
@@ -331,10 +397,13 @@ export default function EditProject() {
 
           <TeamEditor team={team} setTeam={setTeam} />
 
-          <button className="btn-primary w-full" disabled={loading} onClick={handleSave}>
+          <button
+            className="btn-primary w-full"
+            disabled={loading}
+            onClick={handleSave}
+          >
             {loading ? "Saving..." : "Save Changes"}
           </button>
-
         </div>
       </main>
 

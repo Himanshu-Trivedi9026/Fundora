@@ -100,7 +100,9 @@ describe("APIKeyEngine", () => {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+              maybeSingle: vi
+                .fn()
+                .mockResolvedValue({ data: null, error: null }),
             }),
           }),
         }),
@@ -116,7 +118,11 @@ describe("APIKeyEngine", () => {
           eq: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               maybeSingle: vi.fn().mockResolvedValue({
-                data: { id: "key-1", status: "active", expires_at: "2020-01-01T00:00:00Z" },
+                data: {
+                  id: "key-1",
+                  status: "active",
+                  expires_at: "2020-01-01T00:00:00Z",
+                },
                 error: null,
               }),
             }),

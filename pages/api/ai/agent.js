@@ -31,50 +31,50 @@ export default withAuth(async function handler(req, res, user) {
       .limit(5);
 
     const projectContext = (projects || []).map((p) => {
-  const progress = p.goal
-    ? (p.pledged / p.goal) * 100
-    : 0;
+      const progress = p.goal ? (p.pledged / p.goal) * 100 : 0;
 
-  // 🔥 TIME FACTOR (newer = better)
-  const daysOld = Math.max(
-    1,
-    (Date.now() - new Date(p.created_at)) / (1000 * 60 * 60 * 24)
-  );
+      // 🔥 TIME FACTOR (newer = better)
+      const daysOld = Math.max(
+        1,
+        (Date.now() - new Date(p.created_at)) / (1000 * 60 * 60 * 24),
+      );
 
-  const freshnessScore = Math.max(0, 30 - daysOld); // max 30
+      const freshnessScore = Math.max(0, 30 - daysOld); // max 30
 
-  // 🔥 MOMENTUM (approx)
-  const momentum = p.pledged / daysOld;
+      // 🔥 MOMENTUM (approx)
+      const momentum = p.pledged / daysOld;
 
-  // 🔥 FINAL SCORE
-  const score =
-    progress * 0.5 +      // funding importance
-    freshnessScore * 1 +  // recency
-    momentum * 0.05;      // growth
+      // 🔥 FINAL SCORE
+      const score =
+        progress * 0.5 + // funding importance
+        freshnessScore * 1 + // recency
+        momentum * 0.05; // growth
 
-  return {
-    title: p.title,
-    goal: p.goal,
-    pledged: p.pledged,
-    progress: `${progress.toFixed(1)}%`,
-    score: score.toFixed(1),
-  };
-});
+      return {
+        title: p.title,
+        goal: p.goal,
+        pledged: p.pledged,
+        progress: `${progress.toFixed(1)}%`,
+        score: score.toFixed(1),
+      };
+    });
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "http://localhost:3000",
-        "X-Title": "Fundora AI",
-      },
-      body: JSON.stringify({
-        model: "meta-llama/llama-3-8b-instruct",
-        messages: [
-          {
-            role: "system",
-            content: `You are Fundora AI.
+    const response = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "http://localhost:3000",
+          "X-Title": "Fundora AI",
+        },
+        body: JSON.stringify({
+          model: "meta-llama/llama-3-8b-instruct",
+          messages: [
+            {
+              role: "system",
+              content: `You are Fundora AI.
 
 You have access to real project data with scores:
 
@@ -101,17 +101,18 @@ Example:
 • Project B has strong recent growth
 
 Be concise and structured.`,
-          },
+            },
 
-          ...formattedHistory,
+            ...formattedHistory,
 
-          {
-            role: "user",
-            content: message.trim(),
-          },
-        ],
-      }),
-    });
+            {
+              role: "user",
+              content: message.trim(),
+            },
+          ],
+        }),
+      },
+    );
 
     const text = await response.text();
 
@@ -130,7 +131,6 @@ Be concise and structured.`,
       "⚠️ AI not responding. Try again.";
 
     return res.status(200).json({ reply });
-
   } catch (err) {
     console.error("AI agent error:", err);
 

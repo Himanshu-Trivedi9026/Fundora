@@ -52,17 +52,27 @@ describe("HeroSection role-aware CTAs", () => {
       mockUseRole({ user: null });
       render(<HeroSection />);
 
-      expect(screen.getByRole("button", { name: "Start Your Journey" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Explore Projects" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Start Your Journey" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Explore Projects" }),
+      ).toBeInTheDocument();
     });
 
     it("does not show role-gated CTAs", () => {
       mockUseRole({ user: null });
       render(<HeroSection />);
 
-      expect(screen.queryByRole("button", { name: "Start Project" })).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: "My Dashboard" })).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: "Admin Dashboard" })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "Start Project" }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "My Dashboard" }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "Admin Dashboard" }),
+      ).not.toBeInTheDocument();
     });
 
     it("navigates Start Your Journey to /get-started", async () => {
@@ -71,7 +81,9 @@ describe("HeroSection role-aware CTAs", () => {
       mockUseRole({ user: null });
       render(<HeroSection />);
 
-      await user.click(screen.getByRole("button", { name: "Start Your Journey" }));
+      await user.click(
+        screen.getByRole("button", { name: "Start Your Journey" }),
+      );
       expect(router.push).toHaveBeenCalledWith("/get-started");
     });
 
@@ -81,7 +93,9 @@ describe("HeroSection role-aware CTAs", () => {
       mockUseRole({ user: null });
       render(<HeroSection />);
 
-      await user.click(screen.getByRole("button", { name: "Explore Projects" }));
+      await user.click(
+        screen.getByRole("button", { name: "Explore Projects" }),
+      );
       expect(router.push).toHaveBeenCalledWith("/explore");
     });
   });
@@ -91,10 +105,18 @@ describe("HeroSection role-aware CTAs", () => {
       mockUseRole({ user: { id: "u1" }, role: ROLES.INVESTOR });
       render(<HeroSection />);
 
-      expect(screen.getByRole("button", { name: "Explore Projects" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "My Dashboard" })).toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: "Start Project" })).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: "Start Your Journey" })).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Explore Projects" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "My Dashboard" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "Start Project" }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "Start Your Journey" }),
+      ).not.toBeInTheDocument();
     });
 
     it("navigates My Dashboard to /investor/dashboard", async () => {
@@ -113,10 +135,18 @@ describe("HeroSection role-aware CTAs", () => {
       mockUseRole({ user: { id: "u2" }, role: ROLES.CREATOR });
       render(<HeroSection />);
 
-      expect(screen.getByRole("button", { name: "Start Project" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Explore Projects" })).toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: "My Dashboard" })).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: "Admin Dashboard" })).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Start Project" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Explore Projects" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "My Dashboard" }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "Admin Dashboard" }),
+      ).not.toBeInTheDocument();
     });
 
     it("navigates Start Project to /create", async () => {
@@ -135,10 +165,18 @@ describe("HeroSection role-aware CTAs", () => {
       mockUseRole({ user: { id: "u3" }, role: ROLES.ADMIN });
       render(<HeroSection />);
 
-      expect(screen.getByRole("button", { name: "Admin Dashboard" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Explore Projects" })).toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: "Start Project" })).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: "My Dashboard" })).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Admin Dashboard" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Explore Projects" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "Start Project" }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "My Dashboard" }),
+      ).not.toBeInTheDocument();
     });
 
     it("navigates Admin Dashboard to /admin/dashboard", async () => {
@@ -157,11 +195,21 @@ describe("HeroSection role-aware CTAs", () => {
       mockUseRole({ user: null, loading: true });
       render(<HeroSection />);
 
-      expect(screen.queryByRole("button", { name: "Start Your Journey" })).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: "Start Project" })).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: "Explore Projects" })).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: "My Dashboard" })).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: "Admin Dashboard" })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "Start Your Journey" }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "Start Project" }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "Explore Projects" }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "My Dashboard" }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "Admin Dashboard" }),
+      ).not.toBeInTheDocument();
     });
   });
 });

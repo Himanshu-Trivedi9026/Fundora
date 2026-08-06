@@ -15,14 +15,42 @@ vi.mock("../../../lib/supabaseAdmin.js", () => ({
     from: vi.fn(() => ({
       insert: vi.fn(() => ({
         select: vi.fn(() => ({
-          single: vi.fn(() => Promise.resolve({ data: { id: "job-1", job_type: "test", status: "pending" }, error: null })),
+          single: vi.fn(() =>
+            Promise.resolve({
+              data: { id: "job-1", job_type: "test", status: "pending" },
+              error: null,
+            }),
+          ),
         })),
       })),
       select: vi.fn(() => ({
         eq: vi.fn(() => ({
-          single: vi.fn(() => Promise.resolve({ data: { id: "job-1", job_type: "test", status: "pending" }, error: null })),
+          single: vi.fn(() =>
+            Promise.resolve({
+              data: { id: "job-1", job_type: "test", status: "pending" },
+              error: null,
+            }),
+          ),
           order: vi.fn(() => ({
-            limit: vi.fn(() => Promise.resolve({ data: [{ id: "job-1", job_type: "test", status: "pending", queue_name: "default", priority: 5, retry_count: 0, max_retries: 3, payload: {}, created_at: new Date().toISOString(), scheduled_at: null }], error: null })),
+            limit: vi.fn(() =>
+              Promise.resolve({
+                data: [
+                  {
+                    id: "job-1",
+                    job_type: "test",
+                    status: "pending",
+                    queue_name: "default",
+                    priority: 5,
+                    retry_count: 0,
+                    max_retries: 3,
+                    payload: {},
+                    created_at: new Date().toISOString(),
+                    scheduled_at: null,
+                  },
+                ],
+                error: null,
+              }),
+            ),
           })),
         })),
         order: vi.fn(() => ({
@@ -48,7 +76,12 @@ vi.mock("../../../lib/verification/auditLog.js", () => ({
 }));
 
 vi.mock("../../../lib/cache/index.js", () => ({
-  checkRateLimit: vi.fn(() => Promise.resolve({ success: true, data: { limit: 60, remaining: 59, resetAt: Date.now() + 60000 } })),
+  checkRateLimit: vi.fn(() =>
+    Promise.resolve({
+      success: true,
+      data: { limit: 60, remaining: 59, resetAt: Date.now() + 60000 },
+    }),
+  ),
 }));
 
 describe("Job Queue", () => {
@@ -81,7 +114,9 @@ describe("Job Queue", () => {
 
       const handlers = listHandlers();
       expect(handlers).toHaveLength(3);
-      expect(handlers).toEqual(expect.arrayContaining(["job.a", "job.b", "job.c"]));
+      expect(handlers).toEqual(
+        expect.arrayContaining(["job.a", "job.b", "job.c"]),
+      );
     });
 
     it("should track active jobs count", () => {

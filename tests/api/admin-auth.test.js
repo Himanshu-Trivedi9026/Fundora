@@ -47,7 +47,12 @@ import { ROLES } from "@/lib/roles";
 
 // ---- Helpers ----
 
-function createReq({ method = "GET", query = {}, body = {}, token = "token-1" } = {}) {
+function createReq({
+  method = "GET",
+  query = {},
+  body = {},
+  token = "token-1",
+} = {}) {
   return {
     method,
     query,
@@ -114,7 +119,7 @@ function setRole(role) {
         select: vi.fn(() => ({
           eq: vi.fn(() => ({
             maybeSingle: vi.fn(() =>
-              Promise.resolve({ data: role ? { role } : null, error: null })
+              Promise.resolve({ data: role ? { role } : null, error: null }),
             ),
           })),
         })),
@@ -132,24 +137,87 @@ function authOk() {
 }
 
 function authNone() {
-  supabaseAdmin.auth.getUser.mockResolvedValue({ data: { user: null }, error: null });
+  supabaseAdmin.auth.getUser.mockResolvedValue({
+    data: { user: null },
+    error: null,
+  });
 }
 
 // Each entry: a request an authorized platform_admin would make. The route's
 // business logic is not asserted; we only assert the auth gate lets it through.
 const ADMIN_ROUTES = [
-  { name: "appeals-dashboard", handler: appealsHandler, req: { method: "GET", query: {}, body: {} } },
-  { name: "bank-review", handler: bankReviewHandler, req: { method: "POST", query: {}, body: { action: "approve", verificationId: "v-1" } } },
-  { name: "business-review", handler: businessReviewHandler, req: { method: "POST", query: {}, body: { action: "approve", verificationId: "v-1" } } },
-  { name: "compliance-dashboard", handler: complianceHandler, req: { method: "GET", query: {}, body: {} } },
-  { name: "escrow-dashboard", handler: escrowHandler, req: { method: "GET", query: {}, body: {} } },
-  { name: "fraud-dashboard", handler: fraudHandler, req: { method: "GET", query: {}, body: {} } },
-  { name: "identity-review", handler: identityReviewHandler, req: { method: "POST", query: {}, body: { action: "approve", verificationId: "v-1" } } },
-  { name: "moderation-dashboard", handler: moderationHandler, req: { method: "GET", query: {}, body: {} } },
-  { name: "payout-review", handler: payoutReviewHandler, req: { method: "GET", query: {}, body: {} } },
-  { name: "platform-analytics", handler: analyticsHandler, req: { method: "GET", query: {}, body: {} } },
-  { name: "policy-management", handler: policyHandler, req: { method: "GET", query: {}, body: {} } },
-  { name: "review-queue", handler: reviewQueueHandler, req: { method: "GET", query: {}, body: {} } },
+  {
+    name: "appeals-dashboard",
+    handler: appealsHandler,
+    req: { method: "GET", query: {}, body: {} },
+  },
+  {
+    name: "bank-review",
+    handler: bankReviewHandler,
+    req: {
+      method: "POST",
+      query: {},
+      body: { action: "approve", verificationId: "v-1" },
+    },
+  },
+  {
+    name: "business-review",
+    handler: businessReviewHandler,
+    req: {
+      method: "POST",
+      query: {},
+      body: { action: "approve", verificationId: "v-1" },
+    },
+  },
+  {
+    name: "compliance-dashboard",
+    handler: complianceHandler,
+    req: { method: "GET", query: {}, body: {} },
+  },
+  {
+    name: "escrow-dashboard",
+    handler: escrowHandler,
+    req: { method: "GET", query: {}, body: {} },
+  },
+  {
+    name: "fraud-dashboard",
+    handler: fraudHandler,
+    req: { method: "GET", query: {}, body: {} },
+  },
+  {
+    name: "identity-review",
+    handler: identityReviewHandler,
+    req: {
+      method: "POST",
+      query: {},
+      body: { action: "approve", verificationId: "v-1" },
+    },
+  },
+  {
+    name: "moderation-dashboard",
+    handler: moderationHandler,
+    req: { method: "GET", query: {}, body: {} },
+  },
+  {
+    name: "payout-review",
+    handler: payoutReviewHandler,
+    req: { method: "GET", query: {}, body: {} },
+  },
+  {
+    name: "platform-analytics",
+    handler: analyticsHandler,
+    req: { method: "GET", query: {}, body: {} },
+  },
+  {
+    name: "policy-management",
+    handler: policyHandler,
+    req: { method: "GET", query: {}, body: {} },
+  },
+  {
+    name: "review-queue",
+    handler: reviewQueueHandler,
+    req: { method: "GET", query: {}, body: {} },
+  },
 ];
 
 describe("Admin API Authorization (CR-3)", () => {

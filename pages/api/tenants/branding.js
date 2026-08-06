@@ -8,7 +8,10 @@ async function handler(req, res) {
     const { method } = req;
     const tenantId = req.query.tenantId || req.user.organization_id;
 
-    if (!tenantId) return res.status(400).json({ success: false, error: "Tenant ID required" });
+    if (!tenantId)
+      return res
+        .status(400)
+        .json({ success: false, error: "Tenant ID required" });
 
     switch (method) {
       case "GET": {
@@ -22,7 +25,9 @@ async function handler(req, res) {
       }
 
       default:
-        return res.status(405).json({ success: false, error: "Method not allowed" });
+        return res
+          .status(405)
+          .json({ success: false, error: "Method not allowed" });
     }
   } catch (error) {
     console.error("Handler error:", error);

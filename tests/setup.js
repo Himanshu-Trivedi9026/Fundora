@@ -3,10 +3,7 @@ import "@testing-library/jest-dom";
 // Suppress act() warnings in tests (not relevant for unit tests)
 const originalError = console.error;
 console.error = (...args) => {
-  if (
-    typeof args[0] === "string" &&
-    args[0].includes("Not wrapped in act")
-  ) {
+  if (typeof args[0] === "string" && args[0].includes("Not wrapped in act")) {
     return;
   }
   originalError.call(console, ...args);
@@ -91,7 +88,9 @@ vi.mock("../lib/supabaseAdmin", () => ({
     },
     from: vi.fn().mockReturnThis(),
     select: vi.fn().mockReturnThis(),
-    insert: vi.fn().mockResolvedValue({ data: { id: "donation-1" }, error: null }),
+    insert: vi
+      .fn()
+      .mockResolvedValue({ data: { id: "donation-1" }, error: null }),
     update: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
     single: vi.fn().mockResolvedValue({ data: null, error: null }),

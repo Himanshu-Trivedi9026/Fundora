@@ -99,7 +99,10 @@ describe("ForgotPasswordPage", () => {
 
     render(<ForgotPasswordPage />);
 
-    await user.type(screen.getByLabelText("Email Address"), "nobody@example.com");
+    await user.type(
+      screen.getByLabelText("Email Address"),
+      "nobody@example.com",
+    );
     await user.click(screen.getByRole("button", { name: /send reset link/i }));
 
     await waitFor(() => {
@@ -133,7 +136,10 @@ describe("ResetPasswordPage", () => {
     });
 
     await user.type(screen.getByLabelText("New Password"), "newpass123");
-    await user.type(screen.getByLabelText("Confirm New Password"), "newpass123");
+    await user.type(
+      screen.getByLabelText("Confirm New Password"),
+      "newpass123",
+    );
     await user.click(screen.getByRole("button", { name: /update password/i }));
 
     await waitFor(() => {
@@ -152,11 +158,16 @@ describe("ResetPasswordPage", () => {
     });
 
     await user.type(screen.getByLabelText("New Password"), "newpass123");
-    await user.type(screen.getByLabelText("Confirm New Password"), "newpass123");
+    await user.type(
+      screen.getByLabelText("Confirm New Password"),
+      "newpass123",
+    );
     await user.click(screen.getByRole("button", { name: /update password/i }));
 
     await waitFor(() => {
-      expect(screen.getByText(/has been updated successfully/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/has been updated successfully/i),
+      ).toBeInTheDocument();
     });
   });
 
@@ -169,7 +180,10 @@ describe("ResetPasswordPage", () => {
     });
 
     await user.type(screen.getByLabelText("New Password"), "newpass123");
-    await user.type(screen.getByLabelText("Confirm New Password"), "different1");
+    await user.type(
+      screen.getByLabelText("Confirm New Password"),
+      "different1",
+    );
     await user.click(screen.getByRole("button", { name: /update password/i }));
 
     await waitFor(() => {
@@ -207,7 +221,10 @@ describe("ResetPasswordPage", () => {
     });
 
     await user.type(screen.getByLabelText("New Password"), "newpass123");
-    await user.type(screen.getByLabelText("Confirm New Password"), "newpass123");
+    await user.type(
+      screen.getByLabelText("Confirm New Password"),
+      "newpass123",
+    );
     await user.click(screen.getByRole("button", { name: /update password/i }));
 
     await waitFor(() => {

@@ -12,19 +12,19 @@ Signals → Rules → Scoring → Decision → Action
 
 ### Core Modules
 
-| Module | Responsibility |
-|--------|---------------|
-| `riskEngine.js` | Orchestrates the entire fraud detection pipeline |
-| `ruleEngine.js` | Evaluates configurable rules against signals |
-| `signalAggregator.js` | Collects and aggregates risk signals from multiple sources |
-| `riskScorer.js` | Calculates composite risk score (0-100) |
-| `decisionEngine.js` | Maps risk score + trust score to actions |
-| `riskHistory.js` | Tracks historical risk scores and changes |
-| `fraudEvents.js` | Records fraud-related events |
-| `providerAdapter.js` | Pluggable AI provider abstraction |
-| `aiRiskAnalyzer.js` | Orchestrates AI-powered risk analysis |
-| `deviceFingerprint.js` | Tracks and analyzes device fingerprints |
-| `behaviorAnalytics.js` | Tracks and analyzes user behavior patterns |
+| Module                 | Responsibility                                             |
+| ---------------------- | ---------------------------------------------------------- |
+| `riskEngine.js`        | Orchestrates the entire fraud detection pipeline           |
+| `ruleEngine.js`        | Evaluates configurable rules against signals               |
+| `signalAggregator.js`  | Collects and aggregates risk signals from multiple sources |
+| `riskScorer.js`        | Calculates composite risk score (0-100)                    |
+| `decisionEngine.js`    | Maps risk score + trust score to actions                   |
+| `riskHistory.js`       | Tracks historical risk scores and changes                  |
+| `fraudEvents.js`       | Records fraud-related events                               |
+| `providerAdapter.js`   | Pluggable AI provider abstraction                          |
+| `aiRiskAnalyzer.js`    | Orchestrates AI-powered risk analysis                      |
+| `deviceFingerprint.js` | Tracks and analyzes device fingerprints                    |
+| `behaviorAnalytics.js` | Tracks and analyzes user behavior patterns                 |
 
 ### Data Flow
 
@@ -39,45 +39,45 @@ Signals → Rules → Scoring → Decision → Action
 
 ### Risk Levels
 
-| Level | Score Range | Description |
-|-------|-------------|-------------|
-| LOW | 0-25 | Normal risk — standard monitoring |
-| MEDIUM | 26-50 | Moderate risk — monitoring recommended |
-| HIGH | 51-75 | Elevated risk — manual review required |
-| CRITICAL | 76-100 | Immediate action required |
+| Level    | Score Range | Description                            |
+| -------- | ----------- | -------------------------------------- |
+| LOW      | 0-25        | Normal risk — standard monitoring      |
+| MEDIUM   | 26-50       | Moderate risk — monitoring recommended |
+| HIGH     | 51-75       | Elevated risk — manual review required |
+| CRITICAL | 76-100      | Immediate action required              |
 
 ### Scoring Factors (Configurable)
 
-| Factor | Weight | Description |
-|--------|--------|-------------|
-| Signals | 40% | Behavioral and device signals |
-| Rules | 30% | Triggered fraud rules |
-| Trust Inversion | 15% | Low trust = high risk |
-| Verification Gap | 15% | Missing verification = higher risk |
+| Factor           | Weight | Description                        |
+| ---------------- | ------ | ---------------------------------- |
+| Signals          | 40%    | Behavioral and device signals      |
+| Rules            | 30%    | Triggered fraud rules              |
+| Trust Inversion  | 15%    | Low trust = high risk              |
+| Verification Gap | 15%    | Missing verification = higher risk |
 
 ### Signal Categories
 
-| Category | Signals |
-|----------|---------|
-| Identity | Email, phone, ID verification |
-| Verification | Bank, business verification |
-| Behavior | Login frequency, donation velocity, verification attempts |
-| Device | Fingerprint, known/unknown device |
-| Velocity | Rate-based signals (events per time window) |
-| Reputation | Trust score, previous fraud history |
-| Account | Account age, profile completeness |
+| Category     | Signals                                                   |
+| ------------ | --------------------------------------------------------- |
+| Identity     | Email, phone, ID verification                             |
+| Verification | Bank, business verification                               |
+| Behavior     | Login frequency, donation velocity, verification attempts |
+| Device       | Fingerprint, known/unknown device                         |
+| Velocity     | Rate-based signals (events per time window)               |
+| Reputation   | Trust score, previous fraud history                       |
+| Account      | Account age, profile completeness                         |
 
 ## Rule Engine
 
 ### Rule Categories
 
-| Category | Description | Example |
-|----------|-------------|---------|
-| Velocity | Count events within time window | 5+ donations in 1 hour |
-| Threshold | Value comparisons | 2+ rejected documents in 7 days |
-| Pattern | Custom behavioral patterns | IP country mismatch |
-| Compound | Multiple conditions | Low trust + large donation |
-| Duplicate | Cross-user uniqueness | PAN used by multiple users |
+| Category  | Description                     | Example                         |
+| --------- | ------------------------------- | ------------------------------- |
+| Velocity  | Count events within time window | 5+ donations in 1 hour          |
+| Threshold | Value comparisons               | 2+ rejected documents in 7 days |
+| Pattern   | Custom behavioral patterns      | IP country mismatch             |
+| Compound  | Multiple conditions             | Low trust + large donation      |
+| Duplicate | Cross-user uniqueness           | PAN used by multiple users      |
 
 ### Default Rules
 
@@ -104,23 +104,23 @@ Signals → Rules → Scoring → Decision → Action
 
 ### Decision Actions
 
-| Action | Description | Restrictions |
-|--------|-------------|--------------|
-| ALLOW | No restrictions | None |
-| MONITOR | Silent monitoring | None |
-| MANUAL_REVIEW | Queue for admin review | request_payout |
-| LIMIT | Restrict certain actions | request_payout, create_campaign |
-| BLOCK | Block all actions | All actions blocked |
-| ESCALATE | Immediate admin escalation | All actions blocked |
+| Action        | Description                | Restrictions                    |
+| ------------- | -------------------------- | ------------------------------- |
+| ALLOW         | No restrictions            | None                            |
+| MONITOR       | Silent monitoring          | None                            |
+| MANUAL_REVIEW | Queue for admin review     | request_payout                  |
+| LIMIT         | Restrict certain actions   | request_payout, create_campaign |
+| BLOCK         | Block all actions          | All actions blocked             |
+| ESCALATE      | Immediate admin escalation | All actions blocked             |
 
 ### Decision Matrix
 
-| Risk Level | Trust Low | Trust Medium | Trust High |
-|------------|-----------|--------------|------------|
-| CRITICAL | BLOCK | BLOCK | MANUAL_REVIEW |
-| HIGH | MANUAL_REVIEW | MANUAL_REVIEW | LIMIT |
-| MEDIUM | MANUAL_REVIEW | MONITOR | ALLOW |
-| LOW | MONITOR | ALLOW | ALLOW |
+| Risk Level | Trust Low     | Trust Medium  | Trust High    |
+| ---------- | ------------- | ------------- | ------------- |
+| CRITICAL   | BLOCK         | BLOCK         | MANUAL_REVIEW |
+| HIGH       | MANUAL_REVIEW | MANUAL_REVIEW | LIMIT         |
+| MEDIUM     | MANUAL_REVIEW | MONITOR       | ALLOW         |
+| LOW        | MONITOR       | ALLOW         | ALLOW         |
 
 ## Device Fingerprinting
 
@@ -161,13 +161,13 @@ Signals → Rules → Scoring → Decision → Action
 
 ### Supported Providers
 
-| Provider | Status | API Key Required |
-|----------|--------|------------------|
-| Mock | Active (default) | No |
-| OpenAI | Placeholder | Yes |
-| Gemini | Placeholder | Yes |
-| Anthropic | Placeholder | Yes |
-| Local (Ollama) | Placeholder | No |
+| Provider       | Status           | API Key Required |
+| -------------- | ---------------- | ---------------- |
+| Mock           | Active (default) | No               |
+| OpenAI         | Placeholder      | Yes              |
+| Gemini         | Placeholder      | Yes              |
+| Anthropic      | Placeholder      | Yes              |
+| Local (Ollama) | Placeholder      | No               |
 
 ### Features
 
@@ -180,18 +180,18 @@ Signals → Rules → Scoring → Decision → Action
 
 ### User APIs
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/fraud/profile` | GET | Get fraud profile |
-| `/api/fraud/evaluate` | POST | Trigger evaluation |
-| `/api/fraud/events` | GET | Get fraud events |
-| `/api/fraud/history` | GET | Get risk history |
-| `/api/fraud/devices` | GET/POST | Device fingerprints |
+| Endpoint              | Method   | Purpose             |
+| --------------------- | -------- | ------------------- |
+| `/api/fraud/profile`  | GET      | Get fraud profile   |
+| `/api/fraud/evaluate` | POST     | Trigger evaluation  |
+| `/api/fraud/events`   | GET      | Get fraud events    |
+| `/api/fraud/history`  | GET      | Get risk history    |
+| `/api/fraud/devices`  | GET/POST | Device fingerprints |
 
 ### Admin APIs
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
+| Endpoint                     | Method   | Purpose         |
+| ---------------------------- | -------- | --------------- |
 | `/api/admin/fraud-dashboard` | GET/POST | Fraud dashboard |
 
 ## Security
@@ -218,27 +218,27 @@ Signals → Rules → Scoring → Decision → Action
 
 ## File Locations
 
-| File | Purpose |
-|------|---------|
-| `lib/fraud/riskEngine.js` | Pipeline orchestrator |
-| `lib/fraud/ruleEngine.js` | Rule evaluation |
-| `lib/fraud/signalAggregator.js` | Signal collection |
-| `lib/fraud/riskScorer.js` | Risk score calculation |
-| `lib/fraud/decisionEngine.js` | Decision determination |
-| `lib/fraud/riskHistory.js` | Historical tracking |
-| `lib/fraud/fraudEvents.js` | Event recording |
-| `lib/fraud/providerAdapter.js` | AI provider abstraction |
-| `lib/fraud/aiRiskAnalyzer.js` | AI analysis orchestration |
-| `lib/fraud/deviceFingerprint.js` | Device tracking |
-| `lib/fraud/behaviorAnalytics.js` | Behavior analysis |
-| `lib/fraud/signals/index.js` | Signal providers |
-| `lib/fraud/index.js` | Public API |
-| `pages/api/fraud/profile.js` | Profile API |
-| `pages/api/fraud/evaluate.js` | Evaluation API |
-| `pages/api/fraud/events.js` | Events API |
-| `pages/api/fraud/history.js` | History API |
-| `pages/api/fraud/devices.js` | Devices API |
-| `pages/api/admin/fraud-dashboard.js` | Admin dashboard API |
-| `components/admin/FraudDashboard.jsx` | Admin UI |
-| `components/verification/SecurityDashboard.jsx` | Creator UI |
-| `pages/admin/fraud.js` | Admin page |
+| File                                            | Purpose                   |
+| ----------------------------------------------- | ------------------------- |
+| `lib/fraud/riskEngine.js`                       | Pipeline orchestrator     |
+| `lib/fraud/ruleEngine.js`                       | Rule evaluation           |
+| `lib/fraud/signalAggregator.js`                 | Signal collection         |
+| `lib/fraud/riskScorer.js`                       | Risk score calculation    |
+| `lib/fraud/decisionEngine.js`                   | Decision determination    |
+| `lib/fraud/riskHistory.js`                      | Historical tracking       |
+| `lib/fraud/fraudEvents.js`                      | Event recording           |
+| `lib/fraud/providerAdapter.js`                  | AI provider abstraction   |
+| `lib/fraud/aiRiskAnalyzer.js`                   | AI analysis orchestration |
+| `lib/fraud/deviceFingerprint.js`                | Device tracking           |
+| `lib/fraud/behaviorAnalytics.js`                | Behavior analysis         |
+| `lib/fraud/signals/index.js`                    | Signal providers          |
+| `lib/fraud/index.js`                            | Public API                |
+| `pages/api/fraud/profile.js`                    | Profile API               |
+| `pages/api/fraud/evaluate.js`                   | Evaluation API            |
+| `pages/api/fraud/events.js`                     | Events API                |
+| `pages/api/fraud/history.js`                    | History API               |
+| `pages/api/fraud/devices.js`                    | Devices API               |
+| `pages/api/admin/fraud-dashboard.js`            | Admin dashboard API       |
+| `components/admin/FraudDashboard.jsx`           | Admin UI                  |
+| `components/verification/SecurityDashboard.jsx` | Creator UI                |
+| `pages/admin/fraud.js`                          | Admin page                |

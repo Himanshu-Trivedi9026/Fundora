@@ -183,7 +183,9 @@ export default function ProjectChat({ projectId, onFirstRender }) {
         const readMap = {};
         const delivMap = {};
         for (const m of data) {
-          readMap[m.id] = Array.isArray(m.read_by) ? new Set(m.read_by) : new Set();
+          readMap[m.id] = Array.isArray(m.read_by)
+            ? new Set(m.read_by)
+            : new Set();
           delivMap[m.id] = !!m.delivered_at;
         }
         setReadByMap(readMap);
@@ -225,7 +227,7 @@ export default function ProjectChat({ projectId, onFirstRender }) {
               if (nearBottomRef.current) scrollToBottom("smooth");
             });
           }
-        }
+        },
       )
       .subscribe();
 
@@ -238,7 +240,7 @@ export default function ProjectChat({ projectId, onFirstRender }) {
         const state = presenceChannel.presenceState();
         presenceSet.clear();
         Object.values(state).forEach((u) =>
-          u.forEach((p) => p.user_id && presenceSet.add(p.user_id))
+          u.forEach((p) => p.user_id && presenceSet.add(p.user_id)),
         );
         setActiveUsers(presenceSet.size);
       })
@@ -247,7 +249,9 @@ export default function ProjectChat({ projectId, onFirstRender }) {
         setActiveUsers(presenceSet.size);
       })
       .on("presence", { event: "leave" }, ({ key, leftPresences }) => {
-        leftPresences.forEach((p) => p.user_id && presenceSet.delete(p.user_id));
+        leftPresences.forEach(
+          (p) => p.user_id && presenceSet.delete(p.user_id),
+        );
         setActiveUsers(presenceSet.size);
       })
       .subscribe(async (status) => {
@@ -275,7 +279,7 @@ export default function ProjectChat({ projectId, onFirstRender }) {
 
       const map = readByMapRef.current;
       const idsToMark = messageIds.filter(
-        (id) => !(map[id] && map[id].has(user.id))
+        (id) => !(map[id] && map[id].has(user.id)),
       );
       if (idsToMark.length === 0) return;
 
@@ -298,11 +302,11 @@ export default function ProjectChat({ projectId, onFirstRender }) {
               .from("project_messages")
               .update({ read_by: next })
               .eq("id", id);
-          })
+          }),
         );
       }
     },
-    [user?.id, schemaReady]
+    [user?.id, schemaReady],
   );
 
   // Observer to detect when messages scroll into view → they are "read".
@@ -320,7 +324,7 @@ export default function ProjectChat({ projectId, onFirstRender }) {
           .filter(Boolean);
         if (seen.length > 0) markAsRead(seen);
       },
-      { root: scrollRef.current, threshold: 0.6 }
+      { root: scrollRef.current, threshold: 0.6 },
     );
 
     // Observe message rows (add data-msg-id to each message wrapper).
@@ -368,16 +372,16 @@ export default function ProjectChat({ projectId, onFirstRender }) {
       console.error("Send message error:", error);
       // Replace optimistic row with a failed state (show retry / error icon).
       setMessages((prev) =>
-        prev.map((m) =>
-          m.id === optimisticId ? { ...m, _failed: true } : m
-        )
+        prev.map((m) => (m.id === optimisticId ? { ...m, _failed: true } : m)),
       );
       return;
     }
 
     // Swap optimistic id → real id, mark delivered.
     setMessages((prev) =>
-      prev.map((m) => (m.id === optimisticId ? { ...m, id: data.id, _optimistic: false } : m))
+      prev.map((m) =>
+        m.id === optimisticId ? { ...m, id: data.id, _optimistic: false } : m,
+      ),
     );
     setDeliveredMap((prev) => ({ ...prev, [data.id]: true }));
 
@@ -411,9 +415,11 @@ export default function ProjectChat({ projectId, onFirstRender }) {
 
     if (uploadError) {
       console.error("Upload error:", uploadError);
-      alert(uploadError?.message === "row-level security policy"
-        ? "Upload not permitted — chat attachments policy may be missing."
-        : "Upload failed");
+      alert(
+        uploadError?.message === "row-level security policy"
+          ? "Upload not permitted — chat attachments policy may be missing."
+          : "Upload failed",
+      );
       setUploading(false);
       return;
     }
@@ -425,8 +431,8 @@ export default function ProjectChat({ projectId, onFirstRender }) {
     const type = file.type.startsWith("image")
       ? "image"
       : file.type.startsWith("video")
-      ? "video"
-      : "file";
+        ? "video"
+        : "file";
 
     const optimisticId = makeId();
     const optimisticMsg = {
@@ -460,17 +466,23 @@ export default function ProjectChat({ projectId, onFirstRender }) {
       console.error("Attachment insert error:", insertError);
       // Try to remove the orphaned object so we don't leak storage.
       try {
-        await supabase.storage.from("chat_attachments").remove([deriveStoragePath(data.publicUrl)]);
+        await supabase.storage
+          .from("chat_attachments")
+          .remove([deriveStoragePath(data.publicUrl)]);
       } catch {}
       setMessages((prev) =>
-        prev.map((m) => (m.id === optimisticId ? { ...m, _failed: true } : m))
+        prev.map((m) => (m.id === optimisticId ? { ...m, _failed: true } : m)),
       );
       setUploading(false);
       return;
     }
 
     setMessages((prev) =>
-      prev.map((m) => (m.id === optimisticId ? { ...m, id: inserted.id, _optimistic: false } : m))
+      prev.map((m) =>
+        m.id === optimisticId
+          ? { ...m, id: inserted.id, _optimistic: false }
+          : m,
+      ),
     );
     setDeliveredMap((prev) => ({ ...prev, [inserted.id]: true }));
     setUploading(false);
@@ -601,8 +613,12 @@ export default function ProjectChat({ projectId, onFirstRender }) {
                 }`}
               >
                 {/* Sender Info */}
-                <div className={`flex items-center gap-2 mb-1.5 ${isMe ? "flex-row-reverse" : ""}`}>
-                  <span className={`text-[10px] px-2 py-0.5 rounded font-bold tracking-tight ${roleBadgeStyle(role)}`}>
+                <div
+                  className={`flex items-center gap-2 mb-1.5 ${isMe ? "flex-row-reverse" : ""}`}
+                >
+                  <span
+                    className={`text-[10px] px-2 py-0.5 rounded font-bold tracking-tight ${roleBadgeStyle(role)}`}
+                  >
                     {role.toUpperCase()}
                   </span>
                   <span className="text-[11px] text-on-surface-variant font-mono truncate max-w-[140px]">
@@ -653,7 +669,9 @@ export default function ProjectChat({ projectId, onFirstRender }) {
                       download={msg.attachment_name}
                       className="text-primary underline mt-2 block text-sm flex items-center gap-1"
                     >
-                      <span className="material-symbols-outlined text-lg">attach_file</span>
+                      <span className="material-symbols-outlined text-lg">
+                        attach_file
+                      </span>
                       {msg.attachment_name || "Download file"}
                     </a>
                   )}
@@ -663,12 +681,16 @@ export default function ProjectChat({ projectId, onFirstRender }) {
                     <div className="mt-1 flex items-center justify-end gap-1 text-[10px] text-on-surface-variant/70">
                       {isFailed ? (
                         <span className="text-danger flex items-center gap-1">
-                          <span className="material-symbols-outlined text-[12px]">error</span>
+                          <span className="material-symbols-outlined text-[12px]">
+                            error
+                          </span>
                           Failed to send
                         </span>
                       ) : isOptimistic ? (
                         <span className="flex items-center gap-1">
-                          <span className="material-symbols-outlined text-[12px] animate-pulse">schedule</span>
+                          <span className="material-symbols-outlined text-[12px] animate-pulse">
+                            schedule
+                          </span>
                           Sending…
                         </span>
                       ) : (
@@ -676,7 +698,9 @@ export default function ProjectChat({ projectId, onFirstRender }) {
                           <span>{deliveryLabel()}</span>
                           {seen > 0 && (
                             <span className="flex items-center gap-0.5 text-primary">
-                              <span className="material-symbols-outlined text-[12px]">done_all</span>
+                              <span className="material-symbols-outlined text-[12px]">
+                                done_all
+                              </span>
                               Seen by {seen}
                             </span>
                           )}
@@ -692,7 +716,9 @@ export default function ProjectChat({ projectId, onFirstRender }) {
                       className="mt-1 text-[10px] text-on-surface-variant/50 hover:text-danger transition-colors flex items-center gap-0.5"
                       aria-label="Delete message"
                     >
-                      <span className="material-symbols-outlined text-[12px]">delete</span>
+                      <span className="material-symbols-outlined text-[12px]">
+                        delete
+                      </span>
                       Delete
                     </button>
                   )}
@@ -797,4 +823,3 @@ export default function ProjectChat({ projectId, onFirstRender }) {
     </div>
   );
 }
-

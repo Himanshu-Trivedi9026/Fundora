@@ -5,7 +5,13 @@ import Link from "next/link";
 import { supabase } from "../../lib/supabaseClient";
 import { useRole } from "../../context/RoleContext";
 import PageLayout from "../../components/PageLayout";
-import { GlassCard, PageHeader, LoadingSpinner, EmptyState, RetryError } from "../../components/ui";
+import {
+  GlassCard,
+  PageHeader,
+  LoadingSpinner,
+  EmptyState,
+  RetryError,
+} from "../../components/ui";
 import { loadInvestorDonations } from "../../lib/investor/investorData";
 import { formatINR } from "../../lib/investor/investorFormat";
 
@@ -57,7 +63,9 @@ export default function InvestorInvestments() {
         clearTimeout(timer);
         if (cancelled || timedOut) return;
         setDonations(rows);
-        setTotalInvested(rows.reduce((sum, d) => sum + (Number(d.amount) || 0), 0));
+        setTotalInvested(
+          rows.reduce((sum, d) => sum + (Number(d.amount) || 0), 0),
+        );
       } catch (err) {
         clearTimeout(timer);
         if (cancelled || timedOut) return;
@@ -118,7 +126,10 @@ export default function InvestorInvestments() {
             </div>
           ) : error ? (
             <div className="mt-12">
-              <RetryError message={error} onRetry={() => setRetryNonce((n) => n + 1)} />
+              <RetryError
+                message={error}
+                onRetry={() => setRetryNonce((n) => n + 1)}
+              />
             </div>
           ) : donations.length === 0 ? (
             /* No investments yet — single empty state with a discover CTA. */
@@ -197,13 +208,14 @@ export default function InvestorInvestments() {
                           {donation.projects?.title || "Unknown Project"}
                         </p>
                         <p className="text-xs text-on-surface-variant">
-                          {new Date(
-                            donation.created_at
-                          ).toLocaleDateString("en-US", {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })}
+                          {new Date(donation.created_at).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            },
+                          )}
                         </p>
                       </div>
 
@@ -214,7 +226,7 @@ export default function InvestorInvestments() {
                         </p>
                         <span
                           className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-medium border ${getStatusColor(
-                            donation.status
+                            donation.status,
                           )}`}
                         >
                           {donation.status || "N/A"}

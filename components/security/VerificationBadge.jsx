@@ -45,11 +45,12 @@ export default function VerificationBadge({
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       className={`inline-flex items-center font-inter font-semibold rounded-full border
-        ${isApproved
-          ? "bg-success-muted text-success border-success/20"
-          : status === "under_review"
-          ? "bg-primary/10 text-primary border-primary/20"
-          : "bg-surface-container-high text-on-surface-variant border-outline-variant/30"
+        ${
+          isApproved
+            ? "bg-success-muted text-success border-success/20"
+            : status === "under_review"
+              ? "bg-primary/10 text-primary border-primary/20"
+              : "bg-surface-container-high text-on-surface-variant border-outline-variant/30"
         }
         ${s.badge} ${className}
       `}
@@ -62,9 +63,7 @@ export default function VerificationBadge({
       >
         {isApproved ? "verified" : "pending"}
       </span>
-      {showLabel && (
-        <span>{levelLabels[level] || "Unverified"}</span>
-      )}
+      {showLabel && <span>{levelLabels[level] || "Unverified"}</span>}
     </motion.span>
   );
 }

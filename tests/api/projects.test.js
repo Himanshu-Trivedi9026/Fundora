@@ -71,13 +71,20 @@ describe("POST /api/projects", () => {
     // mockReset() clears leftover queued chains from tests that short-circuit
     // (403/400/405 gate tests consume only the verification chain) so ordering
     // stays aligned across tests.
-    mockInsert.mockReturnValue({ select: vi.fn().mockReturnValue({ single: mockInsertSingle }) });
-    supabaseAdmin.auth.getUser.mockResolvedValue({ data: { user: USER }, error: null });
+    mockInsert.mockReturnValue({
+      select: vi.fn().mockReturnValue({ single: mockInsertSingle }),
+    });
+    supabaseAdmin.auth.getUser.mockResolvedValue({
+      data: { user: USER },
+      error: null,
+    });
     supabaseAdmin.from
       .mockReset()
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
+        eq: vi
+          .fn()
+          .mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
       })
       .mockReturnValueOnce({
         insert: mockInsert,
@@ -108,7 +115,10 @@ describe("POST /api/projects", () => {
   });
 
   it("returns 401 for a guest (no valid session)", async () => {
-    supabaseAdmin.auth.getUser.mockResolvedValue({ data: { user: null }, error: null });
+    supabaseAdmin.auth.getUser.mockResolvedValue({
+      data: { user: null },
+      error: null,
+    });
     const res = createRes();
 
     await handler(createReq("POST", validBody), res);
@@ -132,7 +142,10 @@ describe("POST /api/projects", () => {
   });
 
   it("returns 403 for a missing verification row", async () => {
-    mockVerificationMaybeSingle.mockResolvedValueOnce({ data: null, error: null });
+    mockVerificationMaybeSingle.mockResolvedValueOnce({
+      data: null,
+      error: null,
+    });
     const res = createRes();
 
     await handler(createReq("POST", validBody), res);

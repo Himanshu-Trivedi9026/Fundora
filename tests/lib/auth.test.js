@@ -4,15 +4,28 @@ import { vi } from "vitest";
 vi.mock("@/lib/supabaseClient", () => ({
   supabase: {
     auth: {
-      signUp: vi.fn().mockResolvedValue({ data: { user: { id: "new-user" } }, error: null }),
-      signInWithPassword: vi.fn().mockResolvedValue({ data: { user: { id: "signed-in-user" } }, error: null }),
+      signUp: vi
+        .fn()
+        .mockResolvedValue({ data: { user: { id: "new-user" } }, error: null }),
+      signInWithPassword: vi.fn().mockResolvedValue({
+        data: { user: { id: "signed-in-user" } },
+        error: null,
+      }),
       signOut: vi.fn().mockResolvedValue({ error: null }),
-      getUser: vi.fn().mockResolvedValue({ data: { user: { id: "current-user" } }, error: null }),
+      getUser: vi.fn().mockResolvedValue({
+        data: { user: { id: "current-user" } },
+        error: null,
+      }),
     },
   },
 }));
 
-import { signUpEmail, signInEmail, signOutUser, getCurrentUser } from "@/lib/auth";
+import {
+  signUpEmail,
+  signInEmail,
+  signOutUser,
+  getCurrentUser,
+} from "@/lib/auth";
 import { supabase } from "@/lib/supabaseClient";
 
 describe("lib/auth.js — client-side auth helpers", () => {
@@ -51,7 +64,10 @@ describe("lib/auth.js — client-side auth helpers", () => {
   });
 
   it("getCurrentUser returns null when no user", async () => {
-    supabase.auth.getUser.mockResolvedValueOnce({ data: { user: null }, error: null });
+    supabase.auth.getUser.mockResolvedValueOnce({
+      data: { user: null },
+      error: null,
+    });
     const user = await getCurrentUser();
     expect(user).toBeNull();
   });

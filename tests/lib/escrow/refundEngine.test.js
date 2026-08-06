@@ -60,7 +60,9 @@ describe("RefundEngine", () => {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               is: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: mockAccount, error: null }),
+                single: vi
+                  .fn()
+                  .mockResolvedValue({ data: mockAccount, error: null }),
               }),
             }),
           }),
@@ -70,7 +72,10 @@ describe("RefundEngine", () => {
             eq: vi.fn().mockReturnValue({
               eq: vi.fn().mockReturnValue({
                 select: vi.fn().mockReturnValue({
-                  single: vi.fn().mockResolvedValue({ data: { ...mockAccount, locked_balance: 500 }, error: null }),
+                  single: vi.fn().mockResolvedValue({
+                    data: { ...mockAccount, locked_balance: 500 },
+                    error: null,
+                  }),
                 }),
               }),
             }),
@@ -98,7 +103,9 @@ describe("RefundEngine", () => {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             is: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockAccount, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockAccount, error: null }),
             }),
           }),
         }),
@@ -133,7 +140,9 @@ describe("RefundEngine", () => {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               is: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: mockAccount, error: null }),
+                single: vi
+                  .fn()
+                  .mockResolvedValue({ data: mockAccount, error: null }),
               }),
             }),
           }),
@@ -142,7 +151,9 @@ describe("RefundEngine", () => {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               is: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: mockAccount, error: null }),
+                single: vi
+                  .fn()
+                  .mockResolvedValue({ data: mockAccount, error: null }),
               }),
             }),
           }),
@@ -152,7 +163,10 @@ describe("RefundEngine", () => {
             eq: vi.fn().mockReturnValue({
               eq: vi.fn().mockReturnValue({
                 select: vi.fn().mockReturnValue({
-                  single: vi.fn().mockResolvedValue({ data: { ...mockAccount, locked_balance: 0 }, error: null }),
+                  single: vi.fn().mockResolvedValue({
+                    data: { ...mockAccount, locked_balance: 0 },
+                    error: null,
+                  }),
                 }),
               }),
             }),

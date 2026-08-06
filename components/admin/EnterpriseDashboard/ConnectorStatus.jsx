@@ -74,30 +74,46 @@ export default function ConnectorStatus() {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="h-24 bg-gray-800 rounded-xl animate-pulse" />
+            <div
+              key={i}
+              className="h-24 bg-gray-800 rounded-xl animate-pulse"
+            />
           ))}
         </div>
       ) : connectors.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-500 mb-4">No connectors configured</p>
-          <p className="text-gray-600 text-sm">Configure connectors to integrate with external services</p>
+          <p className="text-gray-600 text-sm">
+            Configure connectors to integrate with external services
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {connectors.map((connector) => (
-            <div key={connector.id} className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+            <div
+              key={connector.id}
+              className="bg-gray-900 rounded-xl p-4 border border-gray-800"
+            >
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-xl">{PROVIDER_ICONS[connector.provider] || "🔌"}</span>
-                  <span className="text-white font-medium">{connector.label || connector.provider}</span>
+                  <span className="text-xl">
+                    {PROVIDER_ICONS[connector.provider] || "🔌"}
+                  </span>
+                  <span className="text-white font-medium">
+                    {connector.label || connector.provider}
+                  </span>
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full border ${STATUS_STYLES[connector.status] || STATUS_STYLES.disconnected}`}>
+                <span
+                  className={`text-xs px-2 py-1 rounded-full border ${STATUS_STYLES[connector.status] || STATUS_STYLES.disconnected}`}
+                >
                   {connector.status}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-gray-500 text-xs capitalize">{connector.provider?.replace("_", " ")}</span>
+                <span className="text-gray-500 text-xs capitalize">
+                  {connector.provider?.replace("_", " ")}
+                </span>
                 <div className="flex gap-2">
                   {connector.status !== "connected" && (
                     <button
@@ -121,7 +137,9 @@ export default function ConnectorStatus() {
               </div>
 
               {connector.last_error && (
-                <p className="text-red-400 text-xs mt-2 truncate">{connector.last_error}</p>
+                <p className="text-red-400 text-xs mt-2 truncate">
+                  {connector.last_error}
+                </p>
               )}
               {connector.last_connected_at && (
                 <p className="text-gray-600 text-xs mt-2">

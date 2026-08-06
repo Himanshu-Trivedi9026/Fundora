@@ -53,7 +53,12 @@ describe("Signed URL Engine", () => {
 describe("Image Optimizer", () => {
   it("should build transformation URLs", () => {
     const baseUrl = "https://cdn.example.com/photo.jpg";
-    const params = new URLSearchParams({ w: "320", h: "240", fm: "webp", q: "80" });
+    const params = new URLSearchParams({
+      w: "320",
+      h: "240",
+      fm: "webp",
+      q: "80",
+    });
     const url = `${baseUrl}?${params.toString()}`;
 
     expect(url).toContain("w=320");

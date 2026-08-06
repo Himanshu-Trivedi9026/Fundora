@@ -4,7 +4,13 @@ import Link from "next/link";
 import { supabase } from "../../lib/supabaseClient";
 import { useRole } from "../../context/RoleContext";
 import PageLayout from "../../components/PageLayout";
-import { GlassCard, PageHeader, LoadingSpinner, EmptyState, RetryError } from "../../components/ui";
+import {
+  GlassCard,
+  PageHeader,
+  LoadingSpinner,
+  EmptyState,
+  RetryError,
+} from "../../components/ui";
 import {
   loadInvestorDonations,
   derivePortfolioStats,
@@ -114,7 +120,10 @@ export default function InvestorPortfolio() {
             </div>
           ) : error ? (
             <div className="mt-12">
-              <RetryError message={error} onRetry={() => setRetryNonce((n) => n + 1)} />
+              <RetryError
+                message={error}
+                onRetry={() => setRetryNonce((n) => n + 1)}
+              />
             </div>
           ) : !hasPortfolio ? (
             /* No settled investments — single empty state with a discover CTA. */
@@ -239,7 +248,9 @@ export default function InvestorPortfolio() {
                     <span className="text-3xl font-bold text-white font-geist">
                       {metrics.diversification}
                     </span>
-                    <span className="text-on-surface-variant text-sm">/ 100</span>
+                    <span className="text-on-surface-variant text-sm">
+                      / 100
+                    </span>
                   </div>
                   <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
                     <div
@@ -265,7 +276,9 @@ export default function InvestorPortfolio() {
                       {metrics.categoryAllocation.map((cat) => (
                         <div key={cat.name}>
                           <div className="flex items-center justify-between text-sm mb-1">
-                            <span className="text-on-surface-variant">{cat.name}</span>
+                            <span className="text-on-surface-variant">
+                              {cat.name}
+                            </span>
                             <span className="text-white font-medium">
                               {formatINR(cat.value)}
                             </span>
@@ -273,7 +286,9 @@ export default function InvestorPortfolio() {
                           <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
                             <div
                               className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
-                              style={{ width: `${(cat.value / maxCategoryValue) * 100}%` }}
+                              style={{
+                                width: `${(cat.value / maxCategoryValue) * 100}%`,
+                              }}
                             />
                           </div>
                         </div>

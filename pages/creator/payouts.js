@@ -55,7 +55,10 @@ export default function CreatorPayouts() {
           fetchError.code === "42P01" || // invalid table name (Postgres)
           fetchError.code === "PGRST204"; // column not found
         if (isMissingSchema) {
-          console.warn("Payout history unavailable (schema):", fetchError.message);
+          console.warn(
+            "Payout history unavailable (schema):",
+            fetchError.message,
+          );
           setPayouts([]);
         } else {
           console.error("Error fetching payouts:", fetchError);
@@ -251,11 +254,7 @@ export default function CreatorPayouts() {
                     <span className="md:hidden text-gray-400 text-xs font-inter mr-2 w-20 shrink-0">
                       Status
                     </span>
-                    <Badge
-                      variant={
-                        statusVariant[payout.status] || "default"
-                      }
-                    >
+                    <Badge variant={statusVariant[payout.status] || "default"}>
                       {payout.status}
                     </Badge>
                   </div>
@@ -267,11 +266,14 @@ export default function CreatorPayouts() {
                     </span>
                     <span className="text-gray-300 font-inter text-sm">
                       {payout.created_at
-                        ? new Date(payout.created_at).toLocaleDateString("en-IN", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })
+                        ? new Date(payout.created_at).toLocaleDateString(
+                            "en-IN",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            },
+                          )
                         : "—"}
                     </span>
                   </div>
@@ -283,11 +285,14 @@ export default function CreatorPayouts() {
                     </span>
                     <span className="text-gray-300 font-inter text-sm">
                       {payout.processed_at
-                        ? new Date(payout.processed_at).toLocaleDateString("en-IN", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })
+                        ? new Date(payout.processed_at).toLocaleDateString(
+                            "en-IN",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            },
+                          )
                         : "—"}
                     </span>
                   </div>

@@ -31,7 +31,9 @@ vi.mock("../../../lib/ai/aiEngine.js", () => ({
     success: true,
     data: { content: "AI response", sources: [], tokensUsed: 100 },
   }),
-  getAIConfig: vi.fn().mockResolvedValue({ success: true, data: { enabled: true } }),
+  getAIConfig: vi
+    .fn()
+    .mockResolvedValue({ success: true, data: { enabled: true } }),
 }));
 
 vi.mock("../../../lib/ai/contextBuilder.js", () => ({
@@ -141,13 +143,19 @@ describe("CopilotEngine", () => {
     });
 
     it("returns error when required params are missing", async () => {
-      const noUser = await askCopilot({ copilotType: "creator", question: "Hi" });
+      const noUser = await askCopilot({
+        copilotType: "creator",
+        question: "Hi",
+      });
       expect(noUser.success).toBe(false);
 
       const noType = await askCopilot({ userId: "u1", question: "Hi" });
       expect(noType.success).toBe(false);
 
-      const noQuestion = await askCopilot({ userId: "u1", copilotType: "creator" });
+      const noQuestion = await askCopilot({
+        userId: "u1",
+        copilotType: "creator",
+      });
       expect(noQuestion.success).toBe(false);
     });
 
@@ -182,7 +190,15 @@ describe("CopilotEngine", () => {
       const chainCreator = {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockResolvedValue({
-            data: [{ id: "c1", title: "My Campaign", goal_amount: 10000, status: "active", created_at: new Date().toISOString() }],
+            data: [
+              {
+                id: "c1",
+                title: "My Campaign",
+                goal_amount: 10000,
+                status: "active",
+                created_at: new Date().toISOString(),
+              },
+            ],
             error: null,
           }),
         }),
@@ -365,7 +381,15 @@ describe("CopilotEngine", () => {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             eq: vi.fn().mockResolvedValue({
-              data: [{ id: "d1", title: "", description: "", goal_amount: 0, media_urls: [] }],
+              data: [
+                {
+                  id: "d1",
+                  title: "",
+                  description: "",
+                  goal_amount: 0,
+                  media_urls: [],
+                },
+              ],
               error: null,
             }),
           }),
@@ -398,7 +422,7 @@ describe("CopilotEngine", () => {
 
       // Should have suggestion about missing title
       const titleSuggestion = result.data.find((s) =>
-        s.suggestion.toLowerCase().includes("title")
+        s.suggestion.toLowerCase().includes("title"),
       );
       expect(titleSuggestion).toBeDefined();
     });

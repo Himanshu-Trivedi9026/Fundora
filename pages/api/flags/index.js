@@ -33,7 +33,9 @@ async function handler(req, res) {
             userId: req.user.id,
             organizationId: req.user.organization_id,
           });
-          return res.status(200).json({ success: true, data: { key: req.query.key, enabled } });
+          return res
+            .status(200)
+            .json({ success: true, data: { key: req.query.key, enabled } });
         }
 
         // Get all enabled flags
@@ -53,7 +55,10 @@ async function handler(req, res) {
 
         // List all flags
         const result = await listFlags({
-          enabled: req.query.filterEnabled !== undefined ? req.query.filterEnabled === "true" : undefined,
+          enabled:
+            req.query.filterEnabled !== undefined
+              ? req.query.filterEnabled === "true"
+              : undefined,
           search: req.query.search,
           limit: req.query.limit,
           offset: req.query.offset,
@@ -62,7 +67,10 @@ async function handler(req, res) {
       }
 
       case "PUT": {
-        if (!req.query.id) return res.status(400).json({ success: false, error: "Flag ID required" });
+        if (!req.query.id)
+          return res
+            .status(400)
+            .json({ success: false, error: "Flag ID required" });
         const result = await updateFlag(req.query.id, req.body);
         return res.status(result.success ? 200 : 400).json(result);
       }
@@ -70,15 +78,22 @@ async function handler(req, res) {
       case "DELETE": {
         if (req.query.all && req.query.all === "cache") {
           clearCache();
-          return res.status(200).json({ success: true, data: { message: "Cache cleared" } });
+          return res
+            .status(200)
+            .json({ success: true, data: { message: "Cache cleared" } });
         }
-        if (!req.query.id) return res.status(400).json({ success: false, error: "Flag ID required" });
+        if (!req.query.id)
+          return res
+            .status(400)
+            .json({ success: false, error: "Flag ID required" });
         const result = await deleteFlag(req.query.id);
         return res.status(result.success ? 200 : 400).json(result);
       }
 
       default:
-        return res.status(405).json({ success: false, error: "Method not allowed" });
+        return res
+          .status(405)
+          .json({ success: false, error: "Method not allowed" });
     }
   } catch (error) {
     console.error("Handler error:", error);

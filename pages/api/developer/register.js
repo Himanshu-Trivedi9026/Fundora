@@ -4,7 +4,9 @@ import { logAuditEvent } from "../../../lib/verification/auditLog.js";
 
 async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ success: false, error: "Method not allowed" });
+    return res
+      .status(405)
+      .json({ success: false, error: "Method not allowed" });
   }
 
   try {
@@ -12,7 +14,9 @@ async function handler(req, res) {
     const { organizationName, website, bio } = req.body;
 
     if (!organizationName) {
-      return res.status(400).json({ success: false, error: "organizationName required" });
+      return res
+        .status(400)
+        .json({ success: false, error: "organizationName required" });
     }
 
     // In production: create developer profile in DB

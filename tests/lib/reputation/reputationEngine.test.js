@@ -69,7 +69,10 @@ describe("ReputationEngine", () => {
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: null, error: { message: "not found" } }),
+            single: vi.fn().mockResolvedValue({
+              data: null,
+              error: { message: "not found" },
+            }),
           }),
         }),
       });
@@ -98,7 +101,11 @@ describe("ReputationEngine", () => {
 
   describe("getCampaignReputation", () => {
     it("should fetch campaign reputation", async () => {
-      const mockRep = { id: "rep-1", campaign_id: "campaign-1", overall_score: 65 };
+      const mockRep = {
+        id: "rep-1",
+        campaign_id: "campaign-1",
+        overall_score: 65,
+      };
 
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnValue({
@@ -116,14 +123,20 @@ describe("ReputationEngine", () => {
   describe("updateReputationPenalty", () => {
     it("should apply penalty to creator reputation", async () => {
       const mockCreatorRep = { id: "rep-1", overall_score: 75 };
-      const mockUpdated = { ...mockCreatorRep, overall_score: 65, penalty_count: 1 };
+      const mockUpdated = {
+        ...mockCreatorRep,
+        overall_score: 65,
+        penalty_count: 1,
+      };
 
       // 1. Check creator_reputation: select("id, overall_score").eq("creator_id", userId).single()
       supabaseAdmin.from
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockCreatorRep, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockCreatorRep, error: null }),
             }),
           }),
         })
@@ -131,7 +144,10 @@ describe("ReputationEngine", () => {
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: { ...mockCreatorRep, penalty_count: 0 }, error: null }),
+              single: vi.fn().mockResolvedValue({
+                data: { ...mockCreatorRep, penalty_count: 0 },
+                error: null,
+              }),
             }),
           }),
         })
@@ -140,13 +156,19 @@ describe("ReputationEngine", () => {
           update: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               select: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: mockUpdated, error: null }),
+                single: vi
+                  .fn()
+                  .mockResolvedValue({ data: mockUpdated, error: null }),
               }),
             }),
           }),
         });
 
-      const result = await updateReputationPenalty("user-1", 1, "Policy violation");
+      const result = await updateReputationPenalty(
+        "user-1",
+        1,
+        "Policy violation",
+      );
       expect(result.success).toBe(true);
     });
   });
@@ -165,7 +187,11 @@ describe("ReputationEngine", () => {
         }),
       });
 
-      const result = await getReputationLeaderboard({ type: "creator", limit: 10, offset: 0 });
+      const result = await getReputationLeaderboard({
+        type: "creator",
+        limit: 10,
+        offset: 0,
+      });
       expect(result.success).toBe(true);
     });
   });

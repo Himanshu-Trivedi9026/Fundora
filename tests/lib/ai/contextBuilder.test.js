@@ -127,7 +127,10 @@ describe("ContextBuilder", () => {
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: null, error: { message: "not found" } }),
+            single: vi.fn().mockResolvedValue({
+              data: null,
+              error: { message: "not found" },
+            }),
           }),
         }),
       });
@@ -150,7 +153,11 @@ describe("ContextBuilder", () => {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               single: vi.fn().mockResolvedValue({
-                data: { id: "user-1", email: "test@example.com", created_at: "2024-01-01" },
+                data: {
+                  id: "user-1",
+                  email: "test@example.com",
+                  created_at: "2024-01-01",
+                },
                 error: null,
               }),
             }),
@@ -161,7 +168,10 @@ describe("ContextBuilder", () => {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               single: vi.fn().mockResolvedValue({
-                data: { verification_level: "verified", completed_types: ["aadhaar", "pan"] },
+                data: {
+                  verification_level: "verified",
+                  completed_types: ["aadhaar", "pan"],
+                },
                 error: null,
               }),
             }),
@@ -246,7 +256,11 @@ describe("ContextBuilder", () => {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               single: vi.fn().mockResolvedValue({
-                data: { id: "donor-1", email: "donor@test.com", created_at: "2024-01-01" },
+                data: {
+                  id: "donor-1",
+                  email: "donor@test.com",
+                  created_at: "2024-01-01",
+                },
                 error: null,
               }),
             }),
@@ -264,19 +278,28 @@ describe("ContextBuilder", () => {
                         campaign_id: "c1",
                         amount: 5000,
                         created_at: "2025-06-01",
-                        campaigns: { category: "education", title: "School Fund" },
+                        campaigns: {
+                          category: "education",
+                          title: "School Fund",
+                        },
                       },
                       {
                         campaign_id: "c2",
                         amount: 3000,
                         created_at: "2025-05-01",
-                        campaigns: { category: "health", title: "Hospital Fund" },
+                        campaigns: {
+                          category: "health",
+                          title: "Hospital Fund",
+                        },
                       },
                       {
                         campaign_id: "c3",
                         amount: 2000,
                         created_at: "2025-04-01",
-                        campaigns: { category: "education", title: "Library Fund" },
+                        campaigns: {
+                          category: "education",
+                          title: "Library Fund",
+                        },
                       },
                     ],
                     error: null,
@@ -347,9 +370,7 @@ describe("ContextBuilder", () => {
             eq: vi.fn().mockReturnValue({
               order: vi.fn().mockReturnValue({
                 limit: vi.fn().mockResolvedValue({
-                  data: [
-                    { id: "t1", title: "Hot Campaign", pledged: 90000 },
-                  ],
+                  data: [{ id: "t1", title: "Hot Campaign", pledged: 90000 }],
                   error: null,
                 }),
               }),
@@ -363,7 +384,12 @@ describe("ContextBuilder", () => {
               order: vi.fn().mockReturnValue({
                 limit: vi.fn().mockResolvedValue({
                   data: [
-                    { id: "don-1", campaign_id: "c1", amount: 500, created_at: "2025-07-01" },
+                    {
+                      id: "don-1",
+                      campaign_id: "c1",
+                      amount: 500,
+                      created_at: "2025-07-01",
+                    },
                   ],
                   error: null,
                 }),

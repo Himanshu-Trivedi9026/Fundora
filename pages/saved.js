@@ -4,7 +4,6 @@ import Footer from "../components/Footer";
 import ProjectCard from "../components/ProjectCard";
 import { supabase } from "../lib/supabaseClient";
 
-
 export default function Saved() {
   const [projects, setProjects] = useState([]);
   const [currentUserId, setCurrentUserId] = useState(null);
@@ -16,7 +15,9 @@ export default function Saved() {
       const uid = userData?.user?.id || null;
       setCurrentUserId(uid);
 
-      const savedIds = JSON.parse(localStorage.getItem("savedProjects") || "[]");
+      const savedIds = JSON.parse(
+        localStorage.getItem("savedProjects") || "[]",
+      );
 
       if (savedIds.length === 0) return setProjects([]);
 
@@ -29,7 +30,9 @@ export default function Saved() {
       setProjects(projectList);
 
       // Batch-fetch creator names
-      const ownerIds = [...new Set(projectList.map(p => p.owner_id).filter(Boolean))];
+      const ownerIds = [
+        ...new Set(projectList.map((p) => p.owner_id).filter(Boolean)),
+      ];
       if (ownerIds.length > 0) {
         const { data: profiles } = await supabase
           .from("profiles")
@@ -37,7 +40,9 @@ export default function Saved() {
           .in("id", ownerIds);
 
         const map = {};
-        (profiles || []).forEach(p => { map[p.id] = p.full_name; });
+        (profiles || []).forEach((p) => {
+          map[p.id] = p.full_name;
+        });
         setCreatorMap(map);
       }
     }
@@ -54,7 +59,9 @@ export default function Saved() {
         </h1>
 
         {projects.length === 0 ? (
-          <p className="text-slate-400" role="status">No saved projects yet.</p>
+          <p className="text-slate-400" role="status">
+            No saved projects yet.
+          </p>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {projects.map((p) => (

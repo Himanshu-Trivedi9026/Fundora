@@ -13,7 +13,13 @@
  * predate the role column backfill.
  */
 
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import { supabase } from "../lib/supabaseClient";
 import { ROLES } from "../lib/roles";
 
@@ -99,7 +105,7 @@ export function RoleProvider({ children }) {
         setUser(u);
         setLoading(true);
         await detectRole(u);
-      }
+      },
     );
 
     return () => listener?.subscription?.unsubscribe();

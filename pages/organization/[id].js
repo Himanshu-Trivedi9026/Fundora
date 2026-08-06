@@ -35,7 +35,10 @@ export default function OrganizationDetailPage() {
 
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-12 text-center text-gray-500" role="status">
+      <div
+        className="max-w-5xl mx-auto px-4 py-12 text-center text-gray-500"
+        role="status"
+      >
         Loading organization...
       </div>
     );
@@ -43,7 +46,10 @@ export default function OrganizationDetailPage() {
 
   if (error || !org) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-12 text-center text-red-500" role="alert">
+      <div
+        className="max-w-5xl mx-auto px-4 py-12 text-center text-red-500"
+        role="alert"
+      >
         {error || "Organization not found"}
       </div>
     );
@@ -60,7 +66,9 @@ export default function OrganizationDetailPage() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-3xl font-bold text-gray-900">{org.name}</h1>
-            <span className={`text-xs px-2 py-1 rounded-full ${org.status === "active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}>
+            <span
+              className={`text-xs px-2 py-1 rounded-full ${org.status === "active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
+            >
               {org.status}
             </span>
           </div>
@@ -72,7 +80,12 @@ export default function OrganizationDetailPage() {
             {org.industry && <span>{org.industry}</span>}
             {org.size && <span>{org.size} employees</span>}
             {org.website && (
-              <a href={org.website} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">
+              <a
+                href={org.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-indigo-600 hover:underline"
+              >
                 Website →
               </a>
             )}
@@ -117,7 +130,10 @@ export default function OrganizationDetailPage() {
 
         {tab === "settings" && (
           <div className="text-center py-8 text-gray-500">
-            <a href={`/organization/${id}/settings`} className="text-indigo-600 hover:underline">
+            <a
+              href={`/organization/${id}/settings`}
+              className="text-indigo-600 hover:underline"
+            >
               Go to Organization Settings →
             </a>
           </div>

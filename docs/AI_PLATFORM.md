@@ -21,26 +21,26 @@ class BaseModelProvider {
 
 ### Supported Providers
 
-| Provider | Class | Default Model | Embeddings | Env Variable | Priority |
-|----------|-------|---------------|------------|--------------|----------|
-| Mock | `MockModelProvider` | `mock-model` | 1536-dim deterministic | Always registered | 100 (lowest) |
-| OpenAI | `OpenAIModelProvider` | `gpt-4o-mini` | `text-embedding-3-small` | `OPENAI_API_KEY` | 10 |
-| Anthropic | `AnthropicModelProvider` | `claude-3-haiku-20240307` | Not supported | `ANTHROPIC_API_KEY` | 15 |
-| Gemini | `GeminiModelProvider` | `gemini-1.5-flash` | `text-embedding-004` | `GEMINI_API_KEY` | 20 |
-| OpenRouter | `OpenRouterModelProvider` | `openai/gpt-4o-mini` | `text-embedding-3-small` | `OPENROUTER_API_KEY` | 25 |
-| Local (Ollama) | `LocalModelProvider` | `llama3` | `nomic-embed-text` | `LOCAL_AI_URL` | 30 |
+| Provider       | Class                     | Default Model             | Embeddings               | Env Variable         | Priority     |
+| -------------- | ------------------------- | ------------------------- | ------------------------ | -------------------- | ------------ |
+| Mock           | `MockModelProvider`       | `mock-model`              | 1536-dim deterministic   | Always registered    | 100 (lowest) |
+| OpenAI         | `OpenAIModelProvider`     | `gpt-4o-mini`             | `text-embedding-3-small` | `OPENAI_API_KEY`     | 10           |
+| Anthropic      | `AnthropicModelProvider`  | `claude-3-haiku-20240307` | Not supported            | `ANTHROPIC_API_KEY`  | 15           |
+| Gemini         | `GeminiModelProvider`     | `gemini-1.5-flash`        | `text-embedding-004`     | `GEMINI_API_KEY`     | 20           |
+| OpenRouter     | `OpenRouterModelProvider` | `openai/gpt-4o-mini`      | `text-embedding-3-small` | `OPENROUTER_API_KEY` | 25           |
+| Local (Ollama) | `LocalModelProvider`      | `llama3`                  | `nomic-embed-text`       | `LOCAL_AI_URL`       | 30           |
 
 ### Provider Registry (Singleton)
 
 The registry is a `Map<string, {provider, config}>` with priority-based fallback ordering:
 
 ```javascript
-registerModelProvider(name, provider, config)  // Register a provider
-getModelProvider(name)                         // Retrieve by name
-setActiveModelProvider(name)                   // Set the active provider
-getActiveModelProvider()                       // Get active (falls back to mock)
-listModelProviders()                           // List all with status
-initializeModelProviders()                     // Auto-register from env vars
+registerModelProvider(name, provider, config); // Register a provider
+getModelProvider(name); // Retrieve by name
+setActiveModelProvider(name); // Set the active provider
+getActiveModelProvider(); // Get active (falls back to mock)
+listModelProviders(); // List all with status
+initializeModelProviders(); // Auto-register from env vars
 ```
 
 On startup, `initializeModelProviders()` reads environment variables and auto-registers each configured provider. The active provider is set from `AI_MODEL_PROVIDER` env var or the first non-mock provider by priority.
@@ -51,14 +51,14 @@ The model router selects optimal models based on task type, cost constraints, an
 
 ### Task Types
 
-| Task | Primary Provider | Primary Model | Purpose |
-|------|-----------------|---------------|---------|
-| `chat` | openai | `gpt-4o-mini` | General conversation |
-| `classification` | openai | `gpt-4o-mini` | Content classification |
-| `embedding` | openai | `text-embedding-3-small` | Vector embeddings |
-| `generation` | openai | `gpt-4o` | Long-form content generation |
-| `analysis` | anthropic | `claude-3-haiku` | Deep analysis tasks |
-| `extraction` | openai | `gpt-4o-mini` | Data extraction |
+| Task             | Primary Provider | Primary Model            | Purpose                      |
+| ---------------- | ---------------- | ------------------------ | ---------------------------- |
+| `chat`           | openai           | `gpt-4o-mini`            | General conversation         |
+| `classification` | openai           | `gpt-4o-mini`            | Content classification       |
+| `embedding`      | openai           | `text-embedding-3-small` | Vector embeddings            |
+| `generation`     | openai           | `gpt-4o`                 | Long-form content generation |
+| `analysis`       | anthropic        | `claude-3-haiku`         | Deep analysis tasks          |
+| `extraction`     | openai           | `gpt-4o-mini`            | Data extraction              |
 
 ### Routing Algorithm
 
@@ -85,7 +85,7 @@ openai → anthropic → openrouter → local → mock
 Health checks are cached for 60 seconds with exponential moving average error rates:
 
 ```javascript
-getProviderHealth() // Returns [{ provider, status, latencyMs, errorRate }]
+getProviderHealth(); // Returns [{ provider, status, latencyMs, errorRate }]
 ```
 
 ## Central Orchestrator (aiEngine.js)
@@ -100,16 +100,16 @@ Input validation → Usage limit check → Model routing → Provider selection
 
 ### Key Parameters
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `userId` | string | Requesting user (for tracking) |
-| `taskType` | string | Task classification |
-| `messages` | array | `[{role, content}]` message array |
-| `model` | string | Explicit model override (optional) |
-| `temperature` | number | Sampling temperature (default: 0.7) |
-| `maxTokens` | number | Max output tokens (default: 2000) |
-| `systemPrompt` | string | System prompt override |
-| `context` | object | Additional context for routing |
+| Parameter      | Type   | Description                         |
+| -------------- | ------ | ----------------------------------- |
+| `userId`       | string | Requesting user (for tracking)      |
+| `taskType`     | string | Task classification                 |
+| `messages`     | array  | `[{role, content}]` message array   |
+| `model`        | string | Explicit model override (optional)  |
+| `temperature`  | number | Sampling temperature (default: 0.7) |
+| `maxTokens`    | number | Max output tokens (default: 2000)   |
+| `systemPrompt` | string | System prompt override              |
+| `context`      | object | Additional context for routing      |
 
 ### Retry Logic
 
@@ -139,13 +139,13 @@ Stored in `platform_config` table under key `ai_config`:
 
 Records per-user, per-day token usage with model-specific pricing:
 
-| Model | Input (per 1k) | Output (per 1k) |
-|-------|----------------|-----------------|
-| gpt-4o | $2.50 | $10.00 |
-| gpt-4o-mini | $0.15 | $0.60 |
-| claude-3-opus | $15.00 | $75.00 |
-| claude-3-haiku | $0.25 | $1.25 |
-| text-embedding-3-small | $0.02 | $0.00 |
+| Model                  | Input (per 1k) | Output (per 1k) |
+| ---------------------- | -------------- | --------------- |
+| gpt-4o                 | $2.50          | $10.00          |
+| gpt-4o-mini            | $0.15          | $0.60           |
+| claude-3-opus          | $15.00         | $75.00          |
+| claude-3-haiku         | $0.25          | $1.25           |
+| text-embedding-3-small | $0.02          | $0.00           |
 
 Usage is aggregated daily per user+provider+model via upsert into `ai_usage`.
 
@@ -172,15 +172,15 @@ Budget limits are stored in `ai_budgets` table with fallback to `AI_BUDGET_DAILY
 
 All AI output is automatically sanitised before returning to callers:
 
-| Pattern | Replacement |
-|---------|-------------|
-| Email addresses | `[EMAIL_REDACTED]` |
-| Indian phone numbers | `[PHONE_REDACTED]` |
-| Aadhaar numbers (12 digits) | `[ID_REDACTED]` |
-| PAN card numbers | `[PAN_REDACTED]` |
-| `<script>` tags | Removed |
-| `javascript:` protocol | Removed |
-| Event handlers (`onload=`, etc.) | Removed |
+| Pattern                          | Replacement        |
+| -------------------------------- | ------------------ |
+| Email addresses                  | `[EMAIL_REDACTED]` |
+| Indian phone numbers             | `[PHONE_REDACTED]` |
+| Aadhaar numbers (12 digits)      | `[ID_REDACTED]`    |
+| PAN card numbers                 | `[PAN_REDACTED]`   |
+| `<script>` tags                  | Removed            |
+| `javascript:` protocol           | Removed            |
+| Event handlers (`onload=`, etc.) | Removed            |
 
 ### Rate Limiting
 
@@ -192,11 +192,11 @@ All AI output is automatically sanitised before returning to callers:
 
 Every AI operation produces audit events:
 
-| Event | Trigger |
-|-------|---------|
-| `ai_request_completed` | Successful AI call |
-| `ai_request_failed` | Failed AI call (after all retries) |
-| `ai_config_updated` | Admin changes AI configuration |
+| Event                  | Trigger                            |
+| ---------------------- | ---------------------------------- |
+| `ai_request_completed` | Successful AI call                 |
+| `ai_request_failed`    | Failed AI call (after all retries) |
+| `ai_config_updated`    | Admin changes AI configuration     |
 
 ### Error Handling
 
@@ -204,22 +204,22 @@ The entire AI platform follows a "never throw" pattern — all errors are caught
 
 ## AI Module Inventory
 
-| Module | File | Description |
-|--------|------|-------------|
-| AI Engine | `aiEngine.js` | Central orchestrator for all AI requests |
-| Provider Registry | `providerRegistry.js` | Multi-provider abstraction with singleton registry |
-| Model Router | `modelRouter.js` | Task-based routing with cost-aware fallback chains |
-| Token Tracker | `tokenTracker.js` | Per-user daily token usage with model pricing |
-| Cost Tracker | `costTracker.js` | Higher-level cost management and budget enforcement |
-| Campaign AI | `campaignAI.js` | Campaign quality scoring, title suggestions, SEO analysis |
-| Recommendation Engine | `recommendationEngine.js` | Multi-signal personalized recommendations |
-| Prediction Engine | `predictionEngine.js` | Rule-based predictive analytics with confidence scores |
-| Copilot Engine | `copilotEngine.js` | Role-specific AI assistants (creator, donor, admin, moderator) |
-| Knowledge Engine | `knowledgeEngine.js` | Knowledge base with semantic search and article management |
-| Embedding Engine | `embeddingEngine.js` | Vector embedding CRUD and similarity search |
-| Context Builder | `contextBuilder.js` | Rich context objects for AI prompts |
-| Conversation Memory | `conversationMemory.js` | Persistent conversation management with context windowing |
-| Prompt Engine | `promptEngine.js` | DB-driven prompt templates with variable substitution |
+| Module                | File                      | Description                                                    |
+| --------------------- | ------------------------- | -------------------------------------------------------------- |
+| AI Engine             | `aiEngine.js`             | Central orchestrator for all AI requests                       |
+| Provider Registry     | `providerRegistry.js`     | Multi-provider abstraction with singleton registry             |
+| Model Router          | `modelRouter.js`          | Task-based routing with cost-aware fallback chains             |
+| Token Tracker         | `tokenTracker.js`         | Per-user daily token usage with model pricing                  |
+| Cost Tracker          | `costTracker.js`          | Higher-level cost management and budget enforcement            |
+| Campaign AI           | `campaignAI.js`           | Campaign quality scoring, title suggestions, SEO analysis      |
+| Recommendation Engine | `recommendationEngine.js` | Multi-signal personalized recommendations                      |
+| Prediction Engine     | `predictionEngine.js`     | Rule-based predictive analytics with confidence scores         |
+| Copilot Engine        | `copilotEngine.js`        | Role-specific AI assistants (creator, donor, admin, moderator) |
+| Knowledge Engine      | `knowledgeEngine.js`      | Knowledge base with semantic search and article management     |
+| Embedding Engine      | `embeddingEngine.js`      | Vector embedding CRUD and similarity search                    |
+| Context Builder       | `contextBuilder.js`       | Rich context objects for AI prompts                            |
+| Conversation Memory   | `conversationMemory.js`   | Persistent conversation management with context windowing      |
+| Prompt Engine         | `promptEngine.js`         | DB-driven prompt templates with variable substitution          |
 
 ## Integration Points
 

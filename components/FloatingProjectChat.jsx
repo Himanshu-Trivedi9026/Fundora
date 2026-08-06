@@ -11,7 +11,11 @@ const getClientSnapshot = () => true;
 const getServerSnapshot = () => false;
 
 export default function FloatingProjectChat({ projectId }) {
-  const mounted = useSyncExternalStore(emptySubscribe, getClientSnapshot, getServerSnapshot);
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    getClientSnapshot,
+    getServerSnapshot,
+  );
   const [open, setOpen] = useState(false);
   const [unread, setUnread] = useState(0);
 
@@ -44,7 +48,7 @@ export default function FloatingProjectChat({ projectId }) {
             countedRef.current.add(id);
             setUnread((u) => u + 1);
           }
-        }
+        },
       )
       .subscribe();
 
@@ -137,6 +141,6 @@ export default function FloatingProjectChat({ projectId }) {
         </AnimatePresence>
       </motion.button>
     </>,
-    document.body
+    document.body,
   );
 }

@@ -31,7 +31,9 @@ export default function CampaignAIGenerator({
       setError("");
       setGenerated("");
 
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       const headers = { "Content-Type": "application/json" };
       if (session?.access_token) {
         headers.Authorization = `Bearer ${session.access_token}`;
@@ -105,7 +107,10 @@ export default function CampaignAIGenerator({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Campaign Title */}
         <div className="space-y-1.5">
-          <label htmlFor="campaign-title" className="block text-xs font-inter text-on-surface-variant uppercase tracking-wider">
+          <label
+            htmlFor="campaign-title"
+            className="block text-xs font-inter text-on-surface-variant uppercase tracking-wider"
+          >
             Campaign Title
           </label>
           <input
@@ -120,7 +125,10 @@ export default function CampaignAIGenerator({
 
         {/* Category Dropdown */}
         <div className="space-y-1.5">
-          <label htmlFor="campaign-category" className="block text-xs font-inter text-on-surface-variant uppercase tracking-wider">
+          <label
+            htmlFor="campaign-category"
+            className="block text-xs font-inter text-on-surface-variant uppercase tracking-wider"
+          >
             Category
           </label>
           <select
@@ -142,7 +150,10 @@ export default function CampaignAIGenerator({
 
         {/* Funding Goal */}
         <div className="space-y-1.5">
-          <label htmlFor="campaign-goal" className="block text-xs font-inter text-on-surface-variant uppercase tracking-wider">
+          <label
+            htmlFor="campaign-goal"
+            className="block text-xs font-inter text-on-surface-variant uppercase tracking-wider"
+          >
             Funding Goal (₹)
           </label>
           <input
@@ -165,7 +176,10 @@ export default function CampaignAIGenerator({
       >
         {loading ? (
           <>
-            <span className="material-symbols-outlined text-[18px] animate-spin" aria-hidden="true">
+            <span
+              className="material-symbols-outlined text-[18px] animate-spin"
+              aria-hidden="true"
+            >
               progress_activity
             </span>
             Generating...
@@ -195,7 +209,10 @@ export default function CampaignAIGenerator({
             role="alert"
             aria-live="polite"
           >
-            <span className="material-symbols-outlined text-red-400 text-[18px] mt-0.5" aria-hidden="true">
+            <span
+              className="material-symbols-outlined text-red-400 text-[18px] mt-0.5"
+              aria-hidden="true"
+            >
               error
             </span>
             <p className="text-red-300 text-sm font-inter flex-1">{error}</p>
@@ -204,7 +221,12 @@ export default function CampaignAIGenerator({
               className="text-red-400/60 hover:text-red-300 transition-colors"
               aria-label="Dismiss error"
             >
-              <span className="material-symbols-outlined text-[16px]" aria-hidden="true">close</span>
+              <span
+                className="material-symbols-outlined text-[16px]"
+                aria-hidden="true"
+              >
+                close
+              </span>
             </button>
           </motion.div>
         )}
@@ -244,7 +266,12 @@ export default function CampaignAIGenerator({
                 onClick={handleAccept}
                 className="flex-1 bg-primary text-on-primary px-5 py-2.5 rounded-lg font-inter text-sm font-semibold hover:opacity-90 active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
               >
-                <span className="material-symbols-outlined text-[16px]" aria-hidden="true">check</span>
+                <span
+                  className="material-symbols-outlined text-[16px]"
+                  aria-hidden="true"
+                >
+                  check
+                </span>
                 Use This Description
               </button>
               <button
@@ -252,7 +279,12 @@ export default function CampaignAIGenerator({
                 disabled={loading}
                 className="px-5 py-2.5 rounded-lg border border-outline-variant text-on-surface-variant font-inter text-sm hover:bg-surface-container-high hover:border-primary/50 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
               >
-                <span className="material-symbols-outlined text-[16px]" aria-hidden="true">refresh</span>
+                <span
+                  className="material-symbols-outlined text-[16px]"
+                  aria-hidden="true"
+                >
+                  refresh
+                </span>
                 Regenerate
               </button>
             </div>

@@ -91,19 +91,19 @@ export const PERMISSIONS = {
 
 ### Default Permission Matrix
 
-| Role | Permissions |
-|------|-------------|
-| **platform_admin** | ALL permissions (unrestricted) |
-| **org_owner** | `org:read`, `org:update`, `org:delete`, `org:manage_members`, `org:manage_settings`, `campaign:create/read/update/delete`, `finance:view/manage/approve_payout`, `compliance:view/manage`, `moderation:view/manage`, `analytics:view/export`, `api:manage/use`, `webhook:manage` |
-| **org_admin** | `org:read`, `org:manage_members`, `campaign:create/read/update`, `finance:view`, `compliance:view`, `moderation:view`, `analytics:view`, `api:manage`, `webhook:manage` |
-| **finance_manager** | `org:read`, `campaign:read`, `finance:view/manage/approve_payout`, `analytics:view` |
-| **campaign_manager** | `org:read`, `campaign:create/read/update`, `analytics:view` |
-| **reviewer** | `org:read`, `campaign:read/approve`, `compliance:view`, `moderation:view` |
-| **auditor** | `org:read`, `campaign:read`, `finance:view`, `compliance:view`, `analytics:view/export` |
-| **moderator** | `org:read`, `campaign:read`, `moderation:view/manage` |
-| **creator** | `campaign:create/read/update` |
-| **donor** | `campaign:read` |
-| **guest** | `campaign:read` |
+| Role                 | Permissions                                                                                                                                                                                                                                                                      |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **platform_admin**   | ALL permissions (unrestricted)                                                                                                                                                                                                                                                   |
+| **org_owner**        | `org:read`, `org:update`, `org:delete`, `org:manage_members`, `org:manage_settings`, `campaign:create/read/update/delete`, `finance:view/manage/approve_payout`, `compliance:view/manage`, `moderation:view/manage`, `analytics:view/export`, `api:manage/use`, `webhook:manage` |
+| **org_admin**        | `org:read`, `org:manage_members`, `campaign:create/read/update`, `finance:view`, `compliance:view`, `moderation:view`, `analytics:view`, `api:manage`, `webhook:manage`                                                                                                          |
+| **finance_manager**  | `org:read`, `campaign:read`, `finance:view/manage/approve_payout`, `analytics:view`                                                                                                                                                                                              |
+| **campaign_manager** | `org:read`, `campaign:create/read/update`, `analytics:view`                                                                                                                                                                                                                      |
+| **reviewer**         | `org:read`, `campaign:read/approve`, `compliance:view`, `moderation:view`                                                                                                                                                                                                        |
+| **auditor**          | `org:read`, `campaign:read`, `finance:view`, `compliance:view`, `analytics:view/export`                                                                                                                                                                                          |
+| **moderator**        | `org:read`, `campaign:read`, `moderation:view/manage`                                                                                                                                                                                                                            |
+| **creator**          | `campaign:create/read/update`                                                                                                                                                                                                                                                    |
+| **donor**            | `campaign:read`                                                                                                                                                                                                                                                                  |
+| **guest**            | `campaign:read`                                                                                                                                                                                                                                                                  |
 
 ### Permission Categories
 
@@ -134,9 +134,9 @@ const result = await checkPlatformAdmin("user-uuid");
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `userId` | `string` | Yes | User UUID |
+| Parameter | Type     | Required | Description |
+| --------- | -------- | -------- | ----------- |
+| `userId`  | `string` | Yes      | User UUID   |
 
 **Returns:**
 
@@ -164,11 +164,11 @@ const result = await hasPermission("user-uuid", "org-uuid", "campaign:create");
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `userId` | `string` | Yes | User UUID |
-| `organizationId` | `string` | No | Organization UUID (null for personal context) |
-| `permission` | `string` | Yes | Permission string from `PERMISSIONS` |
+| Parameter        | Type     | Required | Description                                   |
+| ---------------- | -------- | -------- | --------------------------------------------- |
+| `userId`         | `string` | Yes      | User UUID                                     |
+| `organizationId` | `string` | No       | Organization UUID (null for personal context) |
+| `permission`     | `string` | Yes      | Permission string from `PERMISSIONS`          |
 
 **Flow:**
 
@@ -208,9 +208,9 @@ const perms = getPermissionsForRole("campaign_manager");
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `role` | `string` | Yes | Role name from `PLATFORM_ROLES` |
+| Parameter | Type     | Required | Description                     |
+| --------- | -------- | -------- | ------------------------------- |
+| `role`    | `string` | Yes      | Role name from `PLATFORM_ROLES` |
 
 ---
 
@@ -225,10 +225,10 @@ const result = await getUserRole("user-uuid", "org-uuid");
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `userId` | `string` | Yes | User UUID |
-| `organizationId` | `string` | Yes | Organization UUID |
+| Parameter        | Type     | Required | Description       |
+| ---------------- | -------- | -------- | ----------------- |
+| `userId`         | `string` | Yes      | User UUID         |
+| `organizationId` | `string` | Yes      | Organization UUID |
 
 ---
 
@@ -246,12 +246,13 @@ const result = await getUserPermissions("user-uuid", "org-uuid");
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `userId` | `string` | Yes | User UUID |
-| `organizationId` | `string` | Yes | Organization UUID |
+| Parameter        | Type     | Required | Description       |
+| ---------------- | -------- | -------- | ----------------- |
+| `userId`         | `string` | Yes      | User UUID         |
+| `organizationId` | `string` | Yes      | Organization UUID |
 
 **Resolution logic:**
+
 1. Get the user's role in the organization.
 2. Fetch default permissions for that role from `DEFAULT_ROLE_PERMISSIONS`.
 3. Fetch any custom role entry with the same name from `organization_roles`.
@@ -266,17 +267,22 @@ Assign a new role to a user within an organization. Requires the `org:manage_mem
 ```js
 import { setOrganizationRole } from "@/lib/rbac";
 
-const result = await setOrganizationRole("org-uuid", userId, "finance_manager", adminUserId);
+const result = await setOrganizationRole(
+  "org-uuid",
+  userId,
+  "finance_manager",
+  adminUserId,
+);
 ```
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `organizationId` | `string` | Yes | Organization UUID |
-| `userId` | `string` | Yes | Target user UUID |
-| `role` | `string` | Yes | One of `PLATFORM_ROLES` values |
-| `performedBy` | `string` | Yes | User performing the action |
+| Parameter        | Type     | Required | Description                    |
+| ---------------- | -------- | -------- | ------------------------------ |
+| `organizationId` | `string` | Yes      | Organization UUID              |
+| `userId`         | `string` | Yes      | Target user UUID               |
+| `role`           | `string` | Yes      | One of `PLATFORM_ROLES` values |
+| `performedBy`    | `string` | Yes      | User performing the action     |
 
 **Side effects:** Logs a `role_changed` audit event.
 
@@ -292,21 +298,26 @@ import { createCustomRole, PERMISSIONS } from "@/lib/rbac";
 const result = await createCustomRole(
   "org-uuid",
   "finance_reviewer",
-  [PERMISSIONS.FINANCE_VIEW, PERMISSIONS.ANALYTICS_VIEW, PERMISSIONS.ANALYTICS_EXPORT],
-  adminUserId
+  [
+    PERMISSIONS.FINANCE_VIEW,
+    PERMISSIONS.ANALYTICS_VIEW,
+    PERMISSIONS.ANALYTICS_EXPORT,
+  ],
+  adminUserId,
 );
 ```
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `organizationId` | `string` | Yes | Organization UUID |
-| `name` | `string` | Yes | Role name (must be unique within the org) |
-| `permissions` | `string[]` | Yes | Array of permission strings |
-| `performedBy` | `string` | Yes | User performing the action |
+| Parameter        | Type       | Required | Description                               |
+| ---------------- | ---------- | -------- | ----------------------------------------- |
+| `organizationId` | `string`   | Yes      | Organization UUID                         |
+| `name`           | `string`   | Yes      | Role name (must be unique within the org) |
+| `permissions`    | `string[]` | Yes      | Array of permission strings               |
+| `performedBy`    | `string`   | Yes      | User performing the action                |
 
 **Validation:**
+
 - All permission strings must be valid values from `PERMISSIONS`.
 - Role name must be unique within the organization.
 - The performing user must have `org:manage_settings` permission.
@@ -330,9 +341,9 @@ const result = await getOrganizationRoles("org-uuid");
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `organizationId` | `string` | Yes | Organization UUID |
+| Parameter        | Type     | Required | Description       |
+| ---------------- | -------- | -------- | ----------------- |
+| `organizationId` | `string` | Yes      | Organization UUID |
 
 ---
 
@@ -346,10 +357,10 @@ const result = await initializeOrganizationRoles("org-uuid", ownerId);
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `organizationId` | `string` | Yes | Organization UUID |
-| `performedBy` | `string` | No | User performing initialization |
+| Parameter        | Type     | Required | Description                    |
+| ---------------- | -------- | -------- | ------------------------------ |
+| `organizationId` | `string` | Yes      | Organization UUID              |
+| `performedBy`    | `string` | No       | User performing initialization |
 
 ## Custom Roles
 
@@ -363,9 +374,14 @@ Custom roles allow organizations to define their own role names with specific pe
 ```js
 // The "campaign_manager" role already has: campaign:create, campaign:read, campaign:update, analytics:view
 // Adding a custom role entry for "campaign_manager" with additional permissions:
-await createCustomRole(orgId, "campaign_manager", [
-  PERMISSIONS.CAMPAIGN_APPROVE,  // Extra permission
-], userId);
+await createCustomRole(
+  orgId,
+  "campaign_manager",
+  [
+    PERMISSIONS.CAMPAIGN_APPROVE, // Extra permission
+  ],
+  userId,
+);
 
 // Effective permissions for "campaign_manager" in this org:
 // campaign:create, campaign:read, campaign:update, analytics:view, campaign:approve
@@ -404,6 +420,7 @@ export default withAuthAndPermission(async function handler(req, res, user) {
 ```
 
 **Behavior:**
+
 1. Authenticates the user (same as `withAuth`).
 2. Extracts `organizationId` from `req.query.organizationId` or `req.body.organizationId`.
 3. Calls `hasPermission(user.id, orgId, permission)`.
@@ -459,17 +476,17 @@ hasPermission(userId, orgId, permission)
 
 ## Database Tables
 
-| Table | Description |
-|-------|-------------|
+| Table                  | Description                                                                                   |
+| ---------------------- | --------------------------------------------------------------------------------------------- |
 | `organization_members` | Stores user role assignments per organization. Platform admins have `organization_id = NULL`. |
-| `organization_roles` | Custom role definitions with permission arrays. `is_system = true` for defaults. |
+| `organization_roles`   | Custom role definitions with permission arrays. `is_system = true` for defaults.              |
 
 ## API Routes
 
-| Route | Method | Description |
-|-------|--------|-------------|
-| `/api/rbac/roles` | GET | List roles for an organization (`organizationId` param) or list available permissions (`mode=permissions`) |
-| `/api/rbac/roles` | POST | `create_custom_role` — Create a custom role; `assign_role` — Assign a role to a user |
+| Route             | Method | Description                                                                                                |
+| ----------------- | ------ | ---------------------------------------------------------------------------------------------------------- |
+| `/api/rbac/roles` | GET    | List roles for an organization (`organizationId` param) or list available permissions (`mode=permissions`) |
+| `/api/rbac/roles` | POST   | `create_custom_role` — Create a custom role; `assign_role` — Assign a role to a user                       |
 
 ## Tests
 

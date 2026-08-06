@@ -61,7 +61,10 @@ export default async function handler(req, res) {
 
     const sigBuf = Buffer.from(expectedSignature, "utf8");
     const receivedBuf = Buffer.from(signature || "", "utf8");
-    if (sigBuf.length !== receivedBuf.length || !crypto.timingSafeEqual(sigBuf, receivedBuf)) {
+    if (
+      sigBuf.length !== receivedBuf.length ||
+      !crypto.timingSafeEqual(sigBuf, receivedBuf)
+    ) {
       return res.status(400).json({ error: "Invalid signature" });
     }
 

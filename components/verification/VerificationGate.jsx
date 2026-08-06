@@ -26,13 +26,8 @@ import Button from "../ui/Button";
  */
 export default function VerificationGate({ children }) {
   const router = useRouter();
-  const {
-    verification,
-    loading,
-    requests,
-    pendingActions,
-    rejectedDocuments,
-  } = useVerification();
+  const { verification, loading, requests, pendingActions, rejectedDocuments } =
+    useVerification();
 
   if (loading) {
     return (
@@ -73,7 +68,9 @@ export default function VerificationGate({ children }) {
   else screen = "documents_required";
 
   const rejectionReason =
-    rejectedDocuments?.[0]?.reason || pendingActions?.find((a) => a.action === "rejected")?.reason || "";
+    rejectedDocuments?.[0]?.reason ||
+    pendingActions?.find((a) => a.action === "rejected")?.reason ||
+    "";
 
   const goToVerification = () => router.push("/creator/verification");
 
@@ -126,10 +123,7 @@ export default function VerificationGate({ children }) {
         </div>
 
         <div className="flex justify-center">
-          <VerificationStatus
-            status={status || "pending"}
-            size="lg"
-          />
+          <VerificationStatus status={status || "pending"} size="lg" />
         </div>
 
         <div className="space-y-2">
@@ -148,7 +142,10 @@ export default function VerificationGate({ children }) {
             className="w-full"
             onClick={goToVerification}
           >
-            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+            <span
+              className="material-symbols-outlined text-[18px]"
+              aria-hidden="true"
+            >
               verified_user
             </span>
             {content.cta}

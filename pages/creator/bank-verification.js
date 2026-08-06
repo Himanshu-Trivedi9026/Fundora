@@ -146,11 +146,12 @@ export default function BankVerification() {
                   {/* Status indicator bar */}
                   <div
                     className={`absolute top-0 left-0 w-1 h-full rounded-l-xl ${
-                      account.status === "verified" || account.status === "active"
+                      account.status === "verified" ||
+                      account.status === "active"
                         ? "bg-success"
                         : account.status === "rejected"
-                        ? "bg-danger"
-                        : "bg-warning"
+                          ? "bg-danger"
+                          : "bg-warning"
                     }`}
                   />
 
@@ -175,9 +176,7 @@ export default function BankVerification() {
                         </div>
                       </div>
                       <Badge
-                        variant={
-                          statusVariant[account.status] || "default"
-                        }
+                        variant={statusVariant[account.status] || "default"}
                       >
                         {account.status || "pending"}
                       </Badge>
@@ -190,7 +189,9 @@ export default function BankVerification() {
                           Account Holder
                         </span>
                         <span className="text-white text-sm font-inter font-medium">
-                          {account.account_holder_name || account.holder_name || "—"}
+                          {account.account_holder_name ||
+                            account.holder_name ||
+                            "—"}
                         </span>
                       </div>
 
@@ -200,8 +201,7 @@ export default function BankVerification() {
                         </span>
                         <span className="text-white text-sm font-inter font-mono tracking-wider">
                           {maskAccountNumber(
-                            account.account_number ||
-                              account.account_no
+                            account.account_number || account.account_no,
                           )}
                         </span>
                       </div>
@@ -232,11 +232,14 @@ export default function BankVerification() {
                             Verified On
                           </span>
                           <span className="text-gray-300 text-sm font-inter">
-                            {new Date(account.verified_at).toLocaleDateString("en-IN", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            })}
+                            {new Date(account.verified_at).toLocaleDateString(
+                              "en-IN",
+                              {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              },
+                            )}
                           </span>
                         </div>
                       )}
@@ -250,7 +253,8 @@ export default function BankVerification() {
           {/* Account count */}
           {bankAccounts.length > 0 && (
             <p className="text-gray-500 text-xs font-inter mt-6 text-center">
-              {bankAccounts.length} bank account{bankAccounts.length !== 1 ? "s" : ""} linked
+              {bankAccounts.length} bank account
+              {bankAccounts.length !== 1 ? "s" : ""} linked
             </p>
           )}
         </div>

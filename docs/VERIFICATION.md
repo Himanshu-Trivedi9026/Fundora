@@ -8,14 +8,14 @@ Fundora's verification system provides a multi-step KYC (Know Your Customer) wor
 
 ### Verification Levels (0-5)
 
-| Level | Label | Requirements |
-|-------|-------|-------------|
-| 0 | Email Only | Account created with email |
-| 1 | Phone Verified | Phone number confirmed via OTP |
-| 2 | Identity Verified | Government ID verified (PAN/Aadhaar/Passport) |
-| 3 | Bank Verified | Bank account confirmed |
-| 4 | Business Verified | Business registration verified |
-| 5 | Fully Verified | All checks passed |
+| Level | Label             | Requirements                                  |
+| ----- | ----------------- | --------------------------------------------- |
+| 0     | Email Only        | Account created with email                    |
+| 1     | Phone Verified    | Phone number confirmed via OTP                |
+| 2     | Identity Verified | Government ID verified (PAN/Aadhaar/Passport) |
+| 3     | Bank Verified     | Bank account confirmed                        |
+| 4     | Business Verified | Business registration verified                |
+| 5     | Fully Verified    | All checks passed                             |
 
 ### Verification States
 
@@ -42,15 +42,15 @@ draft → submitted → documents_uploaded → automatic_validation
 
 ### Tables
 
-| Table | Purpose |
-|-------|---------|
-| `creator_verifications` | Master verification record (one per user) |
-| `verification_requests` | Individual verification requests |
-| `verification_sessions` | Resumable wizard state |
-| `verification_documents` | Uploaded document references |
-| `verification_history` | Immutable audit trail |
-| `verification_otp` | Phone OTP storage |
-| `verification_audit_log` | Comprehensive action logging |
+| Table                    | Purpose                                   |
+| ------------------------ | ----------------------------------------- |
+| `creator_verifications`  | Master verification record (one per user) |
+| `verification_requests`  | Individual verification requests          |
+| `verification_sessions`  | Resumable wizard state                    |
+| `verification_documents` | Uploaded document references              |
+| `verification_history`   | Immutable audit trail                     |
+| `verification_otp`       | Phone OTP storage                         |
+| `verification_audit_log` | Comprehensive action logging              |
 
 ### Key Relationships
 
@@ -83,6 +83,7 @@ await provider.submitVerification(userData);
 ```
 
 **Available Providers:**
+
 - `fundora_internal` — Default (manual review, no external APIs)
 - `stripe_identity` — Placeholder for Stripe Identity
 - `hyperverge` — Placeholder for HyperVerge
@@ -100,6 +101,7 @@ registerOCRProvider("my_ocr", MyOCRProvider);
 ```
 
 **Available OCR Providers:**
+
 - `fundora_internal` — Default (mock extraction)
 
 ## Document Lifecycle
@@ -154,23 +156,28 @@ Users can close their browser and resume verification later:
 
 ### Priority Levels
 
-| Priority | Description |
-|----------|-------------|
+| Priority | Description                                         |
+| -------- | --------------------------------------------------- |
 | `urgent` | Returning user, expired verification, admin-flagged |
-| `high` | Level 3+ requests, business accounts |
-| `normal` | Default |
-| `low` | Informational-only requests |
+| `high`   | Level 3+ requests, business accounts                |
+| `normal` | Default                                             |
+| `low`    | Informational-only requests                         |
 
 ### Review Queue
 
 Admins see requests ordered by:
+
 1. Priority (urgent → high → normal → low)
 2. Submitted date (oldest first)
 
 ### Actions
 
 ```javascript
-import { assignReviewer, approveRequest, rejectRequest } from "@/lib/verification/manualReview";
+import {
+  assignReviewer,
+  approveRequest,
+  rejectRequest,
+} from "@/lib/verification/manualReview";
 
 // Assign reviewer
 await assignReviewer(requestId, reviewerId, "high");
@@ -216,7 +223,10 @@ await logAuditEvent({
 Sensitive document metadata is encrypted with AES-256-GCM:
 
 ```javascript
-import { encryptMetadata, decryptMetadata } from "@/lib/verification/metadataEncryption";
+import {
+  encryptMetadata,
+  decryptMetadata,
+} from "@/lib/verification/metadataEncryption";
 
 const encrypted = encryptMetadata({ panNumber: "ABCDE1234F" });
 const decrypted = decryptMetadata(encrypted);
@@ -227,7 +237,11 @@ const decrypted = decryptMetadata(encrypted);
 All API responses are sanitized before sending to frontend:
 
 ```javascript
-import { sanitizeDocumentResponse, sanitizeVerificationRequest, sanitizeSessionResponse } from "@/lib/verification/metadataEncryption";
+import {
+  sanitizeDocumentResponse,
+  sanitizeVerificationRequest,
+  sanitizeSessionResponse,
+} from "@/lib/verification/metadataEncryption";
 
 // Strips: provider_reference, storage_path, metadata_encrypted
 const safeDoc = sanitizeDocumentResponse(rawDoc);
@@ -244,6 +258,7 @@ const safeSession = sanitizeSessionResponse(rawSession);
 ### Trust Score (0-100)
 
 Weighted modules:
+
 - Identity (30%): Verification level and recency
 - Campaigns (25%): Project quality (stub)
 - Community (15%): Engagement (stub)
@@ -252,8 +267,12 @@ Weighted modules:
 - AI (5%): ML signals (stub)
 
 **Integration:**
+
 ```javascript
-import { applyVerificationApproval, applyVerificationRejection } from "@/lib/trust/trustEngine";
+import {
+  applyVerificationApproval,
+  applyVerificationRejection,
+} from "@/lib/trust/trustEngine";
 
 const newScore = applyVerificationApproval(currentScore, "identity"); // +15
 const newScore = applyVerificationRejection(currentScore, "identity"); // -10
@@ -262,11 +281,17 @@ const newScore = applyVerificationRejection(currentScore, "identity"); // -10
 ### Risk Score (0-100)
 
 Weighted factors:
+
 - Chargebacks (20%), Network (15%), Spam (15%), Accounts (15%), Reports (15%), Device (10%), Fraud (10%)
 
 **Integration:**
+
 ```javascript
-import { applyDocumentRejection, applyRepeatedFailures, applyDocumentReplacement } from "@/lib/risk/riskEngine";
+import {
+  applyDocumentRejection,
+  applyRepeatedFailures,
+  applyDocumentReplacement,
+} from "@/lib/risk/riskEngine";
 
 let risk = applyDocumentRejection(currentRisk); // +15
 risk = applyRepeatedFailures(risk, 3); // +15 (5 per failure, max 30)
@@ -294,20 +319,21 @@ Device information is collected as placeholders for future fingerprinting:
 ### Row Level Security (RLS)
 
 All verification tables have RLS enabled:
+
 - Users can only read/write their own data
 - Service role has full access (for API routes, admin operations)
 - Audit log is append-only (REVOKE UPDATE/DELETE)
 
 ### Data Protection
 
-| Data | Storage | Exposure |
-|------|---------|----------|
-| Raw storage paths | DB only | Never to frontend |
-| Provider references | DB only | Never to frontend |
-| OTP hashes | DB only | Never returned |
-| Device metadata | DB only | Never in public APIs |
-| Document names | DB + masked in responses | Masked (e.g., `PAN***1234.jpg`) |
-| IP addresses | Hashed only | Never raw |
+| Data                | Storage                  | Exposure                        |
+| ------------------- | ------------------------ | ------------------------------- |
+| Raw storage paths   | DB only                  | Never to frontend               |
+| Provider references | DB only                  | Never to frontend               |
+| OTP hashes          | DB only                  | Never returned                  |
+| Device metadata     | DB only                  | Never in public APIs            |
+| Document names      | DB + masked in responses | Masked (e.g., `PAN***1234.jpg`) |
+| IP addresses        | Hashed only              | Never raw                       |
 
 ### Signed URLs
 

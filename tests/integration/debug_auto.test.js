@@ -29,7 +29,12 @@ vi.mock("../../lib/verification/auditLog", () => ({
 }));
 
 import { supabaseAdmin } from "../../lib/supabaseAdmin";
-import { createWorkflowTemplate, instantiateFromTemplate, TRIGGER_TYPES, ACTION_TYPES } from "../../lib/automation/workflowEngine";
+import {
+  createWorkflowTemplate,
+  instantiateFromTemplate,
+  TRIGGER_TYPES,
+  ACTION_TYPES,
+} from "../../lib/automation/workflowEngine";
 
 function mockInsertSingle(result) {
   return {
@@ -52,7 +57,9 @@ function mockSelectSingle(result) {
 }
 
 describe("debug auto", () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   it("template", async () => {
     const templateId = "tpl-001";
@@ -62,17 +69,24 @@ describe("debug auto", () => {
           id: templateId,
           name: "Welcome Notification",
           trigger_type: "event",
-          actions: [{ type: ACTION_TYPES.SEND_NOTIFICATION, config: { title: "Welcome!" } }],
+          actions: [
+            {
+              type: ACTION_TYPES.SEND_NOTIFICATION,
+              config: { title: "Welcome!" },
+            },
+          ],
         },
         error: null,
-      })
+      }),
     );
 
     const tplResult = await createWorkflowTemplate({
       name: "Welcome Notification",
       description: "Sends a welcome notification",
       triggerType: TRIGGER_TYPES.EVENT,
-      actions: [{ type: ACTION_TYPES.SEND_NOTIFICATION, config: { title: "Welcome!" } }],
+      actions: [
+        { type: ACTION_TYPES.SEND_NOTIFICATION, config: { title: "Welcome!" } },
+      ],
       createdBy: "admin-1",
     });
 
@@ -85,24 +99,38 @@ describe("debug auto", () => {
           name: "Welcome Notification",
           trigger_type: "event",
           conditions: [],
-          actions: [{ type: ACTION_TYPES.SEND_NOTIFICATION, config: { title: "Welcome!" } }],
+          actions: [
+            {
+              type: ACTION_TYPES.SEND_NOTIFICATION,
+              config: { title: "Welcome!" },
+            },
+          ],
         },
         error: null,
-      })
+      }),
     );
 
     supabaseAdmin.from.mockImplementationOnce(() =>
       mockInsertSingle({
-        data: { id: "wf-from-tpl", name: "Customized Welcome", trigger_type: "event" },
+        data: {
+          id: "wf-from-tpl",
+          name: "Customized Welcome",
+          trigger_type: "event",
+        },
         error: null,
-      })
+      }),
     );
 
     const instanceResult = await instantiateFromTemplate({
       templateId,
       customizations: {
         name: "Customized Welcome",
-        actions: [{ type: ACTION_TYPES.SEND_NOTIFICATION, config: { title: "Custom Welcome!" } }],
+        actions: [
+          {
+            type: ACTION_TYPES.SEND_NOTIFICATION,
+            config: { title: "Custom Welcome!" },
+          },
+        ],
       },
       createdBy: "admin-1",
     });

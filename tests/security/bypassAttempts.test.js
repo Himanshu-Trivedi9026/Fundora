@@ -17,9 +17,7 @@ describe("Security: Secret leak prevention", () => {
   });
 
   it("ENCRYPTION_KEY not in any client-accessible code", async () => {
-    const filesToCheck = [
-      join(projectRoot, "lib", "supabaseClient.js"),
-    ];
+    const filesToCheck = [join(projectRoot, "lib", "supabaseClient.js")];
 
     // Also scan all component files
     const { readdirSync, statSync } = await import("fs");
@@ -61,11 +59,20 @@ describe("Security: Secret leak prevention", () => {
           lines.forEach((line, idx) => {
             // Skip comments
             const trimmed = line.trim();
-            if (trimmed.startsWith("//") || trimmed.startsWith("*") || trimmed.startsWith("/*")) return;
+            if (
+              trimmed.startsWith("//") ||
+              trimmed.startsWith("*") ||
+              trimmed.startsWith("/*")
+            )
+              return;
             if (trimmed.match(/console\.log\s*\(/)) {
               // secureLogger wraps console internally — that's acceptable
               if (!full.includes("secureLogger") && !full.includes("logger")) {
-                violations.push({ file: full, line: idx + 1, content: trimmed });
+                violations.push({
+                  file: full,
+                  line: idx + 1,
+                  content: trimmed,
+                });
               }
             }
           });
@@ -76,7 +83,7 @@ describe("Security: Secret leak prevention", () => {
 
     expect(
       violations,
-      `Found console.log in production lib files:\n${violations.map((v) => `  ${v.file}:${v.line} — ${v.content}`).join("\n")}`
+      `Found console.log in production lib files:\n${violations.map((v) => `  ${v.file}:${v.line} — ${v.content}`).join("\n")}`,
     ).toHaveLength(0);
   });
 });
@@ -91,24 +98,24 @@ describe("Security: Session manager rejects missing userId", () => {
       const { createSession, validateSession } = mod;
 
       // createSession should reject if no userId
-      await expect(
-        createSession({ supabase: mockSupabase })
-      ).rejects.toThrow();
+      await expect(createSession({ supabase: mockSupabase })).rejects.toThrow();
 
       // validateSession should reject if no userId
       await expect(
-        validateSession({ supabase: mockSupabase, sessionId: "fake" })
+        validateSession({ supabase: mockSupabase, sessionId: "fake" }),
       ).rejects.toThrow();
     } catch (err) {
       // If the module itself can't import (e.g. env issues) we at least
       // confirm the source contains the guard
       const source = readFileSync(
         join(projectRoot, "lib", "verification", "sessionManager.js"),
-        "utf-8"
+        "utf-8",
       );
       expect(source).toMatch(/userId/);
       expect(
-        source.includes("throw") || source.includes("reject") || source.includes("Error")
+        source.includes("throw") ||
+          source.includes("reject") ||
+          source.includes("Error"),
       ).toBe(true);
     }
   });
@@ -131,11 +138,13 @@ describe("Security: Manual review rejects missing callerId", () => {
       if (err.message === "SKIP_DYNAMIC") {
         const source = readFileSync(
           join(projectRoot, "lib", "verification", "manualReview.js"),
-          "utf-8"
+          "utf-8",
         );
         expect(source).toMatch(/callerId/);
         expect(
-          source.includes("throw") || source.includes("reject") || source.includes("Error")
+          source.includes("throw") ||
+            source.includes("reject") ||
+            source.includes("Error"),
         ).toBe(true);
       } else {
         // A real rejection is exactly what we want
@@ -149,14 +158,14 @@ describe("Security: OTP is never returned in any response shape", () => {
   it("createOTP returns { success: true } without exposing the OTP", () => {
     const source = readFileSync(
       join(projectRoot, "lib", "verification", "phoneVerification.js"),
-      "utf-8"
+      "utf-8",
     );
     // The function should NOT return the raw OTP value
     // Look for patterns that would leak: returning otp, returning code,
     // or including it in a response object
     const createOtpBlock = source.slice(
       source.indexOf("createOTP"),
-      source.indexOf("createOTP") + 1500
+      source.indexOf("createOTP") + 1500,
     );
 
     // Should NOT contain patterns like `otp:` or `code:` in the return shape
@@ -176,7 +185,7 @@ describe("Security: Timing-safe comparison used for OTP verification", () => {
   it("verifyOTPHash uses crypto.timingSafeEqual", () => {
     const source = readFileSync(
       join(projectRoot, "lib", "verification", "phoneVerification.js"),
-      "utf-8"
+      "utf-8",
     );
     expect(source).toMatch(/timingSafeEqual/);
   });

@@ -3,7 +3,12 @@ import { motion } from "framer-motion";
 /**
  * AchievementCard — glass card for achievement badges.
  */
-export default function AchievementCard({ icon, title, description, delay = 0 }) {
+export default function AchievementCard({
+  icon,
+  title,
+  description,
+  delay = 0,
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -14,8 +19,12 @@ export default function AchievementCard({ icon, title, description, delay = 0 })
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h4 className="font-geist text-base font-semibold text-on-surface mb-1">{title}</h4>
-          <p className="text-on-surface-variant text-sm font-inter leading-relaxed">{description}</p>
+          <h4 className="font-geist text-base font-semibold text-on-surface mb-1">
+            {title}
+          </h4>
+          <p className="text-on-surface-variant text-sm font-inter leading-relaxed">
+            {description}
+          </p>
         </div>
         <span
           className="material-symbols-outlined text-3xl text-primary shrink-0"

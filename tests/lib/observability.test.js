@@ -41,7 +41,8 @@ describe("Metrics Engine", () => {
 
     const grouped = {};
     for (const m of metrics) {
-      if (!grouped[m.metric_name]) grouped[m.metric_name] = { sum: 0, count: 0 };
+      if (!grouped[m.metric_name])
+        grouped[m.metric_name] = { sum: 0, count: 0 };
       grouped[m.metric_name].sum += m.value;
       grouped[m.metric_name].count++;
     }

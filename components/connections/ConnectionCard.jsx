@@ -15,7 +15,12 @@ export const cardVariants = {
  * ConnectionCard — Glass-card connection card with avatar, badge, Follow/Following + Mail.
  * Props: { profile, isFollowing, isSelf, onToggleFollow }
  */
-export default function ConnectionCard({ profile, isFollowing, isSelf, onToggleFollow }) {
+export default function ConnectionCard({
+  profile,
+  isFollowing,
+  isSelf,
+  onToggleFollow,
+}) {
   // Simulated mutual connections count
   const mutualCount = useState(() => Math.floor(Math.random() * 50) + 1)[0];
 
@@ -103,7 +108,9 @@ export default function ConnectionCard({ profile, isFollowing, isSelf, onToggleF
           onClick={(e) => e.stopPropagation()}
           className="px-3 py-2.5 rounded-lg border border-outline-variant/30 hover:bg-surface-variant/50 transition-colors"
         >
-          <span className="material-symbols-outlined text-on-surface-variant">mail</span>
+          <span className="material-symbols-outlined text-on-surface-variant">
+            mail
+          </span>
         </motion.button>
       </div>
     </motion.article>

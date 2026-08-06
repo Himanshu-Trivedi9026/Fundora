@@ -33,6 +33,7 @@ request → pending → approved → processing → completed/failed
 Creates a payout request. Calculates fees and runs fraud evaluation.
 
 **Parameters:**
+
 - `creatorId` (string, required) — Creator ID
 - `escrowAccountId` (string, required) — Escrow account ID
 - `bankAccountId` (string, required) — Bank account ID for payout
@@ -97,6 +98,7 @@ If fraud decision is `block`, the payout is denied.
 - **Maximum payout:** $1,000,000.00 (100000000 cents)
 
 Fee calculation:
+
 ```javascript
 feeAmount = Math.round(amount × (feePercentage / 100))
 netAmount = amount - feeAmount
@@ -122,7 +124,11 @@ class StripePayoutProvider extends BasePayoutProvider { ... }
 ### Registry
 
 ```javascript
-import { registerProvider, setActiveProvider, getActiveProvider } from "../lib/escrow/providerAdapter";
+import {
+  registerProvider,
+  setActiveProvider,
+  getActiveProvider,
+} from "../lib/escrow/providerAdapter";
 
 // Register providers
 registerProvider("mock", new MockPayoutProvider());
@@ -164,7 +170,11 @@ const balance = await getCreatorBalance("user-123");
 ## Usage Example
 
 ```javascript
-import { createPayoutRequest, approvePayout, processPayout } from "../lib/payout";
+import {
+  createPayoutRequest,
+  approvePayout,
+  processPayout,
+} from "../lib/payout";
 
 // Creator requests payout
 const request = await createPayoutRequest({

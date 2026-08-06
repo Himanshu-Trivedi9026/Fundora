@@ -71,7 +71,9 @@ describe("NotificationEngine", () => {
     it("writes only the live notifications columns (type/is_read/actor/entity)", async () => {
       const mockInsert = vi.fn().mockReturnValue({
         select: vi.fn().mockReturnValue({
-          single: vi.fn().mockResolvedValue({ data: { id: "notif-2" }, error: null }),
+          single: vi
+            .fn()
+            .mockResolvedValue({ data: { id: "notif-2" }, error: null }),
         }),
       });
 
@@ -104,12 +106,20 @@ describe("NotificationEngine", () => {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnThis(),
           order: vi.fn().mockReturnValue({
-            range: vi.fn().mockResolvedValue({ data: [{ id: "notif-1" }], count: 1, error: null }),
+            range: vi.fn().mockResolvedValue({
+              data: [{ id: "notif-1" }],
+              count: 1,
+              error: null,
+            }),
           }),
         }),
       });
 
-      const result = await getNotifications({ userId: "user-1", limit: 10, offset: 0 });
+      const result = await getNotifications({
+        userId: "user-1",
+        limit: 10,
+        offset: 0,
+      });
       expect(result.success).toBe(true);
     });
   });
@@ -141,7 +151,9 @@ describe("NotificationEngine", () => {
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockNotif, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockNotif, error: null }),
             }),
           }),
         })
@@ -150,7 +162,10 @@ describe("NotificationEngine", () => {
           update: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               select: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: { ...mockNotif, read: true }, error: null }),
+                single: vi.fn().mockResolvedValue({
+                  data: { ...mockNotif, read: true },
+                  error: null,
+                }),
               }),
             }),
           }),
@@ -168,7 +183,9 @@ describe("NotificationEngine", () => {
         update: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              select: vi.fn().mockResolvedValue({ data: [{ id: "notif-1" }], error: null }),
+              select: vi
+                .fn()
+                .mockResolvedValue({ data: [{ id: "notif-1" }], error: null }),
             }),
           }),
         }),
@@ -191,7 +208,10 @@ describe("NotificationEngine", () => {
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: { id: "notif-1", user_id: "user-1" }, error: null }),
+              single: vi.fn().mockResolvedValue({
+                data: { id: "notif-1", user_id: "user-1" },
+                error: null,
+              }),
             }),
           }),
         })
@@ -211,7 +231,10 @@ describe("NotificationEngine", () => {
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: { id: "notif-1", user_id: "owner-2" }, error: null }),
+            single: vi.fn().mockResolvedValue({
+              data: { id: "notif-1", user_id: "owner-2" },
+              error: null,
+            }),
           }),
         }),
       });
@@ -226,7 +249,9 @@ describe("NotificationEngine", () => {
     it("creates a single in-app notification on the live schema", async () => {
       const mockInsert = vi.fn().mockReturnValue({
         select: vi.fn().mockReturnValue({
-          single: vi.fn().mockResolvedValue({ data: { id: "notif-sent" }, error: null }),
+          single: vi
+            .fn()
+            .mockResolvedValue({ data: { id: "notif-sent" }, error: null }),
         }),
       });
 

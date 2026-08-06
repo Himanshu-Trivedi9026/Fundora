@@ -13,17 +13,30 @@ import RiskIndicator from "./RiskIndicator";
 export default function VerificationCard({ verification, onNavigate }) {
   if (!verification) return null;
 
-  const { verification_level, verification_status, trust_score, risk_score } = verification;
+  const { verification_level, verification_status, trust_score, risk_score } =
+    verification;
 
   const steps = [
     { label: "Email", verified: verification.email_verified, icon: "mail" },
     { label: "Phone", verified: verification.phone_verified, icon: "phone" },
-    { label: "Identity", verified: verification.identity_verified, icon: "badge" },
-    { label: "Bank", verified: verification.bank_verified, icon: "account_balance" },
-    { label: "Business", verified: verification.business_verified, icon: "business" },
+    {
+      label: "Identity",
+      verified: verification.identity_verified,
+      icon: "badge",
+    },
+    {
+      label: "Bank",
+      verified: verification.bank_verified,
+      icon: "account_balance",
+    },
+    {
+      label: "Business",
+      verified: verification.business_verified,
+      icon: "business",
+    },
   ];
 
-  const completedSteps = steps.filter(s => s.verified).length;
+  const completedSteps = steps.filter((s) => s.verified).length;
   const progress = Math.round((completedSteps / steps.length) * 100);
 
   return (
@@ -37,12 +50,19 @@ export default function VerificationCard({ verification, onNavigate }) {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
         <h2 className="font-geist text-[20px] flex items-center gap-3 font-semibold">
-          <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
+          <span
+            className="material-symbols-outlined text-primary"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >
             shield
           </span>
           Identity Verification
         </h2>
-        <VerificationBadge level={verification_level} status={verification_status} size="md" />
+        <VerificationBadge
+          level={verification_level}
+          status={verification_status}
+          size="md"
+        />
       </div>
 
       {/* Card */}
@@ -50,8 +70,12 @@ export default function VerificationCard({ verification, onNavigate }) {
         {/* Progress */}
         <div className="space-y-3">
           <div className="flex justify-between items-center">
-            <span className="text-sm font-inter text-on-surface-variant">Verification Progress</span>
-            <span className="text-xs font-bold text-primary">{completedSteps}/{steps.length}</span>
+            <span className="text-sm font-inter text-on-surface-variant">
+              Verification Progress
+            </span>
+            <span className="text-xs font-bold text-primary">
+              {completedSteps}/{steps.length}
+            </span>
           </div>
           <div className="h-2 bg-surface-container-high rounded-full overflow-hidden">
             <motion.div
@@ -75,18 +99,24 @@ export default function VerificationCard({ verification, onNavigate }) {
                 className={`material-symbols-outlined text-[18px] ${
                   step.verified ? "text-success" : "text-on-surface-variant/50"
                 }`}
-                style={step.verified ? { fontVariationSettings: "'FILL' 1" } : {}}
+                style={
+                  step.verified ? { fontVariationSettings: "'FILL' 1" } : {}
+                }
               >
                 {step.verified ? "check_circle" : step.icon}
               </span>
-              <span className={`flex-1 text-sm font-inter ${
-                step.verified ? "text-on-surface" : "text-on-surface-variant"
-              }`}>
+              <span
+                className={`flex-1 text-sm font-inter ${
+                  step.verified ? "text-on-surface" : "text-on-surface-variant"
+                }`}
+              >
                 {step.label}
               </span>
-              <span className={`text-[9px] font-bold uppercase tracking-wider ${
-                step.verified ? "text-success" : "text-on-surface-variant/50"
-              }`}>
+              <span
+                className={`text-[9px] font-bold uppercase tracking-wider ${
+                  step.verified ? "text-success" : "text-on-surface-variant/50"
+                }`}
+              >
                 {step.verified ? "Verified" : "Pending"}
               </span>
             </div>
@@ -108,14 +138,17 @@ export default function VerificationCard({ verification, onNavigate }) {
             className="w-full bg-primary text-on-primary py-3 rounded-xl font-geist font-semibold text-sm
               hover:brightness-110 transition-all flex items-center justify-center gap-2"
           >
-            <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+            <span className="material-symbols-outlined text-[16px]">
+              arrow_forward
+            </span>
             Complete Verification
           </motion.button>
         )}
 
         {verification_status === "under_review" && (
           <div className="text-center text-sm text-on-surface-variant font-inter">
-            Your verification is being reviewed. This usually takes 1-2 business days.
+            Your verification is being reviewed. This usually takes 1-2 business
+            days.
           </div>
         )}
       </div>

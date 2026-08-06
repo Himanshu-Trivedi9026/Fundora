@@ -28,21 +28,27 @@ describe("016_user_roles.sql", () => {
 
   it("backfills existing project owners to creator", () => {
     expect(MIGRATION).toMatch(/UPDATE\s+public\.profiles/i);
-    expect(MIGRATION).toMatch(/EXISTS\s*\(\s*SELECT\s+1\s+FROM\s+public\.projects/i);
+    expect(MIGRATION).toMatch(
+      /EXISTS\s*\(\s*SELECT\s+1\s+FROM\s+public\.projects/i,
+    );
     expect(MIGRATION).toMatch(/pr\.owner_id\s*=\s*p\.id/i);
   });
 
   it("auto-promotes a user to creator when they create their first project", () => {
-    expect(MIGRATION).toMatch(/FUNCTION\s+public\.promote_user_to_creator\(\)/i);
     expect(MIGRATION).toMatch(
-      /AFTER\s+INSERT\s+ON\s+public\.projects/i,
+      /FUNCTION\s+public\.promote_user_to_creator\(\)/i,
     );
-    expect(MIGRATION).toMatch(/UPDATE\s+public\.profiles\s+SET\s+role\s*=\s*'creator'/i);
+    expect(MIGRATION).toMatch(/AFTER\s+INSERT\s+ON\s+public\.projects/i);
+    expect(MIGRATION).toMatch(
+      /UPDATE\s+public\.profiles\s+SET\s+role\s*=\s*'creator'/i,
+    );
   });
 
   it("blocks direct role changes by end users via a trigger", () => {
     expect(MIGRATION).toMatch(/FUNCTION\s+public\.protect_user_role\(\)/i);
-    expect(MIGRATION).toMatch(/BEFORE\s+UPDATE\s+OF\s+role\s+ON\s+public\.profiles/i);
+    expect(MIGRATION).toMatch(
+      /BEFORE\s+UPDATE\s+OF\s+role\s+ON\s+public\.profiles/i,
+    );
     expect(MIGRATION).toMatch(/app\.allow_role_change/i);
     expect(MIGRATION).toMatch(/42501/i);
   });
@@ -54,7 +60,9 @@ describe("016_user_roles.sql", () => {
   });
 
   it("does not expose the elevation helper to anonymous callers", () => {
-    expect(MIGRATION).toMatch(/REVOKE\s+ALL\s+ON\s+FUNCTION\s+public\.set_user_role/i);
+    expect(MIGRATION).toMatch(
+      /REVOKE\s+ALL\s+ON\s+FUNCTION\s+public\.set_user_role/i,
+    );
     expect(MIGRATION).toMatch(
       /GRANT\s+EXECUTE\s+ON\s+FUNCTION\s+public\.set_user_role\(UUID,\s*TEXT\)\s+TO\s+authenticated/i,
     );
@@ -62,8 +70,6 @@ describe("016_user_roles.sql", () => {
 
   it("does NOT flip RLS to strict mode on profiles (must stay publicly readable)", () => {
     // Migration 016 intentionally leaves profiles RLS as-is (see section 6).
-    expect(MIGRATION).not.toMatch(
-      /ENABLE\s+ROW\s+LEVEL\s+SECURITY/i,
-    );
+    expect(MIGRATION).not.toMatch(/ENABLE\s+ROW\s+LEVEL\s+SECURITY/i);
   });
 });

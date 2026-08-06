@@ -9,8 +9,12 @@ export default function ProjectTabs({ projects, currentUserId, creatorName }) {
   const [activeTab, setActiveTab] = useState("active");
 
   const now = new Date();
-  const active = projects.filter((p) => !p.deadline || new Date(p.deadline) > now);
-  const past = projects.filter((p) => p.deadline && new Date(p.deadline) <= now);
+  const active = projects.filter(
+    (p) => !p.deadline || new Date(p.deadline) > now,
+  );
+  const past = projects.filter(
+    (p) => p.deadline && new Date(p.deadline) <= now,
+  );
 
   const tabs = [
     { key: "active", label: "Active Projects", count: active.length },
@@ -73,7 +77,9 @@ export default function ProjectTabs({ projects, currentUserId, creatorName }) {
                 {activeTab === "active" ? "hourglass_empty" : "history"}
               </span>
               <p className="text-on-surface-variant text-sm font-inter">
-                {activeTab === "active" ? "No active projects yet." : "No past projects yet."}
+                {activeTab === "active"
+                  ? "No active projects yet."
+                  : "No past projects yet."}
               </p>
             </div>
           )}

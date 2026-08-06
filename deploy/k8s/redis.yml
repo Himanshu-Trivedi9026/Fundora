@@ -1,5 +1,4 @@
 # Fundora — Redis (Cache & Queue Backend)
-
 ---
 apiVersion: apps/v1
 kind: Deployment

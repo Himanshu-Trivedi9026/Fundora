@@ -201,7 +201,9 @@ describe("TrendingProjects live campaigns", () => {
     expect(m.mockSelect).toHaveBeenCalledWith(TRENDING_SELECT);
     expect(m.mockEq).toHaveBeenCalledWith("deleted", false);
     expect(m.mockOrder).toHaveBeenCalledWith("pledged", { ascending: false });
-    expect(m.mockOrder).toHaveBeenCalledWith("updated_at", { ascending: false });
+    expect(m.mockOrder).toHaveBeenCalledWith("updated_at", {
+      ascending: false,
+    });
     expect(m.mockLimit).toHaveBeenCalledWith(3);
   });
 
@@ -227,7 +229,14 @@ describe("TrendingProjects live campaigns", () => {
 
   it("renders the icon tile fallback when a thumbnail is missing", async () => {
     mockProjects([
-      { id: "p1", title: "No Image", owner_id: "u1", goal: 100, pledged: 10, thumbnail: null },
+      {
+        id: "p1",
+        title: "No Image",
+        owner_id: "u1",
+        goal: 100,
+        pledged: 10,
+        thumbnail: null,
+      },
     ]);
 
     render(<TrendingProjects />);
@@ -241,13 +250,22 @@ describe("TrendingProjects live campaigns", () => {
 
   it("falls back to the icon tile when a thumbnail fails to load", async () => {
     mockProjects([
-      { id: "p1", title: "Broken Image", owner_id: "u1", goal: 100, pledged: 10, thumbnail: "/broken.png" },
+      {
+        id: "p1",
+        title: "Broken Image",
+        owner_id: "u1",
+        goal: 100,
+        pledged: 10,
+        thumbnail: "/broken.png",
+      },
     ]);
 
     render(<TrendingProjects />);
 
     await waitFor(() => {
-      expect(screen.getByRole("img", { name: "Broken Image" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("img", { name: "Broken Image" }),
+      ).toBeInTheDocument();
     });
     fireEvent.error(screen.getByRole("img", { name: "Broken Image" }));
 
@@ -273,13 +291,19 @@ describe("TrendingProjects live campaigns", () => {
     expect(screen.queryByTestId("thumbnail-fallback")).not.toBeInTheDocument();
 
     // Creators see the create-flow CTA and it opens the creation flow.
-    await userEvent.click(screen.getByRole("button", { name: /start a campaign/i }));
+    await userEvent.click(
+      screen.getByRole("button", { name: /start a campaign/i }),
+    );
     expect(router.push).toHaveBeenCalledWith("/create");
   });
 
   it("hides the create-flow CTA from non-creators in the empty state", async () => {
     mockProjects([]);
-    mockUseRoleValue({ user: { id: "u1" }, role: ROLES.INVESTOR, isCreator: false });
+    mockUseRoleValue({
+      user: { id: "u1" },
+      role: ROLES.INVESTOR,
+      isCreator: false,
+    });
 
     render(<TrendingProjects />);
 
@@ -289,8 +313,12 @@ describe("TrendingProjects live campaigns", () => {
       ).toBeInTheDocument();
     });
     // Guests and investors have no create-flow entry point, but Explore stays.
-    expect(screen.queryByRole("button", { name: /start a campaign/i })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /explore projects/i })).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /start a campaign/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /explore projects/i }),
+    ).toBeInTheDocument();
   });
 
   it("subscribes to realtime changes on projects and cleans up on unmount", async () => {

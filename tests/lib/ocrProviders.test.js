@@ -12,7 +12,9 @@ import {
 describe("OCR Providers", () => {
   describe("OCRProvider (abstract base class)", () => {
     it("cannot be instantiated directly", () => {
-      expect(() => new OCRProvider()).toThrow("OCRProvider is abstract and cannot be instantiated directly");
+      expect(() => new OCRProvider()).toThrow(
+        "OCRProvider is abstract and cannot be instantiated directly",
+      );
     });
 
     it("throws for all abstract methods when called on a subclass that doesn't implement them", async () => {
@@ -26,17 +28,29 @@ describe("OCR Providers", () => {
       const provider = new MinimalProvider();
       expect(provider.providerName).toBe("minimal");
 
-      await expect(provider.initialize()).rejects.toThrow("must be implemented");
-      await expect(provider.extractText(Buffer.alloc(0))).rejects.toThrow("must be implemented");
-      await expect(provider.validateDocumentFields({}, "pan_card")).rejects.toThrow("must be implemented");
-      await expect(provider.compareFaces(Buffer.alloc(0), Buffer.alloc(0))).rejects.toThrow("must be implemented");
-      await expect(provider.getOCRStatus("req-1")).rejects.toThrow("must be implemented");
+      await expect(provider.initialize()).rejects.toThrow(
+        "must be implemented",
+      );
+      await expect(provider.extractText(Buffer.alloc(0))).rejects.toThrow(
+        "must be implemented",
+      );
+      await expect(
+        provider.validateDocumentFields({}, "pan_card"),
+      ).rejects.toThrow("must be implemented");
+      await expect(
+        provider.compareFaces(Buffer.alloc(0), Buffer.alloc(0)),
+      ).rejects.toThrow("must be implemented");
+      await expect(provider.getOCRStatus("req-1")).rejects.toThrow(
+        "must be implemented",
+      );
       expect(() => provider.mapOCRResult({})).toThrow("must be implemented");
     });
 
     it("sets providerName from config", async () => {
       class TestProvider extends OCRProvider {
-        async initialize() { return { success: true }; }
+        async initialize() {
+          return { success: true };
+        }
       }
       const provider = new TestProvider({ providerName: "test_provider" });
       expect(provider.providerName).toBe("test_provider");
@@ -44,7 +58,9 @@ describe("OCR Providers", () => {
 
     it("defaults providerName to 'unknown' if not provided", async () => {
       class TestProvider extends OCRProvider {
-        async initialize() { return { success: true }; }
+        async initialize() {
+          return { success: true };
+        }
       }
       const provider = new TestProvider();
       expect(provider.providerName).toBe("unknown");
@@ -52,7 +68,9 @@ describe("OCR Providers", () => {
 
     it("stores apiKey and baseUrl from config", async () => {
       class TestProvider extends OCRProvider {
-        async initialize() { return { success: true }; }
+        async initialize() {
+          return { success: true };
+        }
       }
       const provider = new TestProvider({
         providerName: "test",
@@ -65,7 +83,9 @@ describe("OCR Providers", () => {
 
     it("defaults apiKey and baseUrl to null", async () => {
       class TestProvider extends OCRProvider {
-        async initialize() { return { success: true }; }
+        async initialize() {
+          return { success: true };
+        }
       }
       const provider = new TestProvider({ providerName: "test" });
       expect(provider.apiKey).toBeNull();
@@ -132,7 +152,10 @@ describe("OCR Providers", () => {
     });
 
     it("validateDocumentFields() returns valid", async () => {
-      const result = await provider.validateDocumentFields({ name: "Test" }, "pan_card");
+      const result = await provider.validateDocumentFields(
+        { name: "Test" },
+        "pan_card",
+      );
       expect(result.valid).toBe(true);
       expect(result.validatedFields).toEqual({ name: "Test" });
       expect(result.errors).toEqual([]);
@@ -146,7 +169,10 @@ describe("OCR Providers", () => {
     });
 
     it("compareFaces() returns match: true", async () => {
-      const result = await provider.compareFaces(Buffer.alloc(10), Buffer.alloc(10));
+      const result = await provider.compareFaces(
+        Buffer.alloc(10),
+        Buffer.alloc(10),
+      );
       expect(result.success).toBe(true);
       expect(result.match).toBe(true);
       expect(result.confidence).toBeGreaterThan(0);
@@ -184,27 +210,41 @@ describe("OCR Providers", () => {
     describe("registerOCRProvider", () => {
       it("registers a valid provider class", () => {
         class TestOCR extends OCRProvider {
-          async initialize() { return { success: true }; }
+          async initialize() {
+            return { success: true };
+          }
         }
         expect(() => registerOCRProvider("test_ocr", TestOCR)).not.toThrow();
       });
 
       it("throws for missing name", () => {
         class TestOCR extends OCRProvider {
-          async initialize() { return { success: true }; }
+          async initialize() {
+            return { success: true };
+          }
         }
-        expect(() => registerOCRProvider(null, TestOCR)).toThrow("name is required");
-        expect(() => registerOCRProvider("", TestOCR)).toThrow("name is required");
-        expect(() => registerOCRProvider(123, TestOCR)).toThrow("name is required");
+        expect(() => registerOCRProvider(null, TestOCR)).toThrow(
+          "name is required",
+        );
+        expect(() => registerOCRProvider("", TestOCR)).toThrow(
+          "name is required",
+        );
+        expect(() => registerOCRProvider(123, TestOCR)).toThrow(
+          "name is required",
+        );
       });
 
       it("throws for non-OCRProvider class", () => {
         class NotOCR {}
-        expect(() => registerOCRProvider("bad", NotOCR)).toThrow("must extend OCRProvider");
+        expect(() => registerOCRProvider("bad", NotOCR)).toThrow(
+          "must extend OCRProvider",
+        );
       });
 
       it("throws for OCRProvider base class itself", () => {
-        expect(() => registerOCRProvider("base", OCRProvider)).toThrow("must extend OCRProvider");
+        expect(() => registerOCRProvider("base", OCRProvider)).toThrow(
+          "must extend OCRProvider",
+        );
       });
 
       it("throws for null class", () => {
@@ -215,7 +255,9 @@ describe("OCR Providers", () => {
     describe("getOCRProvider", () => {
       it("returns an instance of the registered provider", () => {
         class TestOCR extends OCRProvider {
-          async initialize() { return { success: true }; }
+          async initialize() {
+            return { success: true };
+          }
         }
         registerOCRProvider("test_get", TestOCR);
         const provider = getOCRProvider("test_get");
@@ -230,7 +272,9 @@ describe("OCR Providers", () => {
 
       it("passes config to constructor", () => {
         class TestOCR extends OCRProvider {
-          async initialize() { return { success: true }; }
+          async initialize() {
+            return { success: true };
+          }
         }
         registerOCRProvider("test_config", TestOCR);
         const provider = getOCRProvider("test_config", { apiKey: "sk-abc" });
@@ -239,7 +283,9 @@ describe("OCR Providers", () => {
 
       it("sets providerName on the instance", () => {
         class TestOCR extends OCRProvider {
-          async initialize() { return { success: true }; }
+          async initialize() {
+            return { success: true };
+          }
         }
         registerOCRProvider("test_name", TestOCR);
         const provider = getOCRProvider("test_name");
@@ -268,7 +314,9 @@ describe("OCR Providers", () => {
 
       it("falls back to first registered provider if fundora_internal not available", () => {
         class FallbackOCR extends OCRProvider {
-          async initialize() { return { success: true }; }
+          async initialize() {
+            return { success: true };
+          }
         }
         registerOCRProvider("fallback", FallbackOCR);
         const provider = getDefaultOCRProvider();
@@ -283,10 +331,14 @@ describe("OCR Providers", () => {
 
       it("returns registered provider names", () => {
         class TestOCR1 extends OCRProvider {
-          async initialize() { return { success: true }; }
+          async initialize() {
+            return { success: true };
+          }
         }
         class TestOCR2 extends OCRProvider {
-          async initialize() { return { success: true }; }
+          async initialize() {
+            return { success: true };
+          }
         }
         registerOCRProvider("provider_a", TestOCR1);
         registerOCRProvider("provider_b", TestOCR2);
@@ -300,7 +352,9 @@ describe("OCR Providers", () => {
     describe("clearOCRProviders", () => {
       it("clears all registered providers", () => {
         class TestOCR extends OCRProvider {
-          async initialize() { return { success: true }; }
+          async initialize() {
+            return { success: true };
+          }
         }
         registerOCRProvider("to_clear", TestOCR);
         expect(listOCRProviders()).toContain("to_clear");

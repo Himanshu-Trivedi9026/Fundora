@@ -14,9 +14,15 @@ import {
 describe("Base Connector", () => {
   it("throws on unimplemented methods", async () => {
     const conn = new BaseConnector();
-    await expect(conn.connect()).rejects.toThrow("connect() must be implemented");
-    await expect(conn.disconnect()).rejects.toThrow("disconnect() must be implemented");
-    await expect(conn.sendMessage("c", "m")).rejects.toThrow("sendMessage() must be implemented");
+    await expect(conn.connect()).rejects.toThrow(
+      "connect() must be implemented",
+    );
+    await expect(conn.disconnect()).rejects.toThrow(
+      "disconnect() must be implemented",
+    );
+    await expect(conn.sendMessage("c", "m")).rejects.toThrow(
+      "sendMessage() must be implemented",
+    );
   });
 
   it("returns status", async () => {
@@ -58,7 +64,9 @@ describe("SlackConnector", () => {
 
 describe("TeamsConnector", () => {
   it("connects with webhook URL", async () => {
-    const conn = new TeamsConnector({ webhookUrl: "https://outlook.office.com/webhook/test" });
+    const conn = new TeamsConnector({
+      webhookUrl: "https://outlook.office.com/webhook/test",
+    });
     await conn.connect();
     expect(conn.connected).toBe(true);
   });
@@ -72,7 +80,9 @@ describe("TeamsConnector", () => {
 
 describe("DiscordConnector", () => {
   it("connects with token", async () => {
-    const conn = new DiscordConnector({ credentials: { token: "discord-test" } });
+    const conn = new DiscordConnector({
+      credentials: { token: "discord-test" },
+    });
     await conn.connect();
     expect(conn.connected).toBe(true);
   });

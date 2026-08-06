@@ -25,7 +25,9 @@ vi.mock("../../lib/supabaseClient", () => {
       order: m.mockOrder,
       limit: m.mockLimit,
       insert: m.mockInsert,
-      single: vi.fn().mockResolvedValue({ data: { owner_id: "owner-1" }, error: null }),
+      single: vi
+        .fn()
+        .mockResolvedValue({ data: { owner_id: "owner-1" }, error: null }),
       maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
       // Awaiting a mid-chain query resolves to an empty result (supabase-js
       // query builders are thenable; chains are also awaited directly).
@@ -55,7 +57,10 @@ describe("ProjectChat", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    m.mockGetUser.mockResolvedValue({ data: { user: { id: "user-1", email: "me@test.com" } }, error: null });
+    m.mockGetUser.mockResolvedValue({
+      data: { user: { id: "user-1", email: "me@test.com" } },
+      error: null,
+    });
     m.mockSelect.mockResolvedValue({ data: [], error: null });
     m.mockOrder.mockResolvedValue({ data: [], error: null });
     m.mockLimit.mockResolvedValue({ data: [], error: null });
@@ -63,18 +68,26 @@ describe("ProjectChat", () => {
     // Insert default: success
     m.mockInsert.mockImplementation(() => ({
       select: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({ data: { id: "real-id-1" }, error: null }),
+      single: vi
+        .fn()
+        .mockResolvedValue({ data: { id: "real-id-1" }, error: null }),
     }));
 
     m.mockStorageFrom.mockReturnValue({
       upload: vi.fn().mockResolvedValue({ error: null }),
-      getPublicUrl: vi.fn().mockReturnValue({ data: { publicUrl: "https://x.supabase.co/chat_attachments/proj/file.png" } }),
+      getPublicUrl: vi.fn().mockReturnValue({
+        data: {
+          publicUrl: "https://x.supabase.co/chat_attachments/proj/file.png",
+        },
+      }),
       remove: vi.fn().mockResolvedValue({ error: null }),
     });
 
     m.mockChannel.mockReturnValue({
       on: m.mockChannelOn.mockReturnThis(),
-      subscribe: m.mockChannelSubscribe.mockImplementation((cb) => cb && cb("SUBSCRIBED")),
+      subscribe: m.mockChannelSubscribe.mockImplementation(
+        (cb) => cb && cb("SUBSCRIBED"),
+      ),
       presenceState: vi.fn().mockReturnValue({}),
       track: vi.fn().mockResolvedValue({}),
     });
@@ -84,12 +97,20 @@ describe("ProjectChat", () => {
   it("renders chat UI with input area", async () => {
     render(<ProjectChat projectId="proj-1" />);
     expect(screen.getByText("Project Chat")).toBeInTheDocument();
-    await waitFor(() => expect(screen.getByPlaceholderText("Type a message...")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(
+        screen.getByPlaceholderText("Type a message..."),
+      ).toBeInTheDocument(),
+    );
   });
 
   it("sends a message (optimistic row + real id swap)", async () => {
     render(<ProjectChat projectId="proj-1" />);
-    await waitFor(() => expect(screen.getByPlaceholderText("Type a message...")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(
+        screen.getByPlaceholderText("Type a message..."),
+      ).toBeInTheDocument(),
+    );
 
     fireEvent.change(screen.getByPlaceholderText("Type a message..."), {
       target: { value: "Hello world" },
@@ -105,11 +126,17 @@ describe("ProjectChat", () => {
   it("marks the send as failed when the insert errors", async () => {
     m.mockInsert.mockImplementation(() => ({
       select: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({ data: null, error: { message: "RLS" } }),
+      single: vi
+        .fn()
+        .mockResolvedValue({ data: null, error: { message: "RLS" } }),
     }));
 
     render(<ProjectChat projectId="proj-1" />);
-    await waitFor(() => expect(screen.getByPlaceholderText("Type a message...")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(
+        screen.getByPlaceholderText("Type a message..."),
+      ).toBeInTheDocument(),
+    );
 
     fireEvent.change(screen.getByPlaceholderText("Type a message..."), {
       target: { value: "will fail" },

@@ -3,7 +3,14 @@ import { motion } from "framer-motion";
 /**
  * ProfileActions — Edit Profile / Message / Follow / Unfollow / Share buttons.
  */
-export default function ProfileActions({ isOwner, isFollowing, onEdit, onMessage, onFollow, onUnfollow }) {
+export default function ProfileActions({
+  isOwner,
+  isFollowing,
+  onEdit,
+  onMessage,
+  onFollow,
+  onUnfollow,
+}) {
   return (
     <div className="flex gap-3 mt-4 justify-center md:justify-start items-center">
       {isOwner ? (

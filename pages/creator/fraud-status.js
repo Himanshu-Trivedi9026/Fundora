@@ -147,7 +147,9 @@ export default function FraudStatus() {
               disabled={refreshing}
               className="self-start"
             >
-              <span className="material-symbols-outlined text-[16px]">refresh</span>
+              <span className="material-symbols-outlined text-[16px]">
+                refresh
+              </span>
               {refreshing ? "Refreshing..." : "Refresh"}
             </Button>
           </div>
@@ -190,7 +192,12 @@ export default function FraudStatus() {
                           <p className="text-gray-400 text-xs font-inter uppercase tracking-wider">
                             Risk Score
                           </p>
-                          <Badge variant={severityVariant[riskLevel.toLowerCase()] || "warning"}>
+                          <Badge
+                            variant={
+                              severityVariant[riskLevel.toLowerCase()] ||
+                              "warning"
+                            }
+                          >
                             {riskLevel}
                           </Badge>
                         </div>
@@ -201,7 +208,9 @@ export default function FraudStatus() {
                           >
                             {riskScore}
                           </span>
-                          <span className="text-gray-500 text-sm font-inter mb-1">/ 100</span>
+                          <span className="text-gray-500 text-sm font-inter mb-1">
+                            / 100
+                          </span>
                         </div>
 
                         <div className="h-2.5 w-full bg-white/[0.06] rounded-full overflow-hidden">
@@ -220,10 +229,10 @@ export default function FraudStatus() {
                           {riskScore <= 30
                             ? "Your account has a low risk profile. No unusual activity detected."
                             : riskScore <= 60
-                            ? "Moderate risk indicators detected. Review flagged events below."
-                            : riskScore <= 80
-                            ? "High risk score. Immediate attention recommended."
-                            : "Critical risk level. Your account may be restricted."}
+                              ? "Moderate risk indicators detected. Review flagged events below."
+                              : riskScore <= 80
+                                ? "High risk score. Immediate attention recommended."
+                                : "Critical risk level. Your account may be restricted."}
                         </p>
                       </div>
 
@@ -239,7 +248,9 @@ export default function FraudStatus() {
                           >
                             {trustScore}
                           </span>
-                          <span className="text-gray-500 text-sm font-inter mb-1">/ 100</span>
+                          <span className="text-gray-500 text-sm font-inter mb-1">
+                            / 100
+                          </span>
                         </div>
 
                         <div className="h-2.5 w-full bg-white/[0.06] rounded-full overflow-hidden">
@@ -258,8 +269,8 @@ export default function FraudStatus() {
                           {trustScore >= 70
                             ? "Your account has a strong trust rating."
                             : trustScore >= 40
-                            ? "Your trust score needs improvement."
-                            : "Your trust score is low. Please contact support."}
+                              ? "Your trust score needs improvement."
+                              : "Your trust score is low. Please contact support."}
                         </p>
                       </div>
                     </div>
@@ -286,7 +297,9 @@ export default function FraudStatus() {
                               Last Reviewed
                             </p>
                             <p className="text-white font-inter text-sm">
-                              {new Date(fraudProfile.last_reviewed_at).toLocaleDateString("en-IN", {
+                              {new Date(
+                                fraudProfile.last_reviewed_at,
+                              ).toLocaleDateString("en-IN", {
                                 day: "numeric",
                                 month: "short",
                                 year: "numeric",
@@ -333,7 +346,8 @@ export default function FraudStatus() {
                       Recent Fraud Events
                     </h2>
                     <span className="text-gray-500 text-xs font-inter ml-auto">
-                      {fraudEvents.length} event{fraudEvents.length !== 1 ? "s" : ""}
+                      {fraudEvents.length} event
+                      {fraudEvents.length !== 1 ? "s" : ""}
                     </span>
                   </div>
 
@@ -367,7 +381,9 @@ export default function FraudStatus() {
                           Event Type
                         </span>
                         <span className="text-white font-inter text-sm capitalize">
-                          {event.event_type?.replace(/_/g, " ") || event.type?.replace(/_/g, " ") || "—"}
+                          {event.event_type?.replace(/_/g, " ") ||
+                            event.type?.replace(/_/g, " ") ||
+                            "—"}
                         </span>
                       </div>
 
@@ -379,7 +395,11 @@ export default function FraudStatus() {
                         <Badge
                           variant={
                             severityVariant[
-                              (event.severity || event.severity_level || "low").toLowerCase()
+                              (
+                                event.severity ||
+                                event.severity_level ||
+                                "low"
+                              ).toLowerCase()
                             ] || "default"
                           }
                         >
@@ -404,11 +424,14 @@ export default function FraudStatus() {
                         </span>
                         <span className="text-gray-300 font-inter text-sm">
                           {event.created_at
-                            ? new Date(event.created_at).toLocaleDateString("en-IN", {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                              })
+                            ? new Date(event.created_at).toLocaleDateString(
+                                "en-IN",
+                                {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                },
+                              )
                             : "—"}
                         </span>
                       </div>

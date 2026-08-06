@@ -20,27 +20,45 @@ import {
 // Lazily-loaded chart components — keeps recharts out of the main bundle
 // (same pattern as pages/creator/analytics.js).
 const InvestmentGrowthChart = dynamic(
-  () => import("../../components/investor/InvestorCharts").then((m) => m.InvestmentGrowthChart),
+  () =>
+    import("../../components/investor/InvestorCharts").then(
+      (m) => m.InvestmentGrowthChart,
+    ),
   { ssr: false },
 );
 const MonthlyInvestmentChart = dynamic(
-  () => import("../../components/investor/InvestorCharts").then((m) => m.MonthlyInvestmentChart),
+  () =>
+    import("../../components/investor/InvestorCharts").then(
+      (m) => m.MonthlyInvestmentChart,
+    ),
   { ssr: false },
 );
 const PortfolioAllocationChart = dynamic(
-  () => import("../../components/investor/InvestorCharts").then((m) => m.PortfolioAllocationChart),
+  () =>
+    import("../../components/investor/InvestorCharts").then(
+      (m) => m.PortfolioAllocationChart,
+    ),
   { ssr: false },
 );
 const SectorDistributionChart = dynamic(
-  () => import("../../components/investor/InvestorCharts").then((m) => m.SectorDistributionChart),
+  () =>
+    import("../../components/investor/InvestorCharts").then(
+      (m) => m.SectorDistributionChart,
+    ),
   { ssr: false },
 );
 const HistoricalTrendsChart = dynamic(
-  () => import("../../components/investor/InvestorCharts").then((m) => m.HistoricalTrendsChart),
+  () =>
+    import("../../components/investor/InvestorCharts").then(
+      (m) => m.HistoricalTrendsChart,
+    ),
   { ssr: false },
 );
 const FundingTimeline = dynamic(
-  () => import("../../components/investor/InvestorCharts").then((m) => m.FundingTimeline),
+  () =>
+    import("../../components/investor/InvestorCharts").then(
+      (m) => m.FundingTimeline,
+    ),
   { ssr: false },
 );
 
@@ -97,7 +115,11 @@ export default function InvestorAnalytics() {
     return (
       <PageLayout>
         <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#0d0d15] to-[#0a0a0f] flex items-center justify-center">
-          <div role="status" aria-label="Checking authentication" className="text-on-surface-variant text-lg">
+          <div
+            role="status"
+            aria-label="Checking authentication"
+            className="text-on-surface-variant text-lg"
+          >
             Checking authentication...
           </div>
         </div>
@@ -164,7 +186,12 @@ export default function InvestorAnalytics() {
     <PageLayout>
       <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#0d0d15] to-[#0a0a0f]">
         <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
-          <Breadcrumbs items={[{ label: "Investor", href: "/investor/dashboard" }, { label: "Analytics" }]} />
+          <Breadcrumbs
+            items={[
+              { label: "Investor", href: "/investor/dashboard" },
+              { label: "Analytics" },
+            ]}
+          />
 
           <PageHeader
             icon="insights"
@@ -196,9 +223,18 @@ export default function InvestorAnalytics() {
           />
 
           {loading ? (
-            <SectionCard title="Loading analytics" icon="insights" loading={loading} />
+            <SectionCard
+              title="Loading analytics"
+              icon="insights"
+              loading={loading}
+            />
           ) : error ? (
-            <SectionCard title="Analytics" icon="insights" error={error} onRetry={load} />
+            <SectionCard
+              title="Analytics"
+              icon="insights"
+              error={error}
+              onRetry={load}
+            />
           ) : !hasData ? (
             /* Onboarding empty state — new investors see a single CTA instead
                of a grid of empty widgets. */
@@ -210,7 +246,9 @@ export default function InvestorAnalytics() {
                 action={
                   <Link href="/explore">
                     <Button variant="primary">
-                      <span className="material-symbols-outlined text-[18px]">explore</span>
+                      <span className="material-symbols-outlined text-[18px]">
+                        explore
+                      </span>
                       Explore Projects
                     </Button>
                   </Link>
@@ -237,9 +275,12 @@ export default function InvestorAnalytics() {
                     <p className="text-on-surface-variant text-xs font-inter uppercase tracking-wider mb-2">
                       Return on Investment
                     </p>
-                    <p className="text-4xl font-bold text-primary font-geist">{roi}%</p>
+                    <p className="text-4xl font-bold text-primary font-geist">
+                      {roi}%
+                    </p>
                     <p className="text-xs text-on-surface-variant font-inter mt-2">
-                      Average funding progress of the projects you&apos;ve backed
+                      Average funding progress of the projects you&apos;ve
+                      backed
                     </p>
                   </GlassCard>
                 </div>
@@ -254,7 +295,9 @@ export default function InvestorAnalytics() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="fade-in-up">
                   <SectionCard title="Monthly Investment" icon="calendar_month">
-                    <MonthlyInvestmentChart data={analytics.monthlyInvestment} />
+                    <MonthlyInvestmentChart
+                      data={analytics.monthlyInvestment}
+                    />
                   </SectionCard>
                 </div>
                 <div className="fade-in-up">
@@ -302,7 +345,9 @@ export default function InvestorAnalytics() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="fade-in-up">
                   <SectionCard title="Sector Distribution" icon="category">
-                    <SectorDistributionChart data={analytics.sectorDistribution} />
+                    <SectorDistributionChart
+                      data={analytics.sectorDistribution}
+                    />
                   </SectionCard>
                 </div>
                 <div className="fade-in-up">

@@ -53,14 +53,16 @@ describe("Session Manager", () => {
 
   describe("createSession validation (Supabase mocked in setup.js)", () => {
     it("returns error when userId is missing", async () => {
-      const { createSession } = await import("../../lib/verification/sessionManager");
+      const { createSession } =
+        await import("../../lib/verification/sessionManager");
       const result = await createSession(null);
       expect(result.success).toBe(false);
       expect(result.error).toContain("User ID is required");
     });
 
     it("returns error when userId is empty string", async () => {
-      const { createSession } = await import("../../lib/verification/sessionManager");
+      const { createSession } =
+        await import("../../lib/verification/sessionManager");
       const result = await createSession("");
       expect(result.success).toBe(false);
       expect(result.error).toContain("User ID is required");
@@ -69,14 +71,16 @@ describe("Session Manager", () => {
 
   describe("resumeSession validation", () => {
     it("returns error when sessionId is missing", async () => {
-      const { resumeSession } = await import("../../lib/verification/sessionManager");
+      const { resumeSession } =
+        await import("../../lib/verification/sessionManager");
       const result = await resumeSession(null);
       expect(result.success).toBe(false);
       expect(result.error).toContain("Session ID is required");
     });
 
     it("returns error when sessionId is empty", async () => {
-      const { resumeSession } = await import("../../lib/verification/sessionManager");
+      const { resumeSession } =
+        await import("../../lib/verification/sessionManager");
       const result = await resumeSession("");
       expect(result.success).toBe(false);
       expect(result.error).toContain("Session ID is required");
@@ -85,14 +89,16 @@ describe("Session Manager", () => {
 
   describe("updateSessionStep validation", () => {
     it("returns error when sessionId is missing", async () => {
-      const { updateSessionStep } = await import("../../lib/verification/sessionManager");
+      const { updateSessionStep } =
+        await import("../../lib/verification/sessionManager");
       const result = await updateSessionStep(null, "email");
       expect(result.success).toBe(false);
       expect(result.error).toContain("Session ID and step are required");
     });
 
     it("returns error when step is missing", async () => {
-      const { updateSessionStep } = await import("../../lib/verification/sessionManager");
+      const { updateSessionStep } =
+        await import("../../lib/verification/sessionManager");
       const result = await updateSessionStep("sess-1", null);
       expect(result.success).toBe(false);
       expect(result.error).toContain("Session ID and step are required");
@@ -101,14 +107,16 @@ describe("Session Manager", () => {
 
   describe("completeSession validation", () => {
     it("returns error when sessionId is missing", async () => {
-      const { completeSession } = await import("../../lib/verification/sessionManager");
+      const { completeSession } =
+        await import("../../lib/verification/sessionManager");
       const result = await completeSession(null);
       expect(result.success).toBe(false);
       expect(result.error).toContain("Session ID is required");
     });
 
     it("returns error when sessionId is empty", async () => {
-      const { completeSession } = await import("../../lib/verification/sessionManager");
+      const { completeSession } =
+        await import("../../lib/verification/sessionManager");
       const result = await completeSession("");
       expect(result.success).toBe(false);
       expect(result.error).toContain("Session ID is required");
@@ -117,14 +125,16 @@ describe("Session Manager", () => {
 
   describe("getSessionProgress validation", () => {
     it("returns error when userId is missing", async () => {
-      const { getSessionProgress } = await import("../../lib/verification/sessionManager");
+      const { getSessionProgress } =
+        await import("../../lib/verification/sessionManager");
       const result = await getSessionProgress(null);
       expect(result.success).toBe(false);
       expect(result.error).toContain("User ID is required");
     });
 
     it("returns error when userId is empty", async () => {
-      const { getSessionProgress } = await import("../../lib/verification/sessionManager");
+      const { getSessionProgress } =
+        await import("../../lib/verification/sessionManager");
       const result = await getSessionProgress("");
       expect(result.success).toBe(false);
       expect(result.error).toContain("User ID is required");
@@ -133,13 +143,15 @@ describe("Session Manager", () => {
 
   describe("Edge Cases", () => {
     it("createSession with undefined userId", async () => {
-      const { createSession } = await import("../../lib/verification/sessionManager");
+      const { createSession } =
+        await import("../../lib/verification/sessionManager");
       const result = await createSession(undefined);
       expect(result.success).toBe(false);
     });
 
     it("createSession with whitespace-only userId", async () => {
-      const { createSession } = await import("../../lib/verification/sessionManager");
+      const { createSession } =
+        await import("../../lib/verification/sessionManager");
       const result = await createSession("   ");
       // Whitespace userId is truthy — Supabase will handle it
       // This tests the boundary; the function should either accept or reject
@@ -147,40 +159,46 @@ describe("Session Manager", () => {
     });
 
     it("resumeSession with undefined sessionId and userId", async () => {
-      const { resumeSession } = await import("../../lib/verification/sessionManager");
+      const { resumeSession } =
+        await import("../../lib/verification/sessionManager");
       const result = await resumeSession(undefined, undefined);
       expect(result.success).toBe(false);
     });
 
     it("resumeSession with only sessionId (no userId)", async () => {
-      const { resumeSession } = await import("../../lib/verification/sessionManager");
+      const { resumeSession } =
+        await import("../../lib/verification/sessionManager");
       const result = await resumeSession("sess-1");
       expect(result.success).toBe(false);
       expect(result.error).toContain("User ID is required");
     });
 
     it("updateSessionStep with empty string step", async () => {
-      const { updateSessionStep } = await import("../../lib/verification/sessionManager");
+      const { updateSessionStep } =
+        await import("../../lib/verification/sessionManager");
       const result = await updateSessionStep("sess-1", "", [], {}, "user-1");
       expect(result.success).toBe(false);
     });
 
     it("updateSessionStep with no userId", async () => {
-      const { updateSessionStep } = await import("../../lib/verification/sessionManager");
+      const { updateSessionStep } =
+        await import("../../lib/verification/sessionManager");
       const result = await updateSessionStep("sess-1", "email");
       expect(result.success).toBe(false);
       expect(result.error).toContain("User ID is required");
     });
 
     it("completeSession with no userId", async () => {
-      const { completeSession } = await import("../../lib/verification/sessionManager");
+      const { completeSession } =
+        await import("../../lib/verification/sessionManager");
       const result = await completeSession("sess-1");
       expect(result.success).toBe(false);
       expect(result.error).toContain("User ID is required");
     });
 
     it("getSessionProgress with very long userId", async () => {
-      const { getSessionProgress } = await import("../../lib/verification/sessionManager");
+      const { getSessionProgress } =
+        await import("../../lib/verification/sessionManager");
       const longId = "u".repeat(1000);
       // Should not throw, just return from Supabase
       const result = await getSessionProgress(longId);
@@ -189,7 +207,14 @@ describe("Session Manager", () => {
 
     it("all exported functions return objects with success property", async () => {
       const mod = await import("../../lib/verification/sessionManager");
-      const fns = [mod.createSession, mod.resumeSession, mod.updateSessionStep, mod.completeSession, mod.getSessionProgress, mod.cleanupExpiredSessions];
+      const fns = [
+        mod.createSession,
+        mod.resumeSession,
+        mod.updateSessionStep,
+        mod.completeSession,
+        mod.getSessionProgress,
+        mod.cleanupExpiredSessions,
+      ];
       for (const fn of fns) {
         expect(typeof fn).toBe("function");
       }

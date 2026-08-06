@@ -1,6 +1,8 @@
 import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import InvestorPortfolio, { PORTFOLIO_TIMEOUT_MS } from "../../../pages/investor/portfolio";
+import InvestorPortfolio, {
+  PORTFOLIO_TIMEOUT_MS,
+} from "../../../pages/investor/portfolio";
 import { useRole } from "../../../context/RoleContext";
 import { ROLES } from "../../../lib/roles";
 import { clearInvestorCache } from "../../../lib/investor/investorData";
@@ -32,7 +34,11 @@ vi.mock("../../../components/PageLayout", () => ({
 
 function mockUseRoleValue(overrides = {}) {
   vi.mocked(useRole).mockReturnValue({
-    user: { id: "u1", email: "investor@fundora.dev", user_metadata: { full_name: "Investor One" } },
+    user: {
+      id: "u1",
+      email: "investor@fundora.dev",
+      user_metadata: { full_name: "Investor One" },
+    },
     profile: null,
     role: ROLES.INVESTOR,
     isAdmin: false,
@@ -80,7 +86,14 @@ const project = (id, title, overrides = {}) => ({
   ...overrides,
 });
 
-const donation = (id, amount, status, project_id, created_at, projOverrides = {}) => ({
+const donation = (
+  id,
+  amount,
+  status,
+  project_id,
+  created_at,
+  projOverrides = {},
+) => ({
   id,
   amount,
   status,
@@ -113,7 +126,9 @@ describe("pages/investor/portfolio", () => {
             categories: ["Climate"],
           }),
           // Pending is ignored for every settled-only metric.
-          donation("d3", 9000, "pending", "p3", "2026-07-01", { title: "Gamma Fund" }),
+          donation("d3", 9000, "pending", "p3", "2026-07-01", {
+            title: "Gamma Fund",
+          }),
         ],
       },
     });
@@ -123,7 +138,9 @@ describe("pages/investor/portfolio", () => {
     await waitFor(() => {
       expect(screen.getByText("Total Invested")).toBeInTheDocument();
     });
-    expect(screen.queryByText("Calculating portfolio stats...")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Calculating portfolio stats..."),
+    ).not.toBeInTheDocument();
 
     // KPI cards (settled only: 6000 + 4000).
     expect(screen.getByText("₹10,000")).toBeInTheDocument(); // Total Invested
@@ -148,7 +165,9 @@ describe("pages/investor/portfolio", () => {
     render(<InvestorPortfolio />);
 
     await waitFor(() => {
-      expect(screen.getByText("You haven't invested in any projects yet.")).toBeInTheDocument();
+      expect(
+        screen.getByText("You haven't invested in any projects yet."),
+      ).toBeInTheDocument();
     });
 
     // No metrics render in the empty state.
@@ -163,14 +182,20 @@ describe("pages/investor/portfolio", () => {
   it("shows the empty state when the user only has pending donations (nothing settled)", async () => {
     mockTables({
       public_donations: {
-        data: [donation("d1", 5000, "pending", "p1", "2026-07-01", { title: "Gamma Fund" })],
+        data: [
+          donation("d1", 5000, "pending", "p1", "2026-07-01", {
+            title: "Gamma Fund",
+          }),
+        ],
       },
     });
 
     render(<InvestorPortfolio />);
 
     await waitFor(() => {
-      expect(screen.getByText("You haven't invested in any projects yet.")).toBeInTheDocument();
+      expect(
+        screen.getByText("You haven't invested in any projects yet."),
+      ).toBeInTheDocument();
     });
     expect(screen.queryByText("Total Invested")).not.toBeInTheDocument();
   });
@@ -183,10 +208,14 @@ describe("pages/investor/portfolio", () => {
     render(<InvestorPortfolio />);
 
     await waitFor(() => {
-      expect(screen.getByText(/Failed to load your portfolio/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Failed to load your portfolio/i),
+      ).toBeInTheDocument();
     });
     expect(screen.getByRole("button", { name: /retry/i })).toBeInTheDocument();
-    expect(screen.queryByText("Calculating portfolio stats...")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Calculating portfolio stats..."),
+    ).not.toBeInTheDocument();
   });
 
   it("recovers after a failed load when Retry is pressed", async () => {
@@ -211,7 +240,9 @@ describe("pages/investor/portfolio", () => {
     render(<InvestorPortfolio />);
 
     await waitFor(() => {
-      expect(screen.getByText(/Failed to load your portfolio/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Failed to load your portfolio/i),
+      ).toBeInTheDocument();
     });
 
     await userEvent.click(screen.getByRole("button", { name: /retry/i }));
@@ -228,19 +259,29 @@ describe("pages/investor/portfolio", () => {
     vi.useFakeTimers();
     try {
       // A query that never settles.
-      m.mockFrom.mockImplementation(() => mockQuery({ data: [], count: 0, error: null }, { hang: true }));
+      m.mockFrom.mockImplementation(() =>
+        mockQuery({ data: [], count: 0, error: null }, { hang: true }),
+      );
 
       render(<InvestorPortfolio />);
-      expect(screen.getByText("Calculating portfolio stats...")).toBeInTheDocument();
+      expect(
+        screen.getByText("Calculating portfolio stats..."),
+      ).toBeInTheDocument();
 
       // Advance past the guard timeout — the spinner must stop.
       await act(async () => {
         await vi.advanceTimersByTimeAsync(PORTFOLIO_TIMEOUT_MS + 1000);
       });
 
-      expect(screen.queryByText("Calculating portfolio stats...")).not.toBeInTheDocument();
-      expect(screen.getByText(/Failed to load your portfolio/i)).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /retry/i })).toBeInTheDocument();
+      expect(
+        screen.queryByText("Calculating portfolio stats..."),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByText(/Failed to load your portfolio/i),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /retry/i }),
+      ).toBeInTheDocument();
     } finally {
       vi.useRealTimers();
     }

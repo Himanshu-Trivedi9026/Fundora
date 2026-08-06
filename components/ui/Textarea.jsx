@@ -1,16 +1,8 @@
 import { forwardRef } from "react";
 
 const Textarea = forwardRef(function Textarea(
-  {
-    label,
-    error,
-    hint,
-    className = "",
-    id,
-    rows = 4,
-    ...props
-  },
-  ref
+  { label, error, hint, className = "", id, rows = 4, ...props },
+  ref,
 ) {
   const inputId = id || props.name || label?.toLowerCase().replace(/\s+/g, "-");
 

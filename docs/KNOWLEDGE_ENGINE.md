@@ -12,10 +12,10 @@ All functions follow the "never throw" pattern and return `{ success: boolean, d
 
 Splits text into overlapping chunks optimised for embedding. This is a pure function with no side effects.
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `chunkSize` | 500 | Maximum characters per chunk |
-| `overlap` | 50 | Character overlap between consecutive chunks |
+| Parameter   | Default | Description                                  |
+| ----------- | ------- | -------------------------------------------- |
+| `chunkSize` | 500     | Maximum characters per chunk                 |
+| `overlap`   | 50      | Character overlap between consecutive chunks |
 
 ### Chunking Algorithm
 
@@ -34,8 +34,8 @@ Splits text into overlapping chunks optimised for embedding. This is a pure func
 {
   chunks: [
     { text: "First chunk content...", index: 0, charStart: 0, charEnd: 487 },
-    { text: "Second chunk content...", index: 1, charStart: 437, charEnd: 924 }
-  ]
+    { text: "Second chunk content...", index: 1, charStart: 437, charEnd: 924 },
+  ];
 }
 ```
 
@@ -60,11 +60,11 @@ Full indexing pipeline for a knowledge article.
 
 ### Constants
 
-| Constant | Value | Description |
-|----------|-------|-------------|
-| `DEFAULT_CHUNK_SIZE` | 500 | Characters per chunk |
-| `DEFAULT_CHUNK_OVERLAP` | 50 | Overlap between chunks |
-| `MAX_CONTENT_LENGTH` | 500,000 | Maximum article size |
+| Constant                | Value   | Description            |
+| ----------------------- | ------- | ---------------------- |
+| `DEFAULT_CHUNK_SIZE`    | 500     | Characters per chunk   |
+| `DEFAULT_CHUNK_OVERLAP` | 50      | Overlap between chunks |
+| `MAX_CONTENT_LENGTH`    | 500,000 | Maximum article size   |
 
 ## Semantic Search
 
@@ -82,12 +82,12 @@ Searches the knowledge base using vector similarity with keyword fallback.
 
 ### Parameters
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `query` | required | Search query text |
-| `category` | null | Optional category filter |
-| `matchCount` | 5 | Maximum results to return |
-| `threshold` | 0.6 | Minimum similarity score (0–1) |
+| Parameter    | Default  | Description                    |
+| ------------ | -------- | ------------------------------ |
+| `query`      | required | Search query text              |
+| `category`   | null     | Optional category filter       |
+| `matchCount` | 5        | Maximum results to return      |
+| `threshold`  | 0.6      | Minimum similarity score (0–1) |
 
 ### Output
 
@@ -98,9 +98,9 @@ Searches the knowledge base using vector similarity with keyword fallback.
     title: "How to Create a Campaign",
     snippet: "Creating a successful campaign starts with...",
     score: 0.845,
-    category: "guide"
-  }
-]
+    category: "guide",
+  },
+];
 ```
 
 ## Keyword Fallback Search
@@ -120,11 +120,11 @@ Retrieves relevant context from multiple sources for AI prompt construction. Thi
 
 ### Source Types
 
-| Entity Type | Search Method | Max Results |
-|-------------|--------------|-------------|
-| `knowledge_article` | `searchKnowledge()` | 5 articles |
-| `campaign` | Keyword search on `campaigns` table | 3 campaigns |
-| `creator` | Keyword search on `creators` table | 3 creators |
+| Entity Type         | Search Method                       | Max Results |
+| ------------------- | ----------------------------------- | ----------- |
+| `knowledge_article` | `searchKnowledge()`                 | 5 articles  |
+| `campaign`          | Keyword search on `campaigns` table | 3 campaigns |
+| `creator`           | Keyword search on `creators` table  | 3 creators  |
 
 ### Token Budget Management
 
@@ -151,11 +151,11 @@ Retrieves relevant context from multiple sources for AI prompt construction. Thi
 
 Full lifecycle management for knowledge articles.
 
-| Action | Description |
-|--------|-------------|
-| `update` | Updates article metadata. If content changes, deletes old embeddings and re-embeds all chunks |
-| `delete` | Removes the article and all associated embeddings from `ai_embeddings` |
-| `archive` | Sets article status to "archived" (soft delete — removed from search but preserved) |
+| Action    | Description                                                                                   |
+| --------- | --------------------------------------------------------------------------------------------- |
+| `update`  | Updates article metadata. If content changes, deletes old embeddings and re-embeds all chunks |
+| `delete`  | Removes the article and all associated embeddings from `ai_embeddings`                        |
+| `archive` | Sets article status to "archived" (soft delete — removed from search but preserved)           |
 
 ### Update Flow (with content change)
 
@@ -172,6 +172,7 @@ Full lifecycle management for knowledge articles.
 3. Audit log the deletion
 
 All lifecycle operations produce audit events:
+
 - `knowledge.article_indexed` — On initial indexing
 - `knowledge.article_update` — On update
 - `knowledge.article_delete` — On deletion
@@ -179,18 +180,18 @@ All lifecycle operations produce audit events:
 
 ## Storage
 
-| Table | Purpose |
-|-------|---------|
-| `knowledge_articles` | Article metadata (title, content, category, tags, status) |
-| `ai_embeddings` | Vector embeddings linked to articles by `entity_type = "knowledge_article"` |
+| Table                | Purpose                                                                     |
+| -------------------- | --------------------------------------------------------------------------- |
+| `knowledge_articles` | Article metadata (title, content, category, tags, status)                   |
+| `ai_embeddings`      | Vector embeddings linked to articles by `entity_type = "knowledge_article"` |
 
 ## Configuration
 
-| Constant | Value | Description |
-|----------|-------|-------------|
-| `DEFAULT_CHUNK_SIZE` | 500 | Characters per embedding chunk |
-| `DEFAULT_CHUNK_OVERLAP` | 50 | Overlap between chunks |
-| `DEFAULT_SEARCH_MATCH_COUNT` | 5 | Default max search results |
-| `DEFAULT_SEARCH_THRESHOLD` | 0.6 | Minimum similarity for semantic search |
-| `MAX_CONTENT_LENGTH` | 500,000 | Maximum article content size |
-| `DEFAULT_MAX_TOKENS` | 2,000 | Token budget for context retrieval |
+| Constant                     | Value   | Description                            |
+| ---------------------------- | ------- | -------------------------------------- |
+| `DEFAULT_CHUNK_SIZE`         | 500     | Characters per embedding chunk         |
+| `DEFAULT_CHUNK_OVERLAP`      | 50      | Overlap between chunks                 |
+| `DEFAULT_SEARCH_MATCH_COUNT` | 5       | Default max search results             |
+| `DEFAULT_SEARCH_THRESHOLD`   | 0.6     | Minimum similarity for semantic search |
+| `MAX_CONTENT_LENGTH`         | 500,000 | Maximum article content size           |
+| `DEFAULT_MAX_TOKENS`         | 2,000   | Token budget for context retrieval     |

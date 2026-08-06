@@ -5,7 +5,7 @@ import VerificationBadge from "../../components/security/VerificationBadge";
 describe("VerificationBadge", () => {
   it("renders nothing for level 0 non-approved", () => {
     const { container } = render(
-      <VerificationBadge level={0} status="pending" />
+      <VerificationBadge level={0} status="pending" />,
     );
     expect(container.innerHTML).toBe("");
   });
@@ -39,14 +39,12 @@ describe("VerificationBadge", () => {
 
   it("applies correct size classes", () => {
     const { rerender } = render(
-      <VerificationBadge level={2} status="approved" size="lg" />
+      <VerificationBadge level={2} status="approved" size="lg" />,
     );
     const badge = screen.getByRole("status");
     expect(badge.className).toContain("px-4");
 
-    rerender(
-      <VerificationBadge level={2} status="approved" size="sm" />
-    );
+    rerender(<VerificationBadge level={2} status="approved" size="sm" />);
     const badgeSm = screen.getByRole("status");
     expect(badgeSm.className).toContain("px-2");
   });

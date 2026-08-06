@@ -42,13 +42,22 @@ describe("Pagination Engine", () => {
 
 describe("Offline Sync Engine", () => {
   it("should process create operations", () => {
-    const operation = { table: "projects", operation: "create", data: { title: "Test" } };
+    const operation = {
+      table: "projects",
+      operation: "create",
+      data: { title: "Test" },
+    };
     expect(operation.operation).toBe("create");
     expect(operation.data.title).toBe("Test");
   });
 
   it("should handle conflict strategies", () => {
-    const strategies = ["client_wins", "server_wins", "last_write_wins", "manual"];
+    const strategies = [
+      "client_wins",
+      "server_wins",
+      "last_write_wins",
+      "manual",
+    ];
     expect(strategies).toContain("last_write_wins");
     expect(strategies).toHaveLength(4);
   });
@@ -56,7 +65,10 @@ describe("Offline Sync Engine", () => {
   it("should track changes since timestamp", () => {
     const since = "2025-01-01T00:00:00Z";
     const changes = { projects: [], campaigns: [] };
-    const totalChanges = Object.values(changes).reduce((sum, arr) => sum + arr.length, 0);
+    const totalChanges = Object.values(changes).reduce(
+      (sum, arr) => sum + arr.length,
+      0,
+    );
 
     expect(totalChanges).toBe(0);
   });
@@ -82,7 +94,12 @@ describe("Offline Sync Engine", () => {
 
 describe("Response Optimizer", () => {
   it("should select fields from objects", () => {
-    const obj = { id: 1, name: "Test", secret: "hidden", nested: { key: "value" } };
+    const obj = {
+      id: 1,
+      name: "Test",
+      secret: "hidden",
+      nested: { key: "value" },
+    };
     const fields = ["id", "name"];
 
     const result = {};
@@ -96,7 +113,10 @@ describe("Response Optimizer", () => {
 
   it("should build paginated response shape", () => {
     const data = [{ id: 1 }];
-    const response = { data, meta: { total: 1, page: 1, pageSize: 20, hasMore: false } };
+    const response = {
+      data,
+      meta: { total: 1, page: 1, pageSize: 20, hasMore: false },
+    };
 
     expect(response.meta.hasMore).toBe(false);
     expect(response.data).toHaveLength(1);

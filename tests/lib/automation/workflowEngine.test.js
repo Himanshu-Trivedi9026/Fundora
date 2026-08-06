@@ -97,7 +97,10 @@ describe("WorkflowEngine", () => {
   describe("createWorkflow", () => {
     it("should create a workflow successfully", async () => {
       supabaseAdmin.from.mockReturnValueOnce(
-        chainResult({ data: { id: "wf-1", name: "Test Workflow", enabled: true }, error: null })
+        chainResult({
+          data: { id: "wf-1", name: "Test Workflow", enabled: true },
+          error: null,
+        }),
       );
 
       const result = await createWorkflow({
@@ -109,25 +112,37 @@ describe("WorkflowEngine", () => {
       expect(result.success).toBe(true);
       expect(result.data.id).toBe("wf-1");
       expect(logAuditEvent).toHaveBeenCalledWith(
-        expect.objectContaining({ eventType: "workflow.created", entityType: "workflows" })
+        expect.objectContaining({
+          eventType: "workflow.created",
+          entityType: "workflows",
+        }),
       );
     });
 
     it("should reject workflow without name", async () => {
-      const result = await createWorkflow({ triggerType: TRIGGER_TYPES.EVENT, createdBy: "user-1" });
+      const result = await createWorkflow({
+        triggerType: TRIGGER_TYPES.EVENT,
+        createdBy: "user-1",
+      });
       expect(result.success).toBe(false);
       expect(result.error).toContain("name is required");
     });
 
     it("should reject workflow with invalid triggerType", async () => {
-      const result = await createWorkflow({ name: "Test", triggerType: "bad", createdBy: "user-1" });
+      const result = await createWorkflow({
+        name: "Test",
+        triggerType: "bad",
+        createdBy: "user-1",
+      });
       expect(result.success).toBe(false);
       expect(result.error).toContain("triggerType must be one of");
     });
 
     it("should validate action types", async () => {
       const result = await createWorkflow({
-        name: "Test", triggerType: TRIGGER_TYPES.EVENT, createdBy: "user-1",
+        name: "Test",
+        triggerType: TRIGGER_TYPES.EVENT,
+        createdBy: "user-1",
         actions: [{ type: "invalid_action", config: {} }],
       });
       expect(result.success).toBe(false);
@@ -136,7 +151,9 @@ describe("WorkflowEngine", () => {
 
     it("should validate condition types", async () => {
       const result = await createWorkflow({
-        name: "Test", triggerType: TRIGGER_TYPES.EVENT, createdBy: "user-1",
+        name: "Test",
+        triggerType: TRIGGER_TYPES.EVENT,
+        createdBy: "user-1",
         conditions: [{ type: "invalid_condition", field: "x", value: 1 }],
       });
       expect(result.success).toBe(false);
@@ -144,7 +161,10 @@ describe("WorkflowEngine", () => {
     });
 
     it("should reject workflow without createdBy", async () => {
-      const result = await createWorkflow({ name: "Test", triggerType: TRIGGER_TYPES.EVENT });
+      const result = await createWorkflow({
+        name: "Test",
+        triggerType: TRIGGER_TYPES.EVENT,
+      });
       expect(result.success).toBe(false);
       expect(result.error).toContain("createdBy is required");
     });
@@ -155,14 +175,21 @@ describe("WorkflowEngine", () => {
   describe("updateWorkflow", () => {
     it("should update workflow fields", async () => {
       supabaseAdmin.from.mockReturnValueOnce(
-        chainResult({ data: { id: "wf-1", name: "Updated Name" }, error: null })
+        chainResult({
+          data: { id: "wf-1", name: "Updated Name" },
+          error: null,
+        }),
       );
 
-      const result = await updateWorkflow("wf-1", { name: "Updated Name" }, "user-1");
+      const result = await updateWorkflow(
+        "wf-1",
+        { name: "Updated Name" },
+        "user-1",
+      );
       expect(result.success).toBe(true);
       expect(result.data.name).toBe("Updated Name");
       expect(logAuditEvent).toHaveBeenCalledWith(
-        expect.objectContaining({ eventType: "workflow.updated" })
+        expect.objectContaining({ eventType: "workflow.updated" }),
       );
     });
 
@@ -176,15 +203,19 @@ describe("WorkflowEngine", () => {
       const mockChain = chainResult({ data: { id: "wf-1" }, error: null });
       supabaseAdmin.from.mockReturnValueOnce(mockChain);
 
-      await updateWorkflow("wf-1", { name: "New", created_by: "hacker", id: "hack-id" }, "user-1");
+      await updateWorkflow(
+        "wf-1",
+        { name: "New", created_by: "hacker", id: "hack-id" },
+        "user-1",
+      );
 
       // The update mock should have been called with only allowed fields
       expect(mockChain.update).toHaveBeenCalledWith(
-        expect.objectContaining({ name: "New" })
+        expect.objectContaining({ name: "New" }),
       );
       // Disallowed fields should not be present
       expect(mockChain.update).not.toHaveBeenCalledWith(
-        expect.objectContaining({ id: "hack-id" })
+        expect.objectContaining({ id: "hack-id" }),
       );
     });
   });
@@ -194,20 +225,22 @@ describe("WorkflowEngine", () => {
   describe("deleteWorkflow", () => {
     it("should delete a workflow", async () => {
       supabaseAdmin.from
-        .mockReturnValueOnce(chainResult({ data: { id: "wf-1", name: "Test" }, error: null }))
+        .mockReturnValueOnce(
+          chainResult({ data: { id: "wf-1", name: "Test" }, error: null }),
+        )
         .mockReturnValueOnce(chainResult({ error: null }));
 
       const result = await deleteWorkflow("wf-1", "user-1");
       expect(result.success).toBe(true);
       expect(result.data.deleted).toBe(true);
       expect(logAuditEvent).toHaveBeenCalledWith(
-        expect.objectContaining({ eventType: "workflow.deleted" })
+        expect.objectContaining({ eventType: "workflow.deleted" }),
       );
     });
 
     it("should handle not found", async () => {
       supabaseAdmin.from.mockReturnValueOnce(
-        chainResult({ data: null, error: { code: "PGRST116" } })
+        chainResult({ data: null, error: { code: "PGRST116" } }),
       );
 
       const result = await deleteWorkflow("wf-missing", "user-1");
@@ -221,25 +254,25 @@ describe("WorkflowEngine", () => {
   describe("enableWorkflow / disableWorkflow", () => {
     it("should enable a workflow", async () => {
       supabaseAdmin.from.mockReturnValueOnce(
-        chainResult({ data: { id: "wf-1", enabled: true }, error: null })
+        chainResult({ data: { id: "wf-1", enabled: true }, error: null }),
       );
 
       const result = await enableWorkflow("wf-1", "user-1");
       expect(result.success).toBe(true);
       expect(logAuditEvent).toHaveBeenCalledWith(
-        expect.objectContaining({ eventType: "workflow.enabled" })
+        expect.objectContaining({ eventType: "workflow.enabled" }),
       );
     });
 
     it("should disable a workflow", async () => {
       supabaseAdmin.from.mockReturnValueOnce(
-        chainResult({ data: { id: "wf-1", enabled: false }, error: null })
+        chainResult({ data: { id: "wf-1", enabled: false }, error: null }),
       );
 
       const result = await disableWorkflow("wf-1", "user-1");
       expect(result.success).toBe(true);
       expect(logAuditEvent).toHaveBeenCalledWith(
-        expect.objectContaining({ eventType: "workflow.disabled" })
+        expect.objectContaining({ eventType: "workflow.disabled" }),
       );
     });
   });
@@ -250,7 +283,7 @@ describe("WorkflowEngine", () => {
     it("should return paginated results with filters", async () => {
       const workflows = [{ id: "wf-1" }, { id: "wf-2" }];
       supabaseAdmin.from.mockReturnValueOnce(
-        chainResult({ data: workflows, error: null, count: 2 })
+        chainResult({ data: workflows, error: null, count: 2 }),
       );
 
       const result = await listWorkflows({
@@ -272,7 +305,7 @@ describe("WorkflowEngine", () => {
   describe("getWorkflow", () => {
     it("should return workflow by ID", async () => {
       supabaseAdmin.from.mockReturnValueOnce(
-        chainResult({ data: { id: "wf-1", name: "Test" }, error: null })
+        chainResult({ data: { id: "wf-1", name: "Test" }, error: null }),
       );
 
       const result = await getWorkflow("wf-1");
@@ -282,7 +315,7 @@ describe("WorkflowEngine", () => {
 
     it("should handle not found", async () => {
       supabaseAdmin.from.mockReturnValueOnce(
-        chainResult({ data: null, error: { code: "PGRST116" } })
+        chainResult({ data: null, error: { code: "PGRST116" } }),
       );
 
       const result = await getWorkflow("wf-missing");
@@ -297,15 +330,19 @@ describe("WorkflowEngine", () => {
     it("should trigger a workflow successfully", async () => {
       supabaseAdmin.from
         // getWorkflow
-        .mockReturnValueOnce(chainResult({
-          data: { id: "wf-1", enabled: true, conditions: [], actions: [] },
-          error: null,
-        }))
+        .mockReturnValueOnce(
+          chainResult({
+            data: { id: "wf-1", enabled: true, conditions: [], actions: [] },
+            error: null,
+          }),
+        )
         // workflow_runs insert
-        .mockReturnValueOnce(chainResult({
-          data: { id: "run-1", status: "running" },
-          error: null,
-        }))
+        .mockReturnValueOnce(
+          chainResult({
+            data: { id: "run-1", status: "running" },
+            error: null,
+          }),
+        )
         // workflow_runs update (status)
         .mockReturnValueOnce(chainResult({ error: null }));
 
@@ -319,7 +356,7 @@ describe("WorkflowEngine", () => {
       expect(result.success).toBe(true);
       expect(result.data.status).toBe("completed");
       expect(logAuditEvent).toHaveBeenCalledWith(
-        expect.objectContaining({ eventType: "workflow.triggered" })
+        expect.objectContaining({ eventType: "workflow.triggered" }),
       );
     });
 
@@ -328,7 +365,7 @@ describe("WorkflowEngine", () => {
         chainResult({
           data: { id: "wf-1", enabled: false, conditions: [], actions: [] },
           error: null,
-        })
+        }),
       );
 
       const result = await triggerWorkflow({
@@ -348,17 +385,23 @@ describe("WorkflowEngine", () => {
     it("should process action types", async () => {
       supabaseAdmin.from
         // workflow_logs insert
-        .mockReturnValueOnce(chainResult({ data: { id: "log-1" }, error: null }))
+        .mockReturnValueOnce(
+          chainResult({ data: { id: "log-1" }, error: null }),
+        )
         // notifications insert
-        .mockReturnValueOnce(chainResult({ data: { id: "notif-1" }, error: null }))
+        .mockReturnValueOnce(
+          chainResult({ data: { id: "notif-1" }, error: null }),
+        )
         // workflow_logs update
         .mockReturnValueOnce(chainResult({ error: null }));
 
       const result = await executeActions({
-        actions: [{
-          type: ACTION_TYPES.SEND_NOTIFICATION,
-          config: { userId: "user-1", title: "Hello", message: "Test" },
-        }],
+        actions: [
+          {
+            type: ACTION_TYPES.SEND_NOTIFICATION,
+            config: { userId: "user-1", title: "Hello", message: "Test" },
+          },
+        ],
         context: { workflowId: "wf-1", runId: "run-1" },
       });
 
@@ -370,7 +413,9 @@ describe("WorkflowEngine", () => {
     it("should fail fast on error", async () => {
       supabaseAdmin.from
         // workflow_logs insert for first action
-        .mockReturnValueOnce(chainResult({ data: { id: "log-1" }, error: null }))
+        .mockReturnValueOnce(
+          chainResult({ data: { id: "log-1" }, error: null }),
+        )
         // workflow_logs update for failed step
         .mockReturnValueOnce(chainResult({ error: null }));
 
@@ -393,7 +438,9 @@ describe("WorkflowEngine", () => {
   describe("evaluateConditions", () => {
     it("should evaluate equals conditions", async () => {
       const result = await evaluateConditions({
-        conditions: [{ type: CONDITION_TYPES.EQUALS, field: "status", value: "active" }],
+        conditions: [
+          { type: CONDITION_TYPES.EQUALS, field: "status", value: "active" },
+        ],
         context: { status: "active" },
       });
       expect(result.success).toBe(true);
@@ -402,13 +449,15 @@ describe("WorkflowEngine", () => {
 
     it("should evaluate AND conditions", async () => {
       const result = await evaluateConditions({
-        conditions: [{
-          type: CONDITION_TYPES.AND,
-          conditions: [
-            { type: CONDITION_TYPES.EQUALS, field: "a", value: 1 },
-            { type: CONDITION_TYPES.EQUALS, field: "b", value: 2 },
-          ],
-        }],
+        conditions: [
+          {
+            type: CONDITION_TYPES.AND,
+            conditions: [
+              { type: CONDITION_TYPES.EQUALS, field: "a", value: 1 },
+              { type: CONDITION_TYPES.EQUALS, field: "b", value: 2 },
+            ],
+          },
+        ],
         context: { a: 1, b: 2 },
       });
       expect(result.success).toBe(true);
@@ -417,13 +466,15 @@ describe("WorkflowEngine", () => {
 
     it("should evaluate OR conditions", async () => {
       const result = await evaluateConditions({
-        conditions: [{
-          type: CONDITION_TYPES.OR,
-          conditions: [
-            { type: CONDITION_TYPES.EQUALS, field: "a", value: 1 },
-            { type: CONDITION_TYPES.EQUALS, field: "b", value: 99 },
-          ],
-        }],
+        conditions: [
+          {
+            type: CONDITION_TYPES.OR,
+            conditions: [
+              { type: CONDITION_TYPES.EQUALS, field: "a", value: 1 },
+              { type: CONDITION_TYPES.EQUALS, field: "b", value: 99 },
+            ],
+          },
+        ],
         context: { a: 1, b: 2 },
       });
       expect(result.success).toBe(true);
@@ -432,7 +483,9 @@ describe("WorkflowEngine", () => {
 
     it("should evaluate greater_than conditions", async () => {
       const result = await evaluateConditions({
-        conditions: [{ type: CONDITION_TYPES.GREATER_THAN, field: "amount", value: 100 }],
+        conditions: [
+          { type: CONDITION_TYPES.GREATER_THAN, field: "amount", value: 100 },
+        ],
         context: { amount: 200 },
       });
       expect(result.success).toBe(true);
@@ -441,7 +494,9 @@ describe("WorkflowEngine", () => {
 
     it("should return matched false when conditions fail", async () => {
       const result = await evaluateConditions({
-        conditions: [{ type: CONDITION_TYPES.EQUALS, field: "x", value: "yes" }],
+        conditions: [
+          { type: CONDITION_TYPES.EQUALS, field: "x", value: "yes" },
+        ],
         context: { x: "no" },
       });
       expect(result.success).toBe(true);
@@ -455,33 +510,48 @@ describe("WorkflowEngine", () => {
     it("should retry a failed run", async () => {
       supabaseAdmin.from
         // 1. Fetch original run
-        .mockReturnValueOnce(chainResult({
-          data: { id: "run-1", status: "failed", workflow_id: "wf-1", trigger_event: "test", input: {} },
-          error: null,
-        }))
+        .mockReturnValueOnce(
+          chainResult({
+            data: {
+              id: "run-1",
+              status: "failed",
+              workflow_id: "wf-1",
+              trigger_event: "test",
+              input: {},
+            },
+            error: null,
+          }),
+        )
         // 2. getWorkflow (inside triggerWorkflow)
-        .mockReturnValueOnce(chainResult({
-          data: { id: "wf-1", enabled: true, conditions: [], actions: [] },
-          error: null,
-        }))
+        .mockReturnValueOnce(
+          chainResult({
+            data: { id: "wf-1", enabled: true, conditions: [], actions: [] },
+            error: null,
+          }),
+        )
         // 3. workflow_runs insert
-        .mockReturnValueOnce(chainResult({
-          data: { id: "run-2", status: "running" },
-          error: null,
-        }))
+        .mockReturnValueOnce(
+          chainResult({
+            data: { id: "run-2", status: "running" },
+            error: null,
+          }),
+        )
         // 4. workflow_runs update (status)
         .mockReturnValueOnce(chainResult({ error: null }));
 
       const result = await retryWorkflowRun("run-1", "user-1");
       expect(result.success).toBe(true);
       expect(logAuditEvent).toHaveBeenCalledWith(
-        expect.objectContaining({ eventType: "workflow.run.retried" })
+        expect.objectContaining({ eventType: "workflow.run.retried" }),
       );
     });
 
     it("should reject retry of non-failed run", async () => {
       supabaseAdmin.from.mockReturnValueOnce(
-        chainResult({ data: { id: "run-1", status: "completed", workflow_id: "wf-1" }, error: null })
+        chainResult({
+          data: { id: "run-1", status: "completed", workflow_id: "wf-1" },
+          error: null,
+        }),
       );
 
       const result = await retryWorkflowRun("run-1", "user-1");
@@ -495,7 +565,10 @@ describe("WorkflowEngine", () => {
   describe("createWorkflowTemplate", () => {
     it("should create a template", async () => {
       supabaseAdmin.from.mockReturnValueOnce(
-        chainResult({ data: { id: "tpl-1", name: "My Template" }, error: null })
+        chainResult({
+          data: { id: "tpl-1", name: "My Template" },
+          error: null,
+        }),
       );
 
       const result = await createWorkflowTemplate({
@@ -508,7 +581,7 @@ describe("WorkflowEngine", () => {
       expect(result.success).toBe(true);
       expect(result.data.id).toBe("tpl-1");
       expect(logAuditEvent).toHaveBeenCalledWith(
-        expect.objectContaining({ eventType: "workflow.template.created" })
+        expect.objectContaining({ eventType: "workflow.template.created" }),
       );
     });
 
@@ -527,23 +600,30 @@ describe("WorkflowEngine", () => {
     it("should instantiate workflow from template", async () => {
       supabaseAdmin.from
         // Fetch template
-        .mockReturnValueOnce(chainResult({
-          data: {
-            id: "tpl-1",
-            name: "Base Template",
-            trigger_type: TRIGGER_TYPES.EVENT,
-            conditions: [],
-            actions: [{ type: ACTION_TYPES.SEND_NOTIFICATION, config: {} }],
-          },
-          error: null,
-        }))
+        .mockReturnValueOnce(
+          chainResult({
+            data: {
+              id: "tpl-1",
+              name: "Base Template",
+              trigger_type: TRIGGER_TYPES.EVENT,
+              conditions: [],
+              actions: [{ type: ACTION_TYPES.SEND_NOTIFICATION, config: {} }],
+            },
+            error: null,
+          }),
+        )
         // createWorkflow insert
-        .mockReturnValueOnce(chainResult({
-          data: { id: "wf-new", name: "Base Template (copy)", enabled: true },
-          error: null,
-        }));
+        .mockReturnValueOnce(
+          chainResult({
+            data: { id: "wf-new", name: "Base Template (copy)", enabled: true },
+            error: null,
+          }),
+        );
 
-      const result = await instantiateFromTemplate({ templateId: "tpl-1", createdBy: "user-1" });
+      const result = await instantiateFromTemplate({
+        templateId: "tpl-1",
+        createdBy: "user-1",
+      });
       expect(result.success).toBe(true);
       expect(result.data.id).toBe("wf-new");
     });
@@ -555,27 +635,43 @@ describe("WorkflowEngine", () => {
     it("should find due workflows and trigger them", async () => {
       supabaseAdmin.from
         // 1. Fetch scheduled workflows
-        .mockReturnValueOnce(chainResult({
-          data: [{
-            id: "wf-sched",
-            enabled: true,
-            trigger_type: TRIGGER_TYPES.SCHEDULE,
-            schedule_config: { intervalMs: 1000, lastRunAt: "2020-01-01T00:00:00Z" },
-            conditions: [],
-            actions: [],
-          }],
-          error: null,
-        }))
+        .mockReturnValueOnce(
+          chainResult({
+            data: [
+              {
+                id: "wf-sched",
+                enabled: true,
+                trigger_type: TRIGGER_TYPES.SCHEDULE,
+                schedule_config: {
+                  intervalMs: 1000,
+                  lastRunAt: "2020-01-01T00:00:00Z",
+                },
+                conditions: [],
+                actions: [],
+              },
+            ],
+            error: null,
+          }),
+        )
         // 2. getWorkflow (inside triggerWorkflow)
-        .mockReturnValueOnce(chainResult({
-          data: { id: "wf-sched", enabled: true, conditions: [], actions: [] },
-          error: null,
-        }))
+        .mockReturnValueOnce(
+          chainResult({
+            data: {
+              id: "wf-sched",
+              enabled: true,
+              conditions: [],
+              actions: [],
+            },
+            error: null,
+          }),
+        )
         // 3. workflow_runs insert
-        .mockReturnValueOnce(chainResult({
-          data: { id: "run-sched", status: "running" },
-          error: null,
-        }))
+        .mockReturnValueOnce(
+          chainResult({
+            data: { id: "run-sched", status: "running" },
+            error: null,
+          }),
+        )
         // 4. workflow_runs update (status)
         .mockReturnValueOnce(chainResult({ error: null }))
         // 5. Update schedule_config lastRunAt
@@ -588,7 +684,9 @@ describe("WorkflowEngine", () => {
     });
 
     it("should return zeros when no workflows are due", async () => {
-      supabaseAdmin.from.mockReturnValueOnce(chainResult({ data: [], error: null }));
+      supabaseAdmin.from.mockReturnValueOnce(
+        chainResult({ data: [], error: null }),
+      );
 
       const result = await processScheduledWorkflows();
       expect(result.success).toBe(true);
@@ -612,7 +710,11 @@ describe("WorkflowEngine Security (CR-2)", () => {
     it("rejects an unknown table (invalid table)", () => {
       const result = validateActionConfig({
         type: ACTION_TYPES.UPDATE_ENTITY,
-        config: { entityType: "auth.users", entityId: "x", updates: { email: "a@b.c" } },
+        config: {
+          entityType: "auth.users",
+          entityId: "x",
+          updates: { email: "a@b.c" },
+        },
       });
       expect(result.valid).toBe(false);
       expect(result.error).toContain("not allowlisted");
@@ -621,17 +723,31 @@ describe("WorkflowEngine Security (CR-2)", () => {
     it("rejects an invalid column for an allowed table", () => {
       const result = validateActionConfig({
         type: ACTION_TYPES.UPDATE_ENTITY,
-        config: { entityType: "public_donations", entityId: "d1", updates: { password_hash: "x" } },
+        config: {
+          entityType: "public_donations",
+          entityId: "d1",
+          updates: { password_hash: "x" },
+        },
       });
       expect(result.valid).toBe(false);
       expect(result.error).toContain("not allowlisted");
     });
 
     it("rejects a forbidden column (role / owner_id / user_id / organization_id)", () => {
-      for (const col of ["role", "owner_id", "creator_id", "user_id", "organization_id"]) {
+      for (const col of [
+        "role",
+        "owner_id",
+        "creator_id",
+        "user_id",
+        "organization_id",
+      ]) {
         const result = validateActionConfig({
           type: ACTION_TYPES.UPDATE_ENTITY,
-          config: { entityType: "public_donations", entityId: "d1", updates: { [col]: "hacked" } },
+          config: {
+            entityType: "public_donations",
+            entityId: "d1",
+            updates: { [col]: "hacked" },
+          },
         });
         expect(result.valid).toBe(false);
         expect(result.error).toContain(col);
@@ -641,7 +757,12 @@ describe("WorkflowEngine Security (CR-2)", () => {
     it("rejects update_status with a forbidden status field", () => {
       const result = validateActionConfig({
         type: ACTION_TYPES.UPDATE_STATUS,
-        config: { entityType: "public_donations", entityId: "d1", statusField: "owner_id", statusValue: "x" },
+        config: {
+          entityType: "public_donations",
+          entityId: "d1",
+          statusField: "owner_id",
+          statusValue: "x",
+        },
       });
       expect(result.valid).toBe(false);
       expect(result.error).toContain("owner_id");
@@ -650,7 +771,12 @@ describe("WorkflowEngine Security (CR-2)", () => {
     it("accepts a valid update on an allowlisted table/column", () => {
       const result = validateActionConfig({
         type: ACTION_TYPES.UPDATE_STATUS,
-        config: { entityType: "public_donations", entityId: "d1", statusField: "status", statusValue: "active" },
+        config: {
+          entityType: "public_donations",
+          entityId: "d1",
+          statusField: "status",
+          statusValue: "active",
+        },
       });
       expect(result.valid).toBe(true);
     });
@@ -673,7 +799,16 @@ describe("WorkflowEngine Security (CR-2)", () => {
         name: "Bad",
         triggerType: TRIGGER_TYPES.EVENT,
         createdBy: "user-1",
-        actions: [{ type: ACTION_TYPES.UPDATE_ENTITY, config: { entityType: "profiles", entityId: "p1", updates: { role: "platform_admin" } } }],
+        actions: [
+          {
+            type: ACTION_TYPES.UPDATE_ENTITY,
+            config: {
+              entityType: "profiles",
+              entityId: "p1",
+              updates: { role: "platform_admin" },
+            },
+          },
+        ],
       });
       expect(result.success).toBe(false);
       expect(result.error).toContain("not allowlisted");
@@ -684,7 +819,16 @@ describe("WorkflowEngine Security (CR-2)", () => {
         name: "Bad",
         triggerType: TRIGGER_TYPES.EVENT,
         createdBy: "user-1",
-        actions: [{ type: ACTION_TYPES.UPDATE_ENTITY, config: { entityType: "public_donations", entityId: "d1", updates: { owner_id: "attacker" } } }],
+        actions: [
+          {
+            type: ACTION_TYPES.UPDATE_ENTITY,
+            config: {
+              entityType: "public_donations",
+              entityId: "d1",
+              updates: { owner_id: "attacker" },
+            },
+          },
+        ],
       });
       expect(result.success).toBe(false);
       expect(result.error).toContain("owner_id");
@@ -696,10 +840,21 @@ describe("WorkflowEngine Security (CR-2)", () => {
   describe("executeActions execution-time enforcement", () => {
     it("fails an action that attempts to update a forbidden column at execution time", async () => {
       // workflow_logs insert
-      supabaseAdmin.from.mockReturnValueOnce(chainResult({ data: { id: "log-1" }, error: null }));
+      supabaseAdmin.from.mockReturnValueOnce(
+        chainResult({ data: { id: "log-1" }, error: null }),
+      );
 
       const result = await executeActions({
-        actions: [{ type: ACTION_TYPES.UPDATE_ENTITY, config: { entityType: "public_donations", entityId: "d1", updates: { owner_id: "attacker" } } }],
+        actions: [
+          {
+            type: ACTION_TYPES.UPDATE_ENTITY,
+            config: {
+              entityType: "public_donations",
+              entityId: "d1",
+              updates: { owner_id: "attacker" },
+            },
+          },
+        ],
         context: { workflowId: "wf-1", runId: "run-1" },
       });
 
@@ -709,10 +864,21 @@ describe("WorkflowEngine Security (CR-2)", () => {
     });
 
     it("fails an action targeting an unknown table at execution time", async () => {
-      supabaseAdmin.from.mockReturnValueOnce(chainResult({ data: { id: "log-1" }, error: null }));
+      supabaseAdmin.from.mockReturnValueOnce(
+        chainResult({ data: { id: "log-1" }, error: null }),
+      );
 
       const result = await executeActions({
-        actions: [{ type: ACTION_TYPES.UPDATE_ENTITY, config: { entityType: "profiles", entityId: "p1", updates: { role: "x" } } }],
+        actions: [
+          {
+            type: ACTION_TYPES.UPDATE_ENTITY,
+            config: {
+              entityType: "profiles",
+              entityId: "p1",
+              updates: { role: "x" },
+            },
+          },
+        ],
         context: { workflowId: "wf-1", runId: "run-1" },
       });
 
@@ -747,7 +913,12 @@ describe("WorkflowEngine Security (CR-2)", () => {
     });
 
     it("blocks private IP ranges (192.168.x, 10.x, 172.16-31.x, link-local)", async () => {
-      for (const host of ["192.168.1.10", "10.0.0.5", "172.20.0.1", "169.254.10.10"]) {
+      for (const host of [
+        "192.168.1.10",
+        "10.0.0.5",
+        "172.20.0.1",
+        "169.254.10.10",
+      ]) {
         const r = await isSafeOutboundUrl(`https://${host}/`);
         expect(r.safe).toBe(false);
         expect(r.reason).toContain("Private");
@@ -761,9 +932,13 @@ describe("WorkflowEngine Security (CR-2)", () => {
     });
 
     it("blocks cloud metadata endpoints (169.254.169.254 and metadata hostnames)", async () => {
-      const r1 = await isSafeOutboundUrl("https://169.254.169.254/latest/meta-data/");
+      const r1 = await isSafeOutboundUrl(
+        "https://169.254.169.254/latest/meta-data/",
+      );
       expect(r1.safe).toBe(false);
-      const r2 = await isSafeOutboundUrl("https://metadata.google.internal/computeMetadata/v1/");
+      const r2 = await isSafeOutboundUrl(
+        "https://metadata.google.internal/computeMetadata/v1/",
+      );
       expect(r2.safe).toBe(false);
     });
 
@@ -773,7 +948,11 @@ describe("WorkflowEngine Security (CR-2)", () => {
     });
 
     it("blocks bracketed IPv6 loopback and unspecified addresses (::1 / ::)", async () => {
-      for (const url of ["https://[::1]/", "https://[::1]:8080/", "https://[::]/"]) {
+      for (const url of [
+        "https://[::1]/",
+        "https://[::1]:8080/",
+        "https://[::]/",
+      ]) {
         const r = await isSafeOutboundUrl(url);
         expect(r.safe, url).toBe(false);
       }
@@ -791,7 +970,11 @@ describe("WorkflowEngine Security (CR-2)", () => {
     });
 
     it("blocks IPv6 link-local (fe80::/10) and unique-local (fc00::/7) addresses", async () => {
-      for (const url of ["https://[fe80::1]/", "https://[fd00::1]/", "https://[fc00::1]/"]) {
+      for (const url of [
+        "https://[fe80::1]/",
+        "https://[fd00::1]/",
+        "https://[fc00::1]/",
+      ]) {
         const r = await isSafeOutboundUrl(url);
         expect(r.safe, url).toBe(false);
       }
@@ -808,36 +991,56 @@ describe("WorkflowEngine Security (CR-2)", () => {
   describe("verifyWorkflowOwnership", () => {
     it("allows the workflow owner", async () => {
       supabaseAdmin.from.mockReturnValueOnce(
-        chainResult({ data: { created_by: "user-1" }, error: null })
+        chainResult({ data: { created_by: "user-1" }, error: null }),
       );
-      const result = await verifyWorkflowOwnership({ workflowId: "wf-1", userId: "user-1" });
+      const result = await verifyWorkflowOwnership({
+        workflowId: "wf-1",
+        userId: "user-1",
+      });
       expect(result.success).toBe(true);
       expect(result.allowed).toBe(true);
     });
 
     it("denies a non-owner", async () => {
       supabaseAdmin.from
-        .mockReturnValueOnce(chainResult({ data: { created_by: "owner-1" }, error: null }))
-        .mockReturnValueOnce(chainResult({ data: { role: "donor" }, error: null }));
-      const result = await verifyWorkflowOwnership({ workflowId: "wf-1", userId: "attacker" });
+        .mockReturnValueOnce(
+          chainResult({ data: { created_by: "owner-1" }, error: null }),
+        )
+        .mockReturnValueOnce(
+          chainResult({ data: { role: "donor" }, error: null }),
+        );
+      const result = await verifyWorkflowOwnership({
+        workflowId: "wf-1",
+        userId: "attacker",
+      });
       expect(result.success).toBe(true);
       expect(result.allowed).toBe(false);
     });
 
     it("allows a platform_admin on someone else's workflow (ownership bypass blocked for non-admins)", async () => {
       supabaseAdmin.from
-        .mockReturnValueOnce(chainResult({ data: { created_by: "owner-1" }, error: null }))
-        .mockReturnValueOnce(chainResult({ data: { role: "platform_admin" }, error: null }));
-      const result = await verifyWorkflowOwnership({ workflowId: "wf-1", userId: "admin-1" });
+        .mockReturnValueOnce(
+          chainResult({ data: { created_by: "owner-1" }, error: null }),
+        )
+        .mockReturnValueOnce(
+          chainResult({ data: { role: "platform_admin" }, error: null }),
+        );
+      const result = await verifyWorkflowOwnership({
+        workflowId: "wf-1",
+        userId: "admin-1",
+      });
       expect(result.success).toBe(true);
       expect(result.allowed).toBe(true);
     });
 
     it("returns not-found for a missing workflow", async () => {
       supabaseAdmin.from.mockReturnValueOnce(
-        chainResult({ data: null, error: { code: "PGRST116" } })
+        chainResult({ data: null, error: { code: "PGRST116" } }),
       );
-      const result = await verifyWorkflowOwnership({ workflowId: "wf-missing", userId: "user-1" });
+      const result = await verifyWorkflowOwnership({
+        workflowId: "wf-missing",
+        userId: "user-1",
+      });
       expect(result.success).toBe(false);
       expect(result.error).toContain("not found");
     });
@@ -847,11 +1050,17 @@ describe("WorkflowEngine Security (CR-2)", () => {
 
   describe("listWorkflows ownership scoping", () => {
     it("scopes results to the requesting user (non-admin)", async () => {
-      const mockChain = chainResult({ data: [{ id: "wf-1" }], error: null, count: 1 });
+      const mockChain = chainResult({
+        data: [{ id: "wf-1" }],
+        error: null,
+        count: 1,
+      });
       supabaseAdmin.from
         // listWorkflows builds the workflows query FIRST, then the profiles lookup
         .mockReturnValueOnce(mockChain) // workflows
-        .mockReturnValueOnce(chainResult({ data: { role: "donor" }, error: null })); // profiles
+        .mockReturnValueOnce(
+          chainResult({ data: { role: "donor" }, error: null }),
+        ); // profiles
 
       const result = await listWorkflows({ userId: "user-1" });
       expect(result.success).toBe(true);
@@ -859,10 +1068,16 @@ describe("WorkflowEngine Security (CR-2)", () => {
     });
 
     it("does not scope results for a platform_admin", async () => {
-      const mockChain = chainResult({ data: [{ id: "wf-1" }], error: null, count: 1 });
+      const mockChain = chainResult({
+        data: [{ id: "wf-1" }],
+        error: null,
+        count: 1,
+      });
       supabaseAdmin.from
         .mockReturnValueOnce(mockChain) // workflows
-        .mockReturnValueOnce(chainResult({ data: { role: "platform_admin" }, error: null })); // profiles
+        .mockReturnValueOnce(
+          chainResult({ data: { role: "platform_admin" }, error: null }),
+        ); // profiles
 
       const result = await listWorkflows({ userId: "admin-1" });
       expect(result.success).toBe(true);

@@ -6,9 +6,21 @@ import { motion } from "framer-motion";
 
 const STATUS_STYLES = {
   draft: { bg: "bg-gray-700", text: "text-gray-300", label: "Draft" },
-  pending: { bg: "bg-yellow-900/40", text: "text-yellow-400", label: "Pending" },
-  processing: { bg: "bg-blue-900/40", text: "text-blue-400", label: "Processing" },
-  completed: { bg: "bg-green-900/40", text: "text-green-400", label: "Completed" },
+  pending: {
+    bg: "bg-yellow-900/40",
+    text: "text-yellow-400",
+    label: "Pending",
+  },
+  processing: {
+    bg: "bg-blue-900/40",
+    text: "text-blue-400",
+    label: "Processing",
+  },
+  completed: {
+    bg: "bg-green-900/40",
+    text: "text-green-400",
+    label: "Completed",
+  },
   failed: { bg: "bg-red-900/40", text: "text-red-400", label: "Failed" },
   cancelled: { bg: "bg-gray-800", text: "text-gray-500", label: "Cancelled" },
 };
@@ -59,7 +71,8 @@ export default function PayoutHistory({ requests = [] }) {
       <div className="divide-y divide-gray-800/50">
         {requests.map((req, idx) => {
           const status = STATUS_STYLES[req.status] || STATUS_STYLES.draft;
-          const priority = PRIORITY_STYLES[req.priority] || PRIORITY_STYLES.normal;
+          const priority =
+            PRIORITY_STYLES[req.priority] || PRIORITY_STYLES.normal;
 
           return (
             <motion.div
@@ -71,7 +84,9 @@ export default function PayoutHistory({ requests = [] }) {
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-3">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${status.bg} ${status.text}`}>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${status.bg} ${status.text}`}
+                  >
                     {status.label}
                   </span>
                   {req.priority && req.priority !== "normal" && (
@@ -80,21 +95,29 @@ export default function PayoutHistory({ requests = [] }) {
                     </span>
                   )}
                 </div>
-                <span className="text-gray-500 text-xs">{formatDate(req.created_at)}</span>
+                <span className="text-gray-500 text-xs">
+                  {formatDate(req.created_at)}
+                </span>
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <p className="text-gray-400 text-xs">Amount</p>
-                  <p className="text-white font-semibold">{formatCurrency(req.amount)}</p>
+                  <p className="text-white font-semibold">
+                    {formatCurrency(req.amount)}
+                  </p>
                 </div>
                 <div>
                   <p className="text-gray-400 text-xs">Fee</p>
-                  <p className="text-orange-400 font-semibold">{formatCurrency(req.fee_amount)}</p>
+                  <p className="text-orange-400 font-semibold">
+                    {formatCurrency(req.fee_amount)}
+                  </p>
                 </div>
                 <div>
                   <p className="text-gray-400 text-xs">Net Amount</p>
-                  <p className="text-green-400 font-semibold">{formatCurrency(req.net_amount)}</p>
+                  <p className="text-green-400 font-semibold">
+                    {formatCurrency(req.net_amount)}
+                  </p>
                 </div>
               </div>
 

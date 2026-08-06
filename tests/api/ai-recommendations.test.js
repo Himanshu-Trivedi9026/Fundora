@@ -27,7 +27,11 @@ vi.mock("@/lib/ai/recommendationEngine.js", () => ({
 import handler from "@/pages/api/ai/recommendations.js";
 import { getRecommendations } from "@/lib/ai/recommendationEngine.js";
 
-function createMockReq(method = "GET", query = {}, user = { id: "test-user-id" }) {
+function createMockReq(
+  method = "GET",
+  query = {},
+  user = { id: "test-user-id" },
+) {
   return { method, body: {}, user, query };
 }
 
@@ -60,10 +64,10 @@ describe("GET /api/ai/recommendations", () => {
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ campaigns: expect.any(Array) })
+      expect.objectContaining({ campaigns: expect.any(Array) }),
     );
     expect(getRecommendations).toHaveBeenCalledWith(
-      expect.objectContaining({ type: "trending" })
+      expect.objectContaining({ type: "trending" }),
     );
   });
 
@@ -75,7 +79,7 @@ describe("GET /api/ai/recommendations", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ error: expect.stringContaining("type") })
+      expect.objectContaining({ error: expect.stringContaining("type") }),
     );
   });
 
@@ -87,7 +91,7 @@ describe("GET /api/ai/recommendations", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ error: expect.stringContaining("type") })
+      expect.objectContaining({ error: expect.stringContaining("type") }),
     );
   });
 
@@ -102,7 +106,10 @@ describe("GET /api/ai/recommendations", () => {
   });
 
   it("should return 400 when engine fails", async () => {
-    getRecommendations.mockResolvedValueOnce({ success: false, error: "Service unavailable" });
+    getRecommendations.mockResolvedValueOnce({
+      success: false,
+      error: "Service unavailable",
+    });
 
     const req = createMockReq("GET", { type: "campaigns_for_donor" });
     const res = createMockRes();

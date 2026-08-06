@@ -11,7 +11,8 @@ async function handler(req, res) {
 
   try {
     const { deploymentId } = req.body;
-    if (!deploymentId) return res.status(400).json({ error: "deploymentId is required" });
+    if (!deploymentId)
+      return res.status(400).json({ error: "deploymentId is required" });
 
     // Get the deployment to rollback
     const { data: deployment, error: fetchError } = await supabaseAdmin
@@ -30,7 +31,8 @@ async function handler(req, res) {
       .update({ status: "rolled_back", rollback: true })
       .eq("id", deploymentId);
 
-    if (updateError) return res.status(500).json({ error: updateError.message });
+    if (updateError)
+      return res.status(500).json({ error: updateError.message });
 
     await logAuditEvent({
       action: "deployment.rolled_back",

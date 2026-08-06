@@ -28,7 +28,11 @@ export default withAuth(async function handler(req, res, user) {
       }
 
       if (key) {
-        const result = await getOrganizationSetting(organizationId, key, user.id);
+        const result = await getOrganizationSetting(
+          organizationId,
+          key,
+          user.id,
+        );
         if (!result.success) {
           return res.status(500).json({ error: result.error });
         }
@@ -54,10 +58,17 @@ export default withAuth(async function handler(req, res, user) {
       const { organizationId, key, value, description } = req.body;
 
       if (!organizationId || !key) {
-        return res.status(400).json({ error: "organizationId and key are required" });
+        return res
+          .status(400)
+          .json({ error: "organizationId and key are required" });
       }
 
-      const result = await setOrganizationSetting(organizationId, key, value, user.id);
+      const result = await setOrganizationSetting(
+        organizationId,
+        key,
+        value,
+        user.id,
+      );
       if (!result.success) {
         return res.status(400).json({ error: result.error });
       }

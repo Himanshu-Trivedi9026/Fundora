@@ -36,7 +36,12 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 // ---- Helpers ----
 
-function createReq({ method = "GET", query = {}, body = {}, token = "token-1" } = {}) {
+function createReq({
+  method = "GET",
+  query = {},
+  body = {},
+  token = "token-1",
+} = {}) {
   return {
     method,
     query,
@@ -88,7 +93,10 @@ function authAs(userId) {
 }
 
 function authNone() {
-  supabaseAdmin.auth.getUser.mockResolvedValue({ data: { user: null }, error: null });
+  supabaseAdmin.auth.getUser.mockResolvedValue({
+    data: { user: null },
+    error: null,
+  });
 }
 
 const ME = "user-me";
@@ -103,29 +111,52 @@ describe("Export Engine Security (CR-5)", () => {
   describe("Route authorization", () => {
     it("rejects anonymous POST with 401", async () => {
       const res = createRes();
-      await exportsHandler(createReq({ method: "POST", body: { source: "projects", format: "csv" }, token: null }), res);
+      await exportsHandler(
+        createReq({
+          method: "POST",
+          body: { source: "projects", format: "csv" },
+          token: null,
+        }),
+        res,
+      );
       expect(res.status).toHaveBeenCalledWith(401);
     });
 
     it("rejects anonymous GET with 401", async () => {
       const res = createRes();
-      await exportsHandler(createReq({ method: "GET", query: {}, token: null }), res);
+      await exportsHandler(
+        createReq({ method: "GET", query: {}, token: null }),
+        res,
+      );
       expect(res.status).toHaveBeenCalledWith(401);
     });
   });
 
   describe("exportData", () => {
     it("rejects an invalid (non-allowlisted) resource", async () => {
-      const result = await exportData({ format: "csv", source: "totally_made_up", createdBy: ME });
+      const result = await exportData({
+        format: "csv",
+        source: "totally_made_up",
+        createdBy: ME,
+      });
       expect(result.success).toBe(false);
       expect(result.error).toContain("Unknown export source");
       expect(supabaseAdmin.from).not.toHaveBeenCalled();
     });
 
     it("rejects a forbidden resource (auth.users, api_keys, users, secrets)", async () => {
-      for (const source of ["auth.users", "api_keys", "users", "user_secrets"]) {
+      for (const source of [
+        "auth.users",
+        "api_keys",
+        "users",
+        "user_secrets",
+      ]) {
         supabaseAdmin.from.mockClear();
-        const result = await exportData({ format: "csv", source, createdBy: ME });
+        const result = await exportData({
+          format: "csv",
+          source,
+          createdBy: ME,
+        });
         expect(result.success).toBe(false);
         expect(result.error).toContain("not exportable");
         expect(supabaseAdmin.from).not.toHaveBeenCalled();
@@ -148,12 +179,18 @@ describe("Export Engine Security (CR-5)", () => {
         return chain;
       });
 
-      const result = await exportData({ format: "json", source: "projects", createdBy: ME });
+      const result = await exportData({
+        format: "json",
+        source: "projects",
+        createdBy: ME,
+      });
       expect(result.success).toBe(true);
       // Ownership filter was applied on the caller's own rows.
       expect(supabaseAdmin.from).toHaveBeenCalledWith("projects");
       // projects has multi-column ownership → scoped via .or(...).
-      expect(chain.or).toHaveBeenCalledWith("owner_id.eq.user-me,creator_id.eq.user-me");
+      expect(chain.or).toHaveBeenCalledWith(
+        "owner_id.eq.user-me,creator_id.eq.user-me",
+      );
     });
 
     it("denies another user's export (query is scoped to that user, never unfiltered)", async () => {
@@ -166,10 +203,16 @@ describe("Export Engine Security (CR-5)", () => {
         return chain;
       });
 
-      const result = await exportData({ format: "json", source: "projects", createdBy: OTHER });
+      const result = await exportData({
+        format: "json",
+        source: "projects",
+        createdBy: OTHER,
+      });
       expect(result.success).toBe(true);
       const chain = supabaseAdmin.from.mock.results[0].value;
-      expect(chain.or).toHaveBeenCalledWith("owner_id.eq.user-other,creator_id.eq.user-other");
+      expect(chain.or).toHaveBeenCalledWith(
+        "owner_id.eq.user-other,creator_id.eq.user-other",
+      );
     });
 
     it("scopes single-ownership resources (campaigns) to the caller via eq", async () => {
@@ -179,7 +222,11 @@ describe("Export Engine Security (CR-5)", () => {
         return chain;
       });
 
-      const result = await exportData({ format: "json", source: "campaigns", createdBy: ME });
+      const result = await exportData({
+        format: "json",
+        source: "campaigns",
+        createdBy: ME,
+      });
       expect(result.success).toBe(true);
       const chain = supabaseAdmin.from.mock.results[0].value;
       expect(chain.eq).toHaveBeenCalledWith("creator_id", ME);
@@ -190,7 +237,12 @@ describe("Export Engine Security (CR-5)", () => {
     it("rejects creating an export template for a forbidden/invalid resource", async () => {
       for (const source of ["users", "auth.users", "made_up"]) {
         supabaseAdmin.from.mockClear();
-        const result = await createExportTemplate({ name: "T", source, format: "csv", createdBy: ME });
+        const result = await createExportTemplate({
+          name: "T",
+          source,
+          format: "csv",
+          createdBy: ME,
+        });
         expect(result.success).toBe(false);
         expect(result.error).toContain("not exportable");
         expect(supabaseAdmin.from).not.toHaveBeenCalled();
@@ -198,7 +250,12 @@ describe("Export Engine Security (CR-5)", () => {
     });
 
     it("rejects scheduling an export for a forbidden resource", async () => {
-      const result = await scheduleExport({ name: "S", source: "secrets", format: "csv", createdBy: ME });
+      const result = await scheduleExport({
+        name: "S",
+        source: "secrets",
+        format: "csv",
+        createdBy: ME,
+      });
       expect(result.success).toBe(false);
       expect(supabaseAdmin.from).not.toHaveBeenCalled();
     });
@@ -215,7 +272,12 @@ describe("Export Engine Security (CR-5)", () => {
   describe("Allowlists are strict", () => {
     it("only exposes known, ownership-scoped resources", () => {
       expect(Object.keys(EXPORTABLE_SOURCES)).toEqual(
-        expect.arrayContaining(["projects", "campaigns", "profiles", "notifications"])
+        expect.arrayContaining([
+          "projects",
+          "campaigns",
+          "profiles",
+          "notifications",
+        ]),
       );
       for (const resource of Object.values(EXPORTABLE_SOURCES)) {
         expect(resource.ownership.length).toBeGreaterThan(0);
@@ -224,7 +286,17 @@ describe("Export Engine Security (CR-5)", () => {
     });
 
     it("forbids all sensitive/admin/internal sources", () => {
-      for (const s of ["auth.users", "users", "api_keys", "secrets", "audit_logs", "verification_otp", "api_logs", "export_jobs", "policies"]) {
+      for (const s of [
+        "auth.users",
+        "users",
+        "api_keys",
+        "secrets",
+        "audit_logs",
+        "verification_otp",
+        "api_logs",
+        "export_jobs",
+        "policies",
+      ]) {
         expect(FORBIDDEN_SOURCES).toContain(s);
         expect(EXPORTABLE_SOURCES[s]).toBeUndefined();
       }

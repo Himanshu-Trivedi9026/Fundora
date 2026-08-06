@@ -6,7 +6,10 @@
 
 import { withAuth } from "../../../lib/withAuth";
 import { rateLimit } from "../../../lib/rateLimit";
-import { getPayoutRequest, getPayoutHistory } from "../../../lib/payout/payoutEngine";
+import {
+  getPayoutRequest,
+  getPayoutHistory,
+} from "../../../lib/payout/payoutEngine";
 import { logError } from "../../../lib/verification/secureLogger";
 
 const rl = rateLimit({ windowMs: 60_000, max: 10 });
@@ -19,7 +22,11 @@ export default withAuth(async function handler(req, res, user) {
       const { payoutRequestId, mode, limit, offset } = req.query;
 
       if (mode === "history") {
-        const result = await getPayoutHistory(user.id, parseInt(limit, 10) || 20, parseInt(offset, 10) || 0);
+        const result = await getPayoutHistory(
+          user.id,
+          parseInt(limit, 10) || 20,
+          parseInt(offset, 10) || 0,
+        );
         if (!result.success) {
           return res.status(500).json({ error: result.error });
         }
@@ -45,7 +52,9 @@ export default withAuth(async function handler(req, res, user) {
         return res.status(200).json({ success: true, request: safe });
       }
 
-      return res.status(400).json({ error: "payoutRequestId or mode=history is required" });
+      return res
+        .status(400)
+        .json({ error: "payoutRequestId or mode=history is required" });
     } catch (err) {
       logError("PayoutStatusAPI", "GET error", { error: err.message });
       return res.status(500).json({ error: "Failed to fetch payout status" });

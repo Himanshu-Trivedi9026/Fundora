@@ -4,12 +4,11 @@ import { useDropzone } from "react-dropzone";
 import { motion } from "framer-motion";
 
 export default function MediaUploader({ mediaFiles, setMediaFiles }) {
-
   const onDrop = useCallback(
     (acceptedFiles) => {
       setMediaFiles([...mediaFiles, ...acceptedFiles]);
     },
-    [mediaFiles, setMediaFiles]
+    [mediaFiles, setMediaFiles],
   );
 
   const removeFile = (index) => {
@@ -30,14 +29,23 @@ export default function MediaUploader({ mediaFiles, setMediaFiles }) {
             : "border-outline-variant hover:border-primary/50 bg-surface-container-lowest/50"
         }`}
       >
-        <input id="media-upload" {...getInputProps()} aria-label="Upload media files" />
+        <input
+          id="media-upload"
+          {...getInputProps()}
+          aria-label="Upload media files"
+        />
 
         <div className="flex flex-col items-center gap-2 text-center">
-          <span className="material-symbols-outlined text-[32px] text-on-surface-variant group-hover:text-primary transition-colors" aria-hidden="true">
+          <span
+            className="material-symbols-outlined text-[32px] text-on-surface-variant group-hover:text-primary transition-colors"
+            aria-hidden="true"
+          >
             cloud_upload
           </span>
           {isDragActive ? (
-            <p className="text-primary text-sm font-inter">Drop files here...</p>
+            <p className="text-primary text-sm font-inter">
+              Drop files here...
+            </p>
           ) : (
             <>
               <p className="text-on-surface-variant text-sm font-inter">
@@ -62,12 +70,15 @@ export default function MediaUploader({ mediaFiles, setMediaFiles }) {
               className="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low border border-outline-variant/50 group"
             >
               <div className="flex items-center gap-2 overflow-hidden">
-                <span className="material-symbols-outlined text-[16px] text-on-surface-variant flex-shrink-0" aria-hidden="true">
+                <span
+                  className="material-symbols-outlined text-[16px] text-on-surface-variant flex-shrink-0"
+                  aria-hidden="true"
+                >
                   {file.type?.startsWith("image")
                     ? "image"
                     : file.type?.startsWith("video")
-                    ? "videocam"
-                    : "description"}
+                      ? "videocam"
+                      : "description"}
                 </span>
                 <span className="text-xs text-on-surface-variant font-inter truncate">
                   {file.name}
@@ -78,7 +89,10 @@ export default function MediaUploader({ mediaFiles, setMediaFiles }) {
                 className="text-on-surface-variant/50 hover:text-red-400 transition-colors flex-shrink-0 ml-1"
                 aria-label={`Remove ${file.name}`}
               >
-                <span className="material-symbols-outlined text-[14px]" aria-hidden="true">
+                <span
+                  className="material-symbols-outlined text-[14px]"
+                  aria-hidden="true"
+                >
                   close
                 </span>
               </button>

@@ -38,7 +38,9 @@ vi.mock("../../lib/verification/storage", async (importActual) => {
   const actual = await importActual();
   return {
     ...actual,
-    generateStoragePath: vi.fn(() => "user-1/identity/1700000000000-a1b2c3d4.jpg"),
+    generateStoragePath: vi.fn(
+      () => "user-1/identity/1700000000000-a1b2c3d4.jpg",
+    ),
     getStorageFolder: vi.fn(() => "identity"),
     deleteDocument: vi.fn(async (path) => {
       __shared.removes.push(path);
@@ -54,7 +56,9 @@ vi.mock("../../lib/verification/storage", async (importActual) => {
       const { storage_path, storage_bucket, ...rest } = doc || {};
       return {
         ...rest,
-        document_name: doc?.document_name ? `***${doc.document_name.slice(-4)}` : null,
+        document_name: doc?.document_name
+          ? `***${doc.document_name.slice(-4)}`
+          : null,
       };
     }),
   };
@@ -134,7 +138,10 @@ vi.mock("../../lib/supabaseAdmin", () => {
         if (table === "verification_documents") {
           if (this._payload) {
             if (opts.insertError) {
-              return Promise.resolve({ data: null, error: { message: "insert failed" } });
+              return Promise.resolve({
+                data: null,
+                error: { message: "insert failed" },
+              });
             }
             return Promise.resolve({
               data: { id: "doc-1", ...this._payload },
@@ -143,7 +150,7 @@ vi.mock("../../lib/supabaseAdmin", () => {
           }
           if (this._query.document_type) {
             const found = opts.documents.find(
-              (d) => d.document_type === this._query.document_type
+              (d) => d.document_type === this._query.document_type,
             );
             return Promise.resolve({ data: found || null, error: null });
           }
@@ -165,7 +172,9 @@ vi.mock("../../lib/supabaseAdmin", () => {
   };
 
   const supabaseAdmin = {
-    auth: { getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }) },
+    auth: {
+      getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
+    },
     storage: {
       from: vi.fn(() => ({
         upload: vi.fn(async (path, buffer) => {
@@ -179,7 +188,10 @@ vi.mock("../../lib/supabaseAdmin", () => {
         }),
         createSignedUrl: vi.fn(async (path, seconds) => {
           __shared.signedUrls.push({ path, seconds });
-          return { data: { signedUrl: "https://signed.example/doc" }, error: null };
+          return {
+            data: { signedUrl: "https://signed.example/doc" },
+            error: null,
+          };
         }),
       })),
     },
@@ -196,7 +208,10 @@ function mockReq(method = "GET", body = {}, query = {}) {
 }
 
 function mockRes() {
-  const res = { status: vi.fn().mockReturnThis(), json: vi.fn().mockReturnThis() };
+  const res = {
+    status: vi.fn().mockReturnThis(),
+    json: vi.fn().mockReturnThis(),
+  };
   return res;
 }
 
@@ -235,7 +250,10 @@ describe("API — Verification Documents", () => {
 
   it("POST rejects missing documentType", async () => {
     const parse = await import("../../lib/api/parseMultipartFile");
-    parse.parseMultipartFile.mockResolvedValue({ fields: {}, files: [PAN_FILE] });
+    parse.parseMultipartFile.mockResolvedValue({
+      fields: {},
+      files: [PAN_FILE],
+    });
     const res = mockRes();
     await handler(mockReq("POST"), res, { id: "user-1" });
     expect(res.status).toHaveBeenCalledWith(400);
@@ -275,10 +293,14 @@ describe("API — Verification Documents", () => {
     await handler(mockReq("POST"), res, { id: "user-1" });
 
     expect(res.status).toHaveBeenCalledWith(201);
-    const insert = __shared.inserts.find((i) => i.table === "verification_documents");
+    const insert = __shared.inserts.find(
+      (i) => i.table === "verification_documents",
+    );
     expect(insert).toBeTruthy();
     // Real, unmasked path persisted.
-    expect(insert.payload.storage_path).toBe("user-1/identity/1700000000000-a1b2c3d4.jpg");
+    expect(insert.payload.storage_path).toBe(
+      "user-1/identity/1700000000000-a1b2c3d4.jpg",
+    );
     expect(insert.payload.storage_path).not.toContain("***");
     expect(insert.payload.user_id).toBe("user-1");
     expect(insert.payload.verification_id).toBe("verify-1");
@@ -302,7 +324,8 @@ describe("API — Verification Documents", () => {
     await handler(mockReq("POST"), res, { id: "user-1" });
 
     const backstop = __shared.inserts.find(
-      (i) => i.table === "creator_verifications" && i.payload.user_id === "user-1"
+      (i) =>
+        i.table === "creator_verifications" && i.payload.user_id === "user-1",
     );
     expect(backstop).toBeTruthy();
     // Mirrors migration-001 trigger exactly.
@@ -317,7 +340,13 @@ describe("API — Verification Documents", () => {
   it("POST blocks when the document type is already verified", async () => {
     state.setCv({ id: "verify-1" });
     state.opts.documents = [
-      { id: "doc-verified", user_id: "user-1", document_type: "pan_card", storage_path: "old/path.jpg", status: "verified" },
+      {
+        id: "doc-verified",
+        user_id: "user-1",
+        document_type: "pan_card",
+        storage_path: "old/path.jpg",
+        status: "verified",
+      },
     ];
     const parse = await import("../../lib/api/parseMultipartFile");
     parse.parseMultipartFile.mockResolvedValue({
@@ -335,7 +364,13 @@ describe("API — Verification Documents", () => {
   it("POST replaces a pending document (deletes old object + row, inserts new)", async () => {
     state.setCv({ id: "verify-1" });
     state.opts.documents = [
-      { id: "doc-pending", user_id: "user-1", document_type: "pan_card", storage_path: "old/path.jpg", status: "uploaded" },
+      {
+        id: "doc-pending",
+        user_id: "user-1",
+        document_type: "pan_card",
+        storage_path: "old/path.jpg",
+        status: "uploaded",
+      },
     ];
     const parse = await import("../../lib/api/parseMultipartFile");
     parse.parseMultipartFile.mockResolvedValue({
@@ -350,7 +385,9 @@ describe("API — Verification Documents", () => {
     // Old storage object removed.
     expect(__shared.removes).toContain("old/path.jpg");
     // Old row deleted.
-    expect(__shared.deletes.some((d) => d.query.id === "doc-pending")).toBe(true);
+    expect(__shared.deletes.some((d) => d.query.id === "doc-pending")).toBe(
+      true,
+    );
     const jsonBody = res.json.mock.calls[0][0];
     expect(jsonBody.document.replaced).toBe(true);
   });
@@ -369,7 +406,9 @@ describe("API — Verification Documents", () => {
 
     expect(res.status).toHaveBeenCalledWith(500);
     // The just-uploaded object was cleaned up (not orphaned).
-    expect(__shared.removes).toContain("user-1/identity/1700000000000-a1b2c3d4.jpg");
+    expect(__shared.removes).toContain(
+      "user-1/identity/1700000000000-a1b2c3d4.jpg",
+    );
   });
 
   it("POST upload error returns 500 and persists nothing", async () => {
@@ -386,7 +425,7 @@ describe("API — Verification Documents", () => {
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(
-      __shared.inserts.some((i) => i.table === "verification_documents")
+      __shared.inserts.some((i) => i.table === "verification_documents"),
     ).toBe(false);
   });
 
@@ -411,7 +450,9 @@ describe("API — Verification Documents", () => {
     expect(jsonBody.documents.length).toBe(1);
     expect(jsonBody.documents[0].signedUrl).toBe("https://signed.example/doc");
     expect(JSON.stringify(jsonBody)).not.toContain("storage_path");
-    expect(JSON.stringify(jsonBody)).not.toContain("user-1/identity/secret.jpg");
+    expect(JSON.stringify(jsonBody)).not.toContain(
+      "user-1/identity/secret.jpg",
+    );
   });
 
   it("DELETE own document removes storage object and row", async () => {
@@ -420,7 +461,9 @@ describe("API — Verification Documents", () => {
     ];
 
     const res = mockRes();
-    await handler(mockReq("DELETE", {}, { documentId: "doc-1" }), res, { id: "user-1" });
+    await handler(mockReq("DELETE", {}, { documentId: "doc-1" }), res, {
+      id: "user-1",
+    });
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(__shared.removes).toContain("user-1/identity/a.jpg");
@@ -429,11 +472,17 @@ describe("API — Verification Documents", () => {
 
   it("DELETE another user's document is forbidden", async () => {
     state.opts.documents = [
-      { id: "doc-other", user_id: "user-2", storage_path: "user-2/identity/a.jpg" },
+      {
+        id: "doc-other",
+        user_id: "user-2",
+        storage_path: "user-2/identity/a.jpg",
+      },
     ];
 
     const res = mockRes();
-    await handler(mockReq("DELETE", {}, { documentId: "doc-other" }), res, { id: "user-1" });
+    await handler(mockReq("DELETE", {}, { documentId: "doc-other" }), res, {
+      id: "user-1",
+    });
 
     expect(res.status).toHaveBeenCalledWith(403);
     expect(__shared.removes.length).toBe(0);
@@ -447,7 +496,9 @@ describe("API — Verification Documents", () => {
 
   it("DELETE unknown document returns 404", async () => {
     const res = mockRes();
-    await handler(mockReq("DELETE", {}, { documentId: "nope" }), res, { id: "user-1" });
+    await handler(mockReq("DELETE", {}, { documentId: "nope" }), res, {
+      id: "user-1",
+    });
     expect(res.status).toHaveBeenCalledWith(404);
   });
 });

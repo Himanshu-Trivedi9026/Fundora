@@ -30,7 +30,10 @@ vi.mock("@/lib/payout/payoutEngine", () => ({
 }));
 
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { createPayoutRequest, getCreatorBalance } from "@/lib/payout/payoutEngine";
+import {
+  createPayoutRequest,
+  getCreatorBalance,
+} from "@/lib/payout/payoutEngine";
 import handler from "@/pages/api/payout";
 
 const USER = { id: "creator-1", email: "creator@test.com" };
@@ -60,13 +63,14 @@ describe("/api/payout", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    supabaseAdmin.auth.getUser.mockResolvedValue({ data: { user: USER }, error: null });
-    supabaseAdmin.from
-      .mockReset()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
-      });
+    supabaseAdmin.auth.getUser.mockResolvedValue({
+      data: { user: USER },
+      error: null,
+    });
+    supabaseAdmin.from.mockReset().mockReturnValueOnce({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
+    });
     mockVerificationMaybeSingle.mockResolvedValue({
       data: { verification_status: "approved" },
       error: null,
@@ -86,7 +90,7 @@ describe("/api/payout", () => {
         bankAccountId: "bank-1",
         amount: 1000,
       }),
-      res
+      res,
     );
 
     expect(res.status).toHaveBeenCalledWith(403);
@@ -107,7 +111,7 @@ describe("/api/payout", () => {
         bankAccountId: "bank-1",
         amount: 1000,
       }),
-      res
+      res,
     );
 
     expect(res.status).toHaveBeenCalledWith(403);
@@ -127,7 +131,7 @@ describe("/api/payout", () => {
         bankAccountId: "bank-1",
         amount: 1000,
       }),
-      res
+      res,
     );
 
     expect(res.status).toHaveBeenCalledWith(201);
@@ -150,7 +154,10 @@ describe("/api/payout", () => {
   });
 
   it("returns 401 for a guest", async () => {
-    supabaseAdmin.auth.getUser.mockResolvedValue({ data: { user: null }, error: null });
+    supabaseAdmin.auth.getUser.mockResolvedValue({
+      data: { user: null },
+      error: null,
+    });
     const res = createRes();
 
     await handler(
@@ -159,7 +166,7 @@ describe("/api/payout", () => {
         bankAccountId: "bank-1",
         amount: 1000,
       }),
-      res
+      res,
     );
 
     expect(res.status).toHaveBeenCalledWith(401);
@@ -171,7 +178,10 @@ describe("/api/payout", () => {
       data: { verification_status: "pending" },
       error: null,
     });
-    getCreatorBalance.mockResolvedValue({ success: true, balance: { available: 500 } });
+    getCreatorBalance.mockResolvedValue({
+      success: true,
+      balance: { available: 500 },
+    });
     const res = createRes();
 
     await handler(createReq("GET", {}, { mode: "balance" }), res);

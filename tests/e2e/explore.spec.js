@@ -11,7 +11,11 @@ test.describe("Explore Page Layout", () => {
     await page.goto("/explore");
 
     // Check for search input
-    const searchInput = page.locator('input[type="search"], input[placeholder*="search" i], input[placeholder*="Search" i]').first();
+    const searchInput = page
+      .locator(
+        'input[type="search"], input[placeholder*="search" i], input[placeholder*="Search" i]',
+      )
+      .first();
     await expect(searchInput).toBeVisible();
   });
 
@@ -19,7 +23,9 @@ test.describe("Explore Page Layout", () => {
     await page.goto("/explore");
 
     // Look for filter elements (category, sort, etc.)
-    const filterSection = page.locator('[class*="filter"], [class*="sidebar"], [class*="Filter"]').first();
+    const filterSection = page
+      .locator('[class*="filter"], [class*="sidebar"], [class*="Filter"]')
+      .first();
 
     // Filter section should exist
     const isVisible = await filterSection.isVisible().catch(() => false);
@@ -33,7 +39,9 @@ test.describe("Explore Page Layout", () => {
     await page.waitForTimeout(2000);
 
     // Look for project cards
-    const projectCards = page.locator('[class*="card"], [class*="project"]').first();
+    const projectCards = page
+      .locator('[class*="card"], [class*="project"]')
+      .first();
 
     // Either shows cards or shows empty state
     const hasContent = await projectCards.isVisible().catch(() => false);
@@ -45,7 +53,11 @@ test.describe("Explore Search", () => {
   test("search input is interactive", async ({ page }) => {
     await page.goto("/explore");
 
-    const searchInput = page.locator('input[type="search"], input[placeholder*="search" i], input[placeholder*="Search" i]').first();
+    const searchInput = page
+      .locator(
+        'input[type="search"], input[placeholder*="search" i], input[placeholder*="Search" i]',
+      )
+      .first();
 
     // Type in search
     await searchInput.fill("test project");
@@ -57,7 +69,11 @@ test.describe("Explore Search", () => {
   test("search input can be cleared", async ({ page }) => {
     await page.goto("/explore");
 
-    const searchInput = page.locator('input[type="search"], input[placeholder*="search" i], input[placeholder*="Search" i]').first();
+    const searchInput = page
+      .locator(
+        'input[type="search"], input[placeholder*="search" i], input[placeholder*="Search" i]',
+      )
+      .first();
 
     // Type and clear
     await searchInput.fill("test");
@@ -84,7 +100,11 @@ test.describe("Explore Filters", () => {
     await page.goto("/explore");
 
     // Look for sort dropdown or buttons
-    const sortElement = page.locator('select:has(option:has-text("Sort")), [class*="sort"], button:has-text("Sort")').first();
+    const sortElement = page
+      .locator(
+        'select:has(option:has-text("Sort")), [class*="sort"], button:has-text("Sort")',
+      )
+      .first();
 
     const isVisible = await sortElement.isVisible().catch(() => false);
     expect(isVisible || true).toBeTruthy();
@@ -145,7 +165,10 @@ test.describe("Explore Page Performance", () => {
     await page.waitForTimeout(2000);
 
     const criticalErrors = errors.filter(
-      (e) => !e.includes("Supabase") && !e.includes("fetch") && !e.includes("network")
+      (e) =>
+        !e.includes("Supabase") &&
+        !e.includes("fetch") &&
+        !e.includes("network"),
     );
 
     expect(criticalErrors).toHaveLength(0);

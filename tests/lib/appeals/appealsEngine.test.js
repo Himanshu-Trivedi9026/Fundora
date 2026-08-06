@@ -72,7 +72,9 @@ describe("AppealsEngine", () => {
         .mockReturnValueOnce({
           insert: vi.fn().mockReturnValue({
             select: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockAppeal, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockAppeal, error: null }),
             }),
           }),
         });
@@ -98,14 +100,20 @@ describe("AppealsEngine", () => {
   describe("reviewAppeal", () => {
     it("should review an appeal", async () => {
       const mockAppeal = { id: "appeal-1", status: "under_review" };
-      const mockReviewed = { ...mockAppeal, status: "decided", reviewer_decision: "uphold" };
+      const mockReviewed = {
+        ...mockAppeal,
+        status: "decided",
+        reviewer_decision: "uphold",
+      };
 
       // 1. Fetch appeal: select("id, status").eq("id", appealId).single()
       supabaseAdmin.from
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockAppeal, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockAppeal, error: null }),
             }),
           }),
         })
@@ -114,20 +122,32 @@ describe("AppealsEngine", () => {
           update: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               select: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: mockReviewed, error: null }),
+                single: vi
+                  .fn()
+                  .mockResolvedValue({ data: mockReviewed, error: null }),
               }),
             }),
           }),
         });
 
-      const result = await reviewAppeal("appeal-1", "uphold", "Original decision was correct", "Reviewed by admin", "admin-1");
+      const result = await reviewAppeal(
+        "appeal-1",
+        "uphold",
+        "Original decision was correct",
+        "Reviewed by admin",
+        "admin-1",
+      );
       expect(result.success).toBe(true);
     });
   });
 
   describe("withdrawAppeal", () => {
     it("should withdraw an appeal", async () => {
-      const mockAppeal = { id: "appeal-1", status: "submitted", appellant_id: "user-1" };
+      const mockAppeal = {
+        id: "appeal-1",
+        status: "submitted",
+        appellant_id: "user-1",
+      };
       const mockWithdrawn = { ...mockAppeal, status: "withdrawn" };
 
       // 1. Fetch appeal: select("id, appellant_id, status").eq("id", appealId).single()
@@ -135,7 +155,9 @@ describe("AppealsEngine", () => {
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockAppeal, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockAppeal, error: null }),
             }),
           }),
         })
@@ -144,7 +166,9 @@ describe("AppealsEngine", () => {
           update: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               select: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: mockWithdrawn, error: null }),
+                single: vi
+                  .fn()
+                  .mockResolvedValue({ data: mockWithdrawn, error: null }),
               }),
             }),
           }),
@@ -155,12 +179,18 @@ describe("AppealsEngine", () => {
     });
 
     it("should reject withdrawal by non-owner", async () => {
-      const mockAppeal = { id: "appeal-1", status: "submitted", appellant_id: "user-1" };
+      const mockAppeal = {
+        id: "appeal-1",
+        status: "submitted",
+        appellant_id: "user-1",
+      };
 
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: mockAppeal, error: null }),
+            single: vi
+              .fn()
+              .mockResolvedValue({ data: mockAppeal, error: null }),
           }),
         }),
       });

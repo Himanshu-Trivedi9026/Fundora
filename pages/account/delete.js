@@ -63,7 +63,10 @@ export default function DeleteAccount() {
 
   if (!user)
     return (
-      <div className="min-h-screen flex items-center justify-center text-white" role="status">
+      <div
+        className="min-h-screen flex items-center justify-center text-white"
+        role="status"
+      >
         Loading...
       </div>
     );
@@ -81,7 +84,10 @@ export default function DeleteAccount() {
         </p>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/30 text-red-300 px-4 py-3 rounded-lg mb-4" role="alert">
+          <div
+            className="bg-red-500/10 border border-red-500/30 text-red-300 px-4 py-3 rounded-lg mb-4"
+            role="alert"
+          >
             {error}
           </div>
         )}

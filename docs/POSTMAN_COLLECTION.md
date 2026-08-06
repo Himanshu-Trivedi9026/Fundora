@@ -39,21 +39,21 @@
 
 Set these variables in the Postman collection:
 
-| Variable | Initial Value | Description |
-|----------|--------------|-------------|
-| `base_url` | `http://localhost:3000` | API base URL |
-| `session_token` | — | Supabase session token (populated at login) |
-| `auth_cookie` | — | Full `sb-xxx=value` cookie string |
-| `project_id` | — | Test project UUID |
-| `org_id` | — | Test organization UUID |
-| `bank_account_id` | — | Test bank account UUID |
-| `escrow_account_id` | — | Test escrow account UUID |
-| `milestone_id` | — | Test milestone UUID |
-| `webhook_id` | — | Test webhook UUID |
-| `agent_id` | — | Test agent UUID |
-| `workflow_id` | — | Test workflow UUID |
-| `api_key` | — | Test API key |
-| `ai_conversation_id` | — | AI chat conversation UUID |
+| Variable             | Initial Value           | Description                                 |
+| -------------------- | ----------------------- | ------------------------------------------- |
+| `base_url`           | `http://localhost:3000` | API base URL                                |
+| `session_token`      | —                       | Supabase session token (populated at login) |
+| `auth_cookie`        | —                       | Full `sb-xxx=value` cookie string           |
+| `project_id`         | —                       | Test project UUID                           |
+| `org_id`             | —                       | Test organization UUID                      |
+| `bank_account_id`    | —                       | Test bank account UUID                      |
+| `escrow_account_id`  | —                       | Test escrow account UUID                    |
+| `milestone_id`       | —                       | Test milestone UUID                         |
+| `webhook_id`         | —                       | Test webhook UUID                           |
+| `agent_id`           | —                       | Test agent UUID                             |
+| `workflow_id`        | —                       | Test workflow UUID                          |
+| `api_key`            | —                       | Test API key                                |
+| `ai_conversation_id` | —                       | AI chat conversation UUID                   |
 
 ---
 
@@ -61,20 +61,20 @@ Set these variables in the Postman collection:
 
 ```javascript
 // Set content-type header for all POST/PUT/PATCH requests
-if (['post', 'put', 'patch'].includes(request.method.toLowerCase())) {
-    pm.request.headers.add({
-        key: 'Content-Type',
-        value: 'application/json'
-    });
+if (["post", "put", "patch"].includes(request.method.toLowerCase())) {
+  pm.request.headers.add({
+    key: "Content-Type",
+    value: "application/json",
+  });
 }
 
 // Add auth cookie if available
-const authCookie = pm.variables.get('auth_cookie');
+const authCookie = pm.variables.get("auth_cookie");
 if (authCookie) {
-    pm.request.headers.add({
-        key: 'Cookie',
-        value: authCookie
-    });
+  pm.request.headers.add({
+    key: "Cookie",
+    value: authCookie,
+  });
 }
 ```
 
@@ -86,19 +86,22 @@ if (authCookie) {
 // Validate standard response format
 const jsonData = pm.response.json();
 
-pm.test('Response has standard format', () => {
-    // Most endpoints return { success, data } or { error }
-    const hasStandard = jsonData.success !== undefined || jsonData.error !== undefined;
-    pm.expect(hasStandard).to.be.true;
+pm.test("Response has standard format", () => {
+  // Most endpoints return { success, data } or { error }
+  const hasStandard =
+    jsonData.success !== undefined || jsonData.error !== undefined;
+  pm.expect(hasStandard).to.be.true;
 });
 
-pm.test('Status code is proper', () => {
-    if (jsonData.success === true) {
-        pm.expect(pm.response.code).to.be.oneOf([200, 201]);
-    }
-    if (jsonData.error) {
-        pm.expect(pm.response.code).to.be.oneOf([400, 401, 403, 404, 405, 429, 500]);
-    }
+pm.test("Status code is proper", () => {
+  if (jsonData.success === true) {
+    pm.expect(pm.response.code).to.be.oneOf([200, 201]);
+  }
+  if (jsonData.error) {
+    pm.expect(pm.response.code).to.be.oneOf([
+      400, 401, 403, 404, 405, 429, 500,
+    ]);
+  }
 });
 ```
 
@@ -131,9 +134,14 @@ pm.test('Status code is proper', () => {
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('Delete account returns 200', () => { pm.expect(pm.response.code).to.equal(200); });
-pm.test('Response has success: true', () => { pm.expect(pm.response.json().success).to.be.true; });
+pm.test("Delete account returns 200", () => {
+  pm.expect(pm.response.code).to.equal(200);
+});
+pm.test("Response has success: true", () => {
+  pm.expect(pm.response.json().success).to.be.true;
+});
 ```
 
 ---
@@ -165,6 +173,7 @@ pm.test('Response has success: true', () => { pm.expect(pm.response.json().succe
 ```
 
 **Expected Response (200):**
+
 ```json
 {
   "id": "order_P7abc123xyz",
@@ -176,21 +185,22 @@ pm.test('Response has success: true', () => { pm.expect(pm.response.json().succe
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('Order created successfully', () => {
-    pm.expect(pm.response.code).to.equal(200);
-    const json = pm.response.json();
-    pm.expect(json).to.have.property('id');
-    pm.expect(json).to.have.property('orderId');
-    pm.expect(json).to.have.property('amount');
-    pm.expect(json).to.have.property('key');
+pm.test("Order created successfully", () => {
+  pm.expect(pm.response.code).to.equal(200);
+  const json = pm.response.json();
+  pm.expect(json).to.have.property("id");
+  pm.expect(json).to.have.property("orderId");
+  pm.expect(json).to.have.property("amount");
+  pm.expect(json).to.have.property("key");
 });
 
-pm.test('Amount is in paise', () => {
-    pm.expect(pm.response.json().amount).to.equal(50000);
+pm.test("Amount is in paise", () => {
+  pm.expect(pm.response.json().amount).to.equal(50000);
 });
 
-pm.variables.set('razorpay_order_id', pm.response.json().orderId);
+pm.variables.set("razorpay_order_id", pm.response.json().orderId);
 ```
 
 ### Request 2.2: Verify Payment
@@ -218,16 +228,17 @@ pm.variables.set('razorpay_order_id', pm.response.json().orderId);
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('Response is 200 or 400 (invalid sig)', () => {
-    pm.expect(pm.response.code).to.be.oneOf([200, 400]);
+pm.test("Response is 200 or 400 (invalid sig)", () => {
+  pm.expect(pm.response.code).to.be.oneOf([200, 400]);
 });
 
-pm.test('If success has donationId', () => {
-    const json = pm.response.json();
-    if (json.success) {
-        pm.expect(json).to.have.property('donationId');
-    }
+pm.test("If success has donationId", () => {
+  const json = pm.response.json();
+  if (json.success) {
+    pm.expect(json).to.have.property("donationId");
+  }
 });
 ```
 
@@ -280,9 +291,12 @@ pm.test('If success has donationId', () => {
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('Response is PDF', () => {
-    pm.expect(pm.response.headers.one('content-type')).to.include('application/pdf');
+pm.test("Response is PDF", () => {
+  pm.expect(pm.response.headers.one("content-type")).to.include(
+    "application/pdf",
+  );
 });
 ```
 
@@ -311,8 +325,11 @@ pm.test('Response is PDF', () => {
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('Export returns 200', () => { pm.expect(pm.response.code).to.equal(200); });
+pm.test("Export returns 200", () => {
+  pm.expect(pm.response.code).to.equal(200);
+});
 ```
 
 ---
@@ -337,14 +354,20 @@ pm.test('Export returns 200', () => { pm.expect(pm.response.code).to.equal(200);
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('Balance endpoint works', () => {
-    pm.expect(pm.response.code).to.equal(200);
-    const json = pm.response.json();
-    pm.expect(json).to.have.property('success');
-    if (json.success) {
-        pm.expect(json).to.have.all.keys(['success', 'balance', 'pending', 'withdrawn']);
-    }
+pm.test("Balance endpoint works", () => {
+  pm.expect(pm.response.code).to.equal(200);
+  const json = pm.response.json();
+  pm.expect(json).to.have.property("success");
+  if (json.success) {
+    pm.expect(json).to.have.all.keys([
+      "success",
+      "balance",
+      "pending",
+      "withdrawn",
+    ]);
+  }
 });
 ```
 
@@ -404,10 +427,11 @@ pm.test('Balance endpoint works', () => {
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('GET business verification returns 200', () => {
-    pm.expect(pm.response.code).to.equal(200);
-    pm.expect(pm.response.json().success).to.be.true;
+pm.test("GET business verification returns 200", () => {
+  pm.expect(pm.response.code).to.equal(200);
+  pm.expect(pm.response.json().success).to.be.true;
 });
 ```
 
@@ -436,9 +460,10 @@ pm.test('GET business verification returns 200', () => {
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('POST business verification returns 200', () => {
-    pm.expect(pm.response.code).to.equal(200);
+pm.test("POST business verification returns 200", () => {
+  pm.expect(pm.response.code).to.equal(200);
 });
 ```
 
@@ -491,18 +516,19 @@ pm.test('POST business verification returns 200', () => {
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('Add bank account', () => {
-    pm.expect(pm.response.code).to.equal(200);
-    if (pm.response.json().success) {
-        pm.variables.set('bank_account_id', pm.response.json().data?.id);
-    }
+pm.test("Add bank account", () => {
+  pm.expect(pm.response.code).to.equal(200);
+  if (pm.response.json().success) {
+    pm.variables.set("bank_account_id", pm.response.json().data?.id);
+  }
 });
 
 // Negative: mismatched account numbers
-pm.test('Mismatched accounts returns 400', () => {
-    // Send with different confirmAccountNumber
-    // Expect 400 error
+pm.test("Mismatched accounts returns 400", () => {
+  // Send with different confirmAccountNumber
+  // Expect 400 error
 });
 ```
 
@@ -531,8 +557,11 @@ pm.test('Mismatched accounts returns 400', () => {
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('Penny drop returns 200', () => { pm.expect(pm.response.code).to.equal(200); });
+pm.test("Penny drop returns 200", () => {
+  pm.expect(pm.response.code).to.equal(200);
+});
 ```
 
 ### Request 4.6: Verify GST
@@ -630,6 +659,7 @@ pm.test('Penny drop returns 200', () => { pm.expect(pm.response.code).to.equal(2
 ```
 
 **Reject alternative:**
+
 ```json
 { "verificationId": "uuid", "action": "reject", "reason": "Document illegible" }
 ```
@@ -663,15 +693,16 @@ pm.test('Penny drop returns 200', () => { pm.expect(pm.response.code).to.equal(2
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('Fraud evaluate returns overview only', () => {
-    const json = pm.response.json();
-    pm.expect(json).to.have.property('riskLevel');
-    pm.expect(json).to.have.property('decision');
-    pm.expect(json).to.have.property('riskScore');
-    // Must NOT expose raw signals
-    pm.expect(json).to.not.have.property('signals');
-    pm.expect(json).to.not.have.property('breakdown');
+pm.test("Fraud evaluate returns overview only", () => {
+  const json = pm.response.json();
+  pm.expect(json).to.have.property("riskLevel");
+  pm.expect(json).to.have.property("decision");
+  pm.expect(json).to.have.property("riskScore");
+  // Must NOT expose raw signals
+  pm.expect(json).to.not.have.property("signals");
+  pm.expect(json).to.not.have.property("breakdown");
 });
 ```
 
@@ -791,15 +822,16 @@ pm.test('Fraud evaluate returns overview only', () => {
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('Escrow account created', () => {
-    pm.expect(pm.response.code).to.equal(201);
-    const json = pm.response.json();
-    pm.expect(json.success).to.be.true;
-    if (json.account) {
-        pm.expect(json.account).to.not.have.property('metadata');
-        pm.variables.set('escrow_account_id', json.account.id);
-    }
+pm.test("Escrow account created", () => {
+  pm.expect(pm.response.code).to.equal(201);
+  const json = pm.response.json();
+  pm.expect(json.success).to.be.true;
+  if (json.account) {
+    pm.expect(json.account).to.not.have.property("metadata");
+    pm.variables.set("escrow_account_id", json.account.id);
+  }
 });
 ```
 
@@ -888,9 +920,10 @@ pm.test('Escrow account created', () => {
 ```
 
 **Validation Tests:**
+
 ```javascript
-pm.test('Freeze requires reason', () => {
-    // Send without reason → expect 400
+pm.test("Freeze requires reason", () => {
+  // Send without reason → expect 400
 });
 ```
 
@@ -1189,14 +1222,15 @@ pm.test('Freeze requires reason', () => {
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('Organization created', () => {
-    pm.expect(pm.response.code).to.equal(201);
-    const json = pm.response.json();
-    pm.expect(json.success).to.be.true;
-    if (json.data?.id) {
-        pm.variables.set('org_id', json.data.id);
-    }
+pm.test("Organization created", () => {
+  pm.expect(pm.response.code).to.equal(201);
+  const json = pm.response.json();
+  pm.expect(json.success).to.be.true;
+  if (json.data?.id) {
+    pm.variables.set("org_id", json.data.id);
+  }
 });
 ```
 
@@ -1361,14 +1395,15 @@ pm.test('Organization created', () => {
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('API key generated', () => {
-    pm.expect(pm.response.code).to.equal(201);
-    const json = pm.response.json();
-    pm.expect(json).to.have.property('key');
-    pm.expect(json).to.have.property('message');
-    pm.expect(json.message).to.include('not be shown again');
-    pm.variables.set('api_key', json.key);
+pm.test("API key generated", () => {
+  pm.expect(pm.response.code).to.equal(201);
+  const json = pm.response.json();
+  pm.expect(json).to.have.property("key");
+  pm.expect(json).to.have.property("message");
+  pm.expect(json.message).to.include("not be shown again");
+  pm.variables.set("api_key", json.key);
 });
 ```
 
@@ -1483,14 +1518,15 @@ pm.test('API key generated', () => {
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('AI Chat responds', () => {
-    pm.expect(pm.response.code).to.equal(200);
-    const json = pm.response.json();
-    if (json.data) {
-        pm.expect(json.data).to.have.property('answer');
-        pm.variables.set('ai_conversation_id', json.data.conversationId);
-    }
+pm.test("AI Chat responds", () => {
+  pm.expect(pm.response.code).to.equal(200);
+  const json = pm.response.json();
+  if (json.data) {
+    pm.expect(json.data).to.have.property("answer");
+    pm.variables.set("ai_conversation_id", json.data.conversationId);
+  }
 });
 ```
 
@@ -1877,9 +1913,10 @@ pm.test('AI Chat responds', () => {
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('Event published', () => {
-    pm.expect(pm.response.code).to.be.oneOf([201, 200]);
+pm.test("Event published", () => {
+  pm.expect(pm.response.code).to.be.oneOf([201, 200]);
 });
 ```
 
@@ -1954,12 +1991,13 @@ pm.test('Event published', () => {
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('Agent created', () => {
-    pm.expect(pm.response.code).to.equal(201);
-    if (pm.response.json().data?.id) {
-        pm.variables.set('agent_id', pm.response.json().data.id);
-    }
+pm.test("Agent created", () => {
+  pm.expect(pm.response.code).to.equal(201);
+  if (pm.response.json().data?.id) {
+    pm.variables.set("agent_id", pm.response.json().data.id);
+  }
 });
 ```
 
@@ -2057,12 +2095,13 @@ pm.test('Agent created', () => {
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('Workflow created', () => {
-    pm.expect(pm.response.code).to.equal(201);
-    if (pm.response.json().id) {
-        pm.variables.set('workflow_id', pm.response.json().id);
-    }
+pm.test("Workflow created", () => {
+  pm.expect(pm.response.code).to.equal(201);
+  if (pm.response.json().id) {
+    pm.variables.set("workflow_id", pm.response.json().id);
+  }
 });
 ```
 
@@ -2392,9 +2431,10 @@ pm.test('Workflow created', () => {
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('Job enqueued', () => {
-    pm.expect(pm.response.code).to.equal(201);
+pm.test("Job enqueued", () => {
+  pm.expect(pm.response.code).to.equal(201);
 });
 ```
 
@@ -2444,15 +2484,16 @@ pm.test('Job enqueued', () => {
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('Webhook created', () => {
-    pm.expect(pm.response.code).to.equal(201);
-    const json = pm.response.json();
-    pm.expect(json.success).to.be.true;
-    pm.expect(json.message).to.include('not be shown again');
-    if (json.data?.id) {
-        pm.variables.set('webhook_id', json.data.id);
-    }
+pm.test("Webhook created", () => {
+  pm.expect(pm.response.code).to.equal(201);
+  const json = pm.response.json();
+  pm.expect(json.success).to.be.true;
+  pm.expect(json.message).to.include("not be shown again");
+  if (json.data?.id) {
+    pm.variables.set("webhook_id", json.data.id);
+  }
 });
 ```
 
@@ -2478,14 +2519,15 @@ pm.test('Webhook created', () => {
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('Webhook secrets not exposed', () => {
-    const json = pm.response.json();
-    if (json.data && json.data.length > 0) {
-        json.data.forEach(wh => {
-            pm.expect(wh).to.not.have.property('secret');
-        });
-    }
+pm.test("Webhook secrets not exposed", () => {
+  const json = pm.response.json();
+  if (json.data && json.data.length > 0) {
+    json.data.forEach((wh) => {
+      pm.expect(wh).to.not.have.property("secret");
+    });
+  }
 });
 ```
 
@@ -2556,12 +2598,13 @@ pm.test('Webhook secrets not exposed', () => {
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('Notifications returned', () => {
-    pm.expect(pm.response.code).to.equal(200);
-    const json = pm.response.json();
-    pm.expect(json).to.have.property('notifications');
-    pm.expect(json).to.have.property('unreadCount');
+pm.test("Notifications returned", () => {
+  pm.expect(pm.response.code).to.equal(200);
+  const json = pm.response.json();
+  pm.expect(json).to.have.property("notifications");
+  pm.expect(json).to.have.property("unreadCount");
 });
 ```
 
@@ -2651,19 +2694,20 @@ pm.test('Notifications returned', () => {
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('Health check returns 200', () => {
-    pm.expect(pm.response.code).to.equal(200);
-    const json = pm.response.json();
-    pm.expect(json).to.have.property('status');
-    pm.expect(json).to.have.property('checks');
-    pm.expect(json.checks).to.have.property('database');
-    pm.expect(json.checks).to.have.property('memory');
-    pm.expect(json.checks).to.have.property('pool');
+pm.test("Health check returns 200", () => {
+  pm.expect(pm.response.code).to.equal(200);
+  const json = pm.response.json();
+  pm.expect(json).to.have.property("status");
+  pm.expect(json).to.have.property("checks");
+  pm.expect(json.checks).to.have.property("database");
+  pm.expect(json.checks).to.have.property("memory");
+  pm.expect(json.checks).to.have.property("pool");
 });
 
-pm.test('No auth required', () => {
-    pm.expect(pm.response.code).to.equal(200);
+pm.test("No auth required", () => {
+  pm.expect(pm.response.code).to.equal(200);
 });
 ```
 
@@ -2855,11 +2899,12 @@ pm.test('No auth required', () => {
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('Search returns results or empty', () => {
-    pm.expect(pm.response.code).to.equal(200);
-    const json = pm.response.json();
-    pm.expect(json).to.have.property('success');
+pm.test("Search returns results or empty", () => {
+  pm.expect(pm.response.code).to.equal(200);
+  const json = pm.response.json();
+  pm.expect(json).to.have.property("success");
 });
 ```
 
@@ -2930,9 +2975,10 @@ pm.test('Search returns results or empty', () => {
 ```
 
 **Tests:**
+
 ```javascript
-pm.test('Upload returns success', () => {
-    pm.expect(pm.response.code).to.be.oneOf([201, 400]);
+pm.test("Upload returns success", () => {
+  pm.expect(pm.response.code).to.be.oneOf([201, 400]);
 });
 ```
 
@@ -3140,7 +3186,8 @@ const collection = {
   info: {
     name: "Fundora API",
     description: "Complete API collection for Fundora crowdfunding platform",
-    schema: "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    schema:
+      "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
   },
   variable: [
     { key: "base_url", value: "http://localhost:3000" },
@@ -3154,12 +3201,12 @@ const collection = {
     { key: "agent_id", value: "" },
     { key: "workflow_id", value: "" },
     { key: "api_key", value: "" },
-    { key: "ai_conversation_id", value: "" }
+    { key: "ai_conversation_id", value: "" },
   ],
   item: [
     // Map every request from this document into Postman items
     // See the 17 groups above for the complete request definitions
-  ]
+  ],
 };
 
 console.log(JSON.stringify(collection, null, 2));
@@ -3169,46 +3216,46 @@ console.log(JSON.stringify(collection, null, 2));
 
 Create a Postman environment with:
 
-| Variable | Initial | Current |
-|----------|---------|---------|
-| `base_url` | `http://localhost:3000` | `http://localhost:3000` |
-| `auth_cookie` | — | — |
-| `project_id` | — | — |
-| `org_id` | — | — |
-| `bank_account_id` | — | — |
-| `escrow_account_id` | — | — |
-| `milestone_id` | — | — |
-| `webhook_id` | — | — |
-| `agent_id` | — | — |
-| `workflow_id` | — | — |
-| `api_key` | — | — |
-| `ai_conversation_id` | — | — |
+| Variable             | Initial                 | Current                 |
+| -------------------- | ----------------------- | ----------------------- |
+| `base_url`           | `http://localhost:3000` | `http://localhost:3000` |
+| `auth_cookie`        | —                       | —                       |
+| `project_id`         | —                       | —                       |
+| `org_id`             | —                       | —                       |
+| `bank_account_id`    | —                       | —                       |
+| `escrow_account_id`  | —                       | —                       |
+| `milestone_id`       | —                       | —                       |
+| `webhook_id`         | —                       | —                       |
+| `agent_id`           | —                       | —                       |
+| `workflow_id`        | —                       | —                       |
+| `api_key`            | —                       | —                       |
+| `ai_conversation_id` | —                       | —                       |
 
 ---
 
 ## Quick Reference: All Endpoints by Group
 
-| # | Group | Endpoints | Count |
-|---|-------|-----------|-------|
-| 1 | Authentication | `/api/account/delete` | 1 |
-| 2 | Payments & Receipts | `/api/razorpay/create-order`, `/api/razorpay/verify`, `/api/razorpay/webhook`, `/api/receipts/generate`, `/api/export-analytics` | 5 |
-| 3 | Creator & Projects | `/api/creator/balance`, `/api/creator/reputation`, `/api/creator/razorpay-config` | 3 |
-| 4 | Verification | `/api/verification/business`, `/api/verification/bank`, `/api/verification/business-documents`, `/api/verification/bank-documents`, `/api/verification/penny-drop`, `/api/verification/gst`, `/api/verification/pan`, `/api/admin/business-review`, `/api/admin/bank-review`, `/api/admin/review-queue` | 10 |
-| 5 | Fraud Detection | `/api/fraud/evaluate`, `/api/fraud/events`, `/api/fraud/profile`, `/api/fraud/devices`, `/api/fraud/history`, `/api/admin/fraud-dashboard` | 6 |
-| 6 | Escrow & Milestones | `/api/escrow/account`, `/api/escrow/ledger`, `/api/escrow/release`, `/api/milestone/index`, `/api/milestone/submit`, `/api/milestone/review`, `/api/payout/index`, `/api/payout/status`, `/api/admin/escrow-dashboard`, `/api/admin/payout-review` | 10 |
-| 7 | Compliance & Reputation | `/api/admin/compliance-dashboard`, `/api/admin/policy-management`, `/api/admin/moderation-dashboard`, `/api/appeals/index`, `/api/moderation/report`, `/api/reputation/leaderboard` | 6 |
-| 8 | Organizations & RBAC | `/api/organization/index`, `/api/organization/members`, `/api/organization/invitations`, `/api/organization/teams`, `/api/organization/departments`, `/api/organization/settings`, `/api/organization/analytics`, `/api/rbac/roles`, `/api/admin/organizations` | 9 |
-| 9 | API Platform | `/api/api-platform/keys`, `/api/api-platform/apps`, `/api/api-platform/logs` | 3 |
-| 10 | AI Platform | `/api/ai/chat`, `/api/ai/agent`, `/api/ai/config`, `/api/ai/providers`, `/api/ai/predictions`, `/api/ai/recommendations`, `/api/ai/usage`, `/api/ai/knowledge`, `/api/ai/generate-campaign`, `/api/ai/funding-recommendation`, `/api/ai/campaign/score`, `/api/ai/campaign/suggest`, `/api/ai/fraud/analyze`, `/api/ai/moderation/classify`, `/api/ai/moderation/detect` | 15 |
-| 11 | Marketplace & Plugins | `/api/marketplace/featured`, `/api/marketplace/list`, `/api/marketplace/review`, `/api/plugins/list`, `/api/plugins/[id]`, `/api/plugins/submit`, `/api/developer/register`, `/api/developer/my-plugins` | 8 |
-| 12 | Events, Agents, Automation | `/api/events/index`, `/api/events/process`, `/api/events/subscriptions`, `/api/agents/index`, `/api/agents/approve`, `/api/agents/memory`, `/api/agents/permissions`, `/api/agents/run`, `/api/agents/schedule`, `/api/automation/workflows`, `/api/automation/workflows/[id]`, `/api/automation/workflows/[id]/runs`, `/api/automation/workflows/[id]/trigger` | 13 |
-| 13 | Connectors & MCP | `/api/connectors/index`, `/api/mcp/index` | 2 |
-| 14 | Exports, Tenants, Flags | `/api/exports/index`, `/api/exports/schedule`, `/api/exports/templates`, `/api/tenants/index`, `/api/tenants/branding`, `/api/tenants/quotas`, `/api/tenants/settings`, `/api/flags/index`, `/api/flags/abtest` | 9 |
-| 15 | Infrastructure | `/api/infrastructure/cache`, `/api/infrastructure/health`, `/api/infrastructure/queues`, `/api/jobs/index`, `/api/jobs/process`, `/api/jobs/schedule`, `/api/webhooks/index`, `/api/webhooks/deliveries`, `/api/webhooks/test`, `/api/notifications/index`, `/api/notifications/preferences` | 11 |
-| 16 | Health, Diagnostics | `/api/health/index`, `/api/health/database`, `/api/diagnostics/index`, `/api/deployments/index`, `/api/deployments/rollback`, `/api/metrics/index` | 6 |
-| 17 | Global Platform | `/api/i18n/translations`, `/api/currency/rates`, `/api/currency/convert`, `/api/search/index`, `/api/search/autocomplete`, `/api/storage/upload`, `/api/storage/signed-url`, `/api/backup/backups`, `/api/backup/restore`, `/api/observability/metrics`, `/api/observability/health`, `/api/observability/alerts`, `/api/mobile/sync`, `/api/analytics/index`, `/api/analytics/insights`, `/api/analytics/metrics`, `/api/analytics/reports`, `/api/admin/platform-analytics`, `/api/admin/appeals-dashboard` | 19 |
-| | **Total** | | **136** |
+| #   | Group                      | Endpoints                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Count   |
+| --- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| 1   | Authentication             | `/api/account/delete`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | 1       |
+| 2   | Payments & Receipts        | `/api/razorpay/create-order`, `/api/razorpay/verify`, `/api/razorpay/webhook`, `/api/receipts/generate`, `/api/export-analytics`                                                                                                                                                                                                                                                                                                                                                                              | 5       |
+| 3   | Creator & Projects         | `/api/creator/balance`, `/api/creator/reputation`, `/api/creator/razorpay-config`                                                                                                                                                                                                                                                                                                                                                                                                                             | 3       |
+| 4   | Verification               | `/api/verification/business`, `/api/verification/bank`, `/api/verification/business-documents`, `/api/verification/bank-documents`, `/api/verification/penny-drop`, `/api/verification/gst`, `/api/verification/pan`, `/api/admin/business-review`, `/api/admin/bank-review`, `/api/admin/review-queue`                                                                                                                                                                                                       | 10      |
+| 5   | Fraud Detection            | `/api/fraud/evaluate`, `/api/fraud/events`, `/api/fraud/profile`, `/api/fraud/devices`, `/api/fraud/history`, `/api/admin/fraud-dashboard`                                                                                                                                                                                                                                                                                                                                                                    | 6       |
+| 6   | Escrow & Milestones        | `/api/escrow/account`, `/api/escrow/ledger`, `/api/escrow/release`, `/api/milestone/index`, `/api/milestone/submit`, `/api/milestone/review`, `/api/payout/index`, `/api/payout/status`, `/api/admin/escrow-dashboard`, `/api/admin/payout-review`                                                                                                                                                                                                                                                            | 10      |
+| 7   | Compliance & Reputation    | `/api/admin/compliance-dashboard`, `/api/admin/policy-management`, `/api/admin/moderation-dashboard`, `/api/appeals/index`, `/api/moderation/report`, `/api/reputation/leaderboard`                                                                                                                                                                                                                                                                                                                           | 6       |
+| 8   | Organizations & RBAC       | `/api/organization/index`, `/api/organization/members`, `/api/organization/invitations`, `/api/organization/teams`, `/api/organization/departments`, `/api/organization/settings`, `/api/organization/analytics`, `/api/rbac/roles`, `/api/admin/organizations`                                                                                                                                                                                                                                               | 9       |
+| 9   | API Platform               | `/api/api-platform/keys`, `/api/api-platform/apps`, `/api/api-platform/logs`                                                                                                                                                                                                                                                                                                                                                                                                                                  | 3       |
+| 10  | AI Platform                | `/api/ai/chat`, `/api/ai/agent`, `/api/ai/config`, `/api/ai/providers`, `/api/ai/predictions`, `/api/ai/recommendations`, `/api/ai/usage`, `/api/ai/knowledge`, `/api/ai/generate-campaign`, `/api/ai/funding-recommendation`, `/api/ai/campaign/score`, `/api/ai/campaign/suggest`, `/api/ai/fraud/analyze`, `/api/ai/moderation/classify`, `/api/ai/moderation/detect`                                                                                                                                      | 15      |
+| 11  | Marketplace & Plugins      | `/api/marketplace/featured`, `/api/marketplace/list`, `/api/marketplace/review`, `/api/plugins/list`, `/api/plugins/[id]`, `/api/plugins/submit`, `/api/developer/register`, `/api/developer/my-plugins`                                                                                                                                                                                                                                                                                                      | 8       |
+| 12  | Events, Agents, Automation | `/api/events/index`, `/api/events/process`, `/api/events/subscriptions`, `/api/agents/index`, `/api/agents/approve`, `/api/agents/memory`, `/api/agents/permissions`, `/api/agents/run`, `/api/agents/schedule`, `/api/automation/workflows`, `/api/automation/workflows/[id]`, `/api/automation/workflows/[id]/runs`, `/api/automation/workflows/[id]/trigger`                                                                                                                                               | 13      |
+| 13  | Connectors & MCP           | `/api/connectors/index`, `/api/mcp/index`                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | 2       |
+| 14  | Exports, Tenants, Flags    | `/api/exports/index`, `/api/exports/schedule`, `/api/exports/templates`, `/api/tenants/index`, `/api/tenants/branding`, `/api/tenants/quotas`, `/api/tenants/settings`, `/api/flags/index`, `/api/flags/abtest`                                                                                                                                                                                                                                                                                               | 9       |
+| 15  | Infrastructure             | `/api/infrastructure/cache`, `/api/infrastructure/health`, `/api/infrastructure/queues`, `/api/jobs/index`, `/api/jobs/process`, `/api/jobs/schedule`, `/api/webhooks/index`, `/api/webhooks/deliveries`, `/api/webhooks/test`, `/api/notifications/index`, `/api/notifications/preferences`                                                                                                                                                                                                                  | 11      |
+| 16  | Health, Diagnostics        | `/api/health/index`, `/api/health/database`, `/api/diagnostics/index`, `/api/deployments/index`, `/api/deployments/rollback`, `/api/metrics/index`                                                                                                                                                                                                                                                                                                                                                            | 6       |
+| 17  | Global Platform            | `/api/i18n/translations`, `/api/currency/rates`, `/api/currency/convert`, `/api/search/index`, `/api/search/autocomplete`, `/api/storage/upload`, `/api/storage/signed-url`, `/api/backup/backups`, `/api/backup/restore`, `/api/observability/metrics`, `/api/observability/health`, `/api/observability/alerts`, `/api/mobile/sync`, `/api/analytics/index`, `/api/analytics/insights`, `/api/analytics/metrics`, `/api/analytics/reports`, `/api/admin/platform-analytics`, `/api/admin/appeals-dashboard` | 19      |
+|     | **Total**                  |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | **136** |
 
 ---
 
-*End of Postman Collection*
+_End of Postman Collection_

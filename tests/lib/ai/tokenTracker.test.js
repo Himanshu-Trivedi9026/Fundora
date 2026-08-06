@@ -52,7 +52,9 @@ function buildChain({ eqs = 0, terminal, terminalValue }) {
     return { [terminal]: vi.fn().mockResolvedValue(terminalValue) };
   }
   return {
-    eq: vi.fn().mockReturnValue(buildChain({ eqs: eqs - 1, terminal, terminalValue })),
+    eq: vi
+      .fn()
+      .mockReturnValue(buildChain({ eqs: eqs - 1, terminal, terminalValue })),
   };
 }
 
@@ -109,7 +111,10 @@ describe("Token Tracker", () => {
   describe("trackTokenUsage", () => {
     it("records new usage on first request (insert path)", async () => {
       // No existing record → insert path
-      supabaseAdmin.single.mockResolvedValueOnce({ data: null, error: { code: "PGRST116" } });
+      supabaseAdmin.single.mockResolvedValueOnce({
+        data: null,
+        error: { code: "PGRST116" },
+      });
       // Insert succeeds
       supabaseAdmin.single.mockResolvedValueOnce({
         data: { id: "usage-1", costCents: 0.015 },
@@ -145,7 +150,10 @@ describe("Token Tracker", () => {
     });
 
     it("handles DB insert errors gracefully", async () => {
-      supabaseAdmin.single.mockResolvedValueOnce({ data: null, error: { code: "PGRST116" } });
+      supabaseAdmin.single.mockResolvedValueOnce({
+        data: null,
+        error: { code: "PGRST116" },
+      });
       supabaseAdmin.single.mockResolvedValueOnce({
         data: null,
         error: { message: "insert failed" },
@@ -172,16 +180,37 @@ describe("Token Tracker", () => {
         eq: vi.fn().mockReturnValue({
           eq: vi.fn().mockResolvedValue({
             data: [
-              { model: "gpt-4o", provider: "openai", total_tokens: 1000, cost_cents: 5, request_count: 3 },
-              { model: "gpt-4o-mini", provider: "openai", total_tokens: 2000, cost_cents: 1.2, request_count: 5 },
-              { model: "gpt-4o", provider: "openai", total_tokens: 500, cost_cents: 2.5, request_count: 1 },
+              {
+                model: "gpt-4o",
+                provider: "openai",
+                total_tokens: 1000,
+                cost_cents: 5,
+                request_count: 3,
+              },
+              {
+                model: "gpt-4o-mini",
+                provider: "openai",
+                total_tokens: 2000,
+                cost_cents: 1.2,
+                request_count: 5,
+              },
+              {
+                model: "gpt-4o",
+                provider: "openai",
+                total_tokens: 500,
+                cost_cents: 2.5,
+                request_count: 1,
+              },
             ],
             error: null,
           }),
         }),
       });
 
-      const result = await getUserUsage({ userId: "user-1", date: "2025-01-15" });
+      const result = await getUserUsage({
+        userId: "user-1",
+        date: "2025-01-15",
+      });
 
       expect(result.success).toBe(true);
       expect(result.data.totalTokens).toBe(3500);
@@ -224,9 +253,30 @@ describe("Token Tracker", () => {
         gte: vi.fn().mockReturnValue({
           lte: vi.fn().mockResolvedValue({
             data: [
-              { date: "2025-01-15", provider: "openai", model: "gpt-4o", total_tokens: 500, cost_cents: 2.5, request_count: 2 },
-              { date: "2025-01-15", provider: "anthropic", model: "claude-3-haiku", total_tokens: 300, cost_cents: 1.5, request_count: 1 },
-              { date: "2025-01-16", provider: "openai", model: "gpt-4o-mini", total_tokens: 1000, cost_cents: 0.6, request_count: 4 },
+              {
+                date: "2025-01-15",
+                provider: "openai",
+                model: "gpt-4o",
+                total_tokens: 500,
+                cost_cents: 2.5,
+                request_count: 2,
+              },
+              {
+                date: "2025-01-15",
+                provider: "anthropic",
+                model: "claude-3-haiku",
+                total_tokens: 300,
+                cost_cents: 1.5,
+                request_count: 1,
+              },
+              {
+                date: "2025-01-16",
+                provider: "openai",
+                model: "gpt-4o-mini",
+                total_tokens: 1000,
+                cost_cents: 0.6,
+                request_count: 4,
+              },
             ],
             error: null,
           }),
@@ -247,7 +297,10 @@ describe("Token Tracker", () => {
     });
 
     it("returns error when date params are missing", async () => {
-      const result = await getUsageStats({ startDate: null, endDate: "2025-01-16" });
+      const result = await getUsageStats({
+        startDate: null,
+        endDate: "2025-01-16",
+      });
       expect(result.success).toBe(false);
       expect(result.error).toContain("required");
     });

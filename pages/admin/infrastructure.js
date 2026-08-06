@@ -23,7 +23,8 @@ const TABS = [
 
 function AdminInfrastructurePage() {
   const [activeTab, setActiveTab] = useState("health");
-  const ActiveComponent = TABS.find((t) => t.id === activeTab)?.component || SystemHealthPanel;
+  const ActiveComponent =
+    TABS.find((t) => t.id === activeTab)?.component || SystemHealthPanel;
 
   return (
     <PageLayout>
@@ -38,7 +39,10 @@ function AdminInfrastructurePage() {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
               Infrastructure Dashboard
             </h1>
-            <p className="text-gray-400 mt-1">System health, deployments, queues, cache, performance, and backups</p>
+            <p className="text-gray-400 mt-1">
+              System health, deployments, queues, cache, performance, and
+              backups
+            </p>
           </div>
 
           {/* Tabs */}

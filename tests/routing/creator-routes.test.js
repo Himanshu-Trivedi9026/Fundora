@@ -30,11 +30,20 @@ const STATIC_CREATOR_ROUTES = {
   "/creator/dashboard": { file: "dashboard.js", component: "CreatorDashboard" },
   "/creator/projects": { file: "projects.js", component: "CreatorProjects" },
   "/creator/analytics": { file: "analytics.js", component: "CreatorAnalytics" },
-  "/creator/verification": { file: "verification.js", component: "CreatorVerification" },
+  "/creator/verification": {
+    file: "verification.js",
+    component: "CreatorVerification",
+  },
   "/creator/payouts": { file: "payouts.js", component: "CreatorPayouts" },
   "/creator/payments": { file: "payments.js", component: "CreatorPayments" },
-  "/creator/ai-assistant": { file: "ai-assistant.js", component: "AIAssistant" },
-  "/creator/earnings": { file: "earnings.js", component: "CreatorEarningsPage" },
+  "/creator/ai-assistant": {
+    file: "ai-assistant.js",
+    component: "AIAssistant",
+  },
+  "/creator/earnings": {
+    file: "earnings.js",
+    component: "CreatorEarningsPage",
+  },
 };
 
 /** Extract the default function component name from a page module. */
@@ -48,7 +57,9 @@ describe("Creator routing system", () => {
   it("every expected static creator route has a dedicated page file", () => {
     for (const [route, { file }] of Object.entries(STATIC_CREATOR_ROUTES)) {
       const full = path.join(CREATOR_DIR, file);
-      expect(fs.existsSync(full), `${route} → missing page file ${file}`).toBe(true);
+      expect(fs.existsSync(full), `${route} → missing page file ${file}`).toBe(
+        true,
+      );
     }
   });
 
@@ -59,7 +70,7 @@ describe("Creator routing system", () => {
       // File exists (guarded by the test above) — read the export name.
       const name = defaultExportName(full);
       expect(name, `${route} default export`).toBe(component);
-    }
+    },
   );
 
   it("no creator page exports the shared public-profile component name", () => {
@@ -87,7 +98,9 @@ describe("Creator routing system", () => {
     const src = fs.readFileSync(nextConfig, "utf8");
     // A redirect()/rewrite() `source` mapping to /creator/* would shadow the
     // real pages. (Asset rewrites use non-/creator sources and are fine.)
-    const creatorSources = src.match(/source\s*:\s*["'`]\/creator[^"'`]*["'`]/g);
+    const creatorSources = src.match(
+      /source\s*:\s*["'`]\/creator[^"'`]*["'`]/g,
+    );
     expect(creatorSources || []).toEqual([]);
   });
 });

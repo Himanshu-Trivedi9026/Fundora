@@ -25,7 +25,15 @@ export default withAuth(async function handler(req, res, user) {
     if (!rl(req, res)) return;
 
     try {
-      const { accountHolderName, accountNumber, ifscCode, bankName, branchName, accountType, upiId } = req.body;
+      const {
+        accountHolderName,
+        accountNumber,
+        ifscCode,
+        bankName,
+        branchName,
+        accountType,
+        upiId,
+      } = req.body;
       const result = await createBankAccount(user.id, {
         accountHolderName,
         accountNumber,

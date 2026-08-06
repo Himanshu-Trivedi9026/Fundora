@@ -1,7 +1,12 @@
 // API — Data Export
 
 import { withAuth } from "../../../lib/withAuth.js";
-import { exportData, createExportTemplate, listExportTemplates, getSupportedFormats } from "../../../lib/exports/index.js";
+import {
+  exportData,
+  createExportTemplate,
+  listExportTemplates,
+  getSupportedFormats,
+} from "../../../lib/exports/index.js";
 
 async function handler(req, res) {
   try {
@@ -20,7 +25,9 @@ async function handler(req, res) {
 
       case "GET": {
         if (req.query.formats) {
-          return res.status(200).json({ success: true, data: getSupportedFormats() });
+          return res
+            .status(200)
+            .json({ success: true, data: getSupportedFormats() });
         }
         const result = await listExportTemplates({
           createdBy: req.user.id,
@@ -33,7 +40,9 @@ async function handler(req, res) {
       }
 
       default:
-        return res.status(405).json({ success: false, error: "Method not allowed" });
+        return res
+          .status(405)
+          .json({ success: false, error: "Method not allowed" });
     }
   } catch (error) {
     console.error("Handler error:", error);

@@ -39,7 +39,12 @@ describe("BankAccountCard", () => {
   });
 
   it("hides verify button for verified accounts", () => {
-    render(<BankAccountCard account={{ ...baseAccount, status: "verified" }} onVerify={vi.fn()} />);
+    render(
+      <BankAccountCard
+        account={{ ...baseAccount, status: "verified" }}
+        onVerify={vi.fn()}
+      />,
+    );
     expect(screen.queryByText("Verify")).toBeNull();
   });
 
@@ -49,7 +54,7 @@ describe("BankAccountCard", () => {
       <BankAccountCard
         account={{ ...baseAccount, status: "verified", is_primary: false }}
         onSetPrimary={onSetPrimary}
-      />
+      />,
     );
     expect(screen.getByText("Set Primary")).toBeTruthy();
   });
@@ -58,7 +63,7 @@ describe("BankAccountCard", () => {
     render(
       <BankAccountCard
         account={{ ...baseAccount, penny_drop_status: "success" }}
-      />
+      />,
     );
     expect(screen.getByText("success")).toBeTruthy();
   });
@@ -74,7 +79,7 @@ describe("BankAccountCard", () => {
       <BankAccountCard
         account={{ ...baseAccount, status: "verified" }}
         onRemove={vi.fn()}
-      />
+      />,
     );
     expect(screen.queryByText("Remove")).toBeNull();
   });

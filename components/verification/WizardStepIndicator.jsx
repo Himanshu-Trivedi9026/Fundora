@@ -98,8 +98,8 @@ export default function WizardStepIndicator({
                   isCurrent
                     ? "text-primary font-medium"
                     : isCompleted || isPast
-                    ? "text-on-surface"
-                    : "text-on-surface-variant/50"
+                      ? "text-on-surface"
+                      : "text-on-surface-variant/50"
                 }`}
               >
                 {step.label}

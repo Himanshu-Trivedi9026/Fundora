@@ -35,9 +35,13 @@ describe("buildTrendingQuery", () => {
     // Active campaigns only
     expect(chain.eq).toHaveBeenCalledWith("deleted", false);
     // 1. Highest pledged amount
-    expect(chain.order).toHaveBeenNthCalledWith(1, "pledged", { ascending: false });
+    expect(chain.order).toHaveBeenNthCalledWith(1, "pledged", {
+      ascending: false,
+    });
     // 2. Recently updated (donations bump updated_at)
-    expect(chain.order).toHaveBeenNthCalledWith(2, "updated_at", { ascending: false });
+    expect(chain.order).toHaveBeenNthCalledWith(2, "updated_at", {
+      ascending: false,
+    });
     // 3. Bounded result set
     expect(chain.limit).toHaveBeenCalledWith(TRENDING_LIMIT);
   });
@@ -52,13 +56,21 @@ describe("buildTrendingQuery", () => {
 
   it("clamps invalid limits to a safe value", () => {
     // 0 is falsy so it falls back to the default
-    expect(buildTrendingQuery(makeClient().client, { limit: 0 }).limit).toHaveBeenCalledWith(TRENDING_LIMIT);
+    expect(
+      buildTrendingQuery(makeClient().client, { limit: 0 }).limit,
+    ).toHaveBeenCalledWith(TRENDING_LIMIT);
     // negative -> clamped up to 1
-    expect(buildTrendingQuery(makeClient().client, { limit: -5 }).limit).toHaveBeenCalledWith(1);
+    expect(
+      buildTrendingQuery(makeClient().client, { limit: -5 }).limit,
+    ).toHaveBeenCalledWith(1);
     // NaN -> default
-    expect(buildTrendingQuery(makeClient().client, { limit: "abc" }).limit).toHaveBeenCalledWith(TRENDING_LIMIT);
+    expect(
+      buildTrendingQuery(makeClient().client, { limit: "abc" }).limit,
+    ).toHaveBeenCalledWith(TRENDING_LIMIT);
     // fractional -> floored
-    expect(buildTrendingQuery(makeClient().client, { limit: 2.7 }).limit).toHaveBeenCalledWith(2);
+    expect(
+      buildTrendingQuery(makeClient().client, { limit: 2.7 }).limit,
+    ).toHaveBeenCalledWith(2);
   });
 });
 

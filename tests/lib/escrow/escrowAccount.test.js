@@ -28,7 +28,11 @@ vi.mock("../../../lib/verification/auditLog", () => ({
   hashIP: vi.fn().mockReturnValue("hashed-ip"),
 }));
 
-import { createEscrowAccount, getEscrowAccountByCampaign, freezeEscrowAccount } from "../../../lib/escrow/escrowAccount";
+import {
+  createEscrowAccount,
+  getEscrowAccountByCampaign,
+  freezeEscrowAccount,
+} from "../../../lib/escrow/escrowAccount";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 
 describe("EscrowAccount", () => {
@@ -62,7 +66,9 @@ describe("EscrowAccount", () => {
         .mockReturnValueOnce({
           insert: vi.fn().mockReturnValue({
             select: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockAccount, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockAccount, error: null }),
             }),
           }),
         });
@@ -88,13 +94,19 @@ describe("EscrowAccount", () => {
 
   describe("getEscrowAccountByCampaign", () => {
     it("should return account when found", async () => {
-      const mockAccount = { id: "escrow-1", campaign_id: "campaign-1", status: "active" };
+      const mockAccount = {
+        id: "escrow-1",
+        campaign_id: "campaign-1",
+        status: "active",
+      };
 
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             is: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockAccount, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockAccount, error: null }),
             }),
           }),
         }),
@@ -110,7 +122,9 @@ describe("EscrowAccount", () => {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             is: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: null, error: { code: "PGRST116" } }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: null, error: { code: "PGRST116" } }),
             }),
           }),
         }),
@@ -132,7 +146,9 @@ describe("EscrowAccount", () => {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               is: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: mockAccount, error: null }),
+                single: vi
+                  .fn()
+                  .mockResolvedValue({ data: mockAccount, error: null }),
               }),
             }),
           }),
@@ -142,14 +158,21 @@ describe("EscrowAccount", () => {
             eq: vi.fn().mockReturnValue({
               eq: vi.fn().mockReturnValue({
                 select: vi.fn().mockReturnValue({
-                  single: vi.fn().mockResolvedValue({ data: { ...mockAccount, status: "frozen" }, error: null }),
+                  single: vi.fn().mockResolvedValue({
+                    data: { ...mockAccount, status: "frozen" },
+                    error: null,
+                  }),
                 }),
               }),
             }),
           }),
         });
 
-      const result = await freezeEscrowAccount("escrow-1", "Fraud detected", "admin-1");
+      const result = await freezeEscrowAccount(
+        "escrow-1",
+        "Fraud detected",
+        "admin-1",
+      );
       expect(result.success).toBe(true);
     });
   });

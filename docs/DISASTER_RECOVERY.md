@@ -9,11 +9,13 @@ The disaster recovery system provides backup verification, restore validation, f
 Two default plans are initialized on startup:
 
 ### Default Plan
+
 - **RTO**: 15 minutes
 - **RPO**: 5 minutes
 - Standard recovery for single-region deployment
 
 ### Critical Plan
+
 - **RTO**: 5 minutes
 - **RPO**: 1 minute
 - High-availability recovery for multi-region deployment
@@ -41,7 +43,9 @@ if (result.success) {
 import { verifyAllBackups } from "../lib/recovery/index.js";
 
 const summary = await verifyAllBackups({ limit: 50 });
-console.log(`Healthy: ${summary.data.healthy}, Corrupt: ${summary.data.corrupt}`);
+console.log(
+  `Healthy: ${summary.data.healthy}, Corrupt: ${summary.data.corrupt}`,
+);
 ```
 
 ## Restore Operations
@@ -128,11 +132,11 @@ The following runbooks are initialized automatically:
 
 ## API Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/health` | GET | Application health check |
-| `/api/health/database` | GET | Database connectivity health |
-| `/api/diagnostics` | GET | System diagnostics |
+| Endpoint               | Method | Description                  |
+| ---------------------- | ------ | ---------------------------- |
+| `/api/health`          | GET    | Application health check     |
+| `/api/health/database` | GET    | Database connectivity health |
+| `/api/diagnostics`     | GET    | System diagnostics           |
 
 ## Runbook Best Practices
 

@@ -14,7 +14,10 @@ vi.mock("@/lib/supabaseAdmin", () => ({
 }));
 
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { getCreatorVerification, isCreatorVerified } from "@/lib/verification/status";
+import {
+  getCreatorVerification,
+  isCreatorVerified,
+} from "@/lib/verification/status";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -49,12 +52,18 @@ describe("getCreatorVerification", () => {
   });
 
   it("scopes the query to creator_verifications by user_id", async () => {
-    mockVerificationRow({ data: { verification_status: "approved" }, error: null });
+    mockVerificationRow({
+      data: { verification_status: "approved" },
+      error: null,
+    });
 
     await getCreatorVerification("user-42");
 
     expect(supabaseAdmin.from).toHaveBeenCalledWith("creator_verifications");
-    expect(supabaseAdmin.from("creator_verifications").eq).toHaveBeenCalledWith("user_id", "user-42");
+    expect(supabaseAdmin.from("creator_verifications").eq).toHaveBeenCalledWith(
+      "user_id",
+      "user-42",
+    );
   });
 
   it("returns null when the row is missing", async () => {
@@ -75,18 +84,33 @@ describe("getCreatorVerification", () => {
 
 describe("isCreatorVerified", () => {
   it("returns true only for an approved status", async () => {
-    mockVerificationRow({ data: { verification_status: "approved" }, error: null });
+    mockVerificationRow({
+      data: { verification_status: "approved" },
+      error: null,
+    });
     expect(await isCreatorVerified("user-1")).toBe(true);
   });
 
   it("returns false for pending", async () => {
-    mockVerificationRow({ data: { verification_status: "pending" }, error: null });
+    mockVerificationRow({
+      data: { verification_status: "pending" },
+      error: null,
+    });
     expect(await isCreatorVerified("user-1")).toBe(false);
   });
 
   it("returns false for rejected / expired / documents_uploaded", async () => {
-    for (const status of ["rejected", "expired", "documents_uploaded", "under_review", "cancelled"]) {
-      mockVerificationRow({ data: { verification_status: status }, error: null });
+    for (const status of [
+      "rejected",
+      "expired",
+      "documents_uploaded",
+      "under_review",
+      "cancelled",
+    ]) {
+      mockVerificationRow({
+        data: { verification_status: status },
+        error: null,
+      });
       expect(await isCreatorVerified("user-1")).toBe(false);
     }
   });

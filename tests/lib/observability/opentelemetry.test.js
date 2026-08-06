@@ -130,7 +130,9 @@ describe("OpenTelemetry Integration", () => {
     });
 
     it("should handle error level", () => {
-      const entry = structuredLog("error", "something broke", { stack: "Error..." });
+      const entry = structuredLog("error", "something broke", {
+        stack: "Error...",
+      });
       expect(entry.level).toBe("error");
     });
   });
@@ -140,10 +142,14 @@ describe("OpenTelemetry Integration", () => {
       const hook = vi.fn().mockResolvedValue("handled");
       const unregister = registerErrorHook(hook);
 
-      const results = await runErrorHooks(new Error("test error"), { source: "unit-test" });
+      const results = await runErrorHooks(new Error("test error"), {
+        source: "unit-test",
+      });
       expect(results).toHaveLength(1);
       expect(results[0]).toBe("handled");
-      expect(hook).toHaveBeenCalledWith(expect.any(Error), { source: "unit-test" });
+      expect(hook).toHaveBeenCalledWith(expect.any(Error), {
+        source: "unit-test",
+      });
 
       unregister();
       const afterUnregister = await runErrorHooks(new Error("after"));
@@ -151,7 +157,9 @@ describe("OpenTelemetry Integration", () => {
     });
 
     it("should handle hook failures gracefully", async () => {
-      registerErrorHook(() => { throw new Error("hook-error"); });
+      registerErrorHook(() => {
+        throw new Error("hook-error");
+      });
       registerErrorHook(() => Promise.resolve("ok"));
 
       const results = await runErrorHooks(new Error("original"));

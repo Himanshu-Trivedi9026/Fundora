@@ -2,10 +2,9 @@ import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { PageHeader, GlassCard } from "../ui";
 
-const CampaignAIGenerator = dynamic(
-  () => import("../CampaignAIGenerator"),
-  { ssr: false }
-);
+const CampaignAIGenerator = dynamic(() => import("../CampaignAIGenerator"), {
+  ssr: false,
+});
 
 export default function AIGeneratorStep({ setDescription, formData }) {
   return (
@@ -45,8 +44,8 @@ export default function AIGeneratorStep({ setDescription, formData }) {
         </span>
         <p className="text-on-surface-variant font-inter text-xs md:text-sm leading-relaxed">
           The AI will generate a professional campaign description based on your
-          inputs. You can edit the generated text in the next step, or
-          skip this step and write your own description.
+          inputs. You can edit the generated text in the next step, or skip this
+          step and write your own description.
         </p>
       </div>
     </motion.section>

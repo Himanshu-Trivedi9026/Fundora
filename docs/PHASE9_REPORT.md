@@ -9,11 +9,13 @@ Phase 9 transforms Fundora into an intelligent, AI-powered crowdfunding platform
 ### Files Created
 
 #### Database Migration
+
 - `supabase/migrations/009_ai_platform.sql` — 10 new tables with RLS policies, 40+ indexes, auto-update triggers, and vector embedding support (449 lines)
 
 #### Core Library Modules (16 files)
 
 **AI Core:**
+
 - `lib/ai/aiEngine.js` — Central orchestrator for all AI requests with retry, timeout, PII sanitisation, and audit logging (395 lines)
 - `lib/ai/providerRegistry.js` — Multi-provider abstraction with singleton registry, 6 provider implementations, and priority-based fallback (1071 lines)
 - `lib/ai/modelRouter.js` — Task-based routing with cost constraints, provider health monitoring, and cross-provider fallback chains (383 lines)
@@ -24,6 +26,7 @@ Phase 9 transforms Fundora into an intelligent, AI-powered crowdfunding platform
 - `lib/ai/conversationMemory.js` — Persistent conversation management with context windowing
 
 **AI Engines:**
+
 - `lib/ai/campaignAI.js` — Campaign quality scoring (6 dimensions), title suggestions, description improvement, funding goal recommendation, risk observation, SEO, completeness analysis (910 lines)
 - `lib/ai/recommendationEngine.js` — Multi-signal personalised recommendations: content-based, collaborative, trending, trust-weighted (936 lines)
 - `lib/ai/predictionEngine.js` — Rule-based predictive analytics with 8 weighted features, 7 prediction types, and batch prediction support (1176 lines)
@@ -32,15 +35,18 @@ Phase 9 transforms Fundora into an intelligent, AI-powered crowdfunding platform
 - `lib/ai/embeddingEngine.js` — Vector embedding CRUD, batch operations, and cosine similarity search via pgvector
 
 **Automation:**
+
 - `lib/automation/workflowEngine.js` — Workflow DSL with event/schedule/manual/webhook triggers, 7 condition types, 7 action types, template system, and scheduled processing (1327 lines)
 - `lib/automation/index.js` — Barrel exports
 
 **AI Index:**
+
 - `lib/ai/index.js` — Barrel exports for all 14 AI modules
 
 #### API Routes (16 files)
 
 **AI Services:**
+
 - `pages/api/ai/agent.js` — AI agent endpoint for autonomous task execution
 - `pages/api/ai/chat.js` — AI copilot chat with role-specific context
 - `pages/api/ai/config.js` — AI configuration management (admin only, withAuthAndPermission)
@@ -48,12 +54,14 @@ Phase 9 transforms Fundora into an intelligent, AI-powered crowdfunding platform
 - `pages/api/ai/usage.js` — Usage statistics and cost tracking
 
 **Campaign AI:**
+
 - `pages/api/ai/campaign/score.js` — Campaign quality scoring endpoint
 - `pages/api/ai/campaign/suggest.js` — Title and description suggestions
 - `pages/api/ai/generate-campaign.js` — AI-powered campaign content generation
 - `pages/api/ai/funding-recommendation.js` — Funding goal recommendations
 
 **Intelligence:**
+
 - `pages/api/ai/recommendations.js` — Personalised recommendations (donor, trending, similar, creator)
 - `pages/api/ai/predictions.js` — Predictive analytics (success probability, timeline, failure risk, etc.)
 - `pages/api/ai/knowledge.js` — Knowledge base CRUD and search
@@ -62,6 +70,7 @@ Phase 9 transforms Fundora into an intelligent, AI-powered crowdfunding platform
 - `pages/api/ai/moderation/detect.js` — AI content detection
 
 **Automation:**
+
 - `pages/api/automation/workflows.js` — Workflow CRUD and listing
 - `pages/api/automation/workflows/[id].js` — Individual workflow update/delete
 - `pages/api/automation/workflows/[id]/trigger.js` — Manual workflow triggering
@@ -70,6 +79,7 @@ Phase 9 transforms Fundora into an intelligent, AI-powered crowdfunding platform
 #### Tests (24 files)
 
 **AI Library Tests (16 files):**
+
 - `tests/lib/ai/aiEngine.test.js` — AI engine orchestration, retry, timeout, sanitisation
 - `tests/lib/ai/providerRegistry.test.js` — Provider registration, fallback, health checks
 - `tests/lib/ai/modelRouter.test.js` — Task routing, cost limits, fallback chains
@@ -86,9 +96,11 @@ Phase 9 transforms Fundora into an intelligent, AI-powered crowdfunding platform
 - `tests/lib/ai/promptEngine.test.js` — Template rendering, variable substitution
 
 **Automation Tests (2 files):**
+
 - `tests/lib/automation/workflowEngine.test.js` — Workflow CRUD, triggers, conditions, actions
 
 **API Route Tests (6 files):**
+
 - `tests/api/ai.test.js` — AI API route tests
 - `tests/api/ai-campaign.test.js` — Campaign AI API tests
 - `tests/api/ai-chat.test.js` — Copilot chat API tests
@@ -98,6 +110,7 @@ Phase 9 transforms Fundora into an intelligent, AI-powered crowdfunding platform
 - `tests/api/generate-campaign.test.js` — Campaign generation API tests
 
 #### Documentation (7 files)
+
 - `docs/AI_PLATFORM.md` — AI platform architecture and provider abstraction
 - `docs/CAMPAIGN_AI.md` — Campaign analysis capabilities
 - `docs/RECOMMENDATION_ENGINE.md` — Recommendation algorithms
@@ -113,6 +126,7 @@ Phase 9 transforms Fundora into an intelligent, AI-powered crowdfunding platform
 **2,100+ tests across 100+ test files** — all passing.
 
 Phase 9 contributed 24 new test files covering:
+
 - AI engine orchestration with retry, timeout, and PII sanitisation
 - Multi-provider registration, fallback ordering, and health monitoring
 - Task-based model routing with cost constraints and cross-provider fallback
@@ -171,6 +185,7 @@ Phase 9 contributed 24 new test files covering:
 ### 1. Provider Abstraction with Singleton Registry
 
 All AI providers implement a common `BaseModelProvider` interface, registered in a singleton registry. This allows:
+
 - **Zero-downtime provider switching** — Change the active provider without code changes
 - **Priority-based fallback** — If the primary provider is down, automatically fall back to the next best option
 - **Cost comparison** — The model router can select the cheapest provider for a given task
@@ -180,12 +195,14 @@ All AI providers implement a common `BaseModelProvider` interface, registered in
 ### 2. Task-Based Model Routing
 
 Rather than using a single model for all tasks, the router selects optimal models based on:
+
 - **Task type** — Chat, classification, embedding, generation, analysis, extraction
 - **Cost constraints** — Maximum cost per request (default: 500 cents)
 - **Provider health** — Exponential moving average error rates with 60-second cache TTL
 - **Cross-provider fallback** — If the primary provider is unhealthy, try alternatives in priority order
 
 Default routing:
+
 ```
 chat/generation → openai/gpt-4o-mini or gpt-4o
 classification/extraction → openai/gpt-4o-mini
@@ -196,6 +213,7 @@ analysis → anthropic/claude-3-haiku
 ### 3. Non-Blocking AI Operations
 
 All AI analyses (quality scoring, risk observation, recommendations, predictions) are advisory:
+
 - **Never reject campaigns** — Risk observations provide suggestions, not blocks
 - **Confidence-aware** — Every prediction includes a confidence score so callers decide weight
 - **"Never throw" pattern** — All functions return `{ success: boolean, data?, error? }` instead of throwing exceptions
@@ -204,6 +222,7 @@ All AI analyses (quality scoring, risk observation, recommendations, predictions
 ### 4. Multi-Signal Recommendation Architecture
 
 Recommendations combine four independent signals with configurable weights:
+
 - **Content-based (0.35)** — Category match + goal-range proximity
 - **Collaborative (0.25)** — Similar donors' funding patterns
 - **Trending (0.20)** — Recent donation velocity and acceleration
@@ -214,6 +233,7 @@ The composite formula: `adjusted = composite × (0.5 + 0.5 × trustScore)` ensur
 ### 5. Deterministic Prediction Model
 
 Predictions use rule-based scoring rather than black-box ML:
+
 - **8 weighted features** with normalised values (0–1 range)
 - **Category baselines** for industry-standard success rates
 - **Transparent factors** — Every prediction explains which features contributed
@@ -223,6 +243,7 @@ Predictions use rule-based scoring rather than black-box ML:
 ### 6. Knowledge Base with Dual-Path Search
 
 The knowledge engine uses a two-tier search strategy:
+
 - **Primary**: Semantic search via vector embeddings (pgvector cosine similarity)
 - **Fallback**: Keyword search via `ILIKE` on title and content
 
@@ -231,6 +252,7 @@ This ensures the knowledge base is functional even before embeddings are created
 ### 7. PII Redaction at the Output Layer
 
 All AI output passes through `sanitizeAIOutput()` before returning to callers:
+
 - Emails, phone numbers, Aadhaar numbers, PAN card numbers are automatically redacted
 - HTML/JS injection is stripped (script tags, event handlers, javascript: protocol)
 - This prevents accidental PII leakage from AI-generated content
@@ -278,23 +300,23 @@ User Request → API Route (withAuth) → aiEngine.completeAIRequest()
 
 All Phase 9 operations produce audit events that flow into the existing audit log:
 
-| Event Type | Engine |
-|-----------|--------|
-| `ai_request_completed` | AI Engine |
-| `ai_request_failed` | AI Engine |
-| `ai_config_updated` | AI Config |
-| `knowledge.article_indexed` | Knowledge Engine |
-| `knowledge.article_update` | Knowledge Engine |
-| `knowledge.article_delete` | Knowledge Engine |
-| `knowledge.article_archive` | Knowledge Engine |
-| `workflow.created` | Automation Engine |
-| `workflow.updated` | Automation Engine |
-| `workflow.deleted` | Automation Engine |
-| `workflow.enabled` | Automation Engine |
-| `workflow.disabled` | Automation Engine |
-| `workflow.triggered` | Automation Engine |
-| `workflow.run.retried` | Automation Engine |
-| `workflow.template.created` | Automation Engine |
+| Event Type                            | Engine            |
+| ------------------------------------- | ----------------- |
+| `ai_request_completed`                | AI Engine         |
+| `ai_request_failed`                   | AI Engine         |
+| `ai_config_updated`                   | AI Config         |
+| `knowledge.article_indexed`           | Knowledge Engine  |
+| `knowledge.article_update`            | Knowledge Engine  |
+| `knowledge.article_delete`            | Knowledge Engine  |
+| `knowledge.article_archive`           | Knowledge Engine  |
+| `workflow.created`                    | Automation Engine |
+| `workflow.updated`                    | Automation Engine |
+| `workflow.deleted`                    | Automation Engine |
+| `workflow.enabled`                    | Automation Engine |
+| `workflow.disabled`                   | Automation Engine |
+| `workflow.triggered`                  | Automation Engine |
+| `workflow.run.retried`                | Automation Engine |
+| `workflow.template.created`           | Automation Engine |
 | `workflow.instantiated_from_template` | Automation Engine |
 
 ## What Was NOT Implemented (Per Specification)
@@ -312,27 +334,27 @@ All Phase 9 operations produce audit events that flow into the existing audit lo
 
 ## API Route Summary
 
-| Route | Methods | Actions |
-|-------|---------|---------|
-| `/api/ai/agent` | POST | Autonomous AI agent task execution |
-| `/api/ai/chat` | POST | Role-specific copilot chat (creator, donor, admin, moderator) |
-| `/api/ai/config` | GET, POST | AI configuration management (admin only) |
-| `/api/ai/providers` | GET, POST | Provider management and health checks (admin only) |
-| `/api/ai/usage` | GET | Usage statistics and cost tracking |
-| `/api/ai/campaign/score` | POST | Campaign quality scoring (6 dimensions) |
-| `/api/ai/campaign/suggest` | POST | Title and description improvement suggestions |
-| `/api/ai/generate-campaign` | POST | AI-powered campaign content generation |
-| `/api/ai/funding-recommendation` | POST | Funding goal recommendations |
-| `/api/ai/recommendations` | GET, POST | Personalised recommendations (donor, trending, similar, creator) |
-| `/api/ai/predictions` | GET, POST | Predictive analytics (7 prediction types) |
-| `/api/ai/knowledge` | GET, POST | Knowledge base CRUD and semantic search |
-| `/api/ai/fraud/analyze` | POST | AI-enhanced fraud analysis |
-| `/api/ai/moderation/classify` | POST | AI content classification |
-| `/api/ai/moderation/detect` | POST | AI content detection |
-| `/api/automation/workflows` | GET, POST | Workflow CRUD and listing |
-| `/api/automation/workflows/[id]` | GET, PUT, DELETE | Individual workflow management |
-| `/api/automation/workflows/[id]/trigger` | POST | Manual workflow triggering |
-| `/api/automation/workflows/[id]/runs` | GET | Workflow run history |
+| Route                                    | Methods          | Actions                                                          |
+| ---------------------------------------- | ---------------- | ---------------------------------------------------------------- |
+| `/api/ai/agent`                          | POST             | Autonomous AI agent task execution                               |
+| `/api/ai/chat`                           | POST             | Role-specific copilot chat (creator, donor, admin, moderator)    |
+| `/api/ai/config`                         | GET, POST        | AI configuration management (admin only)                         |
+| `/api/ai/providers`                      | GET, POST        | Provider management and health checks (admin only)               |
+| `/api/ai/usage`                          | GET              | Usage statistics and cost tracking                               |
+| `/api/ai/campaign/score`                 | POST             | Campaign quality scoring (6 dimensions)                          |
+| `/api/ai/campaign/suggest`               | POST             | Title and description improvement suggestions                    |
+| `/api/ai/generate-campaign`              | POST             | AI-powered campaign content generation                           |
+| `/api/ai/funding-recommendation`         | POST             | Funding goal recommendations                                     |
+| `/api/ai/recommendations`                | GET, POST        | Personalised recommendations (donor, trending, similar, creator) |
+| `/api/ai/predictions`                    | GET, POST        | Predictive analytics (7 prediction types)                        |
+| `/api/ai/knowledge`                      | GET, POST        | Knowledge base CRUD and semantic search                          |
+| `/api/ai/fraud/analyze`                  | POST             | AI-enhanced fraud analysis                                       |
+| `/api/ai/moderation/classify`            | POST             | AI content classification                                        |
+| `/api/ai/moderation/detect`              | POST             | AI content detection                                             |
+| `/api/automation/workflows`              | GET, POST        | Workflow CRUD and listing                                        |
+| `/api/automation/workflows/[id]`         | GET, PUT, DELETE | Individual workflow management                                   |
+| `/api/automation/workflows/[id]/trigger` | POST             | Manual workflow triggering                                       |
+| `/api/automation/workflows/[id]/runs`    | GET              | Workflow run history                                             |
 
 ## Security Measures
 

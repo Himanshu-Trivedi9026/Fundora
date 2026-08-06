@@ -1,23 +1,36 @@
 // Recovery Manager — Unit Tests
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const mockBackupData = () => Promise.resolve({
-  data: {
-    id: "backup-1",
-    archive_type: "full",
-    archive_date: new Date().toISOString(),
-    archive_size: 1048576,
-    checksum: "abc123",
-    archive_data: "test-data",
-    retention_until: new Date(Date.now() + 86400000 * 30).toISOString(),
-  },
-  error: null,
-});
+const mockBackupData = () =>
+  Promise.resolve({
+    data: {
+      id: "backup-1",
+      archive_type: "full",
+      archive_date: new Date().toISOString(),
+      archive_size: 1048576,
+      checksum: "abc123",
+      archive_data: "test-data",
+      retention_until: new Date(Date.now() + 86400000 * 30).toISOString(),
+    },
+    error: null,
+  });
 
 const mockLimitResult = Promise.resolve({
   data: [
-    { id: "backup-1", archive_type: "full", archive_date: new Date().toISOString(), archive_size: 1048576, status: "healthy" },
-    { id: "backup-2", archive_type: "schema", archive_date: new Date().toISOString(), archive_size: 1024, status: "healthy" },
+    {
+      id: "backup-1",
+      archive_type: "full",
+      archive_date: new Date().toISOString(),
+      archive_size: 1048576,
+      status: "healthy",
+    },
+    {
+      id: "backup-2",
+      archive_type: "schema",
+      archive_date: new Date().toISOString(),
+      archive_size: 1024,
+      status: "healthy",
+    },
   ],
   error: null,
 });
@@ -116,8 +129,16 @@ describe("Recovery Manager", () => {
     });
 
     it("should list all recovery plans", () => {
-      createRecoveryPlan("plan-a", { description: "Plan A", priority: "high", playbook: [] });
-      createRecoveryPlan("plan-b", { description: "Plan B", priority: "normal", playbook: [] });
+      createRecoveryPlan("plan-a", {
+        description: "Plan A",
+        priority: "high",
+        playbook: [],
+      });
+      createRecoveryPlan("plan-b", {
+        description: "Plan B",
+        priority: "normal",
+        playbook: [],
+      });
 
       const plans = listRecoveryPlans();
       expect(plans.length).toBeGreaterThanOrEqual(2);
@@ -125,7 +146,11 @@ describe("Recovery Manager", () => {
     });
 
     it("should delete recovery plans", () => {
-      createRecoveryPlan("delete-me", { description: "Delete", priority: "low", playbook: [] });
+      createRecoveryPlan("delete-me", {
+        description: "Delete",
+        priority: "low",
+        playbook: [],
+      });
       const result = deleteRecoveryPlan("delete-me");
       expect(result.success).toBe(true);
       expect(getRecoveryPlan("delete-me")).toBeNull();
@@ -140,7 +165,10 @@ describe("Recovery Manager", () => {
 
   describe("Failover", () => {
     it("should initiate failover with a valid plan", async () => {
-      const result = await initiateFailover({ plan: "default", reason: "test failover" });
+      const result = await initiateFailover({
+        plan: "default",
+        reason: "test failover",
+      });
       expect(result.success).toBe(true);
       expect(result.data.status).toBe("completed");
     });

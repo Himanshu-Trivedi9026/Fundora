@@ -66,33 +66,33 @@ import { createOrganization } from "@/lib/organization";
 const result = await createOrganization({
   name: "Acme Corp",
   slug: "acme-corp",
-  type: "company",         // optional, default: "company"
-  description: "...",       // optional
-  website: "...",           // optional
-  ownerId: "uuid",          // required — the creating user
-  industry: "technology",   // optional
-  size: "51-200",           // optional
-  contactEmail: "...",      // optional
-  contactPhone: "...",      // optional
-  metadata: {},             // optional, default: {}
+  type: "company", // optional, default: "company"
+  description: "...", // optional
+  website: "...", // optional
+  ownerId: "uuid", // required — the creating user
+  industry: "technology", // optional
+  size: "51-200", // optional
+  contactEmail: "...", // optional
+  contactPhone: "...", // optional
+  metadata: {}, // optional, default: {}
 });
 ```
 
 **Parameters:**
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `name` | `string` | Yes | — | Display name of the organization |
-| `slug` | `string` | Yes | — | URL-safe unique identifier |
-| `type` | `string` | No | `"company"` | One of `ORG_TYPES` |
-| `description` | `string` | No | — | Organization description |
-| `website` | `string` | No | — | Website URL |
-| `ownerId` | `string` | Yes | — | UUID of the creating user |
-| `industry` | `string` | No | — | Industry sector |
-| `size` | `string` | No | — | Company size bracket |
-| `contactEmail` | `string` | No | — | Contact email |
-| `contactPhone` | `string` | No | — | Contact phone |
-| `metadata` | `object` | No | `{}` | Arbitrary JSON metadata |
+| Parameter      | Type     | Required | Default     | Description                      |
+| -------------- | -------- | -------- | ----------- | -------------------------------- |
+| `name`         | `string` | Yes      | —           | Display name of the organization |
+| `slug`         | `string` | Yes      | —           | URL-safe unique identifier       |
+| `type`         | `string` | No       | `"company"` | One of `ORG_TYPES`               |
+| `description`  | `string` | No       | —           | Organization description         |
+| `website`      | `string` | No       | —           | Website URL                      |
+| `ownerId`      | `string` | Yes      | —           | UUID of the creating user        |
+| `industry`     | `string` | No       | —           | Industry sector                  |
+| `size`         | `string` | No       | —           | Company size bracket             |
+| `contactEmail` | `string` | No       | —           | Contact email                    |
+| `contactPhone` | `string` | No       | —           | Contact phone                    |
+| `metadata`     | `object` | No       | `{}`        | Arbitrary JSON metadata          |
 
 **Returns:**
 
@@ -103,6 +103,7 @@ const result = await createOrganization({
 ```
 
 **Side effects:**
+
 - Adds the `ownerId` user as an `owner` member in `organization_members`.
 - Logs an `organization_created` audit event.
 
@@ -119,9 +120,9 @@ const result = await getOrganization("org-uuid");
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `orgId` | `string` | Yes | Organization UUID |
+| Parameter | Type     | Required | Description       |
+| --------- | -------- | -------- | ----------------- |
+| `orgId`   | `string` | Yes      | Organization UUID |
 
 ---
 
@@ -135,9 +136,9 @@ const result = await getOrganizationBySlug("acme-corp");
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `slug` | `string` | Yes | Organization slug |
+| Parameter | Type     | Required | Description       |
+| --------- | -------- | -------- | ----------------- |
+| `slug`    | `string` | Yes      | Organization slug |
 
 ---
 
@@ -146,20 +147,24 @@ const result = await getOrganizationBySlug("acme-corp");
 Update an organization's fields. Only the `owner` or `admin` members can update.
 
 ```js
-const result = await updateOrganization("org-uuid", {
-  name: "Acme Corporation",
-  description: "Updated description",
-  settings: { theme: "dark" },
-}, user.id);
+const result = await updateOrganization(
+  "org-uuid",
+  {
+    name: "Acme Corporation",
+    description: "Updated description",
+    settings: { theme: "dark" },
+  },
+  user.id,
+);
 ```
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `orgId` | `string` | Yes | Organization UUID |
-| `updates` | `object` | Yes | Fields to update (whitelisted) |
-| `userId` | `string` | Yes | User performing the update |
+| Parameter | Type     | Required | Description                    |
+| --------- | -------- | -------- | ------------------------------ |
+| `orgId`   | `string` | Yes      | Organization UUID              |
+| `updates` | `object` | Yes      | Fields to update (whitelisted) |
+| `userId`  | `string` | Yes      | User performing the update     |
 
 **Allowed update fields:** `name`, `description`, `website`, `logo_url`, `type`, `industry`, `size`, `tax_id`, `registration_number`, `contact_email`, `contact_phone`, `address`, `settings`, `metadata`, `status`
 
@@ -177,10 +182,10 @@ const result = await deleteOrganization("org-uuid", user.id);
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `orgId` | `string` | Yes | Organization UUID |
-| `userId` | `string` | Yes | Must be the organization owner |
+| Parameter | Type     | Required | Description                    |
+| --------- | -------- | -------- | ------------------------------ |
+| `orgId`   | `string` | Yes      | Organization UUID              |
+| `userId`  | `string` | Yes      | Must be the organization owner |
 
 **Side effects:** Logs an `organization_deleted` audit event.
 
@@ -192,24 +197,24 @@ List organizations with optional filters. Excludes soft-deleted organizations. S
 
 ```js
 const result = await listOrganizations({
-  userId: "uuid",   // optional — only orgs user belongs to
-  type: "company",  // optional filter
+  userId: "uuid", // optional — only orgs user belongs to
+  type: "company", // optional filter
   status: "active", // optional filter
-  limit: 50,        // default: 50
-  offset: 0,        // default: 0
+  limit: 50, // default: 50
+  offset: 0, // default: 0
 });
 // result.data: Organization[], result.total: number
 ```
 
 **Parameters:**
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `userId` | `string` | No | — | Filter to user's organizations |
-| `type` | `string` | No | — | Filter by organization type |
-| `status` | `string` | No | — | Filter by status |
-| `limit` | `number` | No | `50` | Pagination limit |
-| `offset` | `number` | No | `0` | Pagination offset |
+| Parameter | Type     | Required | Default | Description                    |
+| --------- | -------- | -------- | ------- | ------------------------------ |
+| `userId`  | `string` | No       | —       | Filter to user's organizations |
+| `type`    | `string` | No       | —       | Filter by organization type    |
+| `status`  | `string` | No       | —       | Filter by status               |
+| `limit`   | `number` | No       | `50`    | Pagination limit               |
+| `offset`  | `number` | No       | `0`     | Pagination offset              |
 
 ---
 
@@ -224,9 +229,9 @@ const result = await getUserOrganizations(user.id);
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `userId` | `string` | Yes | User UUID |
+| Parameter | Type     | Required | Description |
+| --------- | -------- | -------- | ----------- |
+| `userId`  | `string` | Yes      | User UUID   |
 
 ---
 
@@ -235,16 +240,20 @@ const result = await getUserOrganizations(user.id);
 Transfer organization ownership. The current owner becomes an admin, and the new owner is assigned the `owner` role.
 
 ```js
-const result = await transferOwnership("org-uuid", currentOwner.id, newOwner.id);
+const result = await transferOwnership(
+  "org-uuid",
+  currentOwner.id,
+  newOwner.id,
+);
 ```
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `orgId` | `string` | Yes | Organization UUID |
-| `currentOwnerId` | `string` | Yes | Must be current owner |
-| `newOwnerId` | `string` | Yes | Must be an active member |
+| Parameter        | Type     | Required | Description              |
+| ---------------- | -------- | -------- | ------------------------ |
+| `orgId`          | `string` | Yes      | Organization UUID        |
+| `currentOwnerId` | `string` | Yes      | Must be current owner    |
+| `newOwnerId`     | `string` | Yes      | Must be an active member |
 
 **Side effects:** Logs an `ownership_transferred` audit event.
 
@@ -271,18 +280,18 @@ const result = await addMember({
   organizationId: "org-uuid",
   userId: "user-uuid",
   role: "campaign_manager", // optional, default: "member"
-  invitedBy: "admin-uuid",  // optional
+  invitedBy: "admin-uuid", // optional
 });
 ```
 
 **Parameters:**
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `organizationId` | `string` | Yes | — | Organization UUID |
-| `userId` | `string` | Yes | — | User to add |
-| `role` | `string` | No | `"member"` | One of `ORG_ROLES` |
-| `invitedBy` | `string` | No | — | User who invited them |
+| Parameter        | Type     | Required | Default    | Description           |
+| ---------------- | -------- | -------- | ---------- | --------------------- |
+| `organizationId` | `string` | Yes      | —          | Organization UUID     |
+| `userId`         | `string` | Yes      | —          | User to add           |
+| `role`           | `string` | No       | `"member"` | One of `ORG_ROLES`    |
+| `invitedBy`      | `string` | No       | —          | User who invited them |
 
 **Side effects:** Logs `member_added` or `member_reactivated` audit event.
 
@@ -298,11 +307,11 @@ const result = await removeMember("org-uuid", targetUser.id, adminUser.id);
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `organizationId` | `string` | Yes | Organization UUID |
-| `userId` | `string` | Yes | Member to remove |
-| `performedBy` | `string` | Yes | Must be owner or admin |
+| Parameter        | Type     | Required | Description            |
+| ---------------- | -------- | -------- | ---------------------- |
+| `organizationId` | `string` | Yes      | Organization UUID      |
+| `userId`         | `string` | Yes      | Member to remove       |
+| `performedBy`    | `string` | Yes      | Must be owner or admin |
 
 **Side effects:** Logs a `member_removed` audit event.
 
@@ -313,17 +322,22 @@ const result = await removeMember("org-uuid", targetUser.id, adminUser.id);
 Update a member's role within an organization. Requires `owner` or `admin` role.
 
 ```js
-const result = await updateMemberRole("org-uuid", userId, "finance_manager", adminId);
+const result = await updateMemberRole(
+  "org-uuid",
+  userId,
+  "finance_manager",
+  adminId,
+);
 ```
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `organizationId` | `string` | Yes | Organization UUID |
-| `userId` | `string` | Yes | Member to update |
-| `newRole` | `string` | Yes | One of `ORG_ROLES` |
-| `performedBy` | `string` | Yes | Must be owner or admin |
+| Parameter        | Type     | Required | Description            |
+| ---------------- | -------- | -------- | ---------------------- |
+| `organizationId` | `string` | Yes      | Organization UUID      |
+| `userId`         | `string` | Yes      | Member to update       |
+| `newRole`        | `string` | Yes      | One of `ORG_ROLES`     |
+| `performedBy`    | `string` | Yes      | Must be owner or admin |
 
 **Side effects:** Logs a `member_role_updated` audit event.
 
@@ -335,10 +349,10 @@ List members of an organization with optional role/status filters.
 
 ```js
 const result = await getMembers("org-uuid", {
-  role: "admin",      // optional filter
-  status: "active",   // optional, default: "active"
-  limit: 50,          // default: 50
-  offset: 0,          // default: 0
+  role: "admin", // optional filter
+  status: "active", // optional, default: "active"
+  limit: 50, // default: 50
+  offset: 0, // default: 0
 });
 // result.data: Member[], result.total: number
 ```
@@ -365,7 +379,7 @@ Create an invitation to join an organization.
 const result = await createInvitation({
   organizationId: "org-uuid",
   email: "newuser@example.com",
-  role: "member",       // optional, default: "member"
+  role: "member", // optional, default: "member"
   invitedBy: "admin-uuid", // required
 });
 // result.data.token — share this token with the invitee
@@ -373,14 +387,15 @@ const result = await createInvitation({
 
 **Parameters:**
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `organizationId` | `string` | Yes | — | Organization UUID |
-| `email` | `string` | Yes | — | Invitee's email |
-| `role` | `string` | No | `"member"` | Role to assign on acceptance |
-| `invitedBy` | `string` | Yes | — | Admin/owner creating the invite |
+| Parameter        | Type     | Required | Default    | Description                     |
+| ---------------- | -------- | -------- | ---------- | ------------------------------- |
+| `organizationId` | `string` | Yes      | —          | Organization UUID               |
+| `email`          | `string` | Yes      | —          | Invitee's email                 |
+| `role`           | `string` | No       | `"member"` | Role to assign on acceptance    |
+| `invitedBy`      | `string` | Yes      | —          | Admin/owner creating the invite |
 
 **Validation:**
+
 - Requires `owner` or `admin` role for the `invitedBy` user.
 - Rejects duplicate pending invitations for the same email + organization.
 - Token expires after 7 days.
@@ -399,12 +414,13 @@ const result = await acceptInvitation("invitation-uuid", "user-uuid");
 
 **Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `invitationId` | `string` | Yes | Invitation UUID |
-| `userId` | `string` | Yes | User accepting the invitation |
+| Parameter      | Type     | Required | Description                   |
+| -------------- | -------- | -------- | ----------------------------- |
+| `invitationId` | `string` | Yes      | Invitation UUID               |
+| `userId`       | `string` | Yes      | User accepting the invitation |
 
 **Validation:**
+
 - Invitation must be in `pending` status.
 - Invitation must not be expired.
 - Calls `addMember` internally to create the membership.
@@ -429,7 +445,7 @@ List invitations for an organization.
 
 ```js
 const result = await getInvitations("org-uuid", {
-  status: "pending",  // optional filter
+  status: "pending", // optional filter
   limit: 50,
   offset: 0,
 });
@@ -445,21 +461,21 @@ Departments support a hierarchical structure via `parent_department_id`.
 const result = await createDepartment({
   organizationId: "org-uuid",
   name: "Engineering",
-  parentDepartmentId: null,    // optional
-  headUserId: "user-uuid",    // optional
+  parentDepartmentId: null, // optional
+  headUserId: "user-uuid", // optional
   description: "Core engineering team",
 });
 ```
 
 **Parameters:**
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `organizationId` | `string` | Yes | — | Organization UUID |
-| `name` | `string` | Yes | — | Department name |
-| `parentDepartmentId` | `string` | No | `null` | Parent department UUID |
-| `headUserId` | `string` | No | `null` | Department head user UUID |
-| `description` | `string` | No | — | Department description |
+| Parameter            | Type     | Required | Default | Description               |
+| -------------------- | -------- | -------- | ------- | ------------------------- |
+| `organizationId`     | `string` | Yes      | —       | Organization UUID         |
+| `name`               | `string` | Yes      | —       | Department name           |
+| `parentDepartmentId` | `string` | No       | `null`  | Parent department UUID    |
+| `headUserId`         | `string` | No       | `null`  | Department head user UUID |
+| `description`        | `string` | No       | —       | Department description    |
 
 ---
 
@@ -484,9 +500,9 @@ Teams can belong to a department or directly to an organization.
 ```js
 const result = await createTeam({
   organizationId: "org-uuid",
-  departmentId: "dept-uuid",  // optional
+  departmentId: "dept-uuid", // optional
   name: "Frontend Team",
-  teamLeadId: "user-uuid",    // optional
+  teamLeadId: "user-uuid", // optional
   description: "...",
 });
 ```
@@ -521,7 +537,12 @@ const result = await getOrganizationSettings("org-uuid");
 Upsert a single setting. Logs an `org_setting_changed` audit event when `performedBy` is provided.
 
 ```js
-const result = await setOrganizationSetting("org-uuid", "theme", "dark", userId);
+const result = await setOrganizationSetting(
+  "org-uuid",
+  "theme",
+  "dark",
+  userId,
+);
 ```
 
 ### `getOrganizationSetting(organizationId, key)`
@@ -556,29 +577,29 @@ if (!result.success) {
 
 The Organization Engine uses the following tables (created in migration `008_enterprise_organizations_api.sql`):
 
-| Table | Description |
-|-------|-------------|
-| `organizations` | Organization records with soft delete |
-| `organization_members` | User ↔ Organization mapping with roles |
-| `departments` | Hierarchical department structure |
-| `teams` | Teams within departments or organizations |
-| `team_members` | User ↔ Team mapping |
-| `invitations` | Pending invitations with tokens |
-| `organization_roles` | Custom role definitions per organization |
-| `organization_settings` | Key-value settings per organization |
+| Table                   | Description                               |
+| ----------------------- | ----------------------------------------- |
+| `organizations`         | Organization records with soft delete     |
+| `organization_members`  | User ↔ Organization mapping with roles    |
+| `departments`           | Hierarchical department structure         |
+| `teams`                 | Teams within departments or organizations |
+| `team_members`          | User ↔ Team mapping                       |
+| `invitations`           | Pending invitations with tokens           |
+| `organization_roles`    | Custom role definitions per organization  |
+| `organization_settings` | Key-value settings per organization       |
 
 ## API Routes
 
-| Route | Method | Actions |
-|-------|--------|---------|
-| `/api/organization` | GET | `orgId`, `slug`, `mode=my`, list |
-| `/api/organization` | POST | `create`, `update`, `delete`, `archive`, `transfer_ownership` |
-| `/api/organization/members` | GET/POST | Member management |
-| `/api/organization/invitations` | GET/POST | Invitation management |
-| `/api/organization/departments` | GET/POST | Department management |
-| `/api/organization/teams` | GET/POST | Team management |
-| `/api/organization/settings` | GET/POST | Settings management |
-| `/api/organization/analytics` | GET | Organization analytics |
+| Route                           | Method   | Actions                                                       |
+| ------------------------------- | -------- | ------------------------------------------------------------- |
+| `/api/organization`             | GET      | `orgId`, `slug`, `mode=my`, list                              |
+| `/api/organization`             | POST     | `create`, `update`, `delete`, `archive`, `transfer_ownership` |
+| `/api/organization/members`     | GET/POST | Member management                                             |
+| `/api/organization/invitations` | GET/POST | Invitation management                                         |
+| `/api/organization/departments` | GET/POST | Department management                                         |
+| `/api/organization/teams`       | GET/POST | Team management                                               |
+| `/api/organization/settings`    | GET/POST | Settings management                                           |
+| `/api/organization/analytics`   | GET      | Organization analytics                                        |
 
 ## Tests
 

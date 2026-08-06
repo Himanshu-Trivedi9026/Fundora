@@ -36,13 +36,18 @@ async function handler(req, res) {
       }
 
       case "PUT": {
-        if (!req.query.id) return res.status(400).json({ success: false, error: "Tenant ID required" });
+        if (!req.query.id)
+          return res
+            .status(400)
+            .json({ success: false, error: "Tenant ID required" });
         const result = await updateTenant(req.query.id, req.body);
         return res.status(result.success ? 200 : 400).json(result);
       }
 
       default:
-        return res.status(405).json({ success: false, error: "Method not allowed" });
+        return res
+          .status(405)
+          .json({ success: false, error: "Method not allowed" });
     }
   } catch (error) {
     console.error("Handler error:", error);

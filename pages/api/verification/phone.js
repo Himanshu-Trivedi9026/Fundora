@@ -81,7 +81,10 @@ export default withAuth(async function handler(req, res, user) {
         .eq("user_id", user.id);
 
       if (updateError) {
-        console.error("Phone verify: creator_verifications update failed:", updateError.message);
+        console.error(
+          "Phone verify: creator_verifications update failed:",
+          updateError.message,
+        );
       }
 
       return res.status(200).json({ success: true });

@@ -133,13 +133,41 @@ describe("FraudAIEnhancer", () => {
     it("detects velocity, amount, and recipient anomalies", async () => {
       const now = Date.now();
       const recentDonations = [
-        { amount: 15000, campaign_id: "c1", created_at: new Date(now - 60000).toISOString() },
-        { amount: 15000, campaign_id: "c1", created_at: new Date(now - 120000).toISOString() },
-        { amount: 15000, campaign_id: "c1", created_at: new Date(now - 180000).toISOString() },
-        { amount: 15000, campaign_id: "c1", created_at: new Date(now - 240000).toISOString() },
-        { amount: 15000, campaign_id: "c1", created_at: new Date(now - 300000).toISOString() },
-        { amount: 15000, campaign_id: "c1", created_at: new Date(now - 360000).toISOString() },
-        { amount: 15000, campaign_id: "c1", created_at: new Date(now - 420000).toISOString() },
+        {
+          amount: 15000,
+          campaign_id: "c1",
+          created_at: new Date(now - 60000).toISOString(),
+        },
+        {
+          amount: 15000,
+          campaign_id: "c1",
+          created_at: new Date(now - 120000).toISOString(),
+        },
+        {
+          amount: 15000,
+          campaign_id: "c1",
+          created_at: new Date(now - 180000).toISOString(),
+        },
+        {
+          amount: 15000,
+          campaign_id: "c1",
+          created_at: new Date(now - 240000).toISOString(),
+        },
+        {
+          amount: 15000,
+          campaign_id: "c1",
+          created_at: new Date(now - 300000).toISOString(),
+        },
+        {
+          amount: 15000,
+          campaign_id: "c1",
+          created_at: new Date(now - 360000).toISOString(),
+        },
+        {
+          amount: 15000,
+          campaign_id: "c1",
+          created_at: new Date(now - 420000).toISOString(),
+        },
       ];
 
       const result = await detectDonationAnomalies({
@@ -155,13 +183,19 @@ describe("FraudAIEnhancer", () => {
 
       expect(result.success).toBe(true);
       expect(result.data.anomalies.length).toBeGreaterThan(0);
-      expect(result.data.velocityAnomaly || result.data.amountAnomaly).toBe(true);
+      expect(result.data.velocityAnomaly || result.data.amountAnomaly).toBe(
+        true,
+      );
     });
 
     it("returns clean result for normal donation patterns", async () => {
       const now = Date.now();
       const recentDonations = [
-        { amount: 50, campaign_id: "c1", created_at: new Date(now - 7200000).toISOString() },
+        {
+          amount: 50,
+          campaign_id: "c1",
+          created_at: new Date(now - 7200000).toISOString(),
+        },
       ];
 
       const result = await detectDonationAnomalies({
@@ -222,7 +256,9 @@ describe("FraudAIEnhancer", () => {
       expect(Array.isArray(result.data.relationships)).toBe(true);
       expect(result.data.riskLevel).toBe("high");
 
-      const collusion = result.data.relationships.find((r) => r.type === "collusion");
+      const collusion = result.data.relationships.find(
+        (r) => r.type === "collusion",
+      );
       expect(collusion).toBeDefined();
       expect(collusion.relatedUsers).toContain("user-1");
       expect(collusion.confidence).toBeGreaterThan(0);
@@ -292,7 +328,7 @@ describe("FraudAIEnhancer", () => {
 
       // Should detect velocity fraud (score > 70)
       const velocityPattern = result.data.patterns.find(
-        (p) => p.type === "velocity_fraud"
+        (p) => p.type === "velocity_fraud",
       );
       expect(velocityPattern).toBeDefined();
       expect(velocityPattern.confidence).toBeGreaterThan(0);
@@ -361,7 +397,10 @@ describe("FraudAIEnhancer", () => {
     });
 
     it("returns error when required params are missing", async () => {
-      const noUser = await explainRiskAssessment({ riskScore: 50, signals: {} });
+      const noUser = await explainRiskAssessment({
+        riskScore: 50,
+        signals: {},
+      });
       expect(noUser.success).toBe(false);
 
       const noScore = await explainRiskAssessment({
@@ -382,7 +421,9 @@ describe("FraudAIEnhancer", () => {
       expect(result.success).toBe(true);
       expect(result.data.explanation).toContain("low");
       expect(result.data.explanation).toContain("allowed");
-      expect(result.data.suggestedActions).toContain("No immediate action required");
+      expect(result.data.suggestedActions).toContain(
+        "No immediate action required",
+      );
     });
   });
 
@@ -391,14 +432,34 @@ describe("FraudAIEnhancer", () => {
   describe("generateFraudSummary", () => {
     it("generates admin dashboard summary with trends", async () => {
       const mockCases = [
-        { id: "f1", status: "open", fraud_type: "identity_fraud", severity: "high", created_at: new Date().toISOString() },
-        { id: "f2", status: "resolved", fraud_type: "velocity_fraud", severity: "medium", created_at: new Date().toISOString() },
-        { id: "f3", status: "open", fraud_type: "identity_fraud", severity: "critical", created_at: new Date().toISOString() },
+        {
+          id: "f1",
+          status: "open",
+          fraud_type: "identity_fraud",
+          severity: "high",
+          created_at: new Date().toISOString(),
+        },
+        {
+          id: "f2",
+          status: "resolved",
+          fraud_type: "velocity_fraud",
+          severity: "medium",
+          created_at: new Date().toISOString(),
+        },
+        {
+          id: "f3",
+          status: "open",
+          fraud_type: "identity_fraud",
+          severity: "critical",
+          created_at: new Date().toISOString(),
+        },
       ];
       const mockPrevious = [{ id: "p1" }];
 
       const dateChain1 = mockDateChain("lte", mockCases);
-      const dateChain2 = { lt: vi.fn().mockResolvedValue({ data: mockPrevious, error: null }) };
+      const dateChain2 = {
+        lt: vi.fn().mockResolvedValue({ data: mockPrevious, error: null }),
+      };
 
       supabaseAdmin.from
         .mockReturnValueOnce({
@@ -457,14 +518,14 @@ describe("FraudAIEnhancer", () => {
 
       // Should include account restriction
       const restriction = result.data.recommendations.find((r) =>
-        r.action.toLowerCase().includes("restrict")
+        r.action.toLowerCase().includes("restrict"),
       );
       expect(restriction).toBeDefined();
       expect(restriction.priority).toBe("high");
 
       // With 4 anomalies (> 3), should include suspension recommendation
       const suspension = result.data.recommendations.find((r) =>
-        r.action.toLowerCase().includes("suspend")
+        r.action.toLowerCase().includes("suspend"),
       );
       expect(suspension).toBeDefined();
     });
@@ -478,7 +539,9 @@ describe("FraudAIEnhancer", () => {
 
       expect(result.success).toBe(true);
       expect(result.data.recommendations.length).toBeGreaterThanOrEqual(3);
-      expect(result.data.recommendations.every((r) => r.priority === "medium")).toBe(true);
+      expect(
+        result.data.recommendations.every((r) => r.priority === "medium"),
+      ).toBe(true);
     });
 
     it("returns low-priority recommendations for low risk", async () => {
@@ -490,7 +553,9 @@ describe("FraudAIEnhancer", () => {
 
       expect(result.success).toBe(true);
       expect(result.data.recommendations.length).toBeGreaterThanOrEqual(2);
-      expect(result.data.recommendations.every((r) => r.priority === "low")).toBe(true);
+      expect(
+        result.data.recommendations.every((r) => r.priority === "low"),
+      ).toBe(true);
     });
 
     it("returns error when required params are missing", async () => {

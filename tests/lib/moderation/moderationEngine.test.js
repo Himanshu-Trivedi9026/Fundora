@@ -63,7 +63,10 @@ describe("ModerationEngine", () => {
             like: vi.fn().mockReturnValue({
               order: vi.fn().mockReturnValue({
                 limit: vi.fn().mockReturnValue({
-                  single: vi.fn().mockResolvedValue({ data: null, error: { message: "not found" } }),
+                  single: vi.fn().mockResolvedValue({
+                    data: null,
+                    error: { message: "not found" },
+                  }),
                 }),
               }),
             }),
@@ -73,7 +76,9 @@ describe("ModerationEngine", () => {
         .mockReturnValueOnce({
           insert: vi.fn().mockReturnValue({
             select: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockCase, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockCase, error: null }),
             }),
           }),
         });
@@ -95,15 +100,25 @@ describe("ModerationEngine", () => {
 
   describe("resolveModerationCase", () => {
     it("should resolve a moderation case", async () => {
-      const mockCase = { id: "mod-1", status: "in_review", case_number: "MOD-2026-00001" };
-      const mockResolved = { ...mockCase, status: "resolved", action_taken: "warning" };
+      const mockCase = {
+        id: "mod-1",
+        status: "in_review",
+        case_number: "MOD-2026-00001",
+      };
+      const mockResolved = {
+        ...mockCase,
+        status: "resolved",
+        action_taken: "warning",
+      };
 
       // 1. Fetch case: select("*").eq("id", caseId).single()
       supabaseAdmin.from
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockCase, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockCase, error: null }),
             }),
           }),
         })
@@ -112,28 +127,47 @@ describe("ModerationEngine", () => {
           update: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               select: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: mockResolved, error: null }),
+                single: vi
+                  .fn()
+                  .mockResolvedValue({ data: mockResolved, error: null }),
               }),
             }),
           }),
         });
 
-      const result = await resolveModerationCase("mod-1", "warning", "First offense", "Don't spam", "admin-1");
+      const result = await resolveModerationCase(
+        "mod-1",
+        "warning",
+        "First offense",
+        "Don't spam",
+        "admin-1",
+      );
       expect(result.success).toBe(true);
     });
   });
 
   describe("escalateModerationCase", () => {
     it("should escalate a moderation case", async () => {
-      const mockCase = { id: "mod-1", status: "open", priority: "medium", case_number: "MOD-2026-00001" };
-      const mockEscalated = { ...mockCase, status: "escalated", priority: "critical" };
+      const mockCase = {
+        id: "mod-1",
+        status: "open",
+        priority: "medium",
+        case_number: "MOD-2026-00001",
+      };
+      const mockEscalated = {
+        ...mockCase,
+        status: "escalated",
+        priority: "critical",
+      };
 
       // 1. Fetch case
       supabaseAdmin.from
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockCase, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockCase, error: null }),
             }),
           }),
         })
@@ -142,13 +176,19 @@ describe("ModerationEngine", () => {
           update: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               select: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: mockEscalated, error: null }),
+                single: vi
+                  .fn()
+                  .mockResolvedValue({ data: mockEscalated, error: null }),
               }),
             }),
           }),
         });
 
-      const result = await escalateModerationCase("mod-1", "Severe harassment", "admin-1");
+      const result = await escalateModerationCase(
+        "mod-1",
+        "Severe harassment",
+        "admin-1",
+      );
       expect(result.success).toBe(true);
     });
   });

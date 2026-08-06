@@ -83,7 +83,22 @@ export default withAuth(async function handler(req, res, user) {
     if (!rl(req, res)) return;
 
     try {
-      const { action, name, slug, type, description, website, industry, size, contactEmail, contactPhone, metadata, orgId, updates, newOwnerId } = req.body;
+      const {
+        action,
+        name,
+        slug,
+        type,
+        description,
+        website,
+        industry,
+        size,
+        contactEmail,
+        contactPhone,
+        metadata,
+        orgId,
+        updates,
+        newOwnerId,
+      } = req.body;
 
       if (action === "create") {
         if (!name || !slug) {
@@ -113,7 +128,9 @@ export default withAuth(async function handler(req, res, user) {
 
       if (action === "update") {
         if (!orgId || !updates) {
-          return res.status(400).json({ error: "orgId and updates are required" });
+          return res
+            .status(400)
+            .json({ error: "orgId and updates are required" });
         }
 
         const result = await updateOrganization(orgId, updates, user.id);
@@ -152,7 +169,9 @@ export default withAuth(async function handler(req, res, user) {
 
       if (action === "transfer_ownership") {
         if (!orgId || !newOwnerId) {
-          return res.status(400).json({ error: "orgId and newOwnerId are required" });
+          return res
+            .status(400)
+            .json({ error: "orgId and newOwnerId are required" });
         }
 
         const result = await transferOwnership(orgId, user.id, newOwnerId);

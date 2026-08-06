@@ -35,7 +35,10 @@ export default function SimilarProjects({ projects }) {
                 </div>
               ) : (
                 <div className="w-16 h-16 bg-surface-container-high rounded-lg shrink-0 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-on-surface-variant/30 text-lg" aria-hidden="true">
+                  <span
+                    className="material-symbols-outlined text-on-surface-variant/30 text-lg"
+                    aria-hidden="true"
+                  >
                     rocket_launch
                   </span>
                 </div>

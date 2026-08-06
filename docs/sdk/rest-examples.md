@@ -90,13 +90,13 @@ All errors follow a consistent format:
 
 ### Error Status Codes
 
-| Status | Meaning | Example |
-|--------|---------|---------|
-| `400` | Bad Request | `"name is required"`, `"url is required"`, `"Invalid action"` |
-| `401` | Unauthorized | `"API key required (X-API-Key header)"`, `"Invalid or revoked API key"` |
-| `405` | Method Not Allowed | `"Method not allowed"` |
-| `429` | Rate Limited | `"Too many requests"` with `retryAfter` field |
-| `500` | Server Error | `"Internal server error"`, `"Failed to fetch API keys"` |
+| Status | Meaning            | Example                                                                 |
+| ------ | ------------------ | ----------------------------------------------------------------------- |
+| `400`  | Bad Request        | `"name is required"`, `"url is required"`, `"Invalid action"`           |
+| `401`  | Unauthorized       | `"API key required (X-API-Key header)"`, `"Invalid or revoked API key"` |
+| `405`  | Method Not Allowed | `"Method not allowed"`                                                  |
+| `429`  | Rate Limited       | `"Too many requests"` with `retryAfter` field                           |
+| `500`  | Server Error       | `"Internal server error"`, `"Failed to fetch API keys"`                 |
 
 ---
 
@@ -447,7 +447,12 @@ curl -X POST \
   "data": {
     "id": "webhook-uuid",
     "url": "https://myapp.com/webhooks/fundora",
-    "events": ["donation.received", "campaign.funded", "escrow.released", "milestone.approved"],
+    "events": [
+      "donation.received",
+      "campaign.funded",
+      "escrow.released",
+      "milestone.approved"
+    ],
     "status": "active"
   }
 }
@@ -580,13 +585,13 @@ curl -X POST \
 
 Failed deliveries are retried with exponential backoff:
 
-| Attempt | Delay | Cumulative Wait |
-|---------|-------|-----------------|
-| 1 | 1 minute | 1 min |
-| 2 | 5 minutes | 6 min |
-| 3 | 30 minutes | 36 min |
-| 4 | 2 hours | 2h 36m |
-| 5 | 12 hours | 14h 36m |
+| Attempt | Delay      | Cumulative Wait |
+| ------- | ---------- | --------------- |
+| 1       | 1 minute   | 1 min           |
+| 2       | 5 minutes  | 6 min           |
+| 3       | 30 minutes | 36 min          |
+| 4       | 2 hours    | 2h 36m          |
+| 5       | 12 hours   | 14h 36m         |
 
 After `max_attempts` (default 5), the delivery is marked as `failed`.
 
@@ -867,7 +872,7 @@ function verifyFundoraSignature(payload, signature, secret) {
 
   return crypto.timingSafeEqual(
     Buffer.from(expected, "utf8"),
-    Buffer.from(signature || "", "utf8")
+    Buffer.from(signature || "", "utf8"),
   );
 }
 

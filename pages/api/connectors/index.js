@@ -28,7 +28,9 @@ async function handler(req, res) {
 
       case "GET": {
         if (req.query.providers) {
-          return res.status(200).json({ success: true, data: getAvailableProviders() });
+          return res
+            .status(200)
+            .json({ success: true, data: getAvailableProviders() });
         }
         if (req.query.id) {
           const result = await getConnectorStatus(req.query.id);
@@ -45,7 +47,10 @@ async function handler(req, res) {
       }
 
       case "PUT": {
-        if (!req.query.id) return res.status(400).json({ success: false, error: "Connector ID required" });
+        if (!req.query.id)
+          return res
+            .status(400)
+            .json({ success: false, error: "Connector ID required" });
 
         const { action, channel, message } = req.body;
         let result;
@@ -58,24 +63,35 @@ async function handler(req, res) {
             result = await disconnectConnector(req.query.id);
             break;
           case "send":
-            if (!channel || !message) return res.status(400).json({ success: false, error: "channel and message required" });
+            if (!channel || !message)
+              return res.status(400).json({
+                success: false,
+                error: "channel and message required",
+              });
             result = await sendConnectorMessage(req.query.id, channel, message);
             break;
           default:
-            return res.status(400).json({ success: false, error: `Unknown action: ${action}` });
+            return res
+              .status(400)
+              .json({ success: false, error: `Unknown action: ${action}` });
         }
 
         return res.status(result.success ? 200 : 400).json(result);
       }
 
       case "DELETE": {
-        if (!req.query.id) return res.status(400).json({ success: false, error: "Connector ID required" });
+        if (!req.query.id)
+          return res
+            .status(400)
+            .json({ success: false, error: "Connector ID required" });
         const result = await deleteConnector(req.query.id);
         return res.status(result.success ? 200 : 400).json(result);
       }
 
       default:
-        return res.status(405).json({ success: false, error: "Method not allowed" });
+        return res
+          .status(405)
+          .json({ success: false, error: "Method not allowed" });
     }
   } catch (error) {
     console.error("Handler error:", error);

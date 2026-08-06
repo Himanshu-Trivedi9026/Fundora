@@ -68,7 +68,9 @@ export default function SecurityDashboard({ userId }) {
   if (loading) {
     return (
       <div className="glass-panel rounded-2xl p-6">
-        <div className="text-gray-400 font-inter">Loading security status...</div>
+        <div className="text-gray-400 font-inter">
+          Loading security status...
+        </div>
       </div>
     );
   }
@@ -82,7 +84,9 @@ export default function SecurityDashboard({ userId }) {
         <div className="flex items-center gap-4 mb-6">
           <div
             className="w-12 h-12 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: `${STATUS_COLORS[securityStatus.level]}20` }}
+            style={{
+              backgroundColor: `${STATUS_COLORS[securityStatus.level]}20`,
+            }}
           >
             <span
               className="material-symbols-outlined text-2xl"
@@ -95,22 +99,31 @@ export default function SecurityDashboard({ userId }) {
             <h3 className="text-lg font-semibold text-white font-geist">
               {securityStatus.title}
             </h3>
-            <p className="text-sm text-gray-400 font-inter">{securityStatus.description}</p>
+            <p className="text-sm text-gray-400 font-inter">
+              {securityStatus.description}
+            </p>
           </div>
         </div>
 
         {/* Recommendations */}
         {securityStatus.recommendations.length > 0 && (
           <div className="space-y-3">
-            <h4 className="text-sm font-medium text-gray-400">Recommendations</h4>
+            <h4 className="text-sm font-medium text-gray-400">
+              Recommendations
+            </h4>
             {securityStatus.recommendations.map((rec, i) => (
-              <div key={i} className="flex items-start gap-3 bg-white/5 rounded-lg p-3">
+              <div
+                key={i}
+                className="flex items-start gap-3 bg-white/5 rounded-lg p-3"
+              >
                 <span className="material-symbols-outlined text-lg text-amber-400 mt-0.5">
                   lightbulb
                 </span>
                 <div>
                   <p className="text-sm text-white font-inter">{rec.title}</p>
-                  <p className="text-xs text-gray-400 font-inter">{rec.description}</p>
+                  <p className="text-xs text-gray-400 font-inter">
+                    {rec.description}
+                  </p>
                 </div>
               </div>
             ))}
@@ -120,23 +133,32 @@ export default function SecurityDashboard({ userId }) {
 
       {/* Device History */}
       <div className="glass-panel rounded-2xl p-6">
-        <h3 className="text-lg font-semibold text-white font-geist mb-4">Recent Devices</h3>
+        <h3 className="text-lg font-semibold text-white font-geist mb-4">
+          Recent Devices
+        </h3>
         {devices.length === 0 ? (
-          <p className="text-sm text-gray-400 font-inter">No device history available</p>
+          <p className="text-sm text-gray-400 font-inter">
+            No device history available
+          </p>
         ) : (
           <div className="space-y-3">
             {devices.map((device) => (
-              <div key={device.id} className="flex items-center justify-between bg-white/5 rounded-lg p-3">
+              <div
+                key={device.id}
+                className="flex items-center justify-between bg-white/5 rounded-lg p-3"
+              >
                 <div className="flex items-center gap-3">
                   <span className="material-symbols-outlined text-gray-400">
                     {getDeviceIcon(device.platform)}
                   </span>
                   <div>
                     <p className="text-sm text-white font-inter">
-                      {device.browser || "Unknown"} on {device.platform || "Unknown"}
+                      {device.browser || "Unknown"} on{" "}
+                      {device.platform || "Unknown"}
                     </p>
                     <p className="text-xs text-gray-400 font-inter">
-                      Last active: {new Date(device.last_seen_at).toLocaleDateString()}
+                      Last active:{" "}
+                      {new Date(device.last_seen_at).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
@@ -157,13 +179,20 @@ export default function SecurityDashboard({ userId }) {
 
       {/* Recent Security Events */}
       <div className="glass-panel rounded-2xl p-6">
-        <h3 className="text-lg font-semibold text-white font-geist mb-4">Recent Activity</h3>
+        <h3 className="text-lg font-semibold text-white font-geist mb-4">
+          Recent Activity
+        </h3>
         {events.length === 0 ? (
-          <p className="text-sm text-gray-400 font-inter">No recent security events</p>
+          <p className="text-sm text-gray-400 font-inter">
+            No recent security events
+          </p>
         ) : (
           <div className="space-y-3">
             {events.map((event) => (
-              <div key={event.id} className="flex items-center justify-between bg-white/5 rounded-lg p-3">
+              <div
+                key={event.id}
+                className="flex items-center justify-between bg-white/5 rounded-lg p-3"
+              >
                 <div className="flex items-center gap-3">
                   <span className="material-symbols-outlined text-gray-400">
                     {getEventIcon(event.eventCategory)}
@@ -180,8 +209,18 @@ export default function SecurityDashboard({ userId }) {
                 <span
                   className="text-xs px-2 py-1 rounded-full"
                   style={{
-                    backgroundColor: event.severity === "critical" ? "#ef444420" : event.severity === "warning" ? "#f59e0b20" : "#10b98120",
-                    color: event.severity === "critical" ? "#ef4444" : event.severity === "warning" ? "#f59e0b" : "#10b981",
+                    backgroundColor:
+                      event.severity === "critical"
+                        ? "#ef444420"
+                        : event.severity === "warning"
+                          ? "#f59e0b20"
+                          : "#10b98120",
+                    color:
+                      event.severity === "critical"
+                        ? "#ef4444"
+                        : event.severity === "warning"
+                          ? "#f59e0b"
+                          : "#10b981",
                   }}
                 >
                   {event.severity}
@@ -203,11 +242,13 @@ function getSecurityStatus(profile) {
       level: "attention",
       icon: "info",
       title: "Security Status Unknown",
-      description: "Complete your verification to improve your security status.",
+      description:
+        "Complete your verification to improve your security status.",
       recommendations: [
         {
           title: "Verify your email",
-          description: "Start by verifying your email address to secure your account.",
+          description:
+            "Start by verifying your email address to secure your account.",
         },
       ],
     };
@@ -230,7 +271,8 @@ function getSecurityStatus(profile) {
       level: "attention",
       icon: "pending",
       title: "Account Under Review",
-      description: "Your account is currently under review. This is usually resolved within 24-48 hours.",
+      description:
+        "Your account is currently under review. This is usually resolved within 24-48 hours.",
       recommendations: [],
     };
   }
@@ -238,7 +280,8 @@ function getSecurityStatus(profile) {
   if (profile.decision === "monitor") {
     recommendations.push({
       title: "Enhanced verification recommended",
-      description: "Complete additional verification steps to improve your account status.",
+      description:
+        "Complete additional verification steps to improve your account status.",
     });
   }
 
@@ -254,7 +297,8 @@ function getSecurityStatus(profile) {
 function getDeviceIcon(platform) {
   if (!platform) return "devices";
   const p = platform.toLowerCase();
-  if (p.includes("iphone") || p.includes("ipad") || p.includes("ios")) return "smartphone";
+  if (p.includes("iphone") || p.includes("ipad") || p.includes("ios"))
+    return "smartphone";
   if (p.includes("android")) return "smartphone";
   if (p.includes("windows")) return "computer";
   if (p.includes("mac")) return "computer";
@@ -282,7 +326,5 @@ function getEventIcon(category) {
 }
 
 function formatEventType(type) {
-  return type
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+  return type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }

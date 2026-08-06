@@ -23,9 +23,16 @@ vi.mock("../../lib/rateLimit", () => ({
 }));
 
 vi.mock("../../lib/verification/businessVerification", () => ({
-  createBusinessVerification: vi.fn().mockResolvedValue({ success: true, data: { id: "123" } }),
-  uploadBusinessDocument: vi.fn().mockResolvedValue({ success: true, data: { id: "doc1" } }),
-  getBusinessVerification: vi.fn().mockResolvedValue({ success: true, data: { id: "123", business_name: "Test" } }),
+  createBusinessVerification: vi
+    .fn()
+    .mockResolvedValue({ success: true, data: { id: "123" } }),
+  uploadBusinessDocument: vi
+    .fn()
+    .mockResolvedValue({ success: true, data: { id: "doc1" } }),
+  getBusinessVerification: vi.fn().mockResolvedValue({
+    success: true,
+    data: { id: "123", business_name: "Test" },
+  }),
 }));
 
 describe("API — Business Verification", () => {
@@ -42,7 +49,10 @@ describe("API — Business Verification", () => {
   }
 
   function mockRes() {
-    const res = { status: vi.fn().mockReturnThis(), json: vi.fn().mockReturnThis() };
+    const res = {
+      status: vi.fn().mockReturnThis(),
+      json: vi.fn().mockReturnThis(),
+    };
     return res;
   }
 
@@ -60,13 +70,24 @@ describe("API — Business Verification", () => {
 
   it("POST creates business verification", async () => {
     const res = mockRes();
-    await handler(mockReq("POST", { verificationId: "v1", businessData: { businessName: "Test", businessType: "private_limited" } }), res, { id: "user1" });
+    await handler(
+      mockReq("POST", {
+        verificationId: "v1",
+        businessData: { businessName: "Test", businessType: "private_limited" },
+      }),
+      res,
+      { id: "user1" },
+    );
     expect(res.status).toHaveBeenCalledWith(200);
   });
 
   it("POST rejects missing businessData", async () => {
-    const { createBusinessVerification } = await import("../../lib/verification/businessVerification");
-    createBusinessVerification.mockResolvedValueOnce({ success: false, error: "Missing required parameters" });
+    const { createBusinessVerification } =
+      await import("../../lib/verification/businessVerification");
+    createBusinessVerification.mockResolvedValueOnce({
+      success: false,
+      error: "Missing required parameters",
+    });
     const res = mockRes();
     await handler(mockReq("POST", {}), res, { id: "user1" });
     // Should still return 200 but with error in body or 400

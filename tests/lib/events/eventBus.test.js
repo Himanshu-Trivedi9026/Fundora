@@ -44,24 +44,36 @@ describe("Event Bus", () => {
 
   describe("publish", () => {
     it("publishes an event with required fields", async () => {
-      const result = await publish("test.event", { hello: "world" }, { source: "test" });
+      const result = await publish(
+        "test.event",
+        { hello: "world" },
+        { source: "test" },
+      );
       expect(result.success).toBe(false); // DB mock won't actually insert
       expect(result.error).toBeDefined();
     });
 
     it("publishes with priority", async () => {
-      const result = await publish("critical.event", { alert: true }, {
-        source: "test",
-        priority: EVENT_PRIORITIES.CRITICAL,
-      });
+      const result = await publish(
+        "critical.event",
+        { alert: true },
+        {
+          source: "test",
+          priority: EVENT_PRIORITIES.CRITICAL,
+        },
+      );
       expect(result.success).toBe(false);
     });
 
     it("publishes with correlation ID", async () => {
-      const result = await publish("tracked.event", { id: 1 }, {
-        source: "test",
-        correlationId: "corr-123",
-      });
+      const result = await publish(
+        "tracked.event",
+        { id: 1 },
+        {
+          source: "test",
+          correlationId: "corr-123",
+        },
+      );
       expect(result.success).toBe(false);
     });
   });
@@ -76,7 +88,9 @@ describe("Event Bus", () => {
 
     it("subscribes with filter expression", () => {
       const handler = vi.fn();
-      const id = subscribe("filtered.event", handler, { filter: { type: "test" } });
+      const id = subscribe("filtered.event", handler, {
+        filter: { type: "test" },
+      });
       expect(id).toBeDefined();
     });
 

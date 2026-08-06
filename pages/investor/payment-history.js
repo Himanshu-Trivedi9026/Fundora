@@ -4,7 +4,12 @@ import Link from "next/link";
 import { supabase } from "../../lib/supabaseClient";
 import { useRole } from "../../context/RoleContext";
 import PageLayout from "../../components/PageLayout";
-import { GlassCard, PageHeader, LoadingSpinner, EmptyState } from "../../components/ui";
+import {
+  GlassCard,
+  PageHeader,
+  LoadingSpinner,
+  EmptyState,
+} from "../../components/ui";
 
 export default function PaymentHistory() {
   const router = useRouter();
@@ -26,7 +31,8 @@ export default function PaymentHistory() {
     try {
       const { data, error: payErr } = await supabase
         .from("public_donations")
-        .select(`
+        .select(
+          `
           id,
           amount,
           created_at,
@@ -38,7 +44,8 @@ export default function PaymentHistory() {
             slug,
             thumbnail
           )
-        `)
+        `,
+        )
         .eq("payer_id", user.id)
         .eq("status", "paid")
         .order("created_at", { ascending: false });
@@ -182,7 +189,7 @@ export default function PaymentHistory() {
                               </p>
                               <p className="text-xs text-on-surface-variant mt-0.5">
                                 {new Date(
-                                  payment.created_at
+                                  payment.created_at,
                                 ).toLocaleDateString("en-US", {
                                   year: "numeric",
                                   month: "short",
@@ -231,7 +238,7 @@ export default function PaymentHistory() {
                               >
                                 <td className="px-6 py-4 text-sm text-on-surface-variant whitespace-nowrap">
                                   {new Date(
-                                    payment.created_at
+                                    payment.created_at,
                                   ).toLocaleDateString("en-US", {
                                     year: "numeric",
                                     month: "short",

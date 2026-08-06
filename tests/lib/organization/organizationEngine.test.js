@@ -61,14 +61,21 @@ describe("OrganizationEngine", () => {
 
   describe("createOrganization", () => {
     it("should create an organization", async () => {
-      const mockOrg = { id: "org-1", name: "Test Org", slug: "test-org", type: "company" };
+      const mockOrg = {
+        id: "org-1",
+        name: "Test Org",
+        slug: "test-org",
+        type: "company",
+      };
 
       // Check slug uniqueness (no existing)
       supabaseAdmin.from
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+              maybeSingle: vi
+                .fn()
+                .mockResolvedValue({ data: null, error: null }),
             }),
           }),
         })
@@ -102,7 +109,12 @@ describe("OrganizationEngine", () => {
     });
 
     it("should reject invalid type", async () => {
-      const result = await createOrganization({ name: "Test", slug: "test", type: "invalid", ownerId: "user-1" });
+      const result = await createOrganization({
+        name: "Test",
+        slug: "test",
+        type: "invalid",
+        ownerId: "user-1",
+      });
       expect(result.success).toBe(false);
     });
 
@@ -110,12 +122,18 @@ describe("OrganizationEngine", () => {
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            maybeSingle: vi.fn().mockResolvedValue({ data: { id: "existing" }, error: null }),
+            maybeSingle: vi
+              .fn()
+              .mockResolvedValue({ data: { id: "existing" }, error: null }),
           }),
         }),
       });
 
-      const result = await createOrganization({ name: "Test", slug: "test-org", ownerId: "user-1" });
+      const result = await createOrganization({
+        name: "Test",
+        slug: "test-org",
+        ownerId: "user-1",
+      });
       expect(result.success).toBe(false);
       expect(result.error).toContain("already taken");
     });
@@ -127,7 +145,10 @@ describe("OrganizationEngine", () => {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             is: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: { id: "org-1", name: "Test" }, error: null }),
+              single: vi.fn().mockResolvedValue({
+                data: { id: "org-1", name: "Test" },
+                error: null,
+              }),
             }),
           }),
         }),
@@ -148,7 +169,10 @@ describe("OrganizationEngine", () => {
             eq: vi.fn().mockReturnValue({
               eq: vi.fn().mockReturnValue({
                 eq: vi.fn().mockReturnValue({
-                  single: vi.fn().mockResolvedValue({ data: { role: "owner" }, error: null }),
+                  single: vi.fn().mockResolvedValue({
+                    data: { role: "owner" },
+                    error: null,
+                  }),
                 }),
               }),
             }),
@@ -159,13 +183,20 @@ describe("OrganizationEngine", () => {
           update: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               select: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: { id: "org-1", name: "Updated" }, error: null }),
+                single: vi.fn().mockResolvedValue({
+                  data: { id: "org-1", name: "Updated" },
+                  error: null,
+                }),
               }),
             }),
           }),
         });
 
-      const result = await updateOrganization("org-1", { name: "Updated" }, "user-1");
+      const result = await updateOrganization(
+        "org-1",
+        { name: "Updated" },
+        "user-1",
+      );
       expect(result.success).toBe(true);
     });
 
@@ -175,14 +206,20 @@ describe("OrganizationEngine", () => {
           eq: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               eq: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: { role: "member" }, error: null }),
+                single: vi
+                  .fn()
+                  .mockResolvedValue({ data: { role: "member" }, error: null }),
               }),
             }),
           }),
         }),
       });
 
-      const result = await updateOrganization("org-1", { name: "Hacked" }, "user-1");
+      const result = await updateOrganization(
+        "org-1",
+        { name: "Hacked" },
+        "user-1",
+      );
       expect(result.success).toBe(false);
     });
   });
@@ -195,7 +232,10 @@ describe("OrganizationEngine", () => {
             eq: vi.fn().mockReturnValue({
               eq: vi.fn().mockReturnValue({
                 eq: vi.fn().mockReturnValue({
-                  single: vi.fn().mockResolvedValue({ data: { role: "owner" }, error: null }),
+                  single: vi.fn().mockResolvedValue({
+                    data: { role: "owner" },
+                    error: null,
+                  }),
                 }),
               }),
             }),
@@ -205,7 +245,9 @@ describe("OrganizationEngine", () => {
           update: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               select: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: { id: "org-1" }, error: null }),
+                single: vi
+                  .fn()
+                  .mockResolvedValue({ data: { id: "org-1" }, error: null }),
               }),
             }),
           }),
@@ -221,7 +263,9 @@ describe("OrganizationEngine", () => {
           eq: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               eq: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: { role: "admin" }, error: null }),
+                single: vi
+                  .fn()
+                  .mockResolvedValue({ data: { role: "admin" }, error: null }),
               }),
             }),
           }),
@@ -241,7 +285,9 @@ describe("OrganizationEngine", () => {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               eq: vi.fn().mockReturnValue({
-                maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+                maybeSingle: vi
+                  .fn()
+                  .mockResolvedValue({ data: null, error: null }),
               }),
             }),
           }),
@@ -250,12 +296,18 @@ describe("OrganizationEngine", () => {
         .mockReturnValueOnce({
           insert: vi.fn().mockReturnValue({
             select: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: { id: "mem-1", role: "member" }, error: null }),
+              single: vi.fn().mockResolvedValue({
+                data: { id: "mem-1", role: "member" },
+                error: null,
+              }),
             }),
           }),
         });
 
-      const result = await addMember({ organizationId: "org-1", userId: "user-1" });
+      const result = await addMember({
+        organizationId: "org-1",
+        userId: "user-1",
+      });
       expect(result.success).toBe(true);
     });
 
@@ -264,13 +316,19 @@ describe("OrganizationEngine", () => {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              maybeSingle: vi.fn().mockResolvedValue({ data: { id: "mem-1", status: "active" }, error: null }),
+              maybeSingle: vi.fn().mockResolvedValue({
+                data: { id: "mem-1", status: "active" },
+                error: null,
+              }),
             }),
           }),
         }),
       });
 
-      const result = await addMember({ organizationId: "org-1", userId: "user-1" });
+      const result = await addMember({
+        organizationId: "org-1",
+        userId: "user-1",
+      });
       expect(result.success).toBe(false);
       expect(result.error).toContain("already an active member");
     });
@@ -285,7 +343,10 @@ describe("OrganizationEngine", () => {
             eq: vi.fn().mockReturnValue({
               eq: vi.fn().mockReturnValue({
                 eq: vi.fn().mockReturnValue({
-                  single: vi.fn().mockResolvedValue({ data: { role: "admin" }, error: null }),
+                  single: vi.fn().mockResolvedValue({
+                    data: { role: "admin" },
+                    error: null,
+                  }),
                 }),
               }),
             }),
@@ -297,7 +358,9 @@ describe("OrganizationEngine", () => {
             eq: vi.fn().mockReturnValue({
               eq: vi.fn().mockReturnValue({
                 eq: vi.fn().mockReturnValue({
-                  maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+                  maybeSingle: vi
+                    .fn()
+                    .mockResolvedValue({ data: null, error: null }),
                 }),
               }),
             }),
@@ -307,7 +370,10 @@ describe("OrganizationEngine", () => {
         .mockReturnValueOnce({
           insert: vi.fn().mockReturnValue({
             select: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: { id: "inv-1", token: "abc123" }, error: null }),
+              single: vi.fn().mockResolvedValue({
+                data: { id: "inv-1", token: "abc123" },
+                error: null,
+              }),
             }),
           }),
         });
@@ -327,12 +393,18 @@ describe("OrganizationEngine", () => {
       supabaseAdmin.from.mockReturnValue({
         insert: vi.fn().mockReturnValue({
           select: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: { id: "dept-1", name: "Engineering" }, error: null }),
+            single: vi.fn().mockResolvedValue({
+              data: { id: "dept-1", name: "Engineering" },
+              error: null,
+            }),
           }),
         }),
       });
 
-      const result = await createDepartment({ organizationId: "org-1", name: "Engineering" });
+      const result = await createDepartment({
+        organizationId: "org-1",
+        name: "Engineering",
+      });
       expect(result.success).toBe(true);
     });
   });
@@ -342,12 +414,18 @@ describe("OrganizationEngine", () => {
       supabaseAdmin.from.mockReturnValue({
         insert: vi.fn().mockReturnValue({
           select: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: { id: "team-1", name: "Frontend" }, error: null }),
+            single: vi.fn().mockResolvedValue({
+              data: { id: "team-1", name: "Frontend" },
+              error: null,
+            }),
           }),
         }),
       });
 
-      const result = await createTeam({ organizationId: "org-1", name: "Frontend" });
+      const result = await createTeam({
+        organizationId: "org-1",
+        name: "Frontend",
+      });
       expect(result.success).toBe(true);
     });
   });
@@ -357,12 +435,21 @@ describe("OrganizationEngine", () => {
       supabaseAdmin.from.mockReturnValue({
         upsert: vi.fn().mockReturnValue({
           select: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: { id: "set-1", setting_key: "theme", setting_value: { color: "blue" } }, error: null }),
+            single: vi.fn().mockResolvedValue({
+              data: {
+                id: "set-1",
+                setting_key: "theme",
+                setting_value: { color: "blue" },
+              },
+              error: null,
+            }),
           }),
         }),
       });
 
-      const result = await setOrganizationSetting("org-1", "theme", { color: "blue" });
+      const result = await setOrganizationSetting("org-1", "theme", {
+        color: "blue",
+      });
       expect(result.success).toBe(true);
     });
   });

@@ -80,11 +80,17 @@ export default function SidebarFilters({ filters, setFilters }) {
               className="w-full h-1.5 bg-surface-container-highest rounded-lg appearance-none cursor-pointer"
               aria-label={`Maximum funding goal: ₹${(filters.maxGoal || 1000000).toLocaleString("en-IN")}`}
             />
-            <div className="flex justify-between mt-3 text-xs font-inter text-on-surface-variant" aria-hidden="true">
+            <div
+              className="flex justify-between mt-3 text-xs font-inter text-on-surface-variant"
+              aria-hidden="true"
+            >
               <span>₹0</span>
               <span>₹10L+</span>
             </div>
-            <p className="text-xs text-on-surface-variant mt-1" aria-live="polite">
+            <p
+              className="text-xs text-on-surface-variant mt-1"
+              aria-live="polite"
+            >
               Max: ₹{(filters.maxGoal || 1000000).toLocaleString("en-IN")}
             </p>
           </div>

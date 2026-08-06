@@ -29,7 +29,12 @@ vi.mock("../../../lib/verification/auditLog", () => ({
   logAuditEvent: vi.fn().mockResolvedValue({ success: true }),
 }));
 
-import { createLedgerEntry, getLedgerEntries, getLedgerBalance, getLedgerSummary } from "../../../lib/escrow/escrowLedger";
+import {
+  createLedgerEntry,
+  getLedgerEntries,
+  getLedgerBalance,
+  getLedgerSummary,
+} from "../../../lib/escrow/escrowLedger";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 
 describe("EscrowLedger", () => {
@@ -94,7 +99,11 @@ describe("EscrowLedger", () => {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             order: vi.fn().mockReturnValue({
-              range: vi.fn().mockResolvedValue({ data: mockEntries, error: null, count: 2 }),
+              range: vi.fn().mockResolvedValue({
+                data: mockEntries,
+                error: null,
+                count: 2,
+              }),
             }),
           }),
         }),

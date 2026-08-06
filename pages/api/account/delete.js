@@ -159,10 +159,7 @@ export default withAuth(async function handler(req, res, user) {
    * spec entry can never block the whole deletion.
    */
   const cleanup = async ({ table, by }) => {
-    const { error } = await supabaseAdmin
-      .from(table)
-      .delete()
-      .eq(by, userId);
+    const { error } = await supabaseAdmin.from(table).delete().eq(by, userId);
 
     if (error) {
       console.warn(`[account-delete] ${table}.${by}: ${error.message}`);
@@ -181,7 +178,10 @@ export default withAuth(async function handler(req, res, user) {
     }
 
     if (failures.length > 0) {
-      console.warn(`[account-delete] ${failures.length} table(s) skipped:`, failures);
+      console.warn(
+        `[account-delete] ${failures.length} table(s) skipped:`,
+        failures,
+      );
     }
 
     // Remove the user's files from the private verification-docs bucket.
@@ -198,9 +198,8 @@ export default withAuth(async function handler(req, res, user) {
     }
 
     // Delete the auth user itself (requires service role key)
-    const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(
-      userId,
-    );
+    const { error: authError } =
+      await supabaseAdmin.auth.admin.deleteUser(userId);
 
     if (authError) {
       console.error("[account-delete] auth.user deletion failed:", authError);

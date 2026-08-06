@@ -55,7 +55,9 @@ describe("Debug Mock Chain", () => {
     const myChain = {
       insert: vi.fn().mockReturnValue({
         select: vi.fn().mockReturnValue({
-          single: vi.fn().mockResolvedValue({ data: { id: "test-id" }, error: null }),
+          single: vi
+            .fn()
+            .mockResolvedValue({ data: { id: "test-id" }, error: null }),
         }),
       }),
     };

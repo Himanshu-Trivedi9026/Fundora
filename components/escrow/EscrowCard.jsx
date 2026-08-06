@@ -10,9 +10,21 @@ import { motion } from "framer-motion";
 const STATUS_STYLES = {
   created: { bg: "bg-gray-700", text: "text-gray-300", label: "Created" },
   active: { bg: "bg-green-900/40", text: "text-green-400", label: "Active" },
-  partially_released: { bg: "bg-blue-900/40", text: "text-blue-400", label: "Partially Released" },
-  fully_released: { bg: "bg-emerald-900/40", text: "text-emerald-400", label: "Fully Released" },
-  refunded: { bg: "bg-yellow-900/40", text: "text-yellow-400", label: "Refunded" },
+  partially_released: {
+    bg: "bg-blue-900/40",
+    text: "text-blue-400",
+    label: "Partially Released",
+  },
+  fully_released: {
+    bg: "bg-emerald-900/40",
+    text: "text-emerald-400",
+    label: "Fully Released",
+  },
+  refunded: {
+    bg: "bg-yellow-900/40",
+    text: "text-yellow-400",
+    label: "Refunded",
+  },
   cancelled: { bg: "bg-red-900/40", text: "text-red-400", label: "Cancelled" },
   closed: { bg: "bg-gray-800", text: "text-gray-500", label: "Closed" },
 };
@@ -59,7 +71,9 @@ export default function EscrowCard({ escrow }) {
               🔒 Frozen
             </span>
           )}
-          <span className={`px-3 py-1 rounded-full text-xs font-medium ${status.bg} ${status.text}`}>
+          <span
+            className={`px-3 py-1 rounded-full text-xs font-medium ${status.bg} ${status.text}`}
+          >
             {status.label}
           </span>
         </div>
@@ -69,11 +83,15 @@ export default function EscrowCard({ escrow }) {
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="bg-gray-800/50 rounded-lg p-3">
           <p className="text-gray-400 text-xs mb-1">Total Donated</p>
-          <p className="text-white font-bold text-lg">{formatCurrency(escrow.total_donated)}</p>
+          <p className="text-white font-bold text-lg">
+            {formatCurrency(escrow.total_donated)}
+          </p>
         </div>
         <div className="bg-gray-800/50 rounded-lg p-3">
           <p className="text-gray-400 text-xs mb-1">Locked Balance</p>
-          <p className="text-yellow-400 font-bold text-lg">{formatCurrency(escrow.locked_balance)}</p>
+          <p className="text-yellow-400 font-bold text-lg">
+            {formatCurrency(escrow.locked_balance)}
+          </p>
         </div>
       </div>
 
@@ -96,19 +114,27 @@ export default function EscrowCard({ escrow }) {
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-gray-800/50 rounded-lg p-3">
               <p className="text-gray-400 text-xs mb-1">Released</p>
-              <p className="text-green-400 font-semibold">{formatCurrency(escrow.released_balance)}</p>
+              <p className="text-green-400 font-semibold">
+                {formatCurrency(escrow.released_balance)}
+              </p>
             </div>
             <div className="bg-gray-800/50 rounded-lg p-3">
               <p className="text-gray-400 text-xs mb-1">Refunded</p>
-              <p className="text-orange-400 font-semibold">{formatCurrency(escrow.refunded_balance)}</p>
+              <p className="text-orange-400 font-semibold">
+                {formatCurrency(escrow.refunded_balance)}
+              </p>
             </div>
             <div className="bg-gray-800/50 rounded-lg p-3">
               <p className="text-gray-400 text-xs mb-1">Platform Fees</p>
-              <p className="text-purple-400 font-semibold">{formatCurrency(escrow.platform_fees)}</p>
+              <p className="text-purple-400 font-semibold">
+                {formatCurrency(escrow.platform_fees)}
+              </p>
             </div>
             <div className="bg-gray-800/50 rounded-lg p-3">
               <p className="text-gray-400 text-xs mb-1">Creator Earnings</p>
-              <p className="text-blue-400 font-semibold">{formatCurrency(escrow.creator_earnings)}</p>
+              <p className="text-blue-400 font-semibold">
+                {formatCurrency(escrow.creator_earnings)}
+              </p>
             </div>
           </div>
 
@@ -120,7 +146,9 @@ export default function EscrowCard({ escrow }) {
           {escrow.frozen && escrow.frozen_reason && (
             <div className="bg-red-900/20 border border-red-800/50 rounded-lg p-3">
               <p className="text-red-400 text-xs font-medium">Freeze Reason</p>
-              <p className="text-red-300 text-sm mt-1">{escrow.frozen_reason}</p>
+              <p className="text-red-300 text-sm mt-1">
+                {escrow.frozen_reason}
+              </p>
             </div>
           )}
         </motion.div>

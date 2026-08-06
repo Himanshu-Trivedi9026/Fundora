@@ -16,7 +16,9 @@ export default withAuth(async function handler(req, res, user) {
       return res.status(200).json({ success: true, ...verification });
     } catch (err) {
       console.error("Get business verification error:", err);
-      return res.status(500).json({ error: "Failed to fetch business verification" });
+      return res
+        .status(500)
+        .json({ error: "Failed to fetch business verification" });
     }
   }
 
@@ -25,11 +27,16 @@ export default withAuth(async function handler(req, res, user) {
 
     try {
       const { verificationId, businessData } = req.body;
-      const result = await createBusinessVerification(user.id, { verificationId, businessData });
+      const result = await createBusinessVerification(user.id, {
+        verificationId,
+        businessData,
+      });
       return res.status(200).json({ success: true, ...result });
     } catch (err) {
       console.error("Create/update business verification error:", err);
-      return res.status(500).json({ error: "Failed to save business verification" });
+      return res
+        .status(500)
+        .json({ error: "Failed to save business verification" });
     }
   }
 
@@ -38,11 +45,17 @@ export default withAuth(async function handler(req, res, user) {
 
     try {
       const { verificationId, documentType, filename } = req.body;
-      const result = await uploadBusinessDocument(user.id, { verificationId, documentType, filename });
+      const result = await uploadBusinessDocument(user.id, {
+        verificationId,
+        documentType,
+        filename,
+      });
       return res.status(200).json({ success: true, ...result });
     } catch (err) {
       console.error("Upload business document error:", err);
-      return res.status(500).json({ error: "Failed to upload business document" });
+      return res
+        .status(500)
+        .json({ error: "Failed to upload business document" });
     }
   }
 

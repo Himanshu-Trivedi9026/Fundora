@@ -30,12 +30,12 @@
 
 All verification queries use PostgreSQL-compatible syntax for Supabase.
 
-| Icon | Meaning |
-|------|---------|
-| ✅ **PASS** | Verification query returned expected result |
-| ❌ **FAIL** | Verification query found unexpected state |
-| ⚠️ **WARN** | Non-critical issue or deprecation notice |
-| 🔍 **INVESTIGATE** | Manual inspection required |
+| Icon               | Meaning                                     |
+| ------------------ | ------------------------------------------- |
+| ✅ **PASS**        | Verification query returned expected result |
+| ❌ **FAIL**        | Verification query found unexpected state   |
+| ⚠️ **WARN**        | Non-critical issue or deprecation notice    |
+| 🔍 **INVESTIGATE** | Manual inspection required                  |
 
 ### Common Helpers
 
@@ -61,44 +61,48 @@ WHERE table_name = '<table_name>';
 
 **Tables Created:** `creator_verifications`
 
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | UUID PK | `DEFAULT gen_random_uuid()` |
-| `user_id` | UUID | FK → `auth.users(id)` ON DELETE CASCADE, UNIQUE |
-| `verification_level` | INTEGER | CHECK (0–5) |
-| `email_verified` | BOOLEAN | DEFAULT FALSE |
-| `phone_verified` | BOOLEAN | DEFAULT FALSE |
-| `identity_verified` | BOOLEAN | DEFAULT FALSE |
-| `bank_verified` | BOOLEAN | DEFAULT FALSE |
-| `business_verified` | BOOLEAN | DEFAULT FALSE |
-| `selfie_verified` | BOOLEAN | DEFAULT FALSE |
-| `verification_status` | TEXT | CHECK: `pending`, `under_review`, `approved`, `rejected`, `expired` |
-| `trust_score` | INTEGER | CHECK (0–100) |
-| `risk_score` | INTEGER | CHECK (0–100) |
-| `verification_provider` | TEXT | |
-| `provider_reference` | TEXT | |
-| `verified_at` | TIMESTAMPTZ | |
-| `created_at` | TIMESTAMPTZ | NOT NULL DEFAULT NOW() |
-| `updated_at` | TIMESTAMPTZ | NOT NULL DEFAULT NOW() |
-| `verification_notes` | TEXT | |
+| Column                  | Type        | Constraints                                                         |
+| ----------------------- | ----------- | ------------------------------------------------------------------- |
+| `id`                    | UUID PK     | `DEFAULT gen_random_uuid()`                                         |
+| `user_id`               | UUID        | FK → `auth.users(id)` ON DELETE CASCADE, UNIQUE                     |
+| `verification_level`    | INTEGER     | CHECK (0–5)                                                         |
+| `email_verified`        | BOOLEAN     | DEFAULT FALSE                                                       |
+| `phone_verified`        | BOOLEAN     | DEFAULT FALSE                                                       |
+| `identity_verified`     | BOOLEAN     | DEFAULT FALSE                                                       |
+| `bank_verified`         | BOOLEAN     | DEFAULT FALSE                                                       |
+| `business_verified`     | BOOLEAN     | DEFAULT FALSE                                                       |
+| `selfie_verified`       | BOOLEAN     | DEFAULT FALSE                                                       |
+| `verification_status`   | TEXT        | CHECK: `pending`, `under_review`, `approved`, `rejected`, `expired` |
+| `trust_score`           | INTEGER     | CHECK (0–100)                                                       |
+| `risk_score`            | INTEGER     | CHECK (0–100)                                                       |
+| `verification_provider` | TEXT        |                                                                     |
+| `provider_reference`    | TEXT        |                                                                     |
+| `verified_at`           | TIMESTAMPTZ |                                                                     |
+| `created_at`            | TIMESTAMPTZ | NOT NULL DEFAULT NOW()                                              |
+| `updated_at`            | TIMESTAMPTZ | NOT NULL DEFAULT NOW()                                              |
+| `verification_notes`    | TEXT        |                                                                     |
 
 **Foreign Keys:** `user_id → auth.users(id) ON DELETE CASCADE`
 
 **Indexes:**
+
 - `idx_creator_verifications_user_id` — on `user_id`
 - `idx_creator_verifications_status` — on `verification_status`
 - `idx_creator_verifications_level` — on `verification_level`
 
 **RLS Policies:** 4 policies
+
 1. **User SELECT** — `auth.uid() = user_id`
 2. **User INSERT** — `auth.uid() = user_id`
 3. **User UPDATE** — `auth.uid() = user_id`
 4. **Service Role ALL** — `auth.role() = 'service_role'`
 
 **Triggers:**
+
 - `trigger_creator_verifications_updated_at` — BEFORE UPDATE, calls `update_creator_verifications_updated_at()`
 
 **Functions:**
+
 - `handle_new_user_verification()` — trigger function on `auth.users` INSERT
 - `get_user_verification_summary()` — returns verification summary for a user
 - `recalculate_verification_level()` — recalculates level based on verified fields
@@ -119,6 +123,7 @@ RETURNING id, user_id, verification_status, created_at;
 -- Expected: Row created with id, user_id, status='pending', created_at=NOW()
 -- Row count: 1
 ```
+
 </details>
 
 <details>
@@ -138,6 +143,7 @@ SELECT updated_at > created_at AS trigger_updated
 FROM creator_verifications
 WHERE user_id = '00000000-0000-0000-0000-000000000001';
 ```
+
 </details>
 
 <details>
@@ -165,6 +171,7 @@ SELECT * FROM creator_verifications
 WHERE risk_score < 0 OR risk_score > 100;
 -- Expected: 0 rows
 ```
+
 </details>
 
 <details>
@@ -188,6 +195,7 @@ WHERE tc.table_name = 'creator_verifications'
   AND tc.constraint_type = 'FOREIGN KEY';
 -- Expected: delete_rule = 'CASCADE'
 ```
+
 </details>
 
 <details>
@@ -200,6 +208,7 @@ LEFT JOIN auth.users u ON cv.user_id = u.id
 WHERE u.id IS NULL;
 -- Expected: 0 rows
 ```
+
 </details>
 
 <details>
@@ -216,6 +225,7 @@ FROM pg_stat_all_tables
 WHERE relname = 'creator_verifications';
 -- Expected: idx_scan > 0 after SELECT queries
 ```
+
 </details>
 
 <details>
@@ -234,6 +244,7 @@ FROM pg_policies
 WHERE tablename = 'creator_verifications';
 -- Expected: 4 policies listed
 ```
+
 </details>
 
 <details>
@@ -255,6 +266,7 @@ FROM pg_stat_all_tables
 WHERE relname = 'creator_verifications';
 -- Expected: dead_pct < 20 (VACUUM if higher)
 ```
+
 </details>
 
 ---
@@ -264,54 +276,56 @@ WHERE relname = 'creator_verifications';
 ### Schema Overview
 
 **Tables Created:**
+
 1. `verification_history` — immutable audit log
 2. `verification_documents` — uploaded verification documents
 
 #### verification_history
 
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | UUID PK | `DEFAULT gen_random_uuid()` |
-| `verification_id` | UUID | FK → `creator_verifications(id)` ON DELETE CASCADE |
-| `user_id` | UUID | FK → `auth.users(id)` ON DELETE CASCADE |
-| `action` | TEXT | CHECK (17 types including `created`, `submitted`, `approved`, `rejected`, etc.) |
-| `old_status` | TEXT | |
-| `new_status` | TEXT | |
-| `old_level` | INTEGER | |
-| `new_level` | INTEGER | |
-| `performed_by` | UUID | |
-| `performed_by_type` | TEXT | CHECK: `system`, `user`, `admin`, `provider` |
-| `reason` | TEXT | |
-| `metadata` | JSONB | DEFAULT '{}' |
-| `created_at` | TIMESTAMPTZ | NOT NULL DEFAULT NOW() |
+| Column              | Type        | Constraints                                                                     |
+| ------------------- | ----------- | ------------------------------------------------------------------------------- |
+| `id`                | UUID PK     | `DEFAULT gen_random_uuid()`                                                     |
+| `verification_id`   | UUID        | FK → `creator_verifications(id)` ON DELETE CASCADE                              |
+| `user_id`           | UUID        | FK → `auth.users(id)` ON DELETE CASCADE                                         |
+| `action`            | TEXT        | CHECK (17 types including `created`, `submitted`, `approved`, `rejected`, etc.) |
+| `old_status`        | TEXT        |                                                                                 |
+| `new_status`        | TEXT        |                                                                                 |
+| `old_level`         | INTEGER     |                                                                                 |
+| `new_level`         | INTEGER     |                                                                                 |
+| `performed_by`      | UUID        |                                                                                 |
+| `performed_by_type` | TEXT        | CHECK: `system`, `user`, `admin`, `provider`                                    |
+| `reason`            | TEXT        |                                                                                 |
+| `metadata`          | JSONB       | DEFAULT '{}'                                                                    |
+| `created_at`        | TIMESTAMPTZ | NOT NULL DEFAULT NOW()                                                          |
 
 **Immutable:** REVOKE UPDATE, DELETE ON `verification_history` FROM `authenticated`
 
 #### verification_documents
 
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | UUID PK | |
-| `verification_id` | UUID | FK → `creator_verifications(id)` ON DELETE CASCADE |
-| `user_id` | UUID | FK → `auth.users(id)` ON DELETE CASCADE |
-| `document_type` | TEXT | CHECK (12 types) |
-| `document_name` | TEXT | |
-| `storage_bucket` | TEXT | |
-| `storage_path` | TEXT | |
-| `mime_type` | TEXT | |
-| `file_size` | BIGINT | |
-| `status` | TEXT | CHECK |
-| `rejection_reason` | TEXT | |
-| `provider_reference` | TEXT | |
-| `uploaded_at` | TIMESTAMPTZ | |
-| `verified_at` | TIMESTAMPTZ | |
-| `expires_at` | TIMESTAMPTZ | |
-| `created_at` | TIMESTAMPTZ | NOT NULL DEFAULT NOW() |
-| `updated_at` | TIMESTAMPTZ | NOT NULL DEFAULT NOW() |
+| Column               | Type        | Constraints                                        |
+| -------------------- | ----------- | -------------------------------------------------- |
+| `id`                 | UUID PK     |                                                    |
+| `verification_id`    | UUID        | FK → `creator_verifications(id)` ON DELETE CASCADE |
+| `user_id`            | UUID        | FK → `auth.users(id)` ON DELETE CASCADE            |
+| `document_type`      | TEXT        | CHECK (12 types)                                   |
+| `document_name`      | TEXT        |                                                    |
+| `storage_bucket`     | TEXT        |                                                    |
+| `storage_path`       | TEXT        |                                                    |
+| `mime_type`          | TEXT        |                                                    |
+| `file_size`          | BIGINT      |                                                    |
+| `status`             | TEXT        | CHECK                                              |
+| `rejection_reason`   | TEXT        |                                                    |
+| `provider_reference` | TEXT        |                                                    |
+| `uploaded_at`        | TIMESTAMPTZ |                                                    |
+| `verified_at`        | TIMESTAMPTZ |                                                    |
+| `expires_at`         | TIMESTAMPTZ |                                                    |
+| `created_at`         | TIMESTAMPTZ | NOT NULL DEFAULT NOW()                             |
+| `updated_at`         | TIMESTAMPTZ | NOT NULL DEFAULT NOW()                             |
 
 **Alters from 001:** `creator_verifications` ADD COLUMN `expires_at`, `expiry_status`
 
 **Indexes:**
+
 - `idx_verification_history_verification` — on `verification_id`
 - `idx_verification_history_user` — on `user_id`
 - `idx_verification_history_created` — on `created_at DESC`
@@ -324,6 +338,7 @@ WHERE relname = 'creator_verifications';
 **RLS Policies:** 6 policies across both tables
 
 **Functions:**
+
 - `record_verification_event()` — inserts into verification_history
 - `get_public_verification()` — returns public verification data
 - `get_verification_expiry_status()` — calculates expiry status
@@ -351,6 +366,7 @@ WHERE table_name = 'verification_history'
   AND grantee = 'authenticated';
 -- Expected: Only INSERT, SELECT (no UPDATE, DELETE)
 ```
+
 </details>
 
 <details>
@@ -377,6 +393,7 @@ WHERE tc.table_name = 'verification_documents'
   AND rc.delete_rule = 'CASCADE';
 -- Expected: At least 1 row with CASCADE
 ```
+
 </details>
 
 <details>
@@ -395,6 +412,7 @@ LEFT JOIN creator_verifications cv ON vd.verification_id = cv.id
 WHERE cv.id IS NULL;
 -- Expected: 0 rows
 ```
+
 </details>
 
 ---
@@ -404,12 +422,14 @@ WHERE cv.id IS NULL;
 ### Schema Overview
 
 **Tables Created:**
+
 1. `verification_requests` — verification request lifecycle
 2. `verification_sessions` — resumable wizard sessions
 3. `verification_otp` — phone verification OTP codes
 4. `verification_audit_log` — append-only audit trail
 
 **Alters from 001/002:**
+
 - `creator_verifications.verification_status` CHECK extended (added `documents_uploaded`, `automatic_validation`, `manual_review`, `cancelled`)
 - `verification_documents` ADD COLUMN `metadata_encrypted` (BYTEA), `metadata_hash` (TEXT)
 - `verification_history.action` CHECK extended (14 new phase 3 actions)
@@ -417,27 +437,28 @@ WHERE cv.id IS NULL;
 
 #### verification_requests
 
-| Column | Key Details |
-|--------|-------------|
-| `id` | UUID PK |
-| `user_id` | UUID FK → `auth.users(id)` CASCADE |
-| `verification_id` | UUID FK → `creator_verifications(id)` SET NULL |
-| `verification_type` | TEXT CHECK: identity/phone/bank/business/address/selfie |
-| `current_step` | TEXT |
-| `status` | TEXT CHECK: 10-value lifecycle |
-| `provider`, `provider_reference` | TEXT |
-| `reviewer_id` | UUID |
-| `review_priority` | TEXT CHECK |
-| `rejection_reason` | TEXT |
-| `submitted_at`, `completed_at` | TIMESTAMPTZ |
-| `created_at`, `updated_at` | TIMESTAMPTZ |
-| `metadata` | JSONB |
+| Column                           | Key Details                                             |
+| -------------------------------- | ------------------------------------------------------- |
+| `id`                             | UUID PK                                                 |
+| `user_id`                        | UUID FK → `auth.users(id)` CASCADE                      |
+| `verification_id`                | UUID FK → `creator_verifications(id)` SET NULL          |
+| `verification_type`              | TEXT CHECK: identity/phone/bank/business/address/selfie |
+| `current_step`                   | TEXT                                                    |
+| `status`                         | TEXT CHECK: 10-value lifecycle                          |
+| `provider`, `provider_reference` | TEXT                                                    |
+| `reviewer_id`                    | UUID                                                    |
+| `review_priority`                | TEXT CHECK                                              |
+| `rejection_reason`               | TEXT                                                    |
+| `submitted_at`, `completed_at`   | TIMESTAMPTZ                                             |
+| `created_at`, `updated_at`       | TIMESTAMPTZ                                             |
+| `metadata`                       | JSONB                                                   |
 
 **Indexes:** 4 on requests, 3 on sessions, 2 on OTP, 4 on audit_log
 
 **Immutability:** REVOKE UPDATE/DELETE ON `verification_audit_log` FROM `authenticated`
 
 **Functions:**
+
 - `get_active_session()` — retrieves current active session
 - `cleanup_expired_sessions()` — removes expired sessions
 - `cleanup_expired_otps()` — removes expired OTP codes
@@ -462,6 +483,7 @@ WHERE table_name = 'verification_documents'
   AND column_name = 'metadata_hash';
 -- Expected: data_type = 'text'
 ```
+
 </details>
 
 <details>
@@ -475,6 +497,7 @@ WHERE conrelid = 'verification_requests'::regclass
   AND contype = 'c';
 -- Expected: CHECK contains 10 status values
 ```
+
 </details>
 
 <details>
@@ -486,6 +509,7 @@ SELECT * FROM verification_otp
 WHERE expires_at < NOW();
 -- Expected: 0 rows if cleanup is working (or non-zero that cleanup will handle)
 ```
+
 </details>
 
 <details>
@@ -499,6 +523,7 @@ WHERE table_name = 'verification_audit_log'
   AND grantee = 'authenticated';
 -- Expected: Only SELECT, INSERT (no UPDATE, DELETE)
 ```
+
 </details>
 
 ---
@@ -508,6 +533,7 @@ WHERE table_name = 'verification_audit_log'
 ### Schema Overview
 
 **Tables Created:** (6 tables)
+
 1. `business_verifications` — UNIQUE(user_id), UNIQUE(verification_id), 11 business types CHECK
 2. `business_documents` — 18 document types CHECK, FK chain
 3. `bank_accounts` — AES-256-GCM encrypted account_number_encrypted (BYTEA), 6-status lifecycle, penny_drop_status CHECK
@@ -517,22 +543,23 @@ WHERE table_name = 'verification_audit_log'
 
 **Key Columns: bank_accounts**
 
-| Column | Details |
-|--------|---------|
-| `account_number_encrypted` | BYTEA (encrypted with AES-256-GCM) |
-| `ifsc_code` | TEXT |
-| `account_holder_name` | TEXT |
-| `bank_name` | TEXT |
-| `account_type` | TEXT CHECK |
-| `penny_drop_status` | TEXT CHECK |
-| `status` | TEXT: draft→pending→verified→rejected→disabled→archived |
-| `is_primary` | BOOLEAN |
+| Column                     | Details                                                 |
+| -------------------------- | ------------------------------------------------------- |
+| `account_number_encrypted` | BYTEA (encrypted with AES-256-GCM)                      |
+| `ifsc_code`                | TEXT                                                    |
+| `account_holder_name`      | TEXT                                                    |
+| `bank_name`                | TEXT                                                    |
+| `account_type`             | TEXT CHECK                                              |
+| `penny_drop_status`        | TEXT CHECK                                              |
+| `status`                   | TEXT: draft→pending→verified→rejected→disabled→archived |
+| `is_primary`               | BOOLEAN                                                 |
 
 **Indexes:** 14 total across 6 tables
 
 **Triggers:** Updates on all 6 tables using generic `update_updated_at()`
 
 **Functions:**
+
 - `get_business_verification_summary()`
 - `get_bank_verification_summary()`
 - `recalculate_bank_verification()`
@@ -558,6 +585,7 @@ WHERE table_name = 'bank_accounts'
   AND column_name IN ('account_number', 'account_number_plain');
 -- Expected: 0 rows — no plaintext column should exist
 ```
+
 </details>
 
 <details>
@@ -572,6 +600,7 @@ WHERE conrelid = 'bank_accounts'::regclass
   AND pg_get_constraintdef(oid) LIKE '%status%';
 -- Expected: Contains draft, pending, verified, rejected, disabled, archived
 ```
+
 </details>
 
 <details>
@@ -596,6 +625,7 @@ WHERE is_primary = TRUE
 GROUP BY user_id HAVING COUNT(*) > 1;
 -- Expected: 0 rows (only one primary per user)
 ```
+
 </details>
 
 <details>
@@ -606,6 +636,7 @@ GROUP BY user_id HAVING COUNT(*) > 1;
 SELECT COUNT(*) FROM verification_providers WHERE is_active = TRUE;
 -- Expected: >= 1 (at least one active provider)
 ```
+
 </details>
 
 ---
@@ -615,6 +646,7 @@ SELECT COUNT(*) FROM verification_providers WHERE is_active = TRUE;
 ### Schema Overview
 
 **Tables Created:** (9 tables)
+
 1. `fraud_profiles` — UNIQUE(user_id), risk_level CHECK, decision CHECK
 2. `fraud_events` — event_category CHECK, severity CHECK
 3. `risk_signals` — UNIQUE(user_id, signal_name)
@@ -626,6 +658,7 @@ SELECT COUNT(*) FROM verification_providers WHERE is_active = TRUE;
 9. `manual_overrides` — override_type CHECK, created_by, revoked_by
 
 **Key Constraints:**
+
 - `fraud_profiles.risk_level` CHECK: low/medium/high/critical
 - `fraud_profiles.decision` CHECK: allow/monitor/manual_review/limit/block/escalate
 - `fraud_events.severity` CHECK: info/warning/critical
@@ -653,6 +686,7 @@ ORDER BY rule_name;
 -- low_trust_high_donation, new_account_high_activity, rapid_bank_changes,
 -- document_resubmission_loop
 ```
+
 </details>
 
 <details>
@@ -669,6 +703,7 @@ LEFT JOIN auth.users u ON fp.user_id = u.id
 WHERE u.id IS NULL;
 -- Expected: 0 rows
 ```
+
 </details>
 
 <details>
@@ -682,6 +717,7 @@ GROUP BY user_id, signal_name
 HAVING COUNT(*) > 1;
 -- Expected: 0 rows
 ```
+
 </details>
 
 <details>
@@ -695,6 +731,7 @@ WHERE table_name = 'device_fingerprints'
   AND column_name = 'risk_flags';
 -- Expected: data_type = 'ARRAY' or 'text[]'
 ```
+
 </details>
 
 <details>
@@ -713,6 +750,7 @@ LEFT JOIN auth.users u ON frh.user_id = u.id
 WHERE u.id IS NULL;
 -- Expected: 0 rows
 ```
+
 </details>
 
 ---
@@ -722,6 +760,7 @@ WHERE u.id IS NULL;
 ### Schema Overview
 
 **Tables Created:** (9 tables)
+
 1. `escrow_accounts` — UNIQUE(campaign_id), 7-status lifecycle, NUMERIC(12,2) balances
 2. `escrow_ledger` — entry_type CHECK (8 types), idempotency_key UNIQUE
 3. `campaign_milestones` — FK → projects, FK → users, 9-status lifecycle
@@ -734,21 +773,22 @@ WHERE u.id IS NULL;
 
 **Key Columns: escrow_accounts**
 
-| Column | Details |
-|--------|---------|
-| `campaign_id` | UUID UNIQUE, FK → projects |
-| `balance` | NUMERIC(12,2) NOT NULL DEFAULT 0, CHECK ≥ 0 |
-| `escrow_balance` | NUMERIC(12,2) NOT NULL DEFAULT 0, CHECK ≥ 0 |
-| `pending_balance` | NUMERIC(12,2) NOT NULL DEFAULT 0, CHECK ≥ 0 |
-| `available_balance` | NUMERIC(12,2) NOT NULL DEFAULT 0, CHECK ≥ 0 |
-| `total_fees` | NUMERIC(12,2) NOT NULL DEFAULT 0, CHECK ≥ 0 |
-| `total_disbursed` | NUMERIC(12,2) NOT NULL DEFAULT 0, CHECK ≥ 0 |
-| `status` | TEXT CHECK: active/frozen/closed/disabled/archived |
-| `fee_percentage` | NUMERIC(5,2) CHECK 0–100 |
+| Column              | Details                                            |
+| ------------------- | -------------------------------------------------- |
+| `campaign_id`       | UUID UNIQUE, FK → projects                         |
+| `balance`           | NUMERIC(12,2) NOT NULL DEFAULT 0, CHECK ≥ 0        |
+| `escrow_balance`    | NUMERIC(12,2) NOT NULL DEFAULT 0, CHECK ≥ 0        |
+| `pending_balance`   | NUMERIC(12,2) NOT NULL DEFAULT 0, CHECK ≥ 0        |
+| `available_balance` | NUMERIC(12,2) NOT NULL DEFAULT 0, CHECK ≥ 0        |
+| `total_fees`        | NUMERIC(12,2) NOT NULL DEFAULT 0, CHECK ≥ 0        |
+| `total_disbursed`   | NUMERIC(12,2) NOT NULL DEFAULT 0, CHECK ≥ 0        |
+| `status`            | TEXT CHECK: active/frozen/closed/disabled/archived |
+| `fee_percentage`    | NUMERIC(5,2) CHECK 0–100                           |
 
 **Indexes:** 24 total across 9 tables
 
 **Functions:**
+
 - `recalculate_escrow_balance()` — recalculates escrow balance from ledger
 - `recalculate_milestone_approval()` — recalculates milestone approval status
 
@@ -766,6 +806,7 @@ WHERE balance < 0 OR escrow_balance < 0 OR pending_balance < 0
    OR available_balance < 0 OR total_fees < 0 OR total_disbursed < 0;
 -- Expected: 0 rows
 ```
+
 </details>
 
 <details>
@@ -779,6 +820,7 @@ GROUP BY idempotency_key
 HAVING COUNT(*) > 1;
 -- Expected: 0 rows
 ```
+
 </details>
 
 <details>
@@ -792,6 +834,7 @@ GROUP BY status;
 -- All statuses should be in: pending, active, submitted, under_review,
 -- changes_requested, approved, rejected, paid, cancelled
 ```
+
 </details>
 
 <details>
@@ -809,6 +852,7 @@ SELECT * FROM payout_requests
 WHERE fraud_decision IS NOT NULL AND fraud_risk_score IS NULL;
 -- Expected: 0 rows (every decision should have a score)
 ```
+
 </details>
 
 <details>
@@ -822,6 +866,7 @@ GROUP BY batch_number
 HAVING COUNT(*) > 1;
 -- Expected: 0 rows
 ```
+
 </details>
 
 <details>
@@ -837,6 +882,7 @@ FROM escrow_accounts
 WHERE ABS(balance - (escrow_balance + pending_balance + total_fees - total_disbursed)) > 0.01;
 -- Expected: 0 rows (or minimal delta explained by in-flight transactions)
 ```
+
 </details>
 
 ---
@@ -846,6 +892,7 @@ WHERE ABS(balance - (escrow_balance + pending_balance + total_fees - total_disbu
 ### Schema Overview
 
 **Tables Created:** (12 tables)
+
 1. `compliance_cases` — UNIQUE(case_number), auto-number (COMP-YYYY-NNNNN), 8 case_types, 7-status, soft delete
 2. `compliance_events` — event tracking
 3. `policies` — UNIQUE(policy_key), 8 categories, 5 policy_types, versioned
@@ -862,6 +909,7 @@ WHERE ABS(balance - (escrow_balance + pending_balance + total_fees - total_disbu
 **Indexes:** 43 total across 12 tables
 
 **Auto-Number Functions:**
+
 - `generate_compliance_case_number()` — BEFORE INSERT trigger, outputs `COMP-YYYY-NNNNN`
 - `generate_moderation_case_number()` — BEFORE INSERT trigger, outputs `MOD-YYYY-NNNNN`
 - `generate_appeal_number()` — BEFORE INSERT trigger, outputs `APL-YYYY-NNNNN`
@@ -900,6 +948,7 @@ GROUP BY appeal_number
 HAVING COUNT(*) > 1;
 -- Expected: 0 rows
 ```
+
 </details>
 
 <details>
@@ -912,6 +961,7 @@ FROM information_schema.columns
 WHERE table_name = 'compliance_cases' AND column_name = 'deleted_at';
 -- Expected: 1 row (TIMESTAMPTZ, nullable)
 ```
+
 </details>
 
 <details>
@@ -941,6 +991,7 @@ FROM information_schema.columns
 WHERE table_name = 'campaign_reputation'
   AND column_name LIKE '%score%' OR column_name = 'red_flag_count';
 ```
+
 </details>
 
 <details>
@@ -963,6 +1014,7 @@ LEFT JOIN policies p ON pv.policy_id = p.id
 WHERE p.id IS NULL;
 -- Expected: 0 rows
 ```
+
 </details>
 
 <details>
@@ -984,6 +1036,7 @@ WHERE conrelid = 'notifications'::regclass
   AND pg_get_constraintdef(oid) LIKE '%notification_type%';
 -- Expected: 14 notification types listed
 ```
+
 </details>
 
 <details>
@@ -997,6 +1050,7 @@ GROUP BY metric_type, metric_date, aggregation_period
 HAVING COUNT(*) > 1;
 -- Expected: 0 rows
 ```
+
 </details>
 
 ---
@@ -1006,6 +1060,7 @@ HAVING COUNT(*) > 1;
 ### Schema Overview
 
 **Tables Created:** (13 tables)
+
 1. `organizations` — UNIQUE(slug), 7 org types, 7 sizes, 4-status, soft delete
 2. `organization_members` — UNIQUE(org_id, user_id), 9 roles, 4-status
 3. `departments` — UNIQUE(org_id, name), self-referencing parent FK
@@ -1021,6 +1076,7 @@ HAVING COUNT(*) > 1;
 13. `webhook_deliveries` — FK → webhooks CASCADE, 4-status
 
 **Functions:**
+
 - `is_org_member(org_id, user_id)` — returns BOOLEAN
 - `is_org_admin(org_id, user_id)` — returns BOOLEAN
 - `get_user_org_role(org_id, user_id)` — returns TEXT role
@@ -1038,6 +1094,7 @@ GROUP BY slug
 HAVING COUNT(*) > 1;
 -- Expected: 0 rows
 ```
+
 </details>
 
 <details>
@@ -1060,6 +1117,7 @@ GROUP BY organization_id, user_id
 HAVING COUNT(*) > 1;
 -- Expected: 0 rows
 ```
+
 </details>
 
 <details>
@@ -1089,6 +1147,7 @@ WITH RECURSIVE dept_tree AS (
 SELECT * FROM dept_tree WHERE depth >= 10;
 -- Expected: 0 rows (no circular references deeper than 10)
 ```
+
 </details>
 
 <details>
@@ -1107,6 +1166,7 @@ GROUP BY key_hash
 HAVING COUNT(*) > 1;
 -- Expected: 0 rows
 ```
+
 </details>
 
 <details>
@@ -1125,6 +1185,7 @@ FROM webhooks
 WHERE failure_count > 10 AND status = 'active';
 -- Expected: 0 rows (should be disabled after repeated failures)
 ```
+
 </details>
 
 <details>
@@ -1138,6 +1199,7 @@ GROUP BY client_id
 HAVING COUNT(*) > 1;
 -- Expected: 0 rows
 ```
+
 </details>
 
 ---
@@ -1147,6 +1209,7 @@ HAVING COUNT(*) > 1;
 ### Schema Overview
 
 **Tables Created:** (10 tables)
+
 1. `ai_conversations` — FK → auth.users CASCADE, copilot_type CHECK (5 types)
 2. `ai_messages` — FK → ai_conversations CASCADE, role CHECK, token_count, cost_cents
 3. `ai_embeddings` — entity_type CHECK (4 types), VECTOR(1536), content_hash
@@ -1173,6 +1236,7 @@ SELECT * FROM pg_extension WHERE extname = 'vector';
 -- Expected: 1 row
 -- If missing: CREATE EXTENSION IF NOT EXISTS vector;
 ```
+
 </details>
 
 <details>
@@ -1193,6 +1257,7 @@ WHERE conrelid = 'ai_embeddings'::regclass
   AND contype = 'c';
 -- Expected: campaign, donor, creator, knowledge_article
 ```
+
 </details>
 
 <details>
@@ -1209,6 +1274,7 @@ SELECT * FROM prediction_results
 WHERE confidence < 0 OR confidence > 1;
 -- Expected: 0 rows
 ```
+
 </details>
 
 <details>
@@ -1222,6 +1288,7 @@ GROUP BY user_id, date, provider, model
 HAVING COUNT(*) > 1;
 -- Expected: 0 rows
 ```
+
 </details>
 
 <details>
@@ -1240,6 +1307,7 @@ LEFT JOIN workflow_templates wt ON wr.workflow_id = wt.id
 WHERE wt.id IS NULL;
 -- Expected: 0 rows
 ```
+
 </details>
 
 <details>
@@ -1258,6 +1326,7 @@ FROM ai_provider_metrics
 WHERE error_rate > 0.1;
 -- Expected: 0 rows or flagged for investigation
 ```
+
 </details>
 
 ---
@@ -1268,19 +1337,20 @@ WHERE error_rate > 0.1;
 
 **Tables Created:** (24 tables)
 
-| Group | Tables |
-|-------|--------|
-| Plugin Platform | `plugins`, `plugin_versions`, `plugin_reviews`, `plugin_downloads` |
-| Marketplace | `marketplace_categories` (self-referencing parent_id) |
-| i18n | `language_packs`, `translation_entries` |
-| Multi-Currency | `currencies` (PK = code TEXT), `exchange_rates` |
-| Observability | `metrics`, `alerts`, `alert_events`, `health_checks`, `traces` |
+| Group             | Tables                                                                |
+| ----------------- | --------------------------------------------------------------------- |
+| Plugin Platform   | `plugins`, `plugin_versions`, `plugin_reviews`, `plugin_downloads`    |
+| Marketplace       | `marketplace_categories` (self-referencing parent_id)                 |
+| i18n              | `language_packs`, `translation_entries`                               |
+| Multi-Currency    | `currencies` (PK = code TEXT), `exchange_rates`                       |
+| Observability     | `metrics`, `alerts`, `alert_events`, `health_checks`, `traces`        |
 | Backup & Recovery | `backup_policies`, `backups`, `recovery_points`, `restore_operations` |
-| Search Platform | `search_indexes` (tsvector + GIN), `search_analytics` |
-| CDN & Storage | `storage_providers`, `storage_objects` |
-| Developer Portal | `api_versions`, `api_rate_limits` |
+| Search Platform   | `search_indexes` (tsvector + GIN), `search_analytics`                 |
+| CDN & Storage     | `storage_providers`, `storage_objects`                                |
+| Developer Portal  | `api_versions`, `api_rate_limits`                                     |
 
 **Seed Data:**
+
 - 5 API rate limit tiers (free/basic/pro/enterprise/custom)
 - 1 API version (v1)
 - 10 currencies (INR, USD, EUR, GBP, CAD, AUD, JPY, SGD, AED, CHF)
@@ -1318,6 +1388,7 @@ SELECT locale, name, is_rtl, is_default
 FROM language_packs WHERE is_active = TRUE;
 -- Expected: Active language packs listed
 ```
+
 </details>
 
 <details>
@@ -1333,6 +1404,7 @@ WHERE tc.table_name = 'currencies'
   AND tc.constraint_type = 'PRIMARY KEY';
 -- Expected: PRIMARY KEY on 'code' column
 ```
+
 </details>
 
 <details>
@@ -1352,6 +1424,7 @@ WHERE tablename = 'search_indexes'
   AND indexdef LIKE '%GIN%';
 -- Expected: idx_search_indexes_gin on search_vector
 ```
+
 </details>
 
 <details>
@@ -1368,6 +1441,7 @@ WHERE tc.table_name = 'marketplace_categories'
   AND ccu.table_name = 'marketplace_categories';
 -- Expected: Self-referencing FK (parent_id → id)
 ```
+
 </details>
 
 <details>
@@ -1381,6 +1455,7 @@ GROUP BY from_currency, to_currency, recorded_at
 HAVING COUNT(*) > 1;
 -- Expected: 0 rows
 ```
+
 </details>
 
 <details>
@@ -1392,6 +1467,7 @@ SELECT name, schedule_cron, retention_days, backup_type, is_active
 FROM backup_policies;
 -- Expected: At least row for 'Daily Full Backup', cron='0 2 * * *', 30 days
 ```
+
 </details>
 
 ---
@@ -1402,18 +1478,19 @@ FROM backup_policies;
 
 **Tables Created:** (17 tables)
 
-| Group | Tables |
-|-------|--------|
-| Agent Platform | `agents`, `agent_runs`, `agent_memory`, `agent_permissions`, `agent_schedules` |
-| Event Bus | `event_bus`, `event_subscriptions` |
-| Enterprise Connectors | `connector_configs` |
-| Tenant Management | `tenant_settings` |
-| Feature Flags | `feature_flags`, `feature_flag_events` |
-| Data Export | `export_templates`, `export_jobs`, `scheduled_exports` |
-| Analytics Studio | `report_templates`, `analytics_snapshots` |
-| Usage Quotas | `usage_quotas` |
+| Group                 | Tables                                                                         |
+| --------------------- | ------------------------------------------------------------------------------ |
+| Agent Platform        | `agents`, `agent_runs`, `agent_memory`, `agent_permissions`, `agent_schedules` |
+| Event Bus             | `event_bus`, `event_subscriptions`                                             |
+| Enterprise Connectors | `connector_configs`                                                            |
+| Tenant Management     | `tenant_settings`                                                              |
+| Feature Flags         | `feature_flags`, `feature_flag_events`                                         |
+| Data Export           | `export_templates`, `export_jobs`, `scheduled_exports`                         |
+| Analytics Studio      | `report_templates`, `analytics_snapshots`                                      |
+| Usage Quotas          | `usage_quotas`                                                                 |
 
 **Seed Data:**
+
 - 4 system report templates (Platform Overview, Campaign Performance, Security Overview, Monthly Report)
 - 8 feature flags (agent-platform, mcp-server, enterprise-connectors, event-bus, analytics-studio, data-export, new-dashboard, dark-mode)
 
@@ -1432,6 +1509,7 @@ GROUP BY slug
 HAVING COUNT(*) > 1;
 -- Expected: 0 rows
 ```
+
 </details>
 
 <details>
@@ -1445,6 +1523,7 @@ GROUP BY agent_id, memory_type, key
 HAVING COUNT(*) > 1;
 -- Expected: 0 rows
 ```
+
 </details>
 
 <details>
@@ -1464,6 +1543,7 @@ FROM event_bus
 WHERE status = 'dead_letter';
 -- Investigate any rows found
 ```
+
 </details>
 
 <details>
@@ -1480,6 +1560,7 @@ FROM feature_flags ORDER BY flag_key;
 --          dark-mode (enabled)
 -- percentage: new-dashboard (disabled, 0%)
 ```
+
 </details>
 
 <details>
@@ -1493,6 +1574,7 @@ WHERE tablename IN ('agents', 'agent_runs', 'tenant_settings')
   AND qual LIKE '%organization_id%';
 -- Expected: Policies referencing auth.jwt() ->> 'organization_id'
 ```
+
 </details>
 
 <details>
@@ -1511,6 +1593,7 @@ GROUP BY organization_id, resource, period
 HAVING COUNT(*) > 1;
 -- Expected: 0 rows (UNIQUE handles this)
 ```
+
 </details>
 
 <details>
@@ -1524,6 +1607,7 @@ GROUP BY snapshot_type, snapshot_date, organization_id
 HAVING COUNT(*) > 1;
 -- Expected: 0 rows
 ```
+
 </details>
 
 ---
@@ -1534,15 +1618,15 @@ HAVING COUNT(*) > 1;
 
 **Tables Created:** (7 tables)
 
-| Table | Key Details |
-|-------|-------------|
-| `job_queue` | status CHECK (7-state), priority 1–10, FK → organizations SET NULL |
-| `scheduled_jobs` | schedule_cron NOT NULL, next_run_at NOT NULL, FK → users SET NULL |
-| `cache_metadata` | cache_key TEXT, ttl_seconds, UNIQUE index on cache_key |
-| `deployment_history` | environment CHECK (5 envs), status CHECK (7-state) |
-| `audit_archives` | archive_type CHECK (5 types), compressed BOOLEAN |
-| `system_health` | status CHECK (4-state), metric_value DOUBLE PRECISION |
-| `connection_pool_metrics` | active/idle/waiting/max_connections, timed_out_count |
+| Table                     | Key Details                                                        |
+| ------------------------- | ------------------------------------------------------------------ |
+| `job_queue`               | status CHECK (7-state), priority 1–10, FK → organizations SET NULL |
+| `scheduled_jobs`          | schedule_cron NOT NULL, next_run_at NOT NULL, FK → users SET NULL  |
+| `cache_metadata`          | cache_key TEXT, ttl_seconds, UNIQUE index on cache_key             |
+| `deployment_history`      | environment CHECK (5 envs), status CHECK (7-state)                 |
+| `audit_archives`          | archive_type CHECK (5 types), compressed BOOLEAN                   |
+| `system_health`           | status CHECK (4-state), metric_value DOUBLE PRECISION              |
+| `connection_pool_metrics` | active/idle/waiting/max_connections, timed_out_count               |
 
 **Indexes:** 19 total
 
@@ -1565,6 +1649,7 @@ WHERE status IN ('pending', 'running', 'retrying')
   AND created_at < NOW() - INTERVAL '24 hours';
 -- Expected: 0 rows
 ```
+
 </details>
 
 <details>
@@ -1582,6 +1667,7 @@ FROM scheduled_jobs
 WHERE next_run_at < NOW() AND is_active = TRUE;
 -- Expected: 0 rows (or jobs that scheduler should have picked up)
 ```
+
 </details>
 
 <details>
@@ -1598,6 +1684,7 @@ SELECT * FROM cache_metadata
 WHERE ttl_seconds < 0;
 -- Expected: 0 rows
 ```
+
 </details>
 
 <details>
@@ -1615,6 +1702,7 @@ SELECT * FROM deployment_history
 WHERE health_check_passed = FALSE;
 -- Investigate
 ```
+
 </details>
 
 <details>
@@ -1635,6 +1723,7 @@ WHERE status IN ('degraded', 'down', 'unknown')
 GROUP BY component
 ORDER BY failure_count DESC;
 ```
+
 </details>
 
 <details>
@@ -1654,6 +1743,7 @@ SELECT pool_name, timed_out_count, acquired_count,
 FROM connection_pool_metrics
 WHERE timed_out_count > 0 AND acquired_count > 0;
 ```
+
 </details>
 
 ---
@@ -2194,33 +2284,33 @@ LIMIT 10;
 
 ## 📊 Master Health Checklist
 
-| # | Check | SQL Ref | Frequency | Status |
-|---|-------|---------|-----------|--------|
-| 1 | All 12 migrations applied | Section 7 | After deploy | □ |
-| 2 | No failed migrations | Section 7 | After deploy | □ |
-| 3 | All tables have RLS enabled | Section 8 | Weekly | □ |
-| 4 | No tables missing RLS policies | Section 8 | Weekly | □ |
-| 5 | Zero orphaned records | Section 2 | Daily | □ |
-| 6 | Zero FK violations | Section 3 | Daily | □ |
-| 7 | Zero duplicate records | Section 4 | Daily | □ |
-| 8 | No invalid CHECK constraint values | Section 5 | Weekly | □ |
-| 9 | All FK columns indexed | Section 6 | After migration | □ |
-| 10 | No sequential scans on large tables | Section 6 | Weekly | □ |
-| 11 | Table bloat < 20% dead rows | Section 9 | Weekly | □ |
-| 12 | Cache hit ratio > 95% | Section 9 | Weekly | □ |
-| 13 | Index hit ratio > 95% | Section 9 | Weekly | □ |
-| 14 | All triggers active and valid | Section 10 | After migration | □ |
-| 15 | No long-running queries (>5 min) | Section 12 | Daily | □ |
-| 16 | Connection count within limits | Section 12 | Daily | □ |
-| 17 | Auto-number sequences healthy | Section 11 | Weekly | □ |
-| 18 | pgvector extension installed | Migration 009 | After deploy | □ |
-| 19 | Search tsvector GIN index exists | Migration 010 | After deploy | □ |
-| 20 | No expired cache entries | Section 012 | Weekly | □ |
-| 21 | Escrow balance consistency | Section 006 | Daily | □ |
-| 22 | Fraud rules all 18 seeded | Section 005 | After deploy | □ |
-| 23 | No events in dead_letter queue | Section 011 | Daily | □ |
-| 24 | Deployment history clean | Section 012 | After deploy | □ |
-| 25 | System health all components OK | Section 012 | Daily | □ |
+| #   | Check                               | SQL Ref       | Frequency       | Status |
+| --- | ----------------------------------- | ------------- | --------------- | ------ |
+| 1   | All 12 migrations applied           | Section 7     | After deploy    | □      |
+| 2   | No failed migrations                | Section 7     | After deploy    | □      |
+| 3   | All tables have RLS enabled         | Section 8     | Weekly          | □      |
+| 4   | No tables missing RLS policies      | Section 8     | Weekly          | □      |
+| 5   | Zero orphaned records               | Section 2     | Daily           | □      |
+| 6   | Zero FK violations                  | Section 3     | Daily           | □      |
+| 7   | Zero duplicate records              | Section 4     | Daily           | □      |
+| 8   | No invalid CHECK constraint values  | Section 5     | Weekly          | □      |
+| 9   | All FK columns indexed              | Section 6     | After migration | □      |
+| 10  | No sequential scans on large tables | Section 6     | Weekly          | □      |
+| 11  | Table bloat < 20% dead rows         | Section 9     | Weekly          | □      |
+| 12  | Cache hit ratio > 95%               | Section 9     | Weekly          | □      |
+| 13  | Index hit ratio > 95%               | Section 9     | Weekly          | □      |
+| 14  | All triggers active and valid       | Section 10    | After migration | □      |
+| 15  | No long-running queries (>5 min)    | Section 12    | Daily           | □      |
+| 16  | Connection count within limits      | Section 12    | Daily           | □      |
+| 17  | Auto-number sequences healthy       | Section 11    | Weekly          | □      |
+| 18  | pgvector extension installed        | Migration 009 | After deploy    | □      |
+| 19  | Search tsvector GIN index exists    | Migration 010 | After deploy    | □      |
+| 20  | No expired cache entries            | Section 012   | Weekly          | □      |
+| 21  | Escrow balance consistency          | Section 006   | Daily           | □      |
+| 22  | Fraud rules all 18 seeded           | Section 005   | After deploy    | □      |
+| 23  | No events in dead_letter queue      | Section 011   | Daily           | □      |
+| 24  | Deployment history clean            | Section 012   | After deploy    | □      |
+| 25  | System health all components OK     | Section 012   | Daily           | □      |
 
 ---
 
@@ -2272,4 +2362,4 @@ WHERE ABS(balance - (escrow_balance + pending_balance + total_fees - total_disbu
 
 ---
 
-*End of Database Verification Guide. This document covers all 12 migrations, 60+ tables, and provides comprehensive SQL verification queries for every schema object type.*
+_End of Database Verification Guide. This document covers all 12 migrations, 60+ tables, and provides comprehensive SQL verification queries for every schema object type._

@@ -18,7 +18,9 @@ import { join } from "path";
 const REPORT_DIR = join(process.cwd(), "tests/performance/reports");
 
 // Ensure report directory exists
-try { mkdirSync(REPORT_DIR, { recursive: true }); } catch {}
+try {
+  mkdirSync(REPORT_DIR, { recursive: true });
+} catch {}
 
 const PAGES_TO_TEST = [
   { name: "landing", path: "/" },
@@ -42,7 +44,9 @@ for (const { name, path: route } of PAGES_TO_TEST) {
         if (!nav) return null;
         return {
           ttfb: Math.round(nav.responseStart - nav.requestStart),
-          domContentLoaded: Math.round(nav.domContentLoadedEventEnd - nav.fetchStart),
+          domContentLoaded: Math.round(
+            nav.domContentLoadedEventEnd - nav.fetchStart,
+          ),
           loadComplete: Math.round(nav.loadEventEnd - nav.fetchStart),
           domInteractive: Math.round(nav.domInteractive - nav.fetchStart),
           transferSize: nav.transferSize,
@@ -77,7 +81,10 @@ for (const { name, path: route } of PAGES_TO_TEST) {
             const entries = list.getEntries();
             lastEntry = entries[entries.length - 1];
           });
-          observer.observe({ type: "largest-contentful-paint", buffered: true });
+          observer.observe({
+            type: "largest-contentful-paint",
+            buffered: true,
+          });
 
           // Give a moment for LCP to settle
           setTimeout(() => {
@@ -114,10 +121,18 @@ for (const { name, path: route } of PAGES_TO_TEST) {
         const resources = performance.getEntriesByType("resource");
         return {
           totalRequests: resources.length,
-          totalTransferSize: resources.reduce((sum, r) => sum + (r.transferSize || 0), 0),
-          jsRequests: resources.filter((r) => r.initiatorType === "script" || r.name.endsWith(".js")).length,
-          cssRequests: resources.filter((r) => r.initiatorType === "link" || r.name.endsWith(".css")).length,
-          imageRequests: resources.filter((r) => r.initiatorType === "img").length,
+          totalTransferSize: resources.reduce(
+            (sum, r) => sum + (r.transferSize || 0),
+            0,
+          ),
+          jsRequests: resources.filter(
+            (r) => r.initiatorType === "script" || r.name.endsWith(".js"),
+          ).length,
+          cssRequests: resources.filter(
+            (r) => r.initiatorType === "link" || r.name.endsWith(".css"),
+          ).length,
+          imageRequests: resources.filter((r) => r.initiatorType === "img")
+            .length,
         };
       });
       metrics.network = networkInfo;
@@ -145,7 +160,8 @@ for (const { name, path: route } of PAGES_TO_TEST) {
           })(),
           totalImages: document.querySelectorAll("img").length,
           totalScripts: document.querySelectorAll("script").length,
-          totalStylesheets: document.querySelectorAll('link[rel="stylesheet"]').length,
+          totalStylesheets: document.querySelectorAll('link[rel="stylesheet"]')
+            .length,
         };
       });
       metrics.pageSize = pageSize;
@@ -157,12 +173,16 @@ for (const { name, path: route } of PAGES_TO_TEST) {
       console.log(`   FCP:                 ${metrics.fcp ?? "N/A"}ms`);
       console.log(`   LCP:                 ${metrics.lcp ?? "N/A"}ms`);
       console.log(`   CLS:                 ${metrics.cls ?? "N/A"}`);
-      console.log(`   DOM Content Loaded:  ${metrics.domContentLoaded ?? "N/A"}ms`);
+      console.log(
+        `   DOM Content Loaded:  ${metrics.domContentLoaded ?? "N/A"}ms`,
+      );
       console.log(`   Load Complete:       ${metrics.loadComplete ?? "N/A"}ms`);
       console.log(`   Page Load Time:      ${metrics.loadTimeMs}ms`);
       console.log(`   ─────────────────────────────────────`);
       console.log(`   Network Requests:    ${networkInfo.totalRequests}`);
-      console.log(`   Transfer Size:       ${(networkInfo.totalTransferSize / 1024).toFixed(1)}KB`);
+      console.log(
+        `   Transfer Size:       ${(networkInfo.totalTransferSize / 1024).toFixed(1)}KB`,
+      );
       console.log(`   JS Chunks:           ${networkInfo.jsRequests}`);
       console.log(`   CSS Files:           ${networkInfo.cssRequests}`);
       console.log(`   Images:              ${networkInfo.imageRequests}`);
@@ -185,13 +205,17 @@ for (const { name, path: route } of PAGES_TO_TEST) {
 
       // Soft assertions — flag pages with measurable issues
       if (metrics.lcp && metrics.lcp > 4000) {
-        console.log(`\n   ⚠️  LCP > 4s — consider optimizing hero image / above-fold content`);
+        console.log(
+          `\n   ⚠️  LCP > 4s — consider optimizing hero image / above-fold content`,
+        );
       }
       if (metrics.cls && metrics.cls > 0.1) {
         console.log(`\n   ⚠️  CLS > 0.1 — layout shifts detected`);
       }
       if (metrics.ttfb && metrics.ttfb > 800) {
-        console.log(`\n   ⚠️  TTFB > 800ms — server response time may need optimization`);
+        console.log(
+          `\n   ⚠️  TTFB > 800ms — server response time may need optimization`,
+        );
       }
 
       // Only fail on critical issues (page didn't load)

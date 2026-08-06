@@ -38,7 +38,9 @@ export default withAuth(async function handler(req, res, user) {
       const unread = await getUnreadCount(user.id);
 
       if (!notifications.success) {
-        return res.status(500).json({ error: notifications.error || "Failed to fetch notifications" });
+        return res.status(500).json({
+          error: notifications.error || "Failed to fetch notifications",
+        });
       }
 
       return res.status(200).json({
@@ -60,16 +62,21 @@ export default withAuth(async function handler(req, res, user) {
       const { action, notificationId } = req.body;
 
       if (action === "mark_read") {
-        if (!notificationId) return res.status(400).json({ error: "notificationId is required" });
+        if (!notificationId)
+          return res.status(400).json({ error: "notificationId is required" });
         const result = await markAsRead(notificationId, user.id);
-        if (!result.success) return res.status(400).json({ error: result.error });
+        if (!result.success)
+          return res.status(400).json({ error: result.error });
         return res.status(200).json({ success: true, data: result.data });
       }
 
       if (action === "mark_all_read") {
         const result = await markAllAsRead(user.id);
-        if (!result.success) return res.status(400).json({ error: result.error });
-        return res.status(200).json({ success: true, message: "All notifications marked as read" });
+        if (!result.success)
+          return res.status(400).json({ error: result.error });
+        return res
+          .status(200)
+          .json({ success: true, message: "All notifications marked as read" });
       }
 
       return res.status(400).json({ error: "Invalid action" });
@@ -84,10 +91,13 @@ export default withAuth(async function handler(req, res, user) {
 
     try {
       const { notificationId } = req.query;
-      if (!notificationId) return res.status(400).json({ error: "notificationId is required" });
+      if (!notificationId)
+        return res.status(400).json({ error: "notificationId is required" });
       const result = await deleteNotification(notificationId, user.id);
       if (!result.success) return res.status(400).json({ error: result.error });
-      return res.status(200).json({ success: true, message: "Notification deleted" });
+      return res
+        .status(200)
+        .json({ success: true, message: "Notification deleted" });
     } catch (err) {
       logError("NotificationsAPI", "DELETE error", { error: err.message });
       return res.status(500).json({ error: "Failed to delete notification" });

@@ -1,5 +1,9 @@
 // API — Queue infrastructure management
-import { listJobs, listHandlers, getActiveJobCount } from "../../../lib/jobs/index.js";
+import {
+  listJobs,
+  listHandlers,
+  getActiveJobCount,
+} from "../../../lib/jobs/index.js";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -10,12 +14,17 @@ export default async function handler(req, res) {
   try {
     const { status, queueName, limit, offset } = req.query;
 
-    const [pendingResult, runningResult, deadLetterResult, completedResult] = await Promise.all([
-      listJobs({ status: "pending", queueName, limit: 0 }),
-      listJobs({ status: "running", queueName, limit: 0 }),
-      listJobs({ status: "dead_letter", queueName, limit: 0 }),
-      listJobs({ status: "completed", queueName, limit: parseInt(limit || "10") }),
-    ]);
+    const [pendingResult, runningResult, deadLetterResult, completedResult] =
+      await Promise.all([
+        listJobs({ status: "pending", queueName, limit: 0 }),
+        listJobs({ status: "running", queueName, limit: 0 }),
+        listJobs({ status: "dead_letter", queueName, limit: 0 }),
+        listJobs({
+          status: "completed",
+          queueName,
+          limit: parseInt(limit || "10"),
+        }),
+      ]);
 
     return res.status(200).json({
       success: true,

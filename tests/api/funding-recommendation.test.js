@@ -75,8 +75,20 @@ describe("POST /api/ai/funding-recommendation", () => {
 
   it("returns recommended category with highest score", async () => {
     const projects = [
-      { id: "p1", categories: ["Tech"], pledged: 8000, goal: 10000, owner_id: "creator-1" },
-      { id: "p2", categories: ["Art"], pledged: 2000, goal: 5000, owner_id: "other" },
+      {
+        id: "p1",
+        categories: ["Tech"],
+        pledged: 8000,
+        goal: 10000,
+        owner_id: "creator-1",
+      },
+      {
+        id: "p2",
+        categories: ["Art"],
+        pledged: 2000,
+        goal: 5000,
+        owner_id: "other",
+      },
     ];
     const donations = [
       { project_id: "p1", amount: 500 },
@@ -105,15 +117,21 @@ describe("POST /api/ai/funding-recommendation", () => {
       expect.objectContaining({
         recommendedCategory: expect.any(String),
         score: expect.any(Number),
-      })
+      }),
     );
   });
 
   it("returns null category when no projects exist", async () => {
     supabaseAdmin.from.mockImplementation(() => ({
       select: () => ({
-        eq: () => ({ limit: () => ({ then: (resolve) => resolve({ data: [], error: null }) }) }),
-        limit: () => ({ then: (resolve) => resolve({ data: [], error: null }) }),
+        eq: () => ({
+          limit: () => ({
+            then: (resolve) => resolve({ data: [], error: null }),
+          }),
+        }),
+        limit: () => ({
+          then: (resolve) => resolve({ data: [], error: null }),
+        }),
       }),
     }));
 

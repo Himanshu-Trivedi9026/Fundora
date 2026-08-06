@@ -19,51 +19,81 @@ const rl = rateLimit({ windowMs: 60_000, max: 10 });
  * action updates Supabase, writes an audit log, syncs the creator's overall
  * verification status, and sends an in-app notification.
  */
-export default withRole(async function handler(req, res, user) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
-  if (!rl(req, res)) return;
-
-  try {
-    const { action, verificationId, reason, notes } = req.body;
-
-    if (!action || !verificationId) {
-      return res.status(400).json({ error: "Action and verification ID are required" });
+export default withRole(
+  async function handler(req, res, user) {
+    if (req.method !== "POST") {
+      return res.status(405).json({ error: "Method not allowed" });
     }
 
-    let result;
+    if (!rl(req, res)) return;
 
-    switch (action) {
-      case "approve":
-        result = await approveRequest(verificationId, user.id, notes, user.id);
-        break;
-      case "reject":
-        if (!reason) {
-          return res.status(400).json({ error: "Rejection reason is required" });
-        }
-        result = await rejectRequest(verificationId, user.id, reason, user.id);
-        break;
-      case "resubmit":
-        if (!reason) {
-          return res.status(400).json({ error: "Reason is required" });
-        }
-        result = await requestResubmission(verificationId, user.id, reason, user.id);
-        break;
-      case "suspend":
-        result = await suspendVerification(verificationId, user.id, reason, user.id);
-        break;
-      default:
-        return res.status(400).json({ error: "Invalid action. Must be: approve, reject, resubmit, suspend" });
+    try {
+      const { action, verificationId, reason, notes } = req.body;
+
+      if (!action || !verificationId) {
+        return res
+          .status(400)
+          .json({ error: "Action and verification ID are required" });
+      }
+
+      let result;
+
+      switch (action) {
+        case "approve":
+          result = await approveRequest(
+            verificationId,
+            user.id,
+            notes,
+            user.id,
+          );
+          break;
+        case "reject":
+          if (!reason) {
+            return res
+              .status(400)
+              .json({ error: "Rejection reason is required" });
+          }
+          result = await rejectRequest(
+            verificationId,
+            user.id,
+            reason,
+            user.id,
+          );
+          break;
+        case "resubmit":
+          if (!reason) {
+            return res.status(400).json({ error: "Reason is required" });
+          }
+          result = await requestResubmission(
+            verificationId,
+            user.id,
+            reason,
+            user.id,
+          );
+          break;
+        case "suspend":
+          result = await suspendVerification(
+            verificationId,
+            user.id,
+            reason,
+            user.id,
+          );
+          break;
+        default:
+          return res.status(400).json({
+            error:
+              "Invalid action. Must be: approve, reject, resubmit, suspend",
+          });
+      }
+
+      if (!result.success) {
+        return res.status(400).json({ error: result.error });
+      }
+
+      return res.status(200).json({ success: true });
+    } catch (err) {
+      return res.status(500).json({ error: "Internal server error" });
     }
-
-    if (!result.success) {
-      return res.status(400).json({ error: result.error });
-    }
-
-    return res.status(200).json({ success: true });
-  } catch (err) {
-    return res.status(500).json({ error: "Internal server error" });
-  }
-}, [ROLES.ADMIN]);
+  },
+  [ROLES.ADMIN],
+);

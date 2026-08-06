@@ -25,7 +25,12 @@ const STATUS_VARIANT_MAP = {
 };
 
 /** Statuses where a creator can submit evidence */
-const SUBMITTABLE_STATUSES = ["active", "in_progress", "pending", "pending_approval"];
+const SUBMITTABLE_STATUSES = [
+  "active",
+  "in_progress",
+  "pending",
+  "pending_approval",
+];
 
 export default function MilestonesPage() {
   const router = useRouter();
@@ -84,7 +89,7 @@ export default function MilestonesPage() {
         grouped[project.id] = {
           project,
           milestones: (milestonesData || []).filter(
-            (m) => m.project_id === project.id
+            (m) => m.project_id === project.id,
           ),
         };
       }
@@ -127,15 +132,25 @@ export default function MilestonesPage() {
           description: evidenceForm.description.trim(),
           progressNotes: evidenceForm.progressNotes.trim(),
           links: evidenceForm.links.trim()
-            ? evidenceForm.links.split("\n").map((l) => l.trim()).filter(Boolean)
+            ? evidenceForm.links
+                .split("\n")
+                .map((l) => l.trim())
+                .filter(Boolean)
             : [],
           submissionType: "progress_report",
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Submission failed");
-      setEvidenceSuccess(`Evidence submitted for "${evidenceModal.title || "milestone"}"`);
-      setEvidenceForm({ title: "", description: "", progressNotes: "", links: "" });
+      setEvidenceSuccess(
+        `Evidence submitted for "${evidenceModal.title || "milestone"}"`,
+      );
+      setEvidenceForm({
+        title: "",
+        description: "",
+        progressNotes: "",
+        links: "",
+      });
       fetchMilestones();
     } catch (err) {
       setEvidenceError(err.message);
@@ -245,132 +260,133 @@ export default function MilestonesPage() {
           {!loading &&
             !error &&
             projects.length > 0 &&
-            Object.values(milestonesByProject).map(({ project, milestones }) => (
-              <GlassCard key={project.id} className="mb-6">
-                {/* Project header */}
-                <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/[0.06]">
-                  <div>
-                    <h2 className="text-lg font-semibold text-on-surface">
-                      {project.title || "Untitled Project"}
-                    </h2>
-                    {project.category && (
-                      <span className="text-xs text-on-surface-variant capitalize">
-                        {project.category}
-                      </span>
+            Object.values(milestonesByProject).map(
+              ({ project, milestones }) => (
+                <GlassCard key={project.id} className="mb-6">
+                  {/* Project header */}
+                  <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/[0.06]">
+                    <div>
+                      <h2 className="text-lg font-semibold text-on-surface">
+                        {project.title || "Untitled Project"}
+                      </h2>
+                      {project.category && (
+                        <span className="text-xs text-on-surface-variant capitalize">
+                          {project.category}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Approval progress */}
+                    {milestones.length > 0 && (
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <p className="text-xs text-on-surface-variant">
+                            Approval Progress
+                          </p>
+                          <p className="text-sm font-semibold text-on-surface">
+                            {computeApprovalPercentage(milestones)}%
+                          </p>
+                        </div>
+                        <div className="w-20 h-2 bg-white/[0.06] rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-success to-success/70 rounded-full transition-all duration-500"
+                            style={{
+                              width: `${computeApprovalPercentage(milestones)}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
                     )}
                   </div>
 
-                  {/* Approval progress */}
-                  {milestones.length > 0 && (
-                    <div className="flex items-center gap-3">
-                      <div className="text-right">
-                        <p className="text-xs text-on-surface-variant">
-                          Approval Progress
-                        </p>
-                        <p className="text-sm font-semibold text-on-surface">
-                          {computeApprovalPercentage(milestones)}%
-                        </p>
-                      </div>
-                      <div className="w-20 h-2 bg-white/[0.06] rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-gradient-to-r from-success to-success/70 rounded-full transition-all duration-500"
-                          style={{
-                            width: `${computeApprovalPercentage(milestones)}%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Milestone count */}
-                <p className="text-xs text-on-surface-variant mb-4">
-                  {milestones.length}{" "}
-                  {milestones.length === 1 ? "milestone" : "milestones"}
-                </p>
-
-                {/* No milestones for this project */}
-                {milestones.length === 0 && (
-                  <p className="text-sm text-on-surface-variant text-center py-6">
-                    No milestones added to this project yet.
+                  {/* Milestone count */}
+                  <p className="text-xs text-on-surface-variant mb-4">
+                    {milestones.length}{" "}
+                    {milestones.length === 1 ? "milestone" : "milestones"}
                   </p>
-                )}
 
-                {/* Milestone list */}
-                {milestones.length > 0 && (
-                  <div className="space-y-3">
-                    {milestones.map((milestone) => (
-                      <div
-                        key={milestone.id}
-                        className="rounded-lg bg-white/[0.03] border border-white/[0.06] p-4 transition-colors hover:bg-white/[0.05]"
-                      >
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="text-sm font-medium text-on-surface truncate">
-                                {milestone.title || "Untitled Milestone"}
-                              </h3>
-                              <Badge
-                                variant={
-                                  STATUS_VARIANT_MAP[milestone.status] ||
-                                  "default"
-                                }
-                              >
-                                {milestone.status || "unknown"}
-                              </Badge>
+                  {/* No milestones for this project */}
+                  {milestones.length === 0 && (
+                    <p className="text-sm text-on-surface-variant text-center py-6">
+                      No milestones added to this project yet.
+                    </p>
+                  )}
+
+                  {/* Milestone list */}
+                  {milestones.length > 0 && (
+                    <div className="space-y-3">
+                      {milestones.map((milestone) => (
+                        <div
+                          key={milestone.id}
+                          className="rounded-lg bg-white/[0.03] border border-white/[0.06] p-4 transition-colors hover:bg-white/[0.05]"
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h3 className="text-sm font-medium text-on-surface truncate">
+                                  {milestone.title || "Untitled Milestone"}
+                                </h3>
+                                <Badge
+                                  variant={
+                                    STATUS_VARIANT_MAP[milestone.status] ||
+                                    "default"
+                                  }
+                                >
+                                  {milestone.status || "unknown"}
+                                </Badge>
+                              </div>
+                              {milestone.description && (
+                                <p className="text-xs text-on-surface-variant line-clamp-2">
+                                  {milestone.description}
+                                </p>
+                              )}
                             </div>
-                            {milestone.description && (
-                              <p className="text-xs text-on-surface-variant line-clamp-2">
-                                {milestone.description}
-                              </p>
-                            )}
-                          </div>
 
-                          {/* Amounts */}
-                          <div className="text-right flex-shrink-0">
-                            {milestone.target_amount != null && (
-                              <p className="text-sm font-semibold text-on-surface">
-                                {currencyFormatter.format(
-                                  milestone.target_amount,
-                                )}
-                              </p>
-                            )}
-                            {milestone.release_amount != null && (
-                              <p className="text-xs text-success">
-                                Release:{" "}
-                                {currencyFormatter.format(
-                                  milestone.release_amount,
-                                )}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Progress bar for approved/released */}
-                        {milestone.target_amount > 0 &&
-                          milestone.release_amount != null && (
-                            <div className="mt-3">
-                              <div className="flex justify-between text-xs text-on-surface-variant mb-1">
-                                <span>Release progress</span>
-                                <span>
-                                  {Math.round(
-                                    (milestone.release_amount /
-                                      milestone.target_amount) *
-                                      100,
+                            {/* Amounts */}
+                            <div className="text-right flex-shrink-0">
+                              {milestone.target_amount != null && (
+                                <p className="text-sm font-semibold text-on-surface">
+                                  {currencyFormatter.format(
+                                    milestone.target_amount,
                                   )}
-                                  %
-                                </span>
-                              </div>
-                              <div className="w-full h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-gradient-to-r from-primary to-primary/60 rounded-full transition-all duration-500"
-                                  style={{
-                                    width: `${Math.min(100, (milestone.release_amount / milestone.target_amount) * 100)}%`,
-                                  }}
-                                />
-                              </div>
+                                </p>
+                              )}
+                              {milestone.release_amount != null && (
+                                <p className="text-xs text-success">
+                                  Release:{" "}
+                                  {currencyFormatter.format(
+                                    milestone.release_amount,
+                                  )}
+                                </p>
+                              )}
                             </div>
-                          )}
+                          </div>
+
+                          {/* Progress bar for approved/released */}
+                          {milestone.target_amount > 0 &&
+                            milestone.release_amount != null && (
+                              <div className="mt-3">
+                                <div className="flex justify-between text-xs text-on-surface-variant mb-1">
+                                  <span>Release progress</span>
+                                  <span>
+                                    {Math.round(
+                                      (milestone.release_amount /
+                                        milestone.target_amount) *
+                                        100,
+                                    )}
+                                    %
+                                  </span>
+                                </div>
+                                <div className="w-full h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                                  <div
+                                    className="h-full bg-gradient-to-r from-primary to-primary/60 rounded-full transition-all duration-500"
+                                    style={{
+                                      width: `${Math.min(100, (milestone.release_amount / milestone.target_amount) * 100)}%`,
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            )}
 
                           {/* Submit Evidence Button */}
                           {SUBMITTABLE_STATUSES.includes(milestone.status) && (
@@ -389,17 +405,20 @@ export default function MilestonesPage() {
                                 }}
                                 className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors"
                               >
-                                <span className="material-symbols-outlined text-[16px]">upload_file</span>
+                                <span className="material-symbols-outlined text-[16px]">
+                                  upload_file
+                                </span>
                                 Submit Evidence
                               </button>
                             </div>
                           )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </GlassCard>
-            ))}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </GlassCard>
+              ),
+            )}
         </div>
       </div>
 
@@ -412,7 +431,11 @@ export default function MilestonesPage() {
                 Submit Evidence
               </h3>
               <button
-                onClick={() => { setEvidenceModal(null); setEvidenceError(null); setEvidenceSuccess(null); }}
+                onClick={() => {
+                  setEvidenceModal(null);
+                  setEvidenceError(null);
+                  setEvidenceSuccess(null);
+                }}
                 className="text-gray-400 hover:text-white transition-colors"
               >
                 <span className="material-symbols-outlined">close</span>
@@ -421,10 +444,15 @@ export default function MilestonesPage() {
 
             {evidenceSuccess ? (
               <div className="text-center py-6">
-                <span className="material-symbols-outlined text-[48px] text-green-400 mb-3">check_circle</span>
+                <span className="material-symbols-outlined text-[48px] text-green-400 mb-3">
+                  check_circle
+                </span>
                 <p className="text-green-300 text-sm">{evidenceSuccess}</p>
                 <button
-                  onClick={() => { setEvidenceModal(null); setEvidenceSuccess(null); }}
+                  onClick={() => {
+                    setEvidenceModal(null);
+                    setEvidenceSuccess(null);
+                  }}
                   className="mt-4 px-4 py-2 rounded-lg bg-purple-600/20 text-purple-400 text-sm hover:bg-purple-600/30"
                 >
                   Close
@@ -433,39 +461,61 @@ export default function MilestonesPage() {
             ) : (
               <form onSubmit={handleEvidenceSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs text-gray-400 mb-1">Title *</label>
+                  <label className="block text-xs text-gray-400 mb-1">
+                    Title *
+                  </label>
                   <input
                     type="text"
                     value={evidenceForm.title}
-                    onChange={(e) => setEvidenceForm((f) => ({ ...f, title: e.target.value }))}
+                    onChange={(e) =>
+                      setEvidenceForm((f) => ({ ...f, title: e.target.value }))
+                    }
                     className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50"
                     placeholder="Evidence title"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-400 mb-1">Description</label>
+                  <label className="block text-xs text-gray-400 mb-1">
+                    Description
+                  </label>
                   <textarea
                     value={evidenceForm.description}
-                    onChange={(e) => setEvidenceForm((f) => ({ ...f, description: e.target.value }))}
+                    onChange={(e) =>
+                      setEvidenceForm((f) => ({
+                        ...f,
+                        description: e.target.value,
+                      }))
+                    }
                     className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 min-h-[80px]"
                     placeholder="Describe the progress made..."
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-400 mb-1">Progress Notes</label>
+                  <label className="block text-xs text-gray-400 mb-1">
+                    Progress Notes
+                  </label>
                   <textarea
                     value={evidenceForm.progressNotes}
-                    onChange={(e) => setEvidenceForm((f) => ({ ...f, progressNotes: e.target.value }))}
+                    onChange={(e) =>
+                      setEvidenceForm((f) => ({
+                        ...f,
+                        progressNotes: e.target.value,
+                      }))
+                    }
                     className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 min-h-[80px]"
                     placeholder="Detailed progress notes..."
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-400 mb-1">Links (one per line)</label>
+                  <label className="block text-xs text-gray-400 mb-1">
+                    Links (one per line)
+                  </label>
                   <textarea
                     value={evidenceForm.links}
-                    onChange={(e) => setEvidenceForm((f) => ({ ...f, links: e.target.value }))}
+                    onChange={(e) =>
+                      setEvidenceForm((f) => ({ ...f, links: e.target.value }))
+                    }
                     className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 min-h-[60px]"
                     placeholder="https://github.com/..."
                   />
@@ -478,7 +528,10 @@ export default function MilestonesPage() {
                 <div className="flex gap-2 justify-end pt-2">
                   <button
                     type="button"
-                    onClick={() => { setEvidenceModal(null); setEvidenceError(null); }}
+                    onClick={() => {
+                      setEvidenceModal(null);
+                      setEvidenceError(null);
+                    }}
                     className="px-4 py-2 rounded-lg bg-white/5 text-gray-300 text-sm hover:bg-white/10 transition-colors"
                   >
                     Cancel

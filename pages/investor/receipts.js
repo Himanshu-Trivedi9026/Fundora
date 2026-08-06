@@ -4,7 +4,12 @@ import Link from "next/link";
 import { supabase } from "../../lib/supabaseClient";
 import { useRole } from "../../context/RoleContext";
 import PageLayout from "../../components/PageLayout";
-import { GlassCard, PageHeader, LoadingSpinner, EmptyState } from "../../components/ui";
+import {
+  GlassCard,
+  PageHeader,
+  LoadingSpinner,
+  EmptyState,
+} from "../../components/ui";
 import { generateReceipt as generateReceiptPDF } from "../../lib/generateReceipt";
 import { authFetch } from "../../lib/authFetch";
 
@@ -30,7 +35,8 @@ export default function InvestorReceipts() {
     try {
       const { data, error: donErr } = await supabase
         .from("public_donations")
-        .select(`
+        .select(
+          `
           id,
           amount,
           created_at,
@@ -42,7 +48,8 @@ export default function InvestorReceipts() {
             slug,
             thumbnail
           )
-        `)
+        `,
+        )
         .eq("payer_id", user.id)
         .eq("status", "paid")
         .order("created_at", { ascending: false });
@@ -255,7 +262,7 @@ export default function InvestorReceipts() {
                                 ) : (
                                   <span className="flex items-center gap-1.5">
                                     <span className="material-symbols-outlined text-[16px]">
-                      receipt
+                                      receipt
                                     </span>
                                     Get Receipt
                                   </span>

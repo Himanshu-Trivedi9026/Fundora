@@ -19,7 +19,9 @@ async function handler(req, res) {
       case "POST": {
         const { eventType, payload, options } = req.body;
         if (!eventType || !payload) {
-          return res.status(400).json({ success: false, error: "eventType and payload required" });
+          return res
+            .status(400)
+            .json({ success: false, error: "eventType and payload required" });
         }
         const result = await publish(eventType, payload, {
           ...options,
@@ -41,7 +43,9 @@ async function handler(req, res) {
       }
 
       default:
-        return res.status(405).json({ success: false, error: "Method not allowed" });
+        return res
+          .status(405)
+          .json({ success: false, error: "Method not allowed" });
     }
   } catch (error) {
     console.error("Handler error:", error);

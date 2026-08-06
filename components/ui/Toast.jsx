@@ -1,4 +1,10 @@
-import { useState, useEffect, useCallback, createContext, useContext } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  createContext,
+  useContext,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 /**
@@ -53,8 +59,8 @@ export function ToastProvider({ children }) {
                 t.type === "success"
                   ? "bg-success-muted border-success/30 text-success"
                   : t.type === "error"
-                  ? "bg-danger-muted border-danger/30 text-danger"
-                  : "bg-surface-container-high border-outline-variant/30 text-on-surface"
+                    ? "bg-danger-muted border-danger/30 text-danger"
+                    : "bg-surface-container-high border-outline-variant/30 text-on-surface"
               }`}
               role="alert"
             >

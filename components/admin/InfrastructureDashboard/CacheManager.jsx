@@ -95,20 +95,28 @@ export default function CacheManager() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Memory Cache */}
           <div className="bg-gray-800/30 rounded-lg p-4 border border-gray-700/50">
-            <h4 className="text-sm font-medium text-gray-300 mb-3">Memory Cache</h4>
+            <h4 className="text-sm font-medium text-gray-300 mb-3">
+              Memory Cache
+            </h4>
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-xs text-gray-400">Items</span>
-                <span className="text-sm font-medium text-white">{memory?.size ?? 0}</span>
+                <span className="text-sm font-medium text-white">
+                  {memory?.size ?? 0}
+                </span>
               </div>
               {memory?.keys && memory.keys.length > 0 && (
                 <div className="mt-2 max-h-32 overflow-y-auto">
                   <p className="text-xs text-gray-500 mb-1">Keys:</p>
                   {memory.keys.slice(0, 10).map((key) => (
-                    <p key={key} className="text-xs text-gray-400 truncate">{key}</p>
+                    <p key={key} className="text-xs text-gray-400 truncate">
+                      {key}
+                    </p>
                   ))}
                   {memory.keys.length > 10 && (
-                    <p className="text-xs text-gray-600">+{memory.keys.length - 10} more</p>
+                    <p className="text-xs text-gray-600">
+                      +{memory.keys.length - 10} more
+                    </p>
                   )}
                 </div>
               )}
@@ -117,11 +125,15 @@ export default function CacheManager() {
 
           {/* Locks */}
           <div className="bg-gray-800/30 rounded-lg p-4 border border-gray-700/50">
-            <h4 className="text-sm font-medium text-gray-300 mb-3">Distributed Locks</h4>
+            <h4 className="text-sm font-medium text-gray-300 mb-3">
+              Distributed Locks
+            </h4>
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-xs text-gray-400">Active Locks</span>
-                <span className="text-sm font-medium text-white">{locks?.active ?? 0}</span>
+                <span className="text-sm font-medium text-white">
+                  {locks?.active ?? 0}
+                </span>
               </div>
               {locks?.active === 0 && (
                 <p className="text-xs text-gray-500">No active locks</p>
@@ -131,11 +143,15 @@ export default function CacheManager() {
 
           {/* Rate Limiters */}
           <div className="bg-gray-800/30 rounded-lg p-4 border border-gray-700/50">
-            <h4 className="text-sm font-medium text-gray-300 mb-3">Rate Limiters</h4>
+            <h4 className="text-sm font-medium text-gray-300 mb-3">
+              Rate Limiters
+            </h4>
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-xs text-gray-400">Active Limiters</span>
-                <span className="text-sm font-medium text-white">{rateLimiters?.active ?? 0}</span>
+                <span className="text-sm font-medium text-white">
+                  {rateLimiters?.active ?? 0}
+                </span>
               </div>
               {rateLimiters?.active === 0 && (
                 <p className="text-xs text-gray-500">No active rate limiters</p>

@@ -46,7 +46,11 @@ const DOCUMENT_TYPES = [
  * (server-persisted documents), and successfully uploaded docs are reported
  * to the wizard via onStateChange so the Review step shows real documents.
  */
-export default function IdentityVerificationStep({ onNext, onBack, onStateChange }) {
+export default function IdentityVerificationStep({
+  onNext,
+  onBack,
+  onStateChange,
+}) {
   const [selectedType, setSelectedType] = useState(null);
   const [uploadedFiles, setUploadedFiles] = useState([]);
 
@@ -178,7 +182,8 @@ export default function IdentityVerificationStep({ onNext, onBack, onStateChange
                 onFilesChange={handleFilesChange}
                 documentType={selectedType}
                 label={`Upload your ${
-                  DOCUMENT_TYPES.find((d) => d.id === selectedType)?.label || "document"
+                  DOCUMENT_TYPES.find((d) => d.id === selectedType)?.label ||
+                  "document"
                 }`}
               />
             </div>
@@ -213,7 +218,11 @@ export default function IdentityVerificationStep({ onNext, onBack, onStateChange
         <button
           onClick={handleSubmit}
           disabled={documents.length === 0}
-          title={documents.length === 0 ? "Upload at least one document to continue" : undefined}
+          title={
+            documents.length === 0
+              ? "Upload at least one document to continue"
+              : undefined
+          }
           className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-primary text-on-primary font-inter text-sm font-medium shadow-glow hover:bg-primary/90 hover:shadow-glow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           aria-label="Continue to selfie verification"
         >

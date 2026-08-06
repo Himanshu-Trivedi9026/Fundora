@@ -13,7 +13,10 @@ export default function AchievementsBento({ achievements }) {
       whileInView="visible"
       viewport={{ once: true, margin: "-40px" }}
     >
-      <motion.h2 variants={staggerItem} className="text-lg font-semibold text-on-surface font-geist mb-4">
+      <motion.h2
+        variants={staggerItem}
+        className="text-lg font-semibold text-on-surface font-geist mb-4"
+      >
         Achievements
       </motion.h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

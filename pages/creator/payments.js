@@ -53,7 +53,9 @@ export default function CreatorPayments() {
       const data = await res.json();
 
       if (!res.ok) {
-        queueMicrotask(() => setMessage(data?.error || "Failed to load config"));
+        queueMicrotask(() =>
+          setMessage(data?.error || "Failed to load config"),
+        );
         return;
       }
 
@@ -114,7 +116,7 @@ export default function CreatorPayments() {
     setKeySecret("");
     setSaving(false);
     setMessage(
-      "Saved. This Razorpay account will be used for all your projects."
+      "Saved. This Razorpay account will be used for all your projects.",
     );
   }
 
@@ -153,7 +155,6 @@ export default function CreatorPayments() {
         </div>
 
         <div className="max-w-7xl mx-auto px-6 lg:px-16">
-
           {/* ═══════════ HEADER ═══════════ */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -165,19 +166,23 @@ export default function CreatorPayments() {
               Payment Management
             </h1>
             <p className="text-on-surface-variant font-inter text-lg max-w-2xl leading-relaxed">
-              Integrate your Razorpay credentials to enable seamless payouts and investor funding.
-              These credentials are encrypted and stored in a secure hardware module.
+              Integrate your Razorpay credentials to enable seamless payouts and
+              investor funding. These credentials are encrypted and stored in a
+              secure hardware module.
             </p>
           </motion.div>
 
           {/* ═══════════ MAIN CONFIG GRID ═══════════ */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-12">
-
             {/* ─── Payment Config Card ─── */}
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+              transition={{
+                duration: 0.6,
+                delay: 0.1,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
               className="lg:col-span-8"
             >
               <div className="glass-card rounded-xl p-8 md:p-12 relative overflow-hidden">
@@ -187,14 +192,22 @@ export default function CreatorPayments() {
                 {/* Header */}
                 <div className="flex items-center gap-4 mb-8">
                   <div className="w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center">
-                    <span className="material-symbols-outlined text-primary text-[28px]" aria-hidden="true">payments</span>
+                    <span
+                      className="material-symbols-outlined text-primary text-[28px]"
+                      aria-hidden="true"
+                    >
+                      payments
+                    </span>
                   </div>
                   <div>
                     <h3 className="font-geist text-lg font-semibold text-on-surface">
                       Razorpay Integration
                     </h3>
                     <p className="text-on-surface-variant font-inter text-sm flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-success" aria-hidden="true" />
+                      <span
+                        className="w-1.5 h-1.5 rounded-full bg-success"
+                        aria-hidden="true"
+                      />
                       Active Connection: Live Mode
                     </p>
                   </div>
@@ -208,7 +221,10 @@ export default function CreatorPayments() {
                       Razorpay Key ID
                     </label>
                     <div className="relative group">
-                      <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors" aria-hidden="true">
+                      <span
+                        className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors"
+                        aria-hidden="true"
+                      >
                         vpn_key
                       </span>
                       <input
@@ -228,7 +244,10 @@ export default function CreatorPayments() {
                       Razorpay Key Secret
                     </label>
                     <div className="relative group">
-                      <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors" aria-hidden="true">
+                      <span
+                        className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors"
+                        aria-hidden="true"
+                      >
                         lock
                       </span>
                       <input
@@ -247,14 +266,26 @@ export default function CreatorPayments() {
                     <div className="flex items-center gap-2 text-on-surface-variant text-[13px] font-inter">
                       {configured ? (
                         <>
-                          <span className="material-symbols-outlined text-success text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">
+                          <span
+                            className="material-symbols-outlined text-success text-[20px]"
+                            style={{ fontVariationSettings: "'FILL' 1" }}
+                            aria-hidden="true"
+                          >
                             verified
                           </span>
-                          Last verified: {new Date().toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })}
+                          Last verified:{" "}
+                          {new Date().toLocaleDateString("en-US", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
                         </>
                       ) : (
                         <>
-                          <span className="material-symbols-outlined text-on-surface-variant/40 text-[20px]" aria-hidden="true">
+                          <span
+                            className="material-symbols-outlined text-on-surface-variant/40 text-[20px]"
+                            aria-hidden="true"
+                          >
                             info
                           </span>
                           Not yet configured
@@ -284,7 +315,9 @@ export default function CreatorPayments() {
                       animate={{ opacity: 1, y: 0 }}
                       role="alert"
                       className={`p-4 rounded-xl text-sm font-inter ${
-                        message.includes("Failed") || message.includes("Enter") || message.includes("login")
+                        message.includes("Failed") ||
+                        message.includes("Enter") ||
+                        message.includes("login")
                           ? "bg-danger-muted text-danger border border-danger/20"
                           : "bg-success-muted text-success border border-success/20"
                       }`}
@@ -300,21 +333,31 @@ export default function CreatorPayments() {
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+              transition={{
+                duration: 0.6,
+                delay: 0.2,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
               className="lg:col-span-4 space-y-6"
             >
               {/* Encryption Status */}
               <div className="bg-surface-container-low border border-outline-variant rounded-xl p-6 flex items-start gap-4">
                 <div className="p-3 bg-primary-container/10 rounded-full shrink-0">
-                  <span className="material-symbols-outlined text-primary text-[24px]" aria-hidden="true">shield_lock</span>
+                  <span
+                    className="material-symbols-outlined text-primary text-[24px]"
+                    aria-hidden="true"
+                  >
+                    shield_lock
+                  </span>
                 </div>
                 <div>
                   <h4 className="font-geist text-sm font-semibold text-on-surface mb-1">
                     256-bit SSL Encryption
                   </h4>
                   <p className="text-[13px] text-on-surface-variant leading-relaxed font-inter">
-                    Your keys are encrypted before storage using bank-grade AES-256 protocols.
-                    Fundora never accesses your account balance.
+                    Your keys are encrypted before storage using bank-grade
+                    AES-256 protocols. Fundora never accesses your account
+                    balance.
                   </p>
                 </div>
               </div>
@@ -322,12 +365,18 @@ export default function CreatorPayments() {
               {/* Quick Tip */}
               <div className="bg-surface-container-lowest border border-dashed border-outline-variant rounded-xl p-6">
                 <h4 className="font-inter text-sm font-semibold text-primary mb-2 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[16px]" aria-hidden="true">info</span>
+                  <span
+                    className="material-symbols-outlined text-[16px]"
+                    aria-hidden="true"
+                  >
+                    info
+                  </span>
                   Setup Tip
                 </h4>
                 <p className="text-[13px] text-on-surface-variant font-inter leading-relaxed">
-                  Generate a separate &quot;Fundora Restricted&quot; API key in your Razorpay Dashboard
-                  to limit permissions for maximum security.
+                  Generate a separate &quot;Fundora Restricted&quot; API key in
+                  your Razorpay Dashboard to limit permissions for maximum
+                  security.
                 </p>
               </div>
             </motion.div>
@@ -348,7 +397,10 @@ export default function CreatorPayments() {
               className="bg-surface-container border border-outline-variant/30 rounded-xl p-6 hover:border-primary/40 transition-all group"
             >
               <div className="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center mb-4 group-hover:bg-primary-container/20 transition-all">
-                <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors" aria-hidden="true">
+                <span
+                  className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors"
+                  aria-hidden="true"
+                >
                   auto_mode
                 </span>
               </div>
@@ -356,7 +408,8 @@ export default function CreatorPayments() {
                 Payout Automation
               </h4>
               <p className="text-sm text-on-surface-variant font-inter leading-relaxed">
-                Automatically distribute funds to your team and vendors as soon as campaign milestones are reached.
+                Automatically distribute funds to your team and vendors as soon
+                as campaign milestones are reached.
               </p>
             </motion.div>
 
@@ -367,7 +420,10 @@ export default function CreatorPayments() {
               className="bg-surface-container border border-outline-variant/30 rounded-xl p-6 hover:border-primary/40 transition-all group"
             >
               <div className="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center mb-4 group-hover:bg-primary-container/20 transition-all">
-                <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors" aria-hidden="true">
+                <span
+                  className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors"
+                  aria-hidden="true"
+                >
                   monitoring
                 </span>
               </div>
@@ -375,7 +431,8 @@ export default function CreatorPayments() {
                 Real-time Tracking
               </h4>
               <p className="text-sm text-on-surface-variant font-inter leading-relaxed">
-                Monitor every pledge and transaction live. Integrated dashboard syncs instantly with your Razorpay ledger.
+                Monitor every pledge and transaction live. Integrated dashboard
+                syncs instantly with your Razorpay ledger.
               </p>
             </motion.div>
 
@@ -385,7 +442,10 @@ export default function CreatorPayments() {
               whileHover={{ y: -4 }}
               className="bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 rounded-xl p-6 flex flex-col justify-center items-center text-center"
             >
-              <span className="material-symbols-outlined text-primary text-[32px] mb-3" aria-hidden="true">
+              <span
+                className="material-symbols-outlined text-primary text-[32px] mb-3"
+                aria-hidden="true"
+              >
                 help_center
               </span>
               <h4 className="font-geist text-sm font-semibold text-on-surface mb-1">
@@ -402,7 +462,6 @@ export default function CreatorPayments() {
               </a>
             </motion.div>
           </motion.div>
-
         </div>
       </main>
 

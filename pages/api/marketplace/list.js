@@ -3,12 +3,20 @@ import { listMarketplacePlugins } from "../../../lib/marketplace/marketplaceEngi
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
-    return res.status(405).json({ success: false, error: "Method not allowed" });
+    return res
+      .status(405)
+      .json({ success: false, error: "Method not allowed" });
   }
 
   try {
     const { category, sort, page, limit, search } = req.query;
-    const result = await listMarketplacePlugins({ category, sort, page: Number(page), limit: Number(limit), search });
+    const result = await listMarketplacePlugins({
+      category,
+      sort,
+      page: Number(page),
+      limit: Number(limit),
+      search,
+    });
 
     if (!result.success) {
       return res.status(400).json(result);

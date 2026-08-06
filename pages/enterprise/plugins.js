@@ -33,7 +33,11 @@ export default function PluginsPage() {
       });
       if (res.ok) {
         setPlugins((prev) =>
-          prev.map((p) => (p.id === id ? { ...p, enabled: !currentEnabled, status: newStatus } : p))
+          prev.map((p) =>
+            p.id === id
+              ? { ...p, enabled: !currentEnabled, status: newStatus }
+              : p,
+          ),
         );
       }
     } catch {
@@ -47,8 +51,12 @@ export default function PluginsPage() {
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-2xl font-bold text-white">Plugin Management</h1>
-              <p className="text-gray-400 mt-1">Manage installed plugins and their settings</p>
+              <h1 className="text-2xl font-bold text-white">
+                Plugin Management
+              </h1>
+              <p className="text-gray-400 mt-1">
+                Manage installed plugins and their settings
+              </p>
             </div>
             <Button variant="primary" size="md">
               <span className="material-symbols-outlined text-[18px]">add</span>
@@ -73,10 +81,19 @@ export default function PluginsPage() {
 
           {error && (
             <GlassCard className="text-center py-12">
-              <span className="material-symbols-outlined text-4xl text-red-400 mb-3">error_outline</span>
-              <p className="text-red-400 text-lg font-medium">Failed to load plugins</p>
+              <span className="material-symbols-outlined text-4xl text-red-400 mb-3">
+                error_outline
+              </span>
+              <p className="text-red-400 text-lg font-medium">
+                Failed to load plugins
+              </p>
               <p className="text-gray-500 text-sm mt-1">{error}</p>
-              <Button variant="secondary" size="sm" className="mt-4" onClick={() => window.location.reload()}>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="mt-4"
+                onClick={() => window.location.reload()}
+              >
                 Retry
               </Button>
             </GlassCard>
@@ -84,9 +101,15 @@ export default function PluginsPage() {
 
           {!loading && !error && plugins.length === 0 && (
             <GlassCard className="text-center py-12">
-              <span className="material-symbols-outlined text-4xl text-gray-500 mb-3">extension</span>
-              <p className="text-gray-400 text-lg font-medium">No plugins installed</p>
-              <p className="text-gray-600 text-sm mt-1">Install plugins from the marketplace to extend functionality.</p>
+              <span className="material-symbols-outlined text-4xl text-gray-500 mb-3">
+                extension
+              </span>
+              <p className="text-gray-400 text-lg font-medium">
+                No plugins installed
+              </p>
+              <p className="text-gray-600 text-sm mt-1">
+                Install plugins from the marketplace to extend functionality.
+              </p>
             </GlassCard>
           )}
 
@@ -102,7 +125,9 @@ export default function PluginsPage() {
                         </span>
                       </div>
                       <div>
-                        <h3 className="text-white font-semibold text-sm">{plugin.name}</h3>
+                        <h3 className="text-white font-semibold text-sm">
+                          {plugin.name}
+                        </h3>
                         <span className="text-[11px] text-gray-500">
                           v{plugin.version || "1.0.0"}
                         </span>
@@ -136,10 +161,14 @@ export default function PluginsPage() {
                           : "bg-gray-500/10 text-gray-400"
                       }`}
                     >
-                      {plugin.enabled || plugin.status === "active" ? "Enabled" : "Disabled"}
+                      {plugin.enabled || plugin.status === "active"
+                        ? "Enabled"
+                        : "Disabled"}
                     </span>
                     <Button variant="ghost" size="sm">
-                      <span className="material-symbols-outlined text-[14px]">settings</span>
+                      <span className="material-symbols-outlined text-[14px]">
+                        settings
+                      </span>
                       Settings
                     </Button>
                   </div>

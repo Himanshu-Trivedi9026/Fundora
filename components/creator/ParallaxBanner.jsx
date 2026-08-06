@@ -2,7 +2,14 @@ import Image from "next/image";
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
-export default function ParallaxBanner({ banner, avatar, fullName, bio, verificationLevel, children }) {
+export default function ParallaxBanner({
+  banner,
+  avatar,
+  fullName,
+  bio,
+  verificationLevel,
+  children,
+}) {
   const containerRef = useRef(null);
 
   const { scrollYProgress } = useScroll({
@@ -58,7 +65,9 @@ export default function ParallaxBanner({ banner, avatar, fullName, bio, verifica
                 }`}
                 style={{ fontVariationSettings: "'FILL' 1" }}
                 role="img"
-                aria-label={verificationLevel >= 2 ? "Verified Creator" : undefined}
+                aria-label={
+                  verificationLevel >= 2 ? "Verified Creator" : undefined
+                }
               >
                 verified
               </span>

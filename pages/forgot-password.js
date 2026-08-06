@@ -26,7 +26,16 @@ const fadeUp = {
 /* ─── SVG Icons ─── */
 function MailIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <rect x="2" y="4" width="20" height="16" rx="2" />
       <path d="M22 7l-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
     </svg>
@@ -35,7 +44,16 @@ function MailIcon() {
 
 function ArrowIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M5 12h14" />
       <path d="M12 5l7 7-7 7" />
     </svg>
@@ -43,7 +61,10 @@ function ArrowIcon() {
 }
 
 /* ─── Input Component ─── */
-const FormInput = forwardRef(function FormInput({ id, label, type, placeholder, value, onChange, icon: Icon }, ref) {
+const FormInput = forwardRef(function FormInput(
+  { id, label, type, placeholder, value, onChange, icon: Icon },
+  ref,
+) {
   return (
     <div className="space-y-2">
       <label
@@ -128,9 +149,16 @@ export default function ForgotPasswordPage() {
             className="w-full max-w-md relative z-10"
           >
             {/* ─── Brand Identity ─── */}
-            <motion.div variants={fadeUp} className="flex flex-col items-center mb-10 text-center">
+            <motion.div
+              variants={fadeUp}
+              className="flex flex-col items-center mb-10 text-center"
+            >
               <div className="mb-6 p-4 rounded-2xl bg-surface-container-high border border-outline-variant/30">
-                <span className="material-symbols-outlined text-primary text-[40px]" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">
+                <span
+                  className="material-symbols-outlined text-primary text-[40px]"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                  aria-hidden="true"
+                >
                   lock_reset
                 </span>
               </div>
@@ -138,7 +166,8 @@ export default function ForgotPasswordPage() {
                 Reset your password
               </h1>
               <p className="font-inter text-base text-on-surface-variant max-w-sm mx-auto leading-relaxed">
-                Enter your account email and we&apos;ll send you a secure link to set a new password.
+                Enter your account email and we&apos;ll send you a secure link
+                to set a new password.
               </p>
             </motion.div>
 
@@ -151,7 +180,8 @@ export default function ForgotPasswordPage() {
                 backdropFilter: "blur(24px) saturate(1.2)",
                 WebkitBackdropFilter: "blur(24px) saturate(1.2)",
                 border: "1px solid rgba(73, 68, 84, 0.3)",
-                boxShadow: "0 8px 32px rgba(0, 0, 0, 0.37), inset 0 1px 0 rgba(255,255,255,0.04)",
+                boxShadow:
+                  "0 8px 32px rgba(0, 0, 0, 0.37), inset 0 1px 0 rgba(255,255,255,0.04)",
               }}
             >
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
@@ -182,8 +212,15 @@ export default function ForgotPasswordPage() {
                           aria-live="polite"
                         >
                           <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-danger-muted border border-danger/20">
-                            <span className="material-symbols-outlined text-danger text-[18px]" aria-hidden="true">error</span>
-                            <p className="text-danger text-sm font-inter">{error}</p>
+                            <span
+                              className="material-symbols-outlined text-danger text-[18px]"
+                              aria-hidden="true"
+                            >
+                              error
+                            </span>
+                            <p className="text-danger text-sm font-inter">
+                              {error}
+                            </p>
                           </div>
                         </motion.div>
                       )}
@@ -236,10 +273,19 @@ export default function ForgotPasswordPage() {
                       role="status"
                     >
                       <div className="w-14 h-14 rounded-full bg-success-muted border border-success/20 flex items-center justify-center">
-                        <span className="material-symbols-outlined text-success text-[28px]" aria-hidden="true">mark_email_read</span>
+                        <span
+                          className="material-symbols-outlined text-success text-[28px]"
+                          aria-hidden="true"
+                        >
+                          mark_email_read
+                        </span>
                       </div>
                       <p className="text-on-surface font-inter text-sm leading-relaxed max-w-xs">
-                        If an account exists for <span className="text-on-surface font-medium">{email}</span>, a password reset link is on its way. Check your inbox.
+                        If an account exists for{" "}
+                        <span className="text-on-surface font-medium">
+                          {email}
+                        </span>
+                        , a password reset link is on its way. Check your inbox.
                       </p>
                       <button
                         type="button"

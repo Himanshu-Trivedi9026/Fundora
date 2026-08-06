@@ -7,7 +7,12 @@
 
 import { withAuth } from "../../../lib/withAuth";
 import { rateLimit } from "../../../lib/rateLimit";
-import { recordFingerprint, getDeviceFingerprints, getDeviceStats, sanitizeDeviceResponse } from "../../../lib/fraud";
+import {
+  recordFingerprint,
+  getDeviceFingerprints,
+  getDeviceStats,
+  sanitizeDeviceResponse,
+} from "../../../lib/fraud";
 import { logError } from "../../../lib/verification/secureLogger";
 
 const rl = rateLimit({ windowMs: 60_000, max: 10 });

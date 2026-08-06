@@ -1,7 +1,11 @@
 // API — System diagnostics endpoint
 // Provides comprehensive system health and performance diagnostics
 
-import { checkDatabaseHealth, getPoolStats, getEndpointMetrics } from "../../../lib/performance/index.js";
+import {
+  checkDatabaseHealth,
+  getPoolStats,
+  getEndpointMetrics,
+} from "../../../lib/performance/index.js";
 import { getStats } from "../../../lib/cache/index.js";
 import { getActiveJobCount } from "../../../lib/jobs/index.js";
 
@@ -28,7 +32,11 @@ export default async function handler(req, res) {
       platform: process.platform,
       arch: process.arch,
       database: {
-        status: dbHealth.success ? (dbHealth.data.reachable ? "connected" : "unreachable") : "error",
+        status: dbHealth.success
+          ? dbHealth.data.reachable
+            ? "connected"
+            : "unreachable"
+          : "error",
         responseTimeMs: dbHealth.data?.responseTime || null,
         lastCheck: dbHealth.data?.lastCheck || null,
         pool: poolStats,

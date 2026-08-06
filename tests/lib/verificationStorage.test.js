@@ -228,7 +228,10 @@ describe("Verification Storage — uploadDocument", () => {
     expect(result.success).toBe(true);
     // Storage call: storage.from(bucket).upload(path, file, { contentType, upsert:false })
     expect(mockUpload).toHaveBeenCalledTimes(1);
-    expect(mockUpload.mock.calls[0][1]).toEqual({ type: "image/png", size: 2048 });
+    expect(mockUpload.mock.calls[0][1]).toEqual({
+      type: "image/png",
+      size: 2048,
+    });
     expect(mockUpload.mock.calls[0][2]).toEqual({
       contentType: "image/png",
       upsert: false,
@@ -236,7 +239,10 @@ describe("Verification Storage — uploadDocument", () => {
   });
 
   it("returns success:false with a message when the upload errors", async () => {
-    mockUpload.mockResolvedValue({ data: null, error: { message: "bucket not found" } });
+    mockUpload.mockResolvedValue({
+      data: null,
+      error: { message: "bucket not found" },
+    });
 
     const result = await uploadDocument({
       userId: "user-1",
@@ -306,6 +312,9 @@ describe("Verification Storage — deleteDocument & getSignedUrl", () => {
     expect(result.success).toBe(true);
     expect(result.url).toBe("https://example.com/signed/url");
     expect(result.expiresAt).toBeDefined();
-    expect(mockCreateSignedUrl).toHaveBeenCalledWith("user-1/identity/123-abc.jpg", 3600);
+    expect(mockCreateSignedUrl).toHaveBeenCalledWith(
+      "user-1/identity/123-abc.jpg",
+      3600,
+    );
   });
 });

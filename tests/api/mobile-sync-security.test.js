@@ -35,7 +35,12 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 // ---- Helpers ----
 
-function createReq({ method = "GET", query = {}, body = {}, token = "token-1" } = {}) {
+function createReq({
+  method = "GET",
+  query = {},
+  body = {},
+  token = "token-1",
+} = {}) {
   return {
     method,
     query,
@@ -91,7 +96,10 @@ function authAs(userId) {
 }
 
 function authNone() {
-  supabaseAdmin.auth.getUser.mockResolvedValue({ data: { user: null }, error: null });
+  supabaseAdmin.auth.getUser.mockResolvedValue({
+    data: { user: null },
+    error: null,
+  });
 }
 
 const ME = "user-me";
@@ -106,13 +114,23 @@ describe("Mobile Sync Security (CR-4)", () => {
   describe("Route authorization", () => {
     it("rejects anonymous requests with 401", async () => {
       const res = createRes();
-      await syncHandler(createReq({ method: "GET", query: { since: "2025-01-01T00:00:00Z" }, token: null }), res);
+      await syncHandler(
+        createReq({
+          method: "GET",
+          query: { since: "2025-01-01T00:00:00Z" },
+          token: null,
+        }),
+        res,
+      );
       expect(res.status).toHaveBeenCalledWith(401);
     });
 
     it("rejects anonymous POST with 401", async () => {
       const res = createRes();
-      await syncHandler(createReq({ method: "POST", body: { operations: [] }, token: null }), res);
+      await syncHandler(
+        createReq({ method: "POST", body: { operations: [] }, token: null }),
+        res,
+      );
       expect(res.status).toHaveBeenCalledWith(401);
     });
   });
@@ -127,22 +145,31 @@ describe("Mobile Sync Security (CR-4)", () => {
     it("allows a user to read their OWN projects", async () => {
       const data = { id: "p1", title: "My project" };
       supabaseAdmin.from.mockImplementation((table) =>
-        genericChain({ maybeSingle: vi.fn(() => Promise.resolve({ data: null, error: null })) })
+        genericChain({
+          maybeSingle: vi.fn(() =>
+            Promise.resolve({ data: null, error: null }),
+          ),
+        }),
       );
       // Capture the query so we can assert the ownership filter was applied.
       let queryUsed = null;
       supabaseAdmin.from.mockImplementation((table) => {
         const chain = genericChain({
-          maybeSingle: vi.fn(() => Promise.resolve({ data: null, error: null })),
+          maybeSingle: vi.fn(() =>
+            Promise.resolve({ data: null, error: null }),
+          ),
         });
         // Resolve the select() chain to an owned row so the result is "allowed".
-        const then = (resolve) => resolve({ data: [{ id: "p1", title: "My project" }], error: null });
+        const then = (resolve) =>
+          resolve({ data: [{ id: "p1", title: "My project" }], error: null });
         chain.then = then;
         queryUsed = table;
         return chain;
       });
 
-      const result = await getChangesSince(ME, "2025-01-01T00:00:00Z", { tables: ["projects"] });
+      const result = await getChangesSince(ME, "2025-01-01T00:00:00Z", {
+        tables: ["projects"],
+      });
       expect(result.success).toBe(true);
       // The engine scoped the read to the caller's rows (ownership filter applied).
       expect(supabaseAdmin.from).toHaveBeenCalledWith("projects");
@@ -150,14 +177,18 @@ describe("Mobile Sync Security (CR-4)", () => {
     });
 
     it("rejects an invalid table", async () => {
-      const result = await getChangesSince(ME, "2025-01-01T00:00:00Z", { tables: ["profiles", "api_keys"] });
+      const result = await getChangesSince(ME, "2025-01-01T00:00:00Z", {
+        tables: ["profiles", "api_keys"],
+      });
       expect(result.success).toBe(false);
       expect(result.error).toContain("api_keys");
       expect(supabaseAdmin.from).not.toHaveBeenCalledWith("api_keys");
     });
 
     it("rejects a request with no user id", async () => {
-      const result = await getChangesSince(undefined, "2025-01-01T00:00:00Z", { tables: ["projects"] });
+      const result = await getChangesSince(undefined, "2025-01-01T00:00:00Z", {
+        tables: ["projects"],
+      });
       expect(result.success).toBe(false);
       expect(result.error).toContain("userId");
     });
@@ -165,24 +196,42 @@ describe("Mobile Sync Security (CR-4)", () => {
 
   describe("processSyncBatch (write sync)", () => {
     it("rejects requests without a user id", async () => {
-      const result = await processSyncBatch([{ table: "projects", operation: "create", data: { title: "x" } }], {});
+      const result = await processSyncBatch(
+        [{ table: "projects", operation: "create", data: { title: "x" } }],
+        {},
+      );
       expect(result.success).toBe(false);
       expect(result.error).toContain("userId");
     });
 
     it("allows a user to create their OWN project (ownership forced server-side)", async () => {
-      const created = { id: "p-new", title: "New project", owner_id: ME, creator_id: ME };
+      const created = {
+        id: "p-new",
+        title: "New project",
+        owner_id: ME,
+        creator_id: ME,
+      };
       let insertChain = null;
       supabaseAdmin.from.mockImplementation((table) => {
-        const chain = genericChain({ maybeSingle: vi.fn(() => Promise.resolve({ data: null, error: null })) });
+        const chain = genericChain({
+          maybeSingle: vi.fn(() =>
+            Promise.resolve({ data: null, error: null }),
+          ),
+        });
         chain.then = (resolve) => resolve({ data: [created], error: null });
         insertChain = chain;
         return chain;
       });
 
       const result = await processSyncBatch(
-        [{ table: "projects", operation: "create", data: { title: "New project" } }],
-        { userId: ME }
+        [
+          {
+            table: "projects",
+            operation: "create",
+            data: { title: "New project" },
+          },
+        ],
+        { userId: ME },
       );
 
       expect(result.success).toBe(true);
@@ -196,8 +245,14 @@ describe("Mobile Sync Security (CR-4)", () => {
 
     it("rejects a client-supplied ownership column on create (never trusted)", async () => {
       const result = await processSyncBatch(
-        [{ table: "projects", operation: "create", data: { title: "New project", owner_id: OTHER } }],
-        { userId: ME }
+        [
+          {
+            table: "projects",
+            operation: "create",
+            data: { title: "New project", owner_id: OTHER },
+          },
+        ],
+        { userId: ME },
       );
       const op = result.data.results[0];
       expect(op.success).toBe(false);
@@ -208,12 +263,25 @@ describe("Mobile Sync Security (CR-4)", () => {
     it("denies updating another user's project (ownership verified before service role)", async () => {
       // The ownership check (maybeSingle) returns a row owned by OTHER.
       supabaseAdmin.from.mockImplementation((table) =>
-        genericChain({ maybeSingle: vi.fn(() => Promise.resolve({ data: { owner_id: OTHER, creator_id: OTHER }, error: null })) })
+        genericChain({
+          maybeSingle: vi.fn(() =>
+            Promise.resolve({
+              data: { owner_id: OTHER, creator_id: OTHER },
+              error: null,
+            }),
+          ),
+        }),
       );
 
       const result = await processSyncBatch(
-        [{ table: "projects", operation: "update", data: { id: "p-other", title: "Hijack" } }],
-        { userId: ME }
+        [
+          {
+            table: "projects",
+            operation: "update",
+            data: { id: "p-other", title: "Hijack" },
+          },
+        ],
+        { userId: ME },
       );
 
       expect(result.success).toBe(true); // batch envelope
@@ -226,12 +294,19 @@ describe("Mobile Sync Security (CR-4)", () => {
 
     it("denies deleting another user's project", async () => {
       supabaseAdmin.from.mockImplementation((table) =>
-        genericChain({ maybeSingle: vi.fn(() => Promise.resolve({ data: { owner_id: OTHER, creator_id: OTHER }, error: null })) })
+        genericChain({
+          maybeSingle: vi.fn(() =>
+            Promise.resolve({
+              data: { owner_id: OTHER, creator_id: OTHER },
+              error: null,
+            }),
+          ),
+        }),
       );
 
       const result = await processSyncBatch(
         [{ table: "projects", operation: "delete", data: { id: "p-other" } }],
-        { userId: ME }
+        { userId: ME },
       );
 
       const op = result.data.results[0];
@@ -243,7 +318,7 @@ describe("Mobile Sync Security (CR-4)", () => {
     it("rejects an invalid (non-allowlisted) table", async () => {
       const result = await processSyncBatch(
         [{ table: "auth.users", operation: "create", data: { email: "x" } }],
-        { userId: ME }
+        { userId: ME },
       );
       const op = result.data.results[0];
       expect(op.success).toBe(false);
@@ -253,8 +328,14 @@ describe("Mobile Sync Security (CR-4)", () => {
 
     it("rejects an invalid column for the table", async () => {
       const result = await processSyncBatch(
-        [{ table: "projects", operation: "create", data: { title: "x", evil_column: "y" } }],
-        { userId: ME }
+        [
+          {
+            table: "projects",
+            operation: "create",
+            data: { title: "x", evil_column: "y" },
+          },
+        ],
+        { userId: ME },
       );
       const op = result.data.results[0];
       expect(op.success).toBe(false);
@@ -264,15 +345,35 @@ describe("Mobile Sync Security (CR-4)", () => {
 
     it("rejects a forbidden field (role, permissions, owner_id, user_id, …)", async () => {
       const forbiddenOps = [
-        { table: "projects", operation: "update", data: { id: "p1", role: "platform_admin" } },
-        { table: "projects", operation: "update", data: { id: "p1", owner_id: OTHER } },
-        { table: "profiles", operation: "update", data: { id: ME, permissions: ["*"] } },
-        { table: "campaigns", operation: "update", data: { id: "c1", user_id: OTHER } },
+        {
+          table: "projects",
+          operation: "update",
+          data: { id: "p1", role: "platform_admin" },
+        },
+        {
+          table: "projects",
+          operation: "update",
+          data: { id: "p1", owner_id: OTHER },
+        },
+        {
+          table: "profiles",
+          operation: "update",
+          data: { id: ME, permissions: ["*"] },
+        },
+        {
+          table: "campaigns",
+          operation: "update",
+          data: { id: "c1", user_id: OTHER },
+        },
       ];
 
       for (const op of forbiddenOps) {
         supabaseAdmin.from.mockImplementation((table) =>
-          genericChain({ maybeSingle: vi.fn(() => Promise.resolve({ data: null, error: null })) })
+          genericChain({
+            maybeSingle: vi.fn(() =>
+              Promise.resolve({ data: null, error: null }),
+            ),
+          }),
         );
         const result = await processSyncBatch([op], { userId: ME });
         const resultOp = result.data.results[0];
@@ -284,7 +385,7 @@ describe("Mobile Sync Security (CR-4)", () => {
     it("rejects writes to tables that are read-only (profiles create)", async () => {
       const result = await processSyncBatch(
         [{ table: "profiles", operation: "create", data: { full_name: "x" } }],
-        { userId: ME }
+        { userId: ME },
       );
       const op = result.data.results[0];
       expect(op.success).toBe(false);
@@ -300,7 +401,18 @@ describe("Mobile Sync Security (CR-4)", () => {
     });
 
     it("forbids all sensitive ownership/auth columns", () => {
-      for (const col of ["role", "permissions", "owner_id", "creator_id", "user_id", "organization_id", "email", "password", "api_key", "token"]) {
+      for (const col of [
+        "role",
+        "permissions",
+        "owner_id",
+        "creator_id",
+        "user_id",
+        "organization_id",
+        "email",
+        "password",
+        "api_key",
+        "token",
+      ]) {
         expect(FORBIDDEN_COLUMNS.has(col)).toBe(true);
       }
     });

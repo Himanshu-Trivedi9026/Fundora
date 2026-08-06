@@ -9,19 +9,23 @@ Phase 8 transforms Fundora from a single-user platform into a multi-tenant enter
 ### Files Created
 
 #### Database Migration
+
 - `supabase/migrations/008_enterprise_organizations_api.sql` — 13 new tables with RLS policies, indexes, constraints, triggers, and helper functions
 
 #### Core Library Modules (11 files)
 
 **Organization Engine:**
+
 - `lib/organization/organizationEngine.js` — Full CRUD, members, invitations, departments, teams, settings (1375 lines)
 - `lib/organization/index.js` — Barrel exports
 
 **RBAC Engine:**
+
 - `lib/rbac/rbacEngine.js` — Permission checking, role assignment, custom roles, platform admin bypass (584 lines)
 - `lib/rbac/index.js` — Barrel exports
 
 **API Platform:**
+
 - `lib/apiPlatform/apiKeyEngine.js` — API key generation, validation, revocation, usage tracking (233 lines)
 - `lib/apiPlatform/apiLogEngine.js` — Request logging, query, and usage summary aggregation (144 lines)
 - `lib/apiPlatform/developerAppEngine.js` — Developer app registration, validation, revocation (212 lines)
@@ -29,6 +33,7 @@ Phase 8 transforms Fundora from a single-user platform into a multi-tenant enter
 - `lib/apiPlatform/index.js` — Barrel exports
 
 **Webhooks:**
+
 - `lib/webhooks/webhookEngine.js` — Webhook CRUD, event triggering, HMAC-SHA256 signing (388 lines)
 - `lib/webhooks/webhookDelivery.js` — Delivery execution, retry with exponential backoff, failure management (277 lines)
 - `lib/webhooks/index.js` — Barrel exports
@@ -36,6 +41,7 @@ Phase 8 transforms Fundora from a single-user platform into a multi-tenant enter
 #### API Routes (12 files)
 
 **Organization Management:**
+
 - `pages/api/organization/index.js` — Organization CRUD (create, update, delete, archive, transfer ownership)
 - `pages/api/organization/members.js` — Member management (add, remove, update role, list)
 - `pages/api/organization/invitations.js` — Invitation management (create, accept, revoke, list)
@@ -45,19 +51,23 @@ Phase 8 transforms Fundora from a single-user platform into a multi-tenant enter
 - `pages/api/organization/analytics.js` — Organization analytics
 
 **RBAC:**
+
 - `pages/api/rbac/roles.js` — Role management (list roles, create custom roles, assign roles)
 
 **API Platform:**
+
 - `pages/api/api-platform/keys.js` — API key management
 - `pages/api/api-platform/logs.js` — API usage logs and summaries
 - `pages/api/api-platform/apps.js` — Developer app management
 
 **Webhooks:**
+
 - `pages/api/webhooks/index.js` — Webhook CRUD
 - `pages/api/webhooks/deliveries.js` — Delivery listing
 - `pages/api/webhooks/test.js` — Test webhook delivery
 
 #### Modified Files (1 file)
+
 - `lib/withAuth.js` — Extended with `withAuthAndPermission()` for RBAC-integrated middleware
 
 #### Tests (10 files)
@@ -74,6 +84,7 @@ Phase 8 transforms Fundora from a single-user platform into a multi-tenant enter
 - `tests/api/webhook.test.js` — Webhook API route tests
 
 #### Documentation (5 files)
+
 - `docs/ORGANIZATION_ENGINE.md` — Organization engine documentation
 - `docs/RBAC.md` — RBAC documentation
 - `docs/API_PLATFORM.md` — API platform documentation
@@ -87,6 +98,7 @@ Phase 8 transforms Fundora from a single-user platform into a multi-tenant enter
 **1,649 tests across 83 test files** — all passing.
 
 Phase 8 contributed 10 new test files covering:
+
 - Organization CRUD, members, invitations, departments, teams, settings
 - RBAC permission checking, role assignment, custom roles, platform admin bypass
 - API key generation, validation, revocation, usage tracking
@@ -226,27 +238,27 @@ Organizations provide context for existing Fundora features:
 
 All Phase 8 mutations produce audit events that flow into the existing audit log:
 
-| Event Type | Engine |
-|-----------|--------|
-| `organization_created` | Organization |
-| `organization_updated` | Organization |
-| `organization_deleted` | Organization |
+| Event Type              | Engine       |
+| ----------------------- | ------------ |
+| `organization_created`  | Organization |
+| `organization_updated`  | Organization |
+| `organization_deleted`  | Organization |
 | `organization_archived` | Organization |
 | `ownership_transferred` | Organization |
-| `member_added` | Organization |
-| `member_removed` | Organization |
-| `member_role_updated` | Organization |
-| `member_reactivated` | Organization |
-| `invitation_created` | Organization |
-| `invitation_accepted` | Organization |
-| `org_setting_changed` | Organization |
-| `role_changed` | RBAC |
-| `custom_role_created` | RBAC |
-| `api_key_created` | API Platform |
-| `api_key_revoked` | API Platform |
+| `member_added`          | Organization |
+| `member_removed`        | Organization |
+| `member_role_updated`   | Organization |
+| `member_reactivated`    | Organization |
+| `invitation_created`    | Organization |
+| `invitation_accepted`   | Organization |
+| `org_setting_changed`   | Organization |
+| `role_changed`          | RBAC         |
+| `custom_role_created`   | RBAC         |
+| `api_key_created`       | API Platform |
+| `api_key_revoked`       | API Platform |
 | `developer_app_created` | API Platform |
 | `developer_app_revoked` | API Platform |
-| `webhook_created` | Webhooks |
+| `webhook_created`       | Webhooks     |
 
 ## What Was NOT Implemented (Per Specification)
 
@@ -262,22 +274,22 @@ All Phase 8 mutations produce audit events that flow into the existing audit log
 
 ## API Route Summary
 
-| Route | Methods | Actions |
-|-------|---------|---------|
-| `/api/organization` | GET, POST | CRUD, archive, transfer ownership |
-| `/api/organization/members` | GET, POST | Add, remove, update role, list |
-| `/api/organization/invitations` | GET, POST | Create, accept, revoke, list |
-| `/api/organization/departments` | GET, POST | CRUD |
-| `/api/organization/teams` | GET, POST | CRUD, add/remove members |
-| `/api/organization/settings` | GET, POST | Get all, set/get specific |
-| `/api/organization/analytics` | GET | Organization analytics |
-| `/api/rbac/roles` | GET, POST | List roles, list permissions, create custom role, assign role |
-| `/api/api-platform/keys` | GET, POST | Create, list, revoke API keys |
-| `/api/api-platform/logs` | GET | Query logs, usage summaries |
-| `/api/api-platform/apps` | GET, POST | Create, list, revoke developer apps |
-| `/api/webhooks` | GET, POST | CRUD, list available events |
-| `/api/webhooks/deliveries` | GET | List deliveries for a webhook |
-| `/api/webhooks/test` | POST | Send test ping |
+| Route                           | Methods   | Actions                                                       |
+| ------------------------------- | --------- | ------------------------------------------------------------- |
+| `/api/organization`             | GET, POST | CRUD, archive, transfer ownership                             |
+| `/api/organization/members`     | GET, POST | Add, remove, update role, list                                |
+| `/api/organization/invitations` | GET, POST | Create, accept, revoke, list                                  |
+| `/api/organization/departments` | GET, POST | CRUD                                                          |
+| `/api/organization/teams`       | GET, POST | CRUD, add/remove members                                      |
+| `/api/organization/settings`    | GET, POST | Get all, set/get specific                                     |
+| `/api/organization/analytics`   | GET       | Organization analytics                                        |
+| `/api/rbac/roles`               | GET, POST | List roles, list permissions, create custom role, assign role |
+| `/api/api-platform/keys`        | GET, POST | Create, list, revoke API keys                                 |
+| `/api/api-platform/logs`        | GET       | Query logs, usage summaries                                   |
+| `/api/api-platform/apps`        | GET, POST | Create, list, revoke developer apps                           |
+| `/api/webhooks`                 | GET, POST | CRUD, list available events                                   |
+| `/api/webhooks/deliveries`      | GET       | List deliveries for a webhook                                 |
+| `/api/webhooks/test`            | POST      | Send test ping                                                |
 
 ## Next Steps
 

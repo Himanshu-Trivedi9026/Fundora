@@ -233,13 +233,13 @@ describe("PromptEngine", () => {
 
       // DB version should be included
       const dbTemplate = result.data.find(
-        (t) => t.name === "campaign_quality" && t.id === "db-1"
+        (t) => t.name === "campaign_quality" && t.id === "db-1",
       );
       expect(dbTemplate).toBeDefined();
 
       // campaign_quality should NOT appear again from defaults
       const defaultCampaignQuality = result.data.filter(
-        (t) => t.name === "campaign_quality" && t.id === null
+        (t) => t.name === "campaign_quality" && t.id === null,
       );
       expect(defaultCampaignQuality).toHaveLength(0);
     });

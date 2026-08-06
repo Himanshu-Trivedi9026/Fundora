@@ -8,12 +8,18 @@ import { motion, AnimatePresence } from "framer-motion";
  * Image preview with zoom controls, PDF placeholder,
  * remove button, fullscreen toggle.
  */
-export default function DocumentPreview({ file, url, onRemove, className = "" }) {
+export default function DocumentPreview({
+  file,
+  url,
+  onRemove,
+  className = "",
+}) {
   const [zoomed, setZoomed] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
 
   const isImage = file?.type?.startsWith("image");
-  const isPdf = file?.type === "application/pdf" || file?.name?.endsWith(".pdf");
+  const isPdf =
+    file?.type === "application/pdf" || file?.name?.endsWith(".pdf");
 
   const toggleFullscreen = () => {
     setFullscreen((prev) => !prev);

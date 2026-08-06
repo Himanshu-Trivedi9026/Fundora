@@ -23,7 +23,9 @@ describe("FloatingAIChat", () => {
       error: null,
     });
     global.fetch.mockResolvedValue({
-      json: vi.fn().mockResolvedValue({ reply: "Hello! I can help with funding." }),
+      json: vi
+        .fn()
+        .mockResolvedValue({ reply: "Hello! I can help with funding." }),
     });
   });
 
@@ -51,7 +53,9 @@ describe("FloatingAIChat", () => {
 
     await user.click(screen.getByText("💡"));
 
-    expect(screen.getByPlaceholderText("Ask Fundora AI...")).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Ask Fundora AI..."),
+    ).toBeInTheDocument();
   });
 
   it("shows empty state message initially", async () => {
@@ -60,7 +64,9 @@ describe("FloatingAIChat", () => {
 
     await user.click(screen.getByText("💡"));
 
-    expect(screen.getByText(/Ask about funding, projects, or growth/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Ask about funding, projects, or growth/),
+    ).toBeInTheDocument();
   });
 
   it('shows "Fundora AI" heading', async () => {
@@ -91,7 +97,10 @@ describe("FloatingAIChat", () => {
 
     await user.click(screen.getByText("💡"));
 
-    await user.type(screen.getByPlaceholderText("Ask Fundora AI..."), "Tell me about projects");
+    await user.type(
+      screen.getByPlaceholderText("Ask Fundora AI..."),
+      "Tell me about projects",
+    );
     await user.click(screen.getByRole("button", { name: /send/i }));
 
     await waitFor(() => {
@@ -104,7 +113,7 @@ describe("FloatingAIChat", () => {
             Authorization: "Bearer test-token",
           }),
           body: expect.stringContaining("Tell me about projects"),
-        })
+        }),
       );
     });
   });
@@ -115,7 +124,10 @@ describe("FloatingAIChat", () => {
 
     await user.click(screen.getByText("💡"));
 
-    await user.type(screen.getByPlaceholderText("Ask Fundora AI..."), "Hello AI");
+    await user.type(
+      screen.getByPlaceholderText("Ask Fundora AI..."),
+      "Hello AI",
+    );
     await user.click(screen.getByRole("button", { name: /send/i }));
 
     await waitFor(() => {
@@ -129,11 +141,16 @@ describe("FloatingAIChat", () => {
 
     await user.click(screen.getByText("💡"));
 
-    await user.type(screen.getByPlaceholderText("Ask Fundora AI..."), "Hello AI");
+    await user.type(
+      screen.getByPlaceholderText("Ask Fundora AI..."),
+      "Hello AI",
+    );
     await user.click(screen.getByRole("button", { name: /send/i }));
 
     await waitFor(() => {
-      expect(screen.getByText("Hello! I can help with funding.")).toBeInTheDocument();
+      expect(
+        screen.getByText("Hello! I can help with funding."),
+      ).toBeInTheDocument();
     });
   });
 
@@ -141,9 +158,10 @@ describe("FloatingAIChat", () => {
     const user = userEvent.setup();
     let resolveFetch;
     global.fetch.mockImplementation(
-      () => new Promise((resolve) => {
-        resolveFetch = resolve;
-      })
+      () =>
+        new Promise((resolve) => {
+          resolveFetch = resolve;
+        }),
     );
 
     render(<FloatingAIChat />);
@@ -179,7 +197,7 @@ describe("FloatingAIChat", () => {
         "/api/ai/agent",
         expect.objectContaining({
           body: expect.stringContaining("Recommend best projects to support"),
-        })
+        }),
       );
     });
   });
@@ -197,7 +215,7 @@ describe("FloatingAIChat", () => {
         "/api/ai/agent",
         expect.objectContaining({
           body: expect.stringContaining("Show trending projects"),
-        })
+        }),
       );
     });
   });
@@ -260,7 +278,7 @@ describe("FloatingAIChat", () => {
           headers: expect.objectContaining({
             Authorization: "Bearer my-secret-token",
           }),
-        })
+        }),
       );
     });
   });

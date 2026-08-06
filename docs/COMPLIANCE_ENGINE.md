@@ -33,57 +33,57 @@ Any resolved or closed case can be reopened. Escalation always sets priority to 
 
 ## Case Types
 
-| Type | Description |
-|------|-------------|
-| `fraud_report` | Suspected fraudulent activity by a user |
-| `kyc_review` | Know Your Customer verification review |
-| `aml_check` | Anti-money laundering investigation |
-| `dispute` | User or campaign dispute resolution |
-| `policy_violation` | Violation of platform policies |
+| Type                  | Description                             |
+| --------------------- | --------------------------------------- |
+| `fraud_report`        | Suspected fraudulent activity by a user |
+| `kyc_review`          | Know Your Customer verification review  |
+| `aml_check`           | Anti-money laundering investigation     |
+| `dispute`             | User or campaign dispute resolution     |
+| `policy_violation`    | Violation of platform policies          |
 | `suspicious_activity` | Unusual or suspicious behavior detected |
-| `regulatory_request` | External regulatory inquiry |
-| `internal_audit` | Internal compliance audit |
-| `user_complaint` | Formal user complaint |
-| `campaign_review` | Campaign content or behavior review |
+| `regulatory_request`  | External regulatory inquiry             |
+| `internal_audit`      | Internal compliance audit               |
+| `user_complaint`      | Formal user complaint                   |
+| `campaign_review`     | Campaign content or behavior review     |
 
 ## Case Statuses
 
-| Status | Description |
-|--------|-------------|
-| `created` | Case just created, not yet opened |
-| `open` | Case is open and awaiting assignment |
-| `investigating` | Actively being investigated |
-| `pending_review` | Investigation complete, awaiting review |
-| `resolved` | Case resolved with a resolution |
-| `closed` | Case permanently closed |
-| `reopened` | Previously resolved/closed case reopened |
-| `escalated` | Escalated to senior staff (priority = urgent) |
+| Status           | Description                                   |
+| ---------------- | --------------------------------------------- |
+| `created`        | Case just created, not yet opened             |
+| `open`           | Case is open and awaiting assignment          |
+| `investigating`  | Actively being investigated                   |
+| `pending_review` | Investigation complete, awaiting review       |
+| `resolved`       | Case resolved with a resolution               |
+| `closed`         | Case permanently closed                       |
+| `reopened`       | Previously resolved/closed case reopened      |
+| `escalated`      | Escalated to senior staff (priority = urgent) |
 
 ## Resolution Types
 
-| Resolution | Description |
-|------------|-------------|
-| `dismissed` | Complaint or report dismissed |
-| `confirmed_violation` | Violation confirmed |
-| `warning_issued` | Warning issued to subject |
-| `account_suspended` | Subject account suspended |
-| `account_banned` | Subject account permanently banned |
-| `campaign_suspended` | Subject campaign suspended |
-| `campaign_removed` | Subject campaign removed |
-| `funds_frozen` | Subject funds frozen |
-| `funds_released` | Frozen funds released |
-| `no_action_required` | No action needed |
-| `referred_to_authorities` | Referred to law enforcement |
-| `policy_change_recommended` | Policy change recommended |
+| Resolution                  | Description                        |
+| --------------------------- | ---------------------------------- |
+| `dismissed`                 | Complaint or report dismissed      |
+| `confirmed_violation`       | Violation confirmed                |
+| `warning_issued`            | Warning issued to subject          |
+| `account_suspended`         | Subject account suspended          |
+| `account_banned`            | Subject account permanently banned |
+| `campaign_suspended`        | Subject campaign suspended         |
+| `campaign_removed`          | Subject campaign removed           |
+| `funds_frozen`              | Subject funds frozen               |
+| `funds_released`            | Frozen funds released              |
+| `no_action_required`        | No action needed                   |
+| `referred_to_authorities`   | Referred to law enforcement        |
+| `policy_change_recommended` | Policy change recommended          |
 
 ## Priority Levels
 
-| Priority | Description |
-|----------|-------------|
-| `low` | Low priority, routine review |
-| `medium` | Standard priority (default) |
-| `high` | High priority, needs prompt attention |
-| `urgent` | Urgent — auto-assigned on escalation |
+| Priority | Description                           |
+| -------- | ------------------------------------- |
+| `low`    | Low priority, routine review          |
+| `medium` | Standard priority (default)           |
+| `high`   | High priority, needs prompt attention |
+| `urgent` | Urgent — auto-assigned on escalation  |
 
 ## Key Functions
 
@@ -92,6 +92,7 @@ Any resolved or closed case can be reopened. Escalation always sets priority to 
 Creates a new compliance case with auto-generated case number (COMP-YYYY-NNNNN).
 
 **Parameters:**
+
 - `caseType` (string, required) — Case type from COMPLIANCE_CASE_TYPES
 - `subjectUserId` (string, optional) — User ID being investigated
 - `subjectCampaignId` (string, optional) — Campaign ID being investigated
@@ -121,6 +122,7 @@ Lists compliance cases with optional filters and pagination.
 Updates a compliance case with status transition validation.
 
 **Parameters:**
+
 - `caseId` (string, required) — Case ID
 - `updates` (object, required) — Fields to update (whitelist: status, priority, description, evidence_urls, metadata, assigned_to, resolution_type, resolution, resolved_at, closed_at, escalated_at, escalation_reason)
 - `performedBy` (string, optional) — User ID performing the update
@@ -174,14 +176,14 @@ Database-driven configurable policies with version history and context-based eva
 
 ### Policy Types
 
-| Type | Evaluation |
-|------|------------|
+| Type        | Evaluation                                                     |
+| ----------- | -------------------------------------------------------------- |
 | `threshold` | `context.value < policyValue` → allowed (higher = higher risk) |
-| `boolean` | Returns `Boolean(value)` — simple enable/disable gate |
-| `array` | Checks if policy value is a subset of context value |
-| `string` | Returns value passively, caller decides |
-| `number` | Returns value passively, caller decides |
-| `json` | Returns value passively, caller decides |
+| `boolean`   | Returns `Boolean(value)` — simple enable/disable gate          |
+| `array`     | Checks if policy value is a subset of context value            |
+| `string`    | Returns value passively, caller decides                        |
+| `number`    | Returns value passively, caller decides                        |
+| `json`      | Returns value passively, caller decides                        |
 
 ### Key Functions
 
@@ -205,16 +207,16 @@ Fetches version history for a policy.
 
 Creates default policies if they don't exist:
 
-| Policy Key | Category | Type | Default |
-|------------|----------|------|---------|
-| `min_trust_score` | verification | threshold | 30 |
-| `required_verifications` | verification | array | ["email", "phone", "id"] |
-| `fraud_block_threshold` | fraud | threshold | 75 |
-| `fraud_monitor_threshold` | fraud | threshold | 50 |
-| `max_payout_amount` | payout | threshold | 100000000 |
-| `min_payout_amount` | payout | threshold | 1000 |
-| `escrow_fee_percentage` | escrow | threshold | 5.0 |
-| `auto_approve_milestone_threshold` | milestone | threshold | 80 |
+| Policy Key                         | Category     | Type      | Default                  |
+| ---------------------------------- | ------------ | --------- | ------------------------ |
+| `min_trust_score`                  | verification | threshold | 30                       |
+| `required_verifications`           | verification | array     | ["email", "phone", "id"] |
+| `fraud_block_threshold`            | fraud        | threshold | 75                       |
+| `fraud_monitor_threshold`          | fraud        | threshold | 50                       |
+| `max_payout_amount`                | payout       | threshold | 100000000                |
+| `min_payout_amount`                | payout       | threshold | 1000                     |
+| `escrow_fee_percentage`            | escrow       | threshold | 5.0                      |
+| `auto_approve_milestone_threshold` | milestone    | threshold | 80                       |
 
 ## Usage Example
 

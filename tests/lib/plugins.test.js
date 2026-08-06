@@ -6,8 +6,20 @@ import { describe, it, expect, beforeAll } from "vitest";
 
 describe("Plugin Manifest Validation", () => {
   it("should validate required manifest fields", () => {
-    const requiredFields = ["name", "version", "description", "hooks", "permissions"];
-    const manifest = { name: "Test Plugin", version: "1.0.0", description: "A test plugin", hooks: [], permissions: [] };
+    const requiredFields = [
+      "name",
+      "version",
+      "description",
+      "hooks",
+      "permissions",
+    ];
+    const manifest = {
+      name: "Test Plugin",
+      version: "1.0.0",
+      description: "A test plugin",
+      hooks: [],
+      permissions: [],
+    };
 
     for (const field of requiredFields) {
       expect(manifest).toHaveProperty(field);
@@ -15,10 +27,18 @@ describe("Plugin Manifest Validation", () => {
   });
 
   it("should reject manifest with invalid permissions", () => {
-    const validPermissions = ["storage:read", "storage:write", "payment:read", "admin:read", "ai:execute"];
+    const validPermissions = [
+      "storage:read",
+      "storage:write",
+      "payment:read",
+      "admin:read",
+      "ai:execute",
+    ];
     const manifestPermissions = ["storage:read", "invalid:perm"];
 
-    const invalid = manifestPermissions.filter((p) => !validPermissions.includes(p) && !p.startsWith("custom:"));
+    const invalid = manifestPermissions.filter(
+      (p) => !validPermissions.includes(p) && !p.startsWith("custom:"),
+    );
     expect(invalid).toHaveLength(1);
     expect(invalid[0]).toBe("invalid:perm");
   });
@@ -34,9 +54,18 @@ describe("Plugin Manifest Validation", () => {
 
   it("should validate hook names against allowed hooks", () => {
     const validHooks = [
-      "before:request", "after:request", "before:payment", "after:payment",
-      "before:escrow", "after:escrow", "on:error", "on:startup",
-      "on:shutdown", "before:auth", "after:auth", "on:webhook",
+      "before:request",
+      "after:request",
+      "before:payment",
+      "after:payment",
+      "before:escrow",
+      "after:escrow",
+      "on:error",
+      "on:startup",
+      "on:shutdown",
+      "before:auth",
+      "after:auth",
+      "on:webhook",
     ];
     const userHooks = ["before:request", "after:payment", "invalid:hook"];
 

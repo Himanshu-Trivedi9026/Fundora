@@ -6,7 +6,9 @@ const mockUpdate = vi.fn().mockReturnThis();
 const mockDelete = vi.fn().mockReturnThis();
 const mockSelect = vi.fn().mockReturnThis();
 const mockEq = vi.fn().mockReturnThis();
-const mockSingle = vi.fn().mockResolvedValue({ data: { id: "proj-1" }, error: null });
+const mockSingle = vi
+  .fn()
+  .mockResolvedValue({ data: { id: "proj-1" }, error: null });
 
 vi.mock("@/lib/supabaseClient", () => ({
   supabase: {
@@ -47,7 +49,10 @@ describe("lib/projects.js — project CRUD", () => {
   });
 
   it("throws on database error during update", async () => {
-    mockSingle.mockResolvedValueOnce({ data: null, error: { message: "update failed" } });
+    mockSingle.mockResolvedValueOnce({
+      data: null,
+      error: { message: "update failed" },
+    });
     await expect(updateProject("proj-1", { title: "X" })).rejects.toThrow();
   });
 

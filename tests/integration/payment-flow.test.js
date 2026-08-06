@@ -16,10 +16,12 @@ vi.mock("@/lib/supabaseAdmin", () => ({
     select: vi.fn().mockReturnThis(),
     insert: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
-    single: vi.fn().mockReturnValue(Promise.resolve({ data: null, error: null })),
-    maybeSingle: vi.fn().mockReturnValue(
-      Promise.resolve({ data: null, error: null })
-    ),
+    single: vi
+      .fn()
+      .mockReturnValue(Promise.resolve({ data: null, error: null })),
+    maybeSingle: vi
+      .fn()
+      .mockReturnValue(Promise.resolve({ data: null, error: null })),
     rpc: vi.fn().mockReturnValue(Promise.resolve({ data: null, error: null })),
   },
 }));
@@ -201,7 +203,7 @@ describe("Payment Flow Integration", () => {
         orderId: "order_test_abc123",
         amount: 50000,
         currency: "INR",
-      })
+      }),
     );
 
     /* Step 2: Verify payment */

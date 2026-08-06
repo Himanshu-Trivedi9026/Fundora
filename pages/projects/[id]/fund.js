@@ -13,9 +13,33 @@ import PaymentSummary from "../../../components/fund/PaymentSummary";
 import TrustIndicators from "../../../components/fund/TrustIndicators";
 
 const REWARD_TIERS = [
-  { amount: 100,  title: "Supporter",   desc: "Basic support ❤️",               icon: "favorite",          badge: null,       deliveryDate: "Mar 2025", backers: 45 },
-  { amount: 500,  title: "Backer",      desc: "Special thanks + shoutout 🚀",   icon: "rocket_launch",     badge: "Popular",  deliveryDate: "Jun 2025", backers: 23 },
-  { amount: 1000, title: "Sponsor",     desc: "Premium supporter badge 💎",     icon: "workspace_premium", badge: "Premium",  deliveryDate: "Sep 2025", backers: 8 },
+  {
+    amount: 100,
+    title: "Supporter",
+    desc: "Basic support ❤️",
+    icon: "favorite",
+    badge: null,
+    deliveryDate: "Mar 2025",
+    backers: 45,
+  },
+  {
+    amount: 500,
+    title: "Backer",
+    desc: "Special thanks + shoutout 🚀",
+    icon: "rocket_launch",
+    badge: "Popular",
+    deliveryDate: "Jun 2025",
+    backers: 23,
+  },
+  {
+    amount: 1000,
+    title: "Sponsor",
+    desc: "Premium supporter badge 💎",
+    icon: "workspace_premium",
+    badge: "Premium",
+    deliveryDate: "Sep 2025",
+    backers: 8,
+  },
 ];
 
 export default function FundProject() {
@@ -135,7 +159,9 @@ export default function FundProject() {
 
     try {
       // Get session with access token for authenticated API calls
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session?.access_token) {
         alert("Please login to continue");
         setLoading(false);
@@ -189,47 +215,47 @@ export default function FundProject() {
           const verifyData = await verifyRes.json();
 
           if (verifyData?.success) {
-  try {
-    // Use donationId from verify response (no race condition with webhook)
-    const donationId = verifyData.donationId;
+            try {
+              // Use donationId from verify response (no race condition with webhook)
+              const donationId = verifyData.donationId;
 
-    if (!donationId) {
-      alert("Payment done but receipt failed");
-      return;
-    }
+              if (!donationId) {
+                alert("Payment done but receipt failed");
+                return;
+              }
 
-    // Call receipt API
-    const receiptRes = await fetch("/api/receipts/generate", {
-      method: "POST",
-      headers: authHeaders,
-      body: JSON.stringify({
-        donationId: donationId,
-      }),
-    });
+              // Call receipt API
+              const receiptRes = await fetch("/api/receipts/generate", {
+                method: "POST",
+                headers: authHeaders,
+                body: JSON.stringify({
+                  donationId: donationId,
+                }),
+              });
 
-    const receiptData = await receiptRes.json();
+              const receiptData = await receiptRes.json();
 
-    if (!receiptData?.receipt) {
-      console.error("Receipt error:", receiptData);
-      alert("Payment done, but receipt failed");
-      return;
-    }
+              if (!receiptData?.receipt) {
+                console.error("Receipt error:", receiptData);
+                alert("Payment done, but receipt failed");
+                return;
+              }
 
-    // 🔥 STEP 3: Generate PDF (dynamic import — jspdf is ~29MB)
-    const { generateReceipt } = await import("../../../lib/generateReceipt");
-    generateReceipt(receiptData.receipt);
+              // 🔥 STEP 3: Generate PDF (dynamic import — jspdf is ~29MB)
+              const { generateReceipt } =
+                await import("../../../lib/generateReceipt");
+              generateReceipt(receiptData.receipt);
 
-    alert("✅ Payment successful & receipt downloaded!");
+              alert("✅ Payment successful & receipt downloaded!");
 
-    setAmount("");
-    setSelectedTier(null);
-    loadData();
-
-  } catch (err) {
-    console.error("Receipt flow error:", err);
-    alert("Payment done but receipt failed");
-  }
-} else {
+              setAmount("");
+              setSelectedTier(null);
+              loadData();
+            } catch (err) {
+              console.error("Receipt flow error:", err);
+              alert("Payment done but receipt failed");
+            }
+          } else {
             alert("Payment verification failed");
           }
         },
@@ -248,11 +274,12 @@ export default function FundProject() {
   }
 
   /* ---------------- DERIVED ---------------- */
-  const currentTierName = selectedTier === "custom"
-    ? "Custom Donation"
-    : selectedTier !== null
-      ? REWARD_TIERS[selectedTier].title
-      : "No Selection";
+  const currentTierName =
+    selectedTier === "custom"
+      ? "Custom Donation"
+      : selectedTier !== null
+        ? REWARD_TIERS[selectedTier].title
+        : "No Selection";
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-dim">
@@ -260,14 +287,15 @@ export default function FundProject() {
 
       <main className="flex-1 pt-24 pb-20 px-4 md:px-6 max-w-6xl mx-auto">
         <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-8">
-
           {/* ── LEFT COLUMN ── */}
           <div className="lg:col-span-8 space-y-6">
             {/* Project Summary */}
             <ProjectSummary
               project={project}
               creator={creator}
-              onBack={() => { router.push(`/projects/${id}`); }}
+              onBack={() => {
+                router.push(`/projects/${id}`);
+              }}
             />
 
             {/* Funding Progress */}

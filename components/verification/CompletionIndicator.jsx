@@ -6,7 +6,11 @@
  * @param {string} props.label — Optional label
  * @param {string} props.size — 'sm' | 'md' | 'lg'
  */
-export default function CompletionIndicator({ percentage = 0, label = "Verification Completion", size = "md" }) {
+export default function CompletionIndicator({
+  percentage = 0,
+  label = "Verification Completion",
+  size = "md",
+}) {
   const sizes = {
     sm: { ring: 12, text: "text-xs", font: "text-[8px]" },
     md: { ring: 16, text: "text-sm", font: "text-[10px]" },
@@ -46,13 +50,17 @@ export default function CompletionIndicator({ percentage = 0, label = "Verificat
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className={`font-bold text-primary ${s.font}`}>{percentage}%</span>
+          <span className={`font-bold text-primary ${s.font}`}>
+            {percentage}%
+          </span>
         </div>
       </div>
       <div>
         <p className={`font-semibold text-on-surface ${s.text}`}>{label}</p>
         <p className="text-xs text-on-surface-variant font-inter">
-          {percentage === 100 ? "Complete" : `${Math.round(percentage / 100 * 6)} of 6 steps done`}
+          {percentage === 100
+            ? "Complete"
+            : `${Math.round((percentage / 100) * 6)} of 6 steps done`}
         </p>
       </div>
     </div>

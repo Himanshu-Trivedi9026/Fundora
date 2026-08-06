@@ -14,13 +14,13 @@ The Escrow Ledger is an **immutable append-only** ledger for all escrow transact
 
 ## Entry Types
 
-| Type | Description | Amount Sign |
-|------|-------------|-------------|
-| `deposit` | Funds added to escrow (donations) | Positive (+) |
-| `release` | Funds released to creator | Negative (-) |
-| `refund` | Funds refunded to donors | Negative (-) |
-| `fee` | Platform fees deducted | Negative (-) |
-| `adjustment` | Manual balance adjustments (admin only) | +/- |
+| Type         | Description                             | Amount Sign  |
+| ------------ | --------------------------------------- | ------------ |
+| `deposit`    | Funds added to escrow (donations)       | Positive (+) |
+| `release`    | Funds released to creator               | Negative (-) |
+| `refund`     | Funds refunded to donors                | Negative (-) |
+| `fee`        | Platform fees deducted                  | Negative (-) |
+| `adjustment` | Manual balance adjustments (admin only) | +/-          |
 
 ## Schema
 
@@ -48,6 +48,7 @@ CREATE TABLE escrow_ledger (
 Appends a ledger entry. Validates idempotency_key uniqueness before insert.
 
 **Parameters:**
+
 - `escrowAccountId` (string, required) — Escrow account ID
 - `campaignId` (string, required) — Campaign ID
 - `entryType` (string, required) — 'deposit' | 'release' | 'refund' | 'fee' | 'adjustment'
@@ -110,6 +111,7 @@ If the same `idempotencyKey` is used again, the entry is rejected.
 ## Metadata Sanitization
 
 Sensitive fields are automatically stripped from metadata:
+
 - `ip_address`
 - `session_token`
 - `encryption_key`
@@ -120,7 +122,11 @@ Sensitive fields are automatically stripped from metadata:
 ## Usage Example
 
 ```javascript
-import { createLedgerEntry, getLedgerBalance, validateLedgerIntegrity } from "../lib/escrow/escrowLedger";
+import {
+  createLedgerEntry,
+  getLedgerBalance,
+  validateLedgerIntegrity,
+} from "../lib/escrow/escrowLedger";
 
 // Record a donation
 await createLedgerEntry({

@@ -19,7 +19,10 @@ export default function EditProfile() {
 
   const loadUser = useCallback(async () => {
     const u = (await supabase.auth.getUser()).data.user;
-    if (!u) { router.push("/login"); return; }
+    if (!u) {
+      router.push("/login");
+      return;
+    }
 
     setUser(u);
 
@@ -78,21 +81,30 @@ export default function EditProfile() {
     setSaving(false);
   }
 
-  if (!user) return <div className="min-h-screen flex items-center justify-center text-white" role="status" aria-live="polite">Loading profile...</div>;
+  if (!user)
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center text-white"
+        role="status"
+        aria-live="polite"
+      >
+        Loading profile...
+      </div>
+    );
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-slate-900 to-slate-800">
       <Navbar />
 
       <main className="flex-1 max-w-3xl mx-auto p-6 text-white">
-
         <h1 className="text-2xl font-bold mb-6">Edit Profile</h1>
 
         <div className="space-y-6 bg-slate-900 p-6 rounded-xl border border-slate-700">
-
           {/* Full Name */}
           <div>
-            <label htmlFor="edit-name" className="text-sm text-slate-300">Full Name</label>
+            <label htmlFor="edit-name" className="text-sm text-slate-300">
+              Full Name
+            </label>
             <input
               id="edit-name"
               className="input"
@@ -104,7 +116,9 @@ export default function EditProfile() {
 
           {/* Bio */}
           <div>
-            <label htmlFor="edit-bio" className="text-sm text-slate-300">Bio</label>
+            <label htmlFor="edit-bio" className="text-sm text-slate-300">
+              Bio
+            </label>
             <textarea
               id="edit-bio"
               className="input"
@@ -117,7 +131,9 @@ export default function EditProfile() {
 
           {/* Website */}
           <div>
-            <label htmlFor="edit-website" className="text-sm text-slate-300">Website</label>
+            <label htmlFor="edit-website" className="text-sm text-slate-300">
+              Website
+            </label>
             <input
               id="edit-website"
               className="input"
@@ -130,8 +146,15 @@ export default function EditProfile() {
 
           {/* Avatar Upload */}
           <div>
-            <label htmlFor="edit-avatar" className="text-sm text-slate-300">Avatar</label>
-            <input id="edit-avatar" type="file" onChange={uploadAvatar} className="mt-2" />
+            <label htmlFor="edit-avatar" className="text-sm text-slate-300">
+              Avatar
+            </label>
+            <input
+              id="edit-avatar"
+              type="file"
+              onChange={uploadAvatar}
+              className="mt-2"
+            />
 
             {avatarUrl && (
               <Image

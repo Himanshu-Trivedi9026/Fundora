@@ -15,24 +15,25 @@ creator_verifications (1:1)
 ```
 
 **Tables:**
+
 - `business_verifications` — Business name, type, GST/PAN/CIN, address (JSONB), status, provider reference
 - `business_documents` — 17 document types with storage paths, validation status
 
 ### Business Types
 
-| Type | Required Documents |
-|------|-------------------|
-| `individual` | pan_card, aadhaar_card, address_proof |
-| `sole_proprietorship` | gst_certificate, pan_card, business_address_proof, cancelled_cheque |
-| `partnership` | partnership_deed, gst_certificate, pan_card, business_address_proof, partner_identity_proof |
-| `llp` | certificate_of_incorporation, gst_certificate, pan_card, partnership_deed |
-| `private_limited` | certificate_of_incorporation, gst_certificate, moa, aoa, director_identity_proof |
-| `public_limited` | certificate_of_incorporation, gst_certificate, moa, aoa, director_identity_proof |
-| `ngo` | trust_registration, gst_certificate, pan_card, business_address_proof |
-| `trust` | trust_registration, gst_certificate, pan_card, business_address_proof |
-| `society` | society_registration, gst_certificate, pan_card, business_address_proof |
-| `startup` | certificate_of_incorporation, gst_certificate, udyam_registration, moa, pan_card |
-| `government` | government_registration, pan_card, business_address_proof |
+| Type                  | Required Documents                                                                          |
+| --------------------- | ------------------------------------------------------------------------------------------- |
+| `individual`          | pan_card, aadhaar_card, address_proof                                                       |
+| `sole_proprietorship` | gst_certificate, pan_card, business_address_proof, cancelled_cheque                         |
+| `partnership`         | partnership_deed, gst_certificate, pan_card, business_address_proof, partner_identity_proof |
+| `llp`                 | certificate_of_incorporation, gst_certificate, pan_card, partnership_deed                   |
+| `private_limited`     | certificate_of_incorporation, gst_certificate, moa, aoa, director_identity_proof            |
+| `public_limited`      | certificate_of_incorporation, gst_certificate, moa, aoa, director_identity_proof            |
+| `ngo`                 | trust_registration, gst_certificate, pan_card, business_address_proof                       |
+| `trust`               | trust_registration, gst_certificate, pan_card, business_address_proof                       |
+| `society`             | society_registration, gst_certificate, pan_card, business_address_proof                     |
+| `startup`             | certificate_of_incorporation, gst_certificate, udyam_registration, moa, pan_card            |
+| `government`          | government_registration, pan_card, business_address_proof                                   |
 
 ## Libraries
 
@@ -41,6 +42,7 @@ creator_verifications (1:1)
 Core business verification CRUD operations.
 
 **Functions:**
+
 - `createBusinessVerification(userId, verificationId, businessData)` — Create/update business verification
 - `updateBusinessVerification(userId, updates)` — Update business details
 - `uploadBusinessDocument(userId, verificationId, documentType, file)` — Upload document
@@ -55,6 +57,7 @@ Core business verification CRUD operations.
 Configuration-driven document requirements engine.
 
 **Functions:**
+
 - `getRequiredDocuments(businessType)` — Returns required documents for business type
 - `getBankDocuments()` — Returns bank verification document requirements
 - `getMissingDocuments(providedTypes, businessType)` — Calculates missing documents
@@ -68,6 +71,7 @@ Configuration-driven document requirements engine.
 GST number verification via provider.
 
 **Functions:**
+
 - `verifyGSTNumber(userId, gstNumber)` — Submit GST for verification
 - `checkGSTStatus(referenceId)` — Check verification status
 
@@ -76,6 +80,7 @@ GST number verification via provider.
 PAN number verification via provider.
 
 **Functions:**
+
 - `verifyPANNumber(userId, panNumber)` — Submit PAN for verification
 - `checkPANStatus(referenceId)` — Check verification status
 
@@ -83,13 +88,14 @@ PAN number verification via provider.
 
 ### `pages/api/verification/business.js`
 
-| Method | Action | Auth | Rate Limit |
-|--------|--------|------|-----------|
-| `GET` | Get business verification | Required | 10/min |
-| `POST` | Create/update business verification | Required | 10/min |
-| `PUT` | Update business details | Required | 10/min |
+| Method | Action                              | Auth     | Rate Limit |
+| ------ | ----------------------------------- | -------- | ---------- |
+| `GET`  | Get business verification           | Required | 10/min     |
+| `POST` | Create/update business verification | Required | 10/min     |
+| `PUT`  | Update business details             | Required | 10/min     |
 
 **POST body:**
+
 ```json
 {
   "business_name": "Acme Corp",
@@ -108,22 +114,24 @@ PAN number verification via provider.
 
 ### `pages/api/verification/business-documents.js`
 
-| Method | Action | Auth | Rate Limit |
-|--------|--------|------|-----------|
-| `GET` | List business documents | Required | 10/min |
-| `POST` | Upload business document | Required | 10/min |
+| Method | Action                   | Auth     | Rate Limit |
+| ------ | ------------------------ | -------- | ---------- |
+| `GET`  | List business documents  | Required | 10/min     |
+| `POST` | Upload business document | Required | 10/min     |
 
 **POST body (multipart):**
+
 - `file` — Document file
 - `documentType` — One of: gst_certificate, pan_card, aadhaar_card, certificate_of_incorporation, moa, aoa, partnership_deed, trust_registration, society_registration, udyam_registration, government_registration, business_address_proof, cancelled_cheque, director_identity_proof, partner_identity_proof
 
 ### `pages/api/verification/gst.js`
 
-| Method | Action | Auth | Rate Limit |
-|--------|--------|------|-----------|
-| `POST` | Verify GST number | Required | 10/min |
+| Method | Action            | Auth     | Rate Limit |
+| ------ | ----------------- | -------- | ---------- |
+| `POST` | Verify GST number | Required | 10/min     |
 
 **POST body:**
+
 ```json
 {
   "action": "verify",
@@ -133,11 +141,12 @@ PAN number verification via provider.
 
 ### `pages/api/verification/pan.js`
 
-| Method | Action | Auth | Rate Limit |
-|--------|--------|------|-----------|
-| `POST` | Verify PAN number | Required | 10/min |
+| Method | Action            | Auth     | Rate Limit |
+| ------ | ----------------- | -------- | ---------- |
+| `POST` | Verify PAN number | Required | 10/min     |
 
 **POST body:**
+
 ```json
 {
   "action": "verify",
@@ -149,11 +158,12 @@ PAN number verification via provider.
 
 ### `pages/api/admin/business-review.js`
 
-| Method | Action | Auth | Rate Limit |
-|--------|--------|------|-----------|
-| `POST` | Approve/reject/resubmit | Admin | 10/min |
+| Method | Action                  | Auth  | Rate Limit |
+| ------ | ----------------------- | ----- | ---------- |
+| `POST` | Approve/reject/resubmit | Admin | 10/min     |
 
 **POST body:**
+
 ```json
 {
   "action": "approve | reject | resubmit",
@@ -195,20 +205,20 @@ Business verification contributes to the trust score via configurable weights:
 
 ## File Locations
 
-| File | Purpose |
-|------|---------|
-| `lib/verification/businessVerification.js` | Core CRUD + validation |
-| `lib/verification/documentRequirements.js` | Config-driven document engine |
-| `lib/verification/gstVerification.js` | GST verification |
-| `lib/verification/panVerification.js` | PAN verification |
-| `lib/verification/providers/businessVerificationProvider.js` | Mock provider |
-| `lib/verification/providers/gstVerificationProvider.js` | GST mock provider |
-| `lib/verification/providers/panVerificationProvider.js` | PAN mock provider |
-| `pages/api/verification/business.js` | Business verification API |
-| `pages/api/verification/business-documents.js` | Business document API |
-| `pages/api/verification/gst.js` | GST verification API |
-| `pages/api/verification/pan.js` | PAN verification API |
-| `pages/api/admin/business-review.js` | Admin business review |
-| `components/verification/BusinessVerificationCard.jsx` | Status card component |
-| `components/verification/BusinessTypeSelector.jsx` | Type selector component |
-| `components/verification/GSTValidator.jsx` | GST validation UI |
+| File                                                         | Purpose                       |
+| ------------------------------------------------------------ | ----------------------------- |
+| `lib/verification/businessVerification.js`                   | Core CRUD + validation        |
+| `lib/verification/documentRequirements.js`                   | Config-driven document engine |
+| `lib/verification/gstVerification.js`                        | GST verification              |
+| `lib/verification/panVerification.js`                        | PAN verification              |
+| `lib/verification/providers/businessVerificationProvider.js` | Mock provider                 |
+| `lib/verification/providers/gstVerificationProvider.js`      | GST mock provider             |
+| `lib/verification/providers/panVerificationProvider.js`      | PAN mock provider             |
+| `pages/api/verification/business.js`                         | Business verification API     |
+| `pages/api/verification/business-documents.js`               | Business document API         |
+| `pages/api/verification/gst.js`                              | GST verification API          |
+| `pages/api/verification/pan.js`                              | PAN verification API          |
+| `pages/api/admin/business-review.js`                         | Admin business review         |
+| `components/verification/BusinessVerificationCard.jsx`       | Status card component         |
+| `components/verification/BusinessTypeSelector.jsx`           | Type selector component       |
+| `components/verification/GSTValidator.jsx`                   | GST validation UI             |

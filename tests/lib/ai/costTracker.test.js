@@ -80,7 +80,9 @@ function buildBudgetNoLimitChainMock() {
     select: vi.fn().mockReturnValue({
       eq: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
-          single: vi.fn().mockResolvedValue({ data: null, error: { code: "PGRST116" } }),
+          single: vi
+            .fn()
+            .mockResolvedValue({ data: null, error: { code: "PGRST116" } }),
         }),
       }),
     }),
@@ -99,7 +101,10 @@ describe("Cost Tracker", () => {
   describe("recordAICost", () => {
     it("records cost successfully (insert path — no existing record)", async () => {
       // No existing record found
-      supabaseAdmin.single.mockResolvedValueOnce({ data: null, error: { code: "PGRST116" } });
+      supabaseAdmin.single.mockResolvedValueOnce({
+        data: null,
+        error: { code: "PGRST116" },
+      });
       // Insert succeeds
       supabaseAdmin.single.mockResolvedValueOnce({
         data: { id: "cost-1" },
@@ -129,7 +134,14 @@ describe("Cost Tracker", () => {
     it("updates existing record when one is found (upsert path)", async () => {
       // Existing record found
       supabaseAdmin.single.mockResolvedValueOnce({
-        data: { id: "cost-existing", cost_cents: 10, request_count: 3, input_tokens: 500, output_tokens: 200, total_tokens: 700 },
+        data: {
+          id: "cost-existing",
+          cost_cents: 10,
+          request_count: 3,
+          input_tokens: 500,
+          output_tokens: 200,
+          total_tokens: 700,
+        },
         error: null,
       });
       // Update succeeds
@@ -167,7 +179,10 @@ describe("Cost Tracker", () => {
     });
 
     it("handles DB insert error gracefully", async () => {
-      supabaseAdmin.single.mockResolvedValueOnce({ data: null, error: { code: "PGRST116" } });
+      supabaseAdmin.single.mockResolvedValueOnce({
+        data: null,
+        error: { code: "PGRST116" },
+      });
       supabaseAdmin.single.mockResolvedValueOnce({
         data: null,
         error: { message: "constraint violation" },
@@ -195,9 +210,27 @@ describe("Cost Tracker", () => {
           gte: vi.fn().mockReturnValue({
             lte: vi.fn().mockResolvedValue({
               data: [
-                { model: "gpt-4o", operation: "chat", cost_cents: 10, total_tokens: 2000, request_count: 5 },
-                { model: "gpt-4o-mini", operation: "embedding", cost_cents: 0.5, total_tokens: 5000, request_count: 20 },
-                { model: "gpt-4o", operation: "chat", cost_cents: 5, total_tokens: 1000, request_count: 3 },
+                {
+                  model: "gpt-4o",
+                  operation: "chat",
+                  cost_cents: 10,
+                  total_tokens: 2000,
+                  request_count: 5,
+                },
+                {
+                  model: "gpt-4o-mini",
+                  operation: "embedding",
+                  cost_cents: 0.5,
+                  total_tokens: 5000,
+                  request_count: 20,
+                },
+                {
+                  model: "gpt-4o",
+                  operation: "chat",
+                  cost_cents: 5,
+                  total_tokens: 1000,
+                  request_count: 3,
+                },
               ],
               error: null,
             }),
@@ -244,7 +277,11 @@ describe("Cost Tracker", () => {
     });
 
     it("returns error when required params are missing", async () => {
-      const result = await getCostSummary({ userId: null, startDate: "2025-01-01", endDate: "2025-01-31" });
+      const result = await getCostSummary({
+        userId: null,
+        startDate: "2025-01-01",
+        endDate: "2025-01-31",
+      });
       expect(result.success).toBe(false);
       expect(result.error).toContain("required");
     });
@@ -258,9 +295,27 @@ describe("Cost Tracker", () => {
         gte: vi.fn().mockReturnValue({
           lte: vi.fn().mockResolvedValue({
             data: [
-              { date: "2025-01-15", user_id: "user-1", cost_cents: 25, total_tokens: 5000, request_count: 10 },
-              { date: "2025-01-15", user_id: "user-2", cost_cents: 10, total_tokens: 2000, request_count: 4 },
-              { date: "2025-01-16", user_id: "user-1", cost_cents: 15, total_tokens: 3000, request_count: 6 },
+              {
+                date: "2025-01-15",
+                user_id: "user-1",
+                cost_cents: 25,
+                total_tokens: 5000,
+                request_count: 10,
+              },
+              {
+                date: "2025-01-15",
+                user_id: "user-2",
+                cost_cents: 10,
+                total_tokens: 2000,
+                request_count: 4,
+              },
+              {
+                date: "2025-01-16",
+                user_id: "user-1",
+                cost_cents: 15,
+                total_tokens: 3000,
+                request_count: 6,
+              },
             ],
             error: null,
           }),
@@ -281,7 +336,10 @@ describe("Cost Tracker", () => {
     });
 
     it("returns error when required params are missing", async () => {
-      const result = await getPlatformAICosts({ startDate: null, endDate: "2025-01-16" });
+      const result = await getPlatformAICosts({
+        startDate: null,
+        endDate: "2025-01-16",
+      });
       expect(result.success).toBe(false);
       expect(result.error).toContain("required");
     });
@@ -302,7 +360,10 @@ describe("Cost Tracker", () => {
         .mockReturnValueOnce(budgetChain)
         .mockReturnValueOnce(spendingChain);
 
-      const result = await checkCostBudget({ entity: "user-1", budgetType: "daily" });
+      const result = await checkCostBudget({
+        entity: "user-1",
+        budgetType: "daily",
+      });
 
       expect(result.success).toBe(true);
       expect(result.data.withinBudget).toBe(true);
@@ -320,7 +381,10 @@ describe("Cost Tracker", () => {
         .mockReturnValueOnce(budgetChain)
         .mockReturnValueOnce(spendingChain);
 
-      const result = await checkCostBudget({ entity: "user-1", budgetType: "daily" });
+      const result = await checkCostBudget({
+        entity: "user-1",
+        budgetType: "daily",
+      });
 
       expect(result.success).toBe(true);
       expect(result.data.withinBudget).toBe(false);
@@ -333,7 +397,10 @@ describe("Cost Tracker", () => {
       supabaseAdmin.from.mockReturnValueOnce(budgetChain);
 
       // Query 2 won't be reached — function returns early when limit is null
-      const result = await checkCostBudget({ entity: "user-unknown", budgetType: "daily" });
+      const result = await checkCostBudget({
+        entity: "user-unknown",
+        budgetType: "daily",
+      });
 
       expect(result.success).toBe(true);
       expect(result.data.withinBudget).toBe(true);
@@ -341,7 +408,10 @@ describe("Cost Tracker", () => {
     });
 
     it("returns error when entity is missing", async () => {
-      const result = await checkCostBudget({ entity: null, budgetType: "daily" });
+      const result = await checkCostBudget({
+        entity: null,
+        budgetType: "daily",
+      });
       expect(result.success).toBe(false);
       expect(result.error).toContain("required");
     });

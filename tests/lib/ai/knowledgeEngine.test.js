@@ -28,7 +28,10 @@ vi.mock("../../../lib/verification/auditLog.js", () => ({
 }));
 
 vi.mock("../../../lib/ai/embeddingEngine.js", () => ({
-  createEmbedding: vi.fn().mockResolvedValue({ success: true, data: { id: "emb-1", dimensions: 1536 } }),
+  createEmbedding: vi.fn().mockResolvedValue({
+    success: true,
+    data: { id: "emb-1", dimensions: 1536 },
+  }),
   searchEmbeddings: vi.fn().mockResolvedValue({ success: true, data: [] }),
 }));
 
@@ -41,7 +44,10 @@ import {
 } from "../../../lib/ai/knowledgeEngine.js";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin.js";
 import { logAuditEvent } from "../../../lib/verification/auditLog.js";
-import { createEmbedding, searchEmbeddings } from "../../../lib/ai/embeddingEngine.js";
+import {
+  createEmbedding,
+  searchEmbeddings,
+} from "../../../lib/ai/embeddingEngine.js";
 
 // ─── Mock chain builders ──────────────────────────────────────────────
 
@@ -91,7 +97,7 @@ describe("Knowledge Engine", () => {
   describe("indexKnowledgeArticle", () => {
     it("should chunk content, create embeddings, and store the article", async () => {
       supabaseAdmin.from.mockReturnValueOnce(
-        mockInsertSingle({ data: { id: "art-1" }, error: null })
+        mockInsertSingle({ data: { id: "art-1" }, error: null }),
       );
 
       const result = await indexKnowledgeArticle({
@@ -131,7 +137,7 @@ describe("Knowledge Engine", () => {
 
     it("should handle DB storage errors gracefully", async () => {
       supabaseAdmin.from.mockReturnValueOnce(
-        mockInsertSingle({ data: null, error: { message: "DB failure" } })
+        mockInsertSingle({ data: null, error: { message: "DB failure" } }),
       );
 
       const result = await indexKnowledgeArticle({
@@ -149,14 +155,22 @@ describe("Knowledge Engine", () => {
     it("should return semantic search results enriched with article metadata", async () => {
       searchEmbeddings.mockResolvedValueOnce({
         success: true,
-        data: [{ entityId: "art-1", entityType: "knowledge_article", score: 0.85 }],
+        data: [
+          { entityId: "art-1", entityType: "knowledge_article", score: 0.85 },
+        ],
       });
 
       supabaseAdmin.from.mockReturnValueOnce(
         mockSelectSingle({
-          data: { id: "art-1", title: "FAQ", content: "Long article content here", category: "faq", status: "active" },
+          data: {
+            id: "art-1",
+            title: "FAQ",
+            content: "Long article content here",
+            category: "faq",
+            status: "active",
+          },
           error: null,
-        })
+        }),
       );
 
       const result = await searchKnowledge({ query: "how to fund" });
@@ -176,7 +190,15 @@ describe("Knowledge Engine", () => {
           eq: vi.fn().mockReturnValue({
             or: vi.fn().mockReturnValue({
               limit: vi.fn().mockResolvedValue({
-                data: [{ id: "art-2", title: "Keyword Match", content: "Relevant content", category: "guide", tags: [] }],
+                data: [
+                  {
+                    id: "art-2",
+                    title: "Keyword Match",
+                    content: "Relevant content",
+                    category: "guide",
+                    tags: [],
+                  },
+                ],
                 error: null,
               }),
             }),
@@ -204,14 +226,22 @@ describe("Knowledge Engine", () => {
     it("should build multi-source context from knowledge articles", async () => {
       searchEmbeddings.mockResolvedValueOnce({
         success: true,
-        data: [{ entityId: "art-1", entityType: "knowledge_article", score: 0.8 }],
+        data: [
+          { entityId: "art-1", entityType: "knowledge_article", score: 0.8 },
+        ],
       });
 
       supabaseAdmin.from.mockReturnValueOnce(
         mockSelectSingle({
-          data: { id: "art-1", title: "FAQ", content: "Context content about funding", category: "faq", status: "active" },
+          data: {
+            id: "art-1",
+            title: "FAQ",
+            content: "Context content about funding",
+            category: "faq",
+            status: "active",
+          },
           error: null,
-        })
+        }),
       );
 
       const result = await getRelevantContext({ query: "funding context" });
@@ -277,9 +307,14 @@ describe("Knowledge Engine", () => {
       supabaseAdmin.from
         .mockReturnValueOnce(
           mockSelectSingle({
-            data: { id: "art-1", title: "FAQ", category: "faq", status: "active" },
+            data: {
+              id: "art-1",
+              title: "FAQ",
+              category: "faq",
+              status: "active",
+            },
             error: null,
-          })
+          }),
         )
         // Update status
         .mockReturnValueOnce(mockUpdateEq({ error: null }));
@@ -296,9 +331,14 @@ describe("Knowledge Engine", () => {
       supabaseAdmin.from
         .mockReturnValueOnce(
           mockSelectSingle({
-            data: { id: "art-1", title: "FAQ", category: "faq", status: "active" },
+            data: {
+              id: "art-1",
+              title: "FAQ",
+              category: "faq",
+              status: "active",
+            },
             error: null,
-          })
+          }),
         )
         // Delete embeddings
         .mockReturnValueOnce(mockDeleteEq({ error: null }))
@@ -327,10 +367,14 @@ describe("Knowledge Engine", () => {
 
     it("should fail when article is not found", async () => {
       supabaseAdmin.from.mockReturnValueOnce(
-        mockSelectSingle({ data: null, error: { message: "not found" } })
+        mockSelectSingle({ data: null, error: { message: "not found" } }),
       );
 
-      const result = await manageKnowledgeArticle("nonexistent", "archive", "user-1");
+      const result = await manageKnowledgeArticle(
+        "nonexistent",
+        "archive",
+        "user-1",
+      );
 
       expect(result.success).toBe(false);
       expect(result.error).toContain("Article not found");

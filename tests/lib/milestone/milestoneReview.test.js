@@ -26,7 +26,12 @@ vi.mock("../../../lib/verification/auditLog", () => ({
   hashIP: vi.fn().mockReturnValue("hashed-ip"),
 }));
 
-import { createReview, getMilestoneReviews, getReviewStats, getUserReview } from "../../../lib/milestone/milestoneReview";
+import {
+  createReview,
+  getMilestoneReviews,
+  getReviewStats,
+  getUserReview,
+} from "../../../lib/milestone/milestoneReview";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 
 describe("MilestoneReview", () => {
@@ -61,7 +66,9 @@ describe("MilestoneReview", () => {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               eq: vi.fn().mockReturnValue({
-                maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+                maybeSingle: vi
+                  .fn()
+                  .mockResolvedValue({ data: null, error: null }),
               }),
             }),
           }),
@@ -69,7 +76,14 @@ describe("MilestoneReview", () => {
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: { id: "milestone-1", status: "submitted", campaign_id: "campaign-1" }, error: null }),
+              single: vi.fn().mockResolvedValue({
+                data: {
+                  id: "milestone-1",
+                  status: "submitted",
+                  campaign_id: "campaign-1",
+                },
+                error: null,
+              }),
             }),
           }),
         })
@@ -77,7 +91,9 @@ describe("MilestoneReview", () => {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               eq: vi.fn().mockReturnValue({
-                in: vi.fn().mockResolvedValue({ data: [{ amount: 1000 }], error: null }),
+                in: vi
+                  .fn()
+                  .mockResolvedValue({ data: [{ amount: 1000 }], error: null }),
               }),
             }),
           }),
@@ -102,7 +118,7 @@ describe("MilestoneReview", () => {
         expect.objectContaining({
           vote_weight: 10,
           donation_amount: 1000,
-        })
+        }),
       );
     });
 
@@ -111,7 +127,10 @@ describe("MilestoneReview", () => {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              maybeSingle: vi.fn().mockResolvedValue({ data: { id: "existing-review" }, error: null }),
+              maybeSingle: vi.fn().mockResolvedValue({
+                data: { id: "existing-review" },
+                error: null,
+              }),
             }),
           }),
         }),
@@ -139,7 +158,9 @@ describe("MilestoneReview", () => {
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockReviews, error: null }),
+            order: vi
+              .fn()
+              .mockResolvedValue({ data: mockReviews, error: null }),
           }),
         }),
       });
@@ -174,13 +195,19 @@ describe("MilestoneReview", () => {
 
   describe("getUserReview", () => {
     it("should return user review if exists", async () => {
-      const mockReview = { id: "review-1", reviewer_id: "user-1", decision: "approve" };
+      const mockReview = {
+        id: "review-1",
+        reviewer_id: "user-1",
+        decision: "approve",
+      };
 
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              maybeSingle: vi.fn().mockResolvedValue({ data: mockReview, error: null }),
+              maybeSingle: vi
+                .fn()
+                .mockResolvedValue({ data: mockReview, error: null }),
             }),
           }),
         }),

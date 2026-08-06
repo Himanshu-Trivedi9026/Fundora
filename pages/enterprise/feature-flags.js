@@ -34,7 +34,7 @@ export default function FeatureFlagsPage() {
       const json = await res.json();
       if (json.success) {
         setFlags((prev) =>
-          prev.map((f) => (f.id === id ? { ...f, enabled: newEnabled } : f))
+          prev.map((f) => (f.id === id ? { ...f, enabled: newEnabled } : f)),
         );
       }
     } catch {
@@ -49,7 +49,9 @@ export default function FeatureFlagsPage() {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-2xl font-bold text-white">Feature Flags</h1>
-              <p className="text-gray-400 mt-1">Toggle and manage feature availability across your platform</p>
+              <p className="text-gray-400 mt-1">
+                Toggle and manage feature availability across your platform
+              </p>
             </div>
             <Button variant="primary" size="md">
               <span className="material-symbols-outlined text-[18px]">add</span>
@@ -73,10 +75,19 @@ export default function FeatureFlagsPage() {
 
           {error && (
             <GlassCard className="text-center py-12">
-              <span className="material-symbols-outlined text-4xl text-red-400 mb-3">error_outline</span>
-              <p className="text-red-400 text-lg font-medium">Failed to load feature flags</p>
+              <span className="material-symbols-outlined text-4xl text-red-400 mb-3">
+                error_outline
+              </span>
+              <p className="text-red-400 text-lg font-medium">
+                Failed to load feature flags
+              </p>
               <p className="text-gray-500 text-sm mt-1">{error}</p>
-              <Button variant="secondary" size="sm" className="mt-4" onClick={() => window.location.reload()}>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="mt-4"
+                onClick={() => window.location.reload()}
+              >
                 Retry
               </Button>
             </GlassCard>
@@ -84,19 +95,30 @@ export default function FeatureFlagsPage() {
 
           {!loading && !error && flags.length === 0 && (
             <GlassCard className="text-center py-12">
-              <span className="material-symbols-outlined text-4xl text-gray-500 mb-3">flag</span>
-              <p className="text-gray-400 text-lg font-medium">No feature flags configured</p>
-              <p className="text-gray-600 text-sm mt-1">Create feature flags to control feature rollouts.</p>
+              <span className="material-symbols-outlined text-4xl text-gray-500 mb-3">
+                flag
+              </span>
+              <p className="text-gray-400 text-lg font-medium">
+                No feature flags configured
+              </p>
+              <p className="text-gray-600 text-sm mt-1">
+                Create feature flags to control feature rollouts.
+              </p>
             </GlassCard>
           )}
 
           {!loading && !error && flags.length > 0 && (
             <div className="space-y-4">
               {flags.map((flag) => (
-                <GlassCard key={flag.id} className="flex items-center justify-between">
+                <GlassCard
+                  key={flag.id}
+                  className="flex items-center justify-between"
+                >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-1">
-                      <h3 className="text-white font-semibold text-sm truncate">{flag.name || flag.key}</h3>
+                      <h3 className="text-white font-semibold text-sm truncate">
+                        {flag.name || flag.key}
+                      </h3>
                       <span className="text-[10px] font-mono text-gray-600 bg-white/[0.04] px-1.5 py-0.5 rounded">
                         {flag.key}
                       </span>
@@ -121,7 +143,9 @@ export default function FeatureFlagsPage() {
                     >
                       <span
                         className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
-                          flag.enabled ? "translate-x-[18px]" : "translate-x-[2px]"
+                          flag.enabled
+                            ? "translate-x-[18px]"
+                            : "translate-x-[2px]"
                         }`}
                       />
                     </button>

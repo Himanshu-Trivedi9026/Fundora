@@ -52,7 +52,10 @@ export default function AdminVerificationReview() {
   const fetchQueue = useCallback(async () => {
     queueMicrotask(() => setLoading(true));
     try {
-      const params = new URLSearchParams({ type: typeFilter, status: statusFilter });
+      const params = new URLSearchParams({
+        type: typeFilter,
+        status: statusFilter,
+      });
       const res = await authFetch(`/api/admin/review-queue?${params}`);
       if (!res.ok) throw new Error(`API returned ${res.status}`);
       const data = await res.json();
@@ -118,10 +121,19 @@ export default function AdminVerificationReview() {
 
   return (
     <>
-      <SEO title="Admin — Verification Review" description="Review and manage verification requests." noindex={true} />
+      <SEO
+        title="Admin — Verification Review"
+        description="Review and manage verification requests."
+        noindex={true}
+      />
       <PageLayout>
         <main className="flex-1 pt-24 pb-16 px-4 md:px-6 bg-surface-dim min-h-screen">
-          <motion.div variants={stagger} initial="hidden" animate="visible" className="max-w-6xl mx-auto">
+          <motion.div
+            variants={stagger}
+            initial="hidden"
+            animate="visible"
+            className="max-w-6xl mx-auto"
+          >
             {/* Header */}
             <motion.div variants={fadeUp} className="mb-8">
               <h1 className="font-geist text-2xl md:text-3xl font-bold text-on-surface mb-2">
@@ -138,7 +150,10 @@ export default function AdminVerificationReview() {
                 {TYPE_FILTERS.map((f) => (
                   <button
                     key={f.value}
-                    onClick={() => { setTypeFilter(f.value); setSelectedItem(null); }}
+                    onClick={() => {
+                      setTypeFilter(f.value);
+                      setSelectedItem(null);
+                    }}
                     className={`px-3 py-1.5 rounded-lg text-xs font-inter font-medium transition-colors ${
                       typeFilter === f.value
                         ? "bg-primary text-on-primary"
@@ -153,7 +168,10 @@ export default function AdminVerificationReview() {
                 {STATUS_FILTERS.map((f) => (
                   <button
                     key={f.value}
-                    onClick={() => { setStatusFilter(f.value); setSelectedItem(null); }}
+                    onClick={() => {
+                      setStatusFilter(f.value);
+                      setSelectedItem(null);
+                    }}
                     className={`px-3 py-1.5 rounded-lg text-xs font-inter font-medium transition-colors ${
                       statusFilter === f.value
                         ? "bg-primary text-on-primary"
@@ -170,8 +188,17 @@ export default function AdminVerificationReview() {
               {/* Queue List */}
               <motion.div variants={fadeUp} className="lg:col-span-1 space-y-2">
                 {loading ? (
-                  <div className="flex items-center justify-center py-12" role="status" aria-label="Loading review queue">
-                    <span className="material-symbols-outlined animate-spin text-primary text-2xl" aria-hidden="true">progress_activity</span>
+                  <div
+                    className="flex items-center justify-center py-12"
+                    role="status"
+                    aria-label="Loading review queue"
+                  >
+                    <span
+                      className="material-symbols-outlined animate-spin text-primary text-2xl"
+                      aria-hidden="true"
+                    >
+                      progress_activity
+                    </span>
                   </div>
                 ) : queue.length === 0 ? (
                   <div className="text-center py-12 text-on-surface-variant font-inter text-sm">
@@ -195,78 +222,131 @@ export default function AdminVerificationReview() {
                   <div className="space-y-6">
                     {/* Request Info */}
                     <div className="glass-panel p-5 rounded-2xl border border-white/5">
-                      <h2 className="font-geist text-lg font-semibold mb-3">Creator</h2>
+                      <h2 className="font-geist text-lg font-semibold mb-3">
+                        Creator
+                      </h2>
                       <div className="grid grid-cols-2 gap-3 text-sm font-inter">
                         <div>
-                          <span className="text-on-surface-variant text-xs">Full Name</span>
-                          <p className="text-on-surface font-medium">{selectedItem.full_name || "—"}</p>
-                        </div>
-                        <div>
-                          <span className="text-on-surface-variant text-xs">Email</span>
-                          <p className="text-on-surface font-medium truncate">{selectedItem.email || "—"}</p>
-                        </div>
-                        <div>
-                          <span className="text-on-surface-variant text-xs">Creator ID</span>
-                          <p className="text-on-surface font-medium font-mono text-xs">{selectedItem.user_id || "—"}</p>
-                        </div>
-                        <div>
-                          <span className="text-on-surface-variant text-xs">Verification Type</span>
-                          <p className="text-on-surface font-medium capitalize">{selectedItem.verification_type?.replace(/_/g, " ") || "—"}</p>
-                        </div>
-                        <div>
-                          <span className="text-on-surface-variant text-xs">Submitted</span>
+                          <span className="text-on-surface-variant text-xs">
+                            Full Name
+                          </span>
                           <p className="text-on-surface font-medium">
-                            {selectedItem.submitted_at ? new Date(selectedItem.submitted_at).toLocaleDateString() : "—"}
+                            {selectedItem.full_name || "—"}
                           </p>
                         </div>
                         <div>
-                          <span className="text-on-surface-variant text-xs">Current Status</span>
-                          <p className="text-on-surface font-medium capitalize">{selectedItem.current_status || selectedItem.status || "—"}</p>
+                          <span className="text-on-surface-variant text-xs">
+                            Email
+                          </span>
+                          <p className="text-on-surface font-medium truncate">
+                            {selectedItem.email || "—"}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-on-surface-variant text-xs">
+                            Creator ID
+                          </span>
+                          <p className="text-on-surface font-medium font-mono text-xs">
+                            {selectedItem.user_id || "—"}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-on-surface-variant text-xs">
+                            Verification Type
+                          </span>
+                          <p className="text-on-surface font-medium capitalize">
+                            {selectedItem.verification_type?.replace(
+                              /_/g,
+                              " ",
+                            ) || "—"}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-on-surface-variant text-xs">
+                            Submitted
+                          </span>
+                          <p className="text-on-surface font-medium">
+                            {selectedItem.submitted_at
+                              ? new Date(
+                                  selectedItem.submitted_at,
+                                ).toLocaleDateString()
+                              : "—"}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-on-surface-variant text-xs">
+                            Current Status
+                          </span>
+                          <p className="text-on-surface font-medium capitalize">
+                            {selectedItem.current_status ||
+                              selectedItem.status ||
+                              "—"}
+                          </p>
                         </div>
                       </div>
                     </div>
 
                     {/* Documents */}
                     <div className="glass-panel p-5 rounded-2xl border border-white/5">
-                      <h2 className="font-geist text-lg font-semibold mb-3">Submitted Documents</h2>
+                      <h2 className="font-geist text-lg font-semibold mb-3">
+                        Submitted Documents
+                      </h2>
                       <div className="space-y-2">
                         {(selectedItem.documents || []).map((doc) => (
                           <DocumentPreview key={doc.id} document={doc} />
                         ))}
-                        {(!selectedItem.documents || selectedItem.documents.length === 0) && (
-                          <p className="text-sm text-on-surface-variant font-inter">No documents uploaded</p>
+                        {(!selectedItem.documents ||
+                          selectedItem.documents.length === 0) && (
+                          <p className="text-sm text-on-surface-variant font-inter">
+                            No documents uploaded
+                          </p>
                         )}
                       </div>
                     </div>
 
                     {/* Decision Panel */}
                     <div className="glass-panel p-5 rounded-2xl border border-white/5">
-                      <h2 className="font-geist text-lg font-semibold mb-3">Decision</h2>
+                      <h2 className="font-geist text-lg font-semibold mb-3">
+                        Decision
+                      </h2>
                       {actionError && (
-                        <div className="mb-3 px-4 py-3 rounded-lg bg-danger-muted border border-danger/30 text-danger text-sm font-inter" role="alert">
+                        <div
+                          className="mb-3 px-4 py-3 rounded-lg bg-danger-muted border border-danger/30 text-danger text-sm font-inter"
+                          role="alert"
+                        >
                           {actionError}
                         </div>
                       )}
                       <DecisionPanel
                         onApprove={(notes) => handleDecision("approve", notes)}
-                        onReject={(reason) => handleDecision("reject", null, reason)}
-                        onResubmit={(reason) => handleDecision("resubmit", null, reason)}
-                        onSuspend={(reason) => handleDecision("suspend", null, reason)}
+                        onReject={(reason) =>
+                          handleDecision("reject", null, reason)
+                        }
+                        onResubmit={(reason) =>
+                          handleDecision("resubmit", null, reason)
+                        }
+                        onSuspend={(reason) =>
+                          handleDecision("suspend", null, reason)
+                        }
                         loading={actionLoading}
                       />
                     </div>
 
                     {/* Timeline */}
-                    {(selectedItem.history?.length > 0) && (
+                    {selectedItem.history?.length > 0 && (
                       <div className="glass-panel p-5 rounded-2xl border border-white/5">
-                        <h2 className="font-geist text-lg font-semibold mb-3">Verification History</h2>
+                        <h2 className="font-geist text-lg font-semibold mb-3">
+                          Verification History
+                        </h2>
                         <ReviewTimeline events={selectedItem.history} />
                       </div>
                     )}
 
                     {/* Audit History */}
                     <div className="glass-panel p-5 rounded-2xl border border-white/5">
-                      <h2 className="font-geist text-lg font-semibold mb-3">Admin Audit Trail</h2>
+                      <h2 className="font-geist text-lg font-semibold mb-3">
+                        Admin Audit Trail
+                      </h2>
                       <AuditHistory
                         entries={(selectedItem.audit || []).map((a) => ({
                           id: a.id,
@@ -280,15 +360,22 @@ export default function AdminVerificationReview() {
                   </div>
                 ) : (
                   <div className="glass-panel p-12 rounded-2xl border border-white/5 text-center">
-                    <span className="material-symbols-outlined text-on-surface-variant/30 text-4xl mb-3" aria-hidden="true">fact_check</span>
-                    <p className="text-on-surface-variant font-inter text-sm">Select a request from the queue to review</p>
+                    <span
+                      className="material-symbols-outlined text-on-surface-variant/30 text-4xl mb-3"
+                      aria-hidden="true"
+                    >
+                      fact_check
+                    </span>
+                    <p className="text-on-surface-variant font-inter text-sm">
+                      Select a request from the queue to review
+                    </p>
                   </div>
                 )}
               </motion.div>
             </div>
           </motion.div>
         </main>
-        </PageLayout>
+      </PageLayout>
     </>
   );
 }

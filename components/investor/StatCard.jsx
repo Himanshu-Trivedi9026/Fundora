@@ -24,9 +24,14 @@ export default function StatCard({
           <p className="text-on-surface-variant text-xs font-inter uppercase tracking-wider">
             {label}
           </p>
-          <p className="text-2xl font-bold text-on-surface mt-2 font-geist">{value}</p>
+          <p className="text-2xl font-bold text-on-surface mt-2 font-geist">
+            {value}
+          </p>
         </div>
-        <span className={`material-symbols-outlined text-[28px] ${color}`} aria-hidden="true">
+        <span
+          className={`material-symbols-outlined text-[28px] ${color}`}
+          aria-hidden="true"
+        >
           {icon}
         </span>
       </div>

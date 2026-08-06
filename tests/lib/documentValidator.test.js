@@ -14,72 +14,108 @@ describe("Document Validator", () => {
   describe("validateDocumentExtension", () => {
     // --- Valid extensions ---
     it("accepts .jpg for pan_card", () => {
-      const result = validateDocumentExtension("scan.jpg", DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentExtension(
+        "scan.jpg",
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(true);
       expect(result.extension).toBe("jpg");
     });
 
     it("accepts .jpeg for pan_card", () => {
-      const result = validateDocumentExtension("scan.jpeg", DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentExtension(
+        "scan.jpeg",
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(true);
       expect(result.extension).toBe("jpeg");
     });
 
     it("accepts .png for pan_card", () => {
-      const result = validateDocumentExtension("scan.png", DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentExtension(
+        "scan.png",
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(true);
       expect(result.extension).toBe("png");
     });
 
     it("accepts .webp for pan_card", () => {
-      const result = validateDocumentExtension("scan.webp", DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentExtension(
+        "scan.webp",
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(true);
       expect(result.extension).toBe("webp");
     });
 
     it("accepts .pdf for pan_card", () => {
-      const result = validateDocumentExtension("scan.pdf", DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentExtension(
+        "scan.pdf",
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(true);
       expect(result.extension).toBe("pdf");
     });
 
     it("accepts .pdf for bank_statement", () => {
-      const result = validateDocumentExtension("statement.pdf", DOCUMENT_TYPES.BANK_STATEMENT);
+      const result = validateDocumentExtension(
+        "statement.pdf",
+        DOCUMENT_TYPES.BANK_STATEMENT,
+      );
       expect(result.valid).toBe(true);
       expect(result.extension).toBe("pdf");
     });
 
     // --- Invalid extensions ---
     it("rejects .exe for pan_card", () => {
-      const result = validateDocumentExtension("malware.exe", DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentExtension(
+        "malware.exe",
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(false);
       expect(result.error).toContain("Invalid extension");
     });
 
     it("rejects .js for pan_card", () => {
-      const result = validateDocumentExtension("script.js", DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentExtension(
+        "script.js",
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(false);
     });
 
     it("rejects .pdf for selfie (not in allowed list)", () => {
-      const result = validateDocumentExtension("photo.pdf", DOCUMENT_TYPES.SELFIE);
+      const result = validateDocumentExtension(
+        "photo.pdf",
+        DOCUMENT_TYPES.SELFIE,
+      );
       expect(result.valid).toBe(false);
     });
 
     it("rejects .doc for passport", () => {
-      const result = validateDocumentExtension("passport.doc", DOCUMENT_TYPES.PASSPORT);
+      const result = validateDocumentExtension(
+        "passport.doc",
+        DOCUMENT_TYPES.PASSPORT,
+      );
       expect(result.valid).toBe(false);
     });
 
     // --- Case insensitivity ---
     it("accepts .JPG (uppercase) for pan_card", () => {
-      const result = validateDocumentExtension("scan.JPG", DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentExtension(
+        "scan.JPG",
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(true);
       expect(result.extension).toBe("jpg");
     });
 
     it("accepts .PDF (uppercase) for pan_card", () => {
-      const result = validateDocumentExtension("scan.PDF", DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentExtension(
+        "scan.PDF",
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(true);
       expect(result.extension).toBe("pdf");
     });
@@ -92,7 +128,10 @@ describe("Document Validator", () => {
     });
 
     it("rejects undefined filename", () => {
-      const result = validateDocumentExtension(undefined, DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentExtension(
+        undefined,
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(false);
     });
 
@@ -107,13 +146,19 @@ describe("Document Validator", () => {
     });
 
     it("rejects filename without extension", () => {
-      const result = validateDocumentExtension("noext", DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentExtension(
+        "noext",
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(false);
       expect(result.error).toContain("extension");
     });
 
     it("rejects filename with trailing dot", () => {
-      const result = validateDocumentExtension("file.", DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentExtension(
+        "file.",
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(false);
       expect(result.error).toContain("extension");
     });
@@ -126,7 +171,10 @@ describe("Document Validator", () => {
 
     // --- Multiple dots ---
     it("handles filename with multiple dots", () => {
-      const result = validateDocumentExtension("my.scan.file.jpg", DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentExtension(
+        "my.scan.file.jpg",
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(true);
       expect(result.extension).toBe("jpg");
     });
@@ -135,7 +183,10 @@ describe("Document Validator", () => {
   describe("validateDocumentMime", () => {
     // --- Valid MIME types ---
     it("accepts image/jpeg for pan_card", () => {
-      const result = validateDocumentMime("image/jpeg", DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentMime(
+        "image/jpeg",
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(true);
     });
 
@@ -145,12 +196,18 @@ describe("Document Validator", () => {
     });
 
     it("accepts image/webp for pan_card", () => {
-      const result = validateDocumentMime("image/webp", DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentMime(
+        "image/webp",
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(true);
     });
 
     it("accepts application/pdf for pan_card", () => {
-      const result = validateDocumentMime("application/pdf", DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentMime(
+        "application/pdf",
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(true);
     });
 
@@ -162,12 +219,18 @@ describe("Document Validator", () => {
     });
 
     it("rejects application/msword for passport", () => {
-      const result = validateDocumentMime("application/msword", DOCUMENT_TYPES.PASSPORT);
+      const result = validateDocumentMime(
+        "application/msword",
+        DOCUMENT_TYPES.PASSPORT,
+      );
       expect(result.valid).toBe(false);
     });
 
     it("rejects application/pdf for selfie (not in allowed list)", () => {
-      const result = validateDocumentMime("application/pdf", DOCUMENT_TYPES.SELFIE);
+      const result = validateDocumentMime(
+        "application/pdf",
+        DOCUMENT_TYPES.SELFIE,
+      );
       expect(result.valid).toBe(false);
     });
 
@@ -208,24 +271,36 @@ describe("Document Validator", () => {
     });
 
     it("accepts 5MB file for pan_card", () => {
-      const result = validateDocumentSize(5 * 1024 * 1024, DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentSize(
+        5 * 1024 * 1024,
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(true);
     });
 
     it("accepts exactly 10MB file for pan_card (maxSizeMB is 10)", () => {
-      const result = validateDocumentSize(10 * 1024 * 1024, DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentSize(
+        10 * 1024 * 1024,
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(true);
     });
 
     // --- Oversized ---
     it("rejects 11MB file for pan_card", () => {
-      const result = validateDocumentSize(11 * 1024 * 1024, DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentSize(
+        11 * 1024 * 1024,
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(false);
       expect(result.error).toContain("too large");
     });
 
     it("rejects 50MB file for pan_card", () => {
-      const result = validateDocumentSize(50 * 1024 * 1024, DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentSize(
+        50 * 1024 * 1024,
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(false);
     });
 
@@ -266,7 +341,11 @@ describe("Document Validator", () => {
     });
 
     it("accepts 1920x1080 for pan_card (well above minimum)", () => {
-      const result = validateImageDimensions(1920, 1080, DOCUMENT_TYPES.PAN_CARD);
+      const result = validateImageDimensions(
+        1920,
+        1080,
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(true);
     });
 
@@ -321,7 +400,11 @@ describe("Document Validator", () => {
     });
 
     it("rejects null width", () => {
-      const result = validateImageDimensions(null, 250, DOCUMENT_TYPES.PAN_CARD);
+      const result = validateImageDimensions(
+        null,
+        250,
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(false);
     });
 
@@ -458,7 +541,9 @@ describe("Document Validator", () => {
         existingNames: ["scan.jpg"],
       });
       expect(result.valid).toBe(false);
-      expect(result.errors.some((e) => e.includes("already exists"))).toBe(true);
+      expect(result.errors.some((e) => e.includes("already exists"))).toBe(
+        true,
+      );
     });
 
     it("collects all errors when multiple validations fail", () => {
@@ -522,7 +607,9 @@ describe("Document Validator", () => {
       expect(DOCUMENT_TYPES.PASSPORT).toBe("passport");
       expect(DOCUMENT_TYPES.DRIVING_LICENSE).toBe("driving_license");
       expect(DOCUMENT_TYPES.VOTER_ID).toBe("voter_id");
-      expect(DOCUMENT_TYPES.BUSINESS_REGISTRATION).toBe("business_registration");
+      expect(DOCUMENT_TYPES.BUSINESS_REGISTRATION).toBe(
+        "business_registration",
+      );
       expect(DOCUMENT_TYPES.GST_CERTIFICATE).toBe("gst_certificate");
       expect(DOCUMENT_TYPES.BANK_STATEMENT).toBe("bank_statement");
       expect(DOCUMENT_TYPES.BANK_PASSBOOK).toBe("bank_passbook");
@@ -543,12 +630,18 @@ describe("Document Validator", () => {
     });
 
     it("OTHER has no minImageDimensions", () => {
-      expect(DOCUMENT_REQUIREMENTS[DOCUMENT_TYPES.OTHER].minImageDimensions).toBeNull();
+      expect(
+        DOCUMENT_REQUIREMENTS[DOCUMENT_TYPES.OTHER].minImageDimensions,
+      ).toBeNull();
     });
 
     it("SELFIE does not allow PDF", () => {
-      expect(DOCUMENT_REQUIREMENTS[DOCUMENT_TYPES.SELFIE].allowedExtensions).not.toContain("pdf");
-      expect(DOCUMENT_REQUIREMENTS[DOCUMENT_TYPES.SELFIE].allowedMimeTypes).not.toContain("application/pdf");
+      expect(
+        DOCUMENT_REQUIREMENTS[DOCUMENT_TYPES.SELFIE].allowedExtensions,
+      ).not.toContain("pdf");
+      expect(
+        DOCUMENT_REQUIREMENTS[DOCUMENT_TYPES.SELFIE].allowedMimeTypes,
+      ).not.toContain("application/pdf");
     });
   });
 
@@ -565,41 +658,62 @@ describe("Document Validator", () => {
     });
 
     it("rejects 1 byte over 10MB limit", () => {
-      const result = validateDocumentSize(10 * 1024 * 1024 + 1, DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentSize(
+        10 * 1024 * 1024 + 1,
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(false);
       expect(result.error).toContain("too large");
     });
 
     it("accepts exactly 10MB (at limit)", () => {
-      const result = validateDocumentSize(10 * 1024 * 1024, DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentSize(
+        10 * 1024 * 1024,
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(true);
     });
 
     it("handles filename with 255 characters (max filesystem length)", () => {
       const longName = "a".repeat(251) + ".jpg";
       expect(longName.length).toBe(255);
-      const result = validateDocumentExtension(longName, DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentExtension(
+        longName,
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(true);
       expect(result.extension).toBe("jpg");
     });
 
     it("handles filename with unicode characters", () => {
-      const result = validateDocumentExtension("दस्तावेज़.jpg", DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentExtension(
+        "दस्तावेज़.jpg",
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(true);
     });
 
     it("handles filename with emoji", () => {
-      const result = validateDocumentExtension("📄scan.jpg", DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentExtension(
+        "📄scan.jpg",
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(true);
     });
 
     it("handles filename with special characters", () => {
-      const result = validateDocumentExtension("scan (copy) [1].jpg", DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentExtension(
+        "scan (copy) [1].jpg",
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(true);
     });
 
     it("rejects deeply nested path in filename", () => {
-      const result = validateDocumentExtension("../../etc/passwd.jpg", DOCUMENT_TYPES.PAN_CARD);
+      const result = validateDocumentExtension(
+        "../../etc/passwd.jpg",
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(true); // Extension is valid, path traversal is handled at upload layer
     });
 
@@ -629,7 +743,11 @@ describe("Document Validator", () => {
     });
 
     it("handles Float dimensions", () => {
-      const result = validateImageDimensions(400.5, 250.5, DOCUMENT_TYPES.PAN_CARD);
+      const result = validateImageDimensions(
+        400.5,
+        250.5,
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(result.valid).toBe(true);
     });
 

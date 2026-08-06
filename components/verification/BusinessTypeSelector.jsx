@@ -1,17 +1,72 @@
 import { motion } from "framer-motion";
 
 const BUSINESS_TYPES = [
-  { value: "individual", label: "Individual", icon: "person", description: "Individual creator" },
-  { value: "sole_proprietorship", label: "Sole Proprietorship", icon: "store", description: "Single owner business" },
-  { value: "partnership", label: "Partnership", icon: "group", description: "Partnership firm" },
-  { value: "llp", label: "LLP", icon: "corporate_fare", description: "Limited Liability Partnership" },
-  { value: "private_limited", label: "Private Limited", icon: "apartment", description: "Private Ltd company" },
-  { value: "public_limited", label: "Public Limited", icon: "domain", description: "Public Ltd company" },
-  { value: "ngo", label: "NGO", icon: "volunteer_activism", description: "Non-profit organization" },
-  { value: "trust", label: "Trust", icon: "handshake", description: "Trust organization" },
-  { value: "society", label: "Society", icon: "groups", description: "Registered society" },
-  { value: "startup", label: "Startup", icon: "rocket_launch", description: "DPIIT recognized startup" },
-  { value: "government", label: "Government", icon: "account_balance", description: "Government entity" },
+  {
+    value: "individual",
+    label: "Individual",
+    icon: "person",
+    description: "Individual creator",
+  },
+  {
+    value: "sole_proprietorship",
+    label: "Sole Proprietorship",
+    icon: "store",
+    description: "Single owner business",
+  },
+  {
+    value: "partnership",
+    label: "Partnership",
+    icon: "group",
+    description: "Partnership firm",
+  },
+  {
+    value: "llp",
+    label: "LLP",
+    icon: "corporate_fare",
+    description: "Limited Liability Partnership",
+  },
+  {
+    value: "private_limited",
+    label: "Private Limited",
+    icon: "apartment",
+    description: "Private Ltd company",
+  },
+  {
+    value: "public_limited",
+    label: "Public Limited",
+    icon: "domain",
+    description: "Public Ltd company",
+  },
+  {
+    value: "ngo",
+    label: "NGO",
+    icon: "volunteer_activism",
+    description: "Non-profit organization",
+  },
+  {
+    value: "trust",
+    label: "Trust",
+    icon: "handshake",
+    description: "Trust organization",
+  },
+  {
+    value: "society",
+    label: "Society",
+    icon: "groups",
+    description: "Registered society",
+  },
+  {
+    value: "startup",
+    label: "Startup",
+    icon: "rocket_launch",
+    description: "DPIIT recognized startup",
+  },
+  {
+    value: "government",
+    label: "Government",
+    icon: "account_balance",
+    description: "Government entity",
+  },
 ];
 
 /**
@@ -37,17 +92,23 @@ export default function BusinessTypeSelector({ value, onChange }) {
               : "border-white/5 bg-surface-container-high/30 hover:border-white/10"
           }`}
         >
-          <span className={`material-symbols-outlined text-[18px] ${
-            value === type.value ? "text-primary" : "text-on-surface-variant"
-          }`}>
+          <span
+            className={`material-symbols-outlined text-[18px] ${
+              value === type.value ? "text-primary" : "text-on-surface-variant"
+            }`}
+          >
             {type.icon}
           </span>
-          <p className={`text-xs font-semibold mt-1 ${
-            value === type.value ? "text-primary" : "text-on-surface"
-          }`}>
+          <p
+            className={`text-xs font-semibold mt-1 ${
+              value === type.value ? "text-primary" : "text-on-surface"
+            }`}
+          >
             {type.label}
           </p>
-          <p className="text-[10px] text-on-surface-variant font-inter mt-0.5">{type.description}</p>
+          <p className="text-[10px] text-on-surface-variant font-inter mt-0.5">
+            {type.description}
+          </p>
         </motion.button>
       ))}
     </div>

@@ -45,27 +45,21 @@ vi.mock("@supabase/supabase-js", () => ({
 let VerificationBadge, TrustScoreCard, RiskIndicator;
 
 try {
-  const badge = await import(
-    "../../components/security/VerificationBadge"
-  );
+  const badge = await import("../../components/security/VerificationBadge");
   VerificationBadge = badge.default || badge.VerificationBadge;
 } catch {
   VerificationBadge = null;
 }
 
 try {
-  const trust = await import(
-    "../../components/security/TrustScoreCard"
-  );
+  const trust = await import("../../components/security/TrustScoreCard");
   TrustScoreCard = trust.default || trust.TrustScoreCard;
 } catch {
   TrustScoreCard = null;
 }
 
 try {
-  const risk = await import(
-    "../../components/security/RiskIndicator"
-  );
+  const risk = await import("../../components/security/RiskIndicator");
   RiskIndicator = risk.default || risk.RiskIndicator;
 } catch {
   RiskIndicator = null;
@@ -75,35 +69,29 @@ describe("Verification Accessibility (a11y)", () => {
   if (VerificationBadge) {
     describe("VerificationBadge", () => {
       it("renders without axe violations", async () => {
-        const { container } = render(
-          <VerificationBadge verified={true} />
-        );
+        const { container } = render(<VerificationBadge verified={true} />);
         const results = await axe(container);
         expect(results).toHaveNoViolations();
       });
 
       it("renders unverified state without axe violations", async () => {
-        const { container } = render(
-          <VerificationBadge verified={false} />
-        );
+        const { container } = render(<VerificationBadge verified={false} />);
         const results = await axe(container);
         expect(results).toHaveNoViolations();
       });
 
       it("has accessible text for screen readers", () => {
         const { getByRole } = render(
-          <VerificationBadge level={1} status="approved" />
+          <VerificationBadge level={1} status="approved" />,
         );
         const badge = getByRole("status");
         expect(badge).toBeDefined();
       });
 
       it("interactive elements have proper ARIA attributes", () => {
-        const { container } = render(
-          <VerificationBadge verified={true} />
-        );
+        const { container } = render(<VerificationBadge verified={true} />);
         const interactiveElements = container.querySelectorAll(
-          "button, a, [role='button']"
+          "button, a, [role='button']",
         );
         interactiveElements.forEach((el) => {
           const hasAccessibleName =
@@ -120,7 +108,7 @@ describe("Verification Accessibility (a11y)", () => {
     describe("TrustScoreCard", () => {
       it("renders without axe violations", async () => {
         const { container } = render(
-          <TrustScoreCard score={85} userId="user-1" />
+          <TrustScoreCard score={85} userId="user-1" />,
         );
         const results = await axe(container);
         expect(results).toHaveNoViolations();
@@ -128,7 +116,7 @@ describe("Verification Accessibility (a11y)", () => {
 
       it("renders low score without axe violations", async () => {
         const { container } = render(
-          <TrustScoreCard score={20} userId="user-1" />
+          <TrustScoreCard score={20} userId="user-1" />,
         );
         const results = await axe(container);
         expect(results).toHaveNoViolations();
@@ -136,7 +124,7 @@ describe("Verification Accessibility (a11y)", () => {
 
       it("score is accessible to screen readers", () => {
         const { getByText } = render(
-          <TrustScoreCard score={75} userId="user-1" />
+          <TrustScoreCard score={75} userId="user-1" />,
         );
         const scoreElement = getByText(/75/);
         expect(scoreElement).toBeDefined();
@@ -144,7 +132,7 @@ describe("Verification Accessibility (a11y)", () => {
 
       it("has no color contrast issues", async () => {
         const { container } = render(
-          <TrustScoreCard score={60} userId="user-1" />
+          <TrustScoreCard score={60} userId="user-1" />,
         );
         const results = await axe(container, {
           rules: {
@@ -159,9 +147,7 @@ describe("Verification Accessibility (a11y)", () => {
   if (RiskIndicator) {
     describe("RiskIndicator", () => {
       it("renders without axe violations", async () => {
-        const { container } = render(
-          <RiskIndicator level="low" />
-        );
+        const { container } = render(<RiskIndicator level="low" />);
         const results = await axe(container);
         expect(results).toHaveNoViolations();
       });
@@ -170,7 +156,7 @@ describe("Verification Accessibility (a11y)", () => {
         const levels = ["low", "medium", "high"];
         for (const level of levels) {
           const { container, unmount } = render(
-            <RiskIndicator level={level} />
+            <RiskIndicator level={level} />,
           );
           const results = await axe(container);
           expect(results).toHaveNoViolations();
@@ -179,9 +165,7 @@ describe("Verification Accessibility (a11y)", () => {
       });
 
       it("risk level is communicated via text, not just color", () => {
-        const { getByText } = render(
-          <RiskIndicator score={80} />
-        );
+        const { getByText } = render(<RiskIndicator score={80} />);
         const indicator = getByText(/high risk/i);
         expect(indicator).toBeDefined();
       });
@@ -207,13 +191,10 @@ describe("Verification Accessibility (a11y)", () => {
             >
               <span>85%</span>
             </div>
-            <div
-              role="status"
-              aria-label="Risk level: Low"
-            >
+            <div role="status" aria-label="Risk level: Low">
               Low Risk
             </div>
-          </div>
+          </div>,
         );
         const results = await axe(container);
         expect(results).toHaveNoViolations();
@@ -222,16 +203,10 @@ describe("Verification Accessibility (a11y)", () => {
       it("interactive verification elements have ARIA attributes", async () => {
         const { container } = render(
           <div>
-            <button
-              aria-label="Verify user identity"
-              type="button"
-            >
+            <button aria-label="Verify user identity" type="button">
               Verify
             </button>
-            <button
-              aria-label="Revoke verification"
-              type="button"
-            >
+            <button aria-label="Revoke verification" type="button">
               Revoke
             </button>
             <a href="/verify" aria-describedby="verify-help">
@@ -240,7 +215,7 @@ describe("Verification Accessibility (a11y)", () => {
             <span id="verify-help" className="sr-only">
               Information about the verification process
             </span>
-          </div>
+          </div>,
         );
         const results = await axe(container);
         expect(results).toHaveNoViolations();
@@ -276,7 +251,7 @@ describe("Verification Accessibility (a11y)", () => {
             >
               Unverified
             </div>
-          </div>
+          </div>,
         );
         const results = await axe(container, {
           rules: {
@@ -289,9 +264,7 @@ describe("Verification Accessibility (a11y)", () => {
       it("form elements for verification have proper labels", async () => {
         const { container } = render(
           <form aria-label="Identity verification">
-            <label htmlFor="id-upload">
-              Upload government ID
-            </label>
+            <label htmlFor="id-upload">Upload government ID</label>
             <input
               id="id-upload"
               type="file"
@@ -299,9 +272,7 @@ describe("Verification Accessibility (a11y)", () => {
               aria-required="true"
             />
 
-            <label htmlFor="selfie-upload">
-              Upload a selfie
-            </label>
+            <label htmlFor="selfie-upload">Upload a selfie</label>
             <input
               id="selfie-upload"
               type="file"
@@ -312,7 +283,7 @@ describe("Verification Accessibility (a11y)", () => {
             <button type="submit" aria-label="Submit verification documents">
               Submit
             </button>
-          </form>
+          </form>,
         );
         const results = await axe(container);
         expect(results).toHaveNoViolations();

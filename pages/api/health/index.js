@@ -1,7 +1,10 @@
 // API — Health check endpoint
 // Used by Docker HEALTHCHECK, K8s liveness/readiness/startup probes, and load balancers
 
-import { checkDatabaseHealth, getPoolStats } from "../../../lib/performance/index.js";
+import {
+  checkDatabaseHealth,
+  getPoolStats,
+} from "../../../lib/performance/index.js";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -21,7 +24,9 @@ export default async function handler(req, res) {
       version: process.env.NEXT_PUBLIC_APP_VERSION || "1.0.0",
       environment: process.env.NODE_ENV || "development",
       checks: {
-        database: dbHealth.success ? { status: "ok", responseTime: dbHealth.data.responseTime } : { status: "error" },
+        database: dbHealth.success
+          ? { status: "ok", responseTime: dbHealth.data.responseTime }
+          : { status: "error" },
         memory: {
           status: "ok",
           usage: process.memoryUsage(),

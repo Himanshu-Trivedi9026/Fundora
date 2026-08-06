@@ -25,15 +25,27 @@ export default withAuth(async function handler(req, res, user) {
 
       if (action === "withdraw") {
         const { appealId } = params;
-        if (!appealId) return res.status(400).json({ error: "appealId is required" });
+        if (!appealId)
+          return res.status(400).json({ error: "appealId is required" });
         const result = await withdrawAppeal(appealId, user.id);
-        if (!result.success) return res.status(400).json({ error: result.error });
+        if (!result.success)
+          return res.status(400).json({ error: result.error });
         return res.status(200).json({ success: true, data: result.data });
       }
 
-      const { appealType, originalAction, originalActionId, originalActionType, reason, evidenceUrls, metadata } = req.body;
+      const {
+        appealType,
+        originalAction,
+        originalActionId,
+        originalActionType,
+        reason,
+        evidenceUrls,
+        metadata,
+      } = req.body;
       if (!appealType || !originalAction || !reason) {
-        return res.status(400).json({ error: "appealType, originalAction, and reason are required" });
+        return res.status(400).json({
+          error: "appealType, originalAction, and reason are required",
+        });
       }
 
       const result = await createAppeal({
@@ -65,7 +77,10 @@ export default withAuth(async function handler(req, res, user) {
         limit: parseInt(limit, 10) || 50,
         offset: parseInt(offset, 10) || 0,
       });
-      return res.status(200).json({ success: true, ...(result.success ? result.data : { appeals: [], total: 0 }) });
+      return res.status(200).json({
+        success: true,
+        ...(result.success ? result.data : { appeals: [], total: 0 }),
+      });
     } catch (err) {
       logError("AppealsAPI", "GET error", { error: err.message });
       return res.status(500).json({ error: "Failed to fetch appeals" });

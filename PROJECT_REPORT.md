@@ -33,6 +33,7 @@
 **Fundora** is a full-stack AI-powered crowdfunding platform where creators launch projects and backers fund them with real money via Razorpay. The platform features AI-driven campaign generation, intelligent project scoring, real-time funding updates, direct messaging, and a comprehensive creator analytics dashboard.
 
 ### Key Differentiators
+
 - **Per-Creator Razorpay**: Each creator has their own payment gateway — funds go directly to them
 - **AI Campaign Generator**: GPT-4o-mini writes campaign descriptions automatically
 - **AI Chat Agent**: Llama 3-powered assistant for platform navigation and recommendations
@@ -44,22 +45,22 @@
 
 ## 2. Tech Stack
 
-| Layer | Technology | Purpose |
-|-------|-----------|---------|
-| **Framework** | Next.js 16.2.11 (Pages Router, Turbopack) | SSR/CSR routing, API routes, middleware |
-| **UI Library** | React 19 | Component rendering |
-| **Styling** | Tailwind CSS v4 + custom `@theme` tokens | Design system, glassmorphism effects |
-| **Animations** | Framer Motion | Page transitions, scroll reveals, hover effects |
-| **Icons** | Material Symbols Outlined (Google Fonts) | 3000+ icon set |
-| **Database** | Supabase (PostgreSQL) | Data storage, auth, realtime |
-| **Auth** | Supabase Auth (Email/Password) | User authentication |
-| **Storage** | Supabase Storage | File uploads (images, videos, documents) |
-| **Payments** | Razorpay (per-creator integration) | Payment processing |
-| **AI (Chat)** | OpenRouter → Meta Llama 3 8B | AI assistant chat |
-| **AI (Content)** | OpenAI GPT-4o-mini | Campaign description generation |
-| **PDF Generation** | jsPDF (client) + pdfkit (server) | Receipts and analytics exports |
-| **Charts** | Recharts | Analytics visualizations |
-| **Testing** | Vitest + Testing Library | Unit and integration tests |
+| Layer              | Technology                                | Purpose                                         |
+| ------------------ | ----------------------------------------- | ----------------------------------------------- |
+| **Framework**      | Next.js 16.2.11 (Pages Router, Turbopack) | SSR/CSR routing, API routes, middleware         |
+| **UI Library**     | React 19                                  | Component rendering                             |
+| **Styling**        | Tailwind CSS v4 + custom `@theme` tokens  | Design system, glassmorphism effects            |
+| **Animations**     | Framer Motion                             | Page transitions, scroll reveals, hover effects |
+| **Icons**          | Material Symbols Outlined (Google Fonts)  | 3000+ icon set                                  |
+| **Database**       | Supabase (PostgreSQL)                     | Data storage, auth, realtime                    |
+| **Auth**           | Supabase Auth (Email/Password)            | User authentication                             |
+| **Storage**        | Supabase Storage                          | File uploads (images, videos, documents)        |
+| **Payments**       | Razorpay (per-creator integration)        | Payment processing                              |
+| **AI (Chat)**      | OpenRouter → Meta Llama 3 8B              | AI assistant chat                               |
+| **AI (Content)**   | OpenAI GPT-4o-mini                        | Campaign description generation                 |
+| **PDF Generation** | jsPDF (client) + pdfkit (server)          | Receipts and analytics exports                  |
+| **Charts**         | Recharts                                  | Analytics visualizations                        |
+| **Testing**        | Vitest + Testing Library                  | Unit and integration tests                      |
 
 ---
 
@@ -225,15 +226,16 @@ Fundora/
 ```
 
 **File counts:**
-| Directory | Files |
-|-----------|-------|
-| `components/` | 72 |
-| `pages/` | 35 (including 10 API routes) |
-| `lib/` | 12 |
-| `context/` | 1 |
-| `tests/` | 19 |
-| `styles/` | 2 |
-| **Total source files** | **~141** |
+
+| Directory              | Files                        |
+| ---------------------- | ---------------------------- |
+| `components/`          | 72                           |
+| `pages/`               | 35 (including 10 API routes) |
+| `lib/`                 | 12                           |
+| `context/`             | 1                            |
+| `tests/`               | 19                           |
+| `styles/`              | 2                            |
+| **Total source files** | **~141**                     |
 
 ---
 
@@ -263,105 +265,115 @@ auth.users (Supabase managed)
 ### Table Details
 
 #### `profiles`
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | uuid (PK) | Maps to `auth.users.id` |
-| `full_name` | text | Display name |
-| `bio` | text | User biography |
-| `website` | text | Personal website |
-| `avatar_url` | text | Profile picture URL |
-| `banner_url` | text | Profile banner URL |
-| `twitter` | text | Twitter handle |
-| `linkedin` | text | LinkedIn URL |
-| `github` | text | GitHub username |
-| `instagram` | text | Instagram handle |
-| `youtube` | text | YouTube channel |
+
+| Column       | Type      | Description             |
+| ------------ | --------- | ----------------------- |
+| `id`         | uuid (PK) | Maps to `auth.users.id` |
+| `full_name`  | text      | Display name            |
+| `bio`        | text      | User biography          |
+| `website`    | text      | Personal website        |
+| `avatar_url` | text      | Profile picture URL     |
+| `banner_url` | text      | Profile banner URL      |
+| `twitter`    | text      | Twitter handle          |
+| `linkedin`   | text      | LinkedIn URL            |
+| `github`     | text      | GitHub username         |
+| `instagram`  | text      | Instagram handle        |
+| `youtube`    | text      | YouTube channel         |
 
 #### `projects`
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | uuid (PK) | Auto-generated |
-| `title` | text | Project title |
-| `short` | text | Short description (tagline) |
-| `description` | text | Full campaign description |
-| `goal` | numeric | Funding goal in INR |
-| `pledged` | numeric | Total amount pledged (default 0) |
-| `deadline` | timestamptz | Campaign end date |
-| `thumbnail` | text | Thumbnail image URL |
-| `prototypeUrl` | text | Link to prototype/demo |
-| `owner_id` | uuid (FK) | Creator's user ID |
-| `categories` | text[] | Array of category tags |
-| `created_at` | timestamptz | Creation timestamp |
+
+| Column         | Type        | Description                      |
+| -------------- | ----------- | -------------------------------- |
+| `id`           | uuid (PK)   | Auto-generated                   |
+| `title`        | text        | Project title                    |
+| `short`        | text        | Short description (tagline)      |
+| `description`  | text        | Full campaign description        |
+| `goal`         | numeric     | Funding goal in INR              |
+| `pledged`      | numeric     | Total amount pledged (default 0) |
+| `deadline`     | timestamptz | Campaign end date                |
+| `thumbnail`    | text        | Thumbnail image URL              |
+| `prototypeUrl` | text        | Link to prototype/demo           |
+| `owner_id`     | uuid (FK)   | Creator's user ID                |
+| `categories`   | text[]      | Array of category tags           |
+| `created_at`   | timestamptz | Creation timestamp               |
 
 #### `public_donations`
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | uuid (PK) | Auto-generated |
-| `project_id` | uuid (FK) | Funded project |
-| `amount` | numeric | Donation amount in INR |
-| `payer_id` | uuid (FK) | Backer's user ID |
-| `payer_email` | text | Backer email (nullable) |
-| `status` | text | "paid" or "success" |
-| `razorpay_payment_id` | text | Razorpay payment ID |
-| `razorpay_order_id` | text | Razorpay order ID |
-| `created_at` | timestamptz | Donation timestamp |
+
+| Column                | Type        | Description             |
+| --------------------- | ----------- | ----------------------- |
+| `id`                  | uuid (PK)   | Auto-generated          |
+| `project_id`          | uuid (FK)   | Funded project          |
+| `amount`              | numeric     | Donation amount in INR  |
+| `payer_id`            | uuid (FK)   | Backer's user ID        |
+| `payer_email`         | text        | Backer email (nullable) |
+| `status`              | text        | "paid" or "success"     |
+| `razorpay_payment_id` | text        | Razorpay payment ID     |
+| `razorpay_order_id`   | text        | Razorpay order ID       |
+| `created_at`          | timestamptz | Donation timestamp      |
 
 #### `media`
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | uuid (PK) | Auto-generated |
-| `project_id` | uuid (FK) | Parent project |
-| `url` | text | File URL |
-| `type` | text | "image", "video", or "document" |
-| `name` | text | Original filename |
-| `created_at` | timestamptz | Upload timestamp |
+
+| Column       | Type        | Description                     |
+| ------------ | ----------- | ------------------------------- |
+| `id`         | uuid (PK)   | Auto-generated                  |
+| `project_id` | uuid (FK)   | Parent project                  |
+| `url`        | text        | File URL                        |
+| `type`       | text        | "image", "video", or "document" |
+| `name`       | text        | Original filename               |
+| `created_at` | timestamptz | Upload timestamp                |
 
 #### `team_members`
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | uuid (PK) | Auto-generated |
+
+| Column       | Type      | Description    |
+| ------------ | --------- | -------------- |
+| `id`         | uuid (PK) | Auto-generated |
 | `project_id` | uuid (FK) | Parent project |
-| `name` | text | Member name |
-| `role` | text | Member role |
-| `email` | text | Contact email |
-| `creator_id` | uuid (FK) | Project owner |
+| `name`       | text      | Member name    |
+| `role`       | text      | Member role    |
+| `email`      | text      | Contact email  |
+| `creator_id` | uuid (FK) | Project owner  |
 
 #### `followers`
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | uuid (PK) | Auto-generated |
-| `follower_id` | uuid (FK) | User who follows |
+
+| Column         | Type      | Description         |
+| -------------- | --------- | ------------------- |
+| `id`           | uuid (PK) | Auto-generated      |
+| `follower_id`  | uuid (FK) | User who follows    |
 | `following_id` | uuid (FK) | User being followed |
 
 #### `creator_payment_configs`
-| Column | Type | Description |
-|--------|------|-------------|
-| `creator_user_id` | uuid (PK, FK) | Creator's user ID (CASCADE) |
-| `razorpay_key_id` | text | Razorpay API key |
-| `razorpay_key_secret` | text | Razorpay API secret |
-| `created_at` | timestamptz | Creation timestamp |
-| `updated_at` | timestamptz | Last update timestamp |
+
+| Column                | Type          | Description                 |
+| --------------------- | ------------- | --------------------------- |
+| `creator_user_id`     | uuid (PK, FK) | Creator's user ID (CASCADE) |
+| `razorpay_key_id`     | text          | Razorpay API key            |
+| `razorpay_key_secret` | text          | Razorpay API secret         |
+| `created_at`          | timestamptz   | Creation timestamp          |
+| `updated_at`          | timestamptz   | Last update timestamp       |
 
 #### `dm_conversations`
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | uuid (PK) | Auto-generated |
-| `user1` | uuid (FK) | First user (sorted) |
-| `user2` | uuid (FK) | Second user (sorted) |
-| `created_at` | timestamptz | Creation timestamp |
+
+| Column       | Type        | Description          |
+| ------------ | ----------- | -------------------- |
+| `id`         | uuid (PK)   | Auto-generated       |
+| `user1`      | uuid (FK)   | First user (sorted)  |
+| `user2`      | uuid (FK)   | Second user (sorted) |
+| `created_at` | timestamptz | Creation timestamp   |
 
 #### `dm_messages`
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | uuid (PK) | Auto-generated |
-| `conversation_id` | uuid (FK) | Parent conversation |
-| `sender_id` | uuid (FK) | Message author |
-| `content` | text | Message text |
-| `attachment_url` | text | File attachment URL |
-| `attachment_type` | text | "image", "video", or "file" |
-| `created_at` | timestamptz | Send timestamp |
+
+| Column            | Type        | Description                 |
+| ----------------- | ----------- | --------------------------- |
+| `id`              | uuid (PK)   | Auto-generated              |
+| `conversation_id` | uuid (FK)   | Parent conversation         |
+| `sender_id`       | uuid (FK)   | Message author              |
+| `content`         | text        | Message text                |
+| `attachment_url`  | text        | File attachment URL         |
+| `attachment_type` | text        | "image", "video", or "file" |
+| `created_at`      | timestamptz | Send timestamp              |
 
 #### Other Tables
+
 - **`typing_status`**: `conversation_id`, `user_id`, `is_typing` — typing indicators
 - **`project_messages`**: `project_id`, `sender_id`, `sender_name`, `content`, `attachment_url` — project chat
 - **`blocked_users`**: `blocker_id`, `blocked_id` — DM blocking
@@ -382,21 +394,26 @@ auth.users (Supabase managed)
 ```
 
 ### Signup (`pages/signup.js`)
+
 - `supabase.auth.signUp({ email, password, options: { data: { full_name } } })`
 - Sends verification email; user must verify before login
 - Password: min 8 characters with special symbol
 
 ### Login (`pages/login.js`)
+
 - `supabase.auth.signInWithPassword({ email, password })`
 - On success: redirect to `/` via `window.location.href`
 
 ### Session Management
+
 - **Client**: `@supabase/ssr` `createBrowserClient` — sessions stored in **cookies** (not localStorage)
 - **Server**: `@supabase/ssr` `createServerClient` — reads cookies for middleware
 - **API routes**: Bearer token from `Authorization` header, validated via `supabaseAdmin.auth.getUser(token)`
 
 ### Middleware Protection (`middleware.js`)
+
 Protected routes (redirect to `/login?redirect=...` if unauthenticated):
+
 ```
 /create, /payments, /saved, /followers, /dm,
 /edit-profile, /edit, /creator/analytics,
@@ -405,12 +422,15 @@ Protected routes (redirect to `/login?redirect=...` if unauthenticated):
 ```
 
 ### Ownership Verification
+
 - **Client-side**: `user.id === project.owner_id` check in edit pages
 - **Server-side**: `withAuth` HOC validates Bearer token, attaches `req.user`
 - **Database**: RLS policies on `creator_payment_configs` (creator-only access)
 
 ### Role Model
+
 No formal roles. Implicit roles:
+
 - **Creator**: Anyone who creates a project (`owner_id` = their user ID)
 - **Backer**: Anyone who donates (`payer_id` stored in `public_donations`)
 - **Admin**: None (no admin panel)
@@ -420,21 +440,24 @@ No formal roles. Implicit roles:
 ## 6. Current Features
 
 ### Landing Page
-| Feature | Description |
-|---------|-------------|
-| Hero Section | Typing animation "Where AI Meets Venture", gradient title, 2 CTAs |
-| Stats Bar | Real-time platform stats (total raised, projects, backers, team) — fetched from Supabase |
-| Trending Projects | Top 3 projects by pledged amount — real Supabase data |
-| Intelligent Ecosystem | Bento grid: AI Due Diligence, Secure Escrow, Syndicate Power, Growth Intelligence |
-| Final CTA | "Ready to fund the next giant?" with signup button |
+
+| Feature               | Description                                                                              |
+| --------------------- | ---------------------------------------------------------------------------------------- |
+| Hero Section          | Typing animation "Where AI Meets Venture", gradient title, 2 CTAs                        |
+| Stats Bar             | Real-time platform stats (total raised, projects, backers, team) — fetched from Supabase |
+| Trending Projects     | Top 3 projects by pledged amount — real Supabase data                                    |
+| Intelligent Ecosystem | Bento grid: AI Due Diligence, Secure Escrow, Syndicate Power, Growth Intelligence        |
+| Final CTA             | "Ready to fund the next giant?" with signup button                                       |
 
 ### Explore Page
+
 - Grid of all projects with filters (category, sort, search)
 - Real-time project updates via Supabase subscription
 - Skeleton loading states
 - Category filtering with shared constant (`lib/categories.js`)
 
 ### Project Detail Page
+
 - Hero banner with title, category badge, description
 - Funding sidebar (sticky): pledged amount, progress bar, backers, views, fund button
 - Intelligence Insight: Growth Catalyst + Performance AI scores
@@ -446,6 +469,7 @@ No formal roles. Implicit roles:
 - Project Chat: Real-time group chat for project discussions
 
 ### Create Project (4-Step Wizard)
+
 1. **Project Details**: Title (min 3 chars), tagline (min 10 chars), multi-category selector
 2. **AI Generator**: GPT-4o-mini generates campaign description; accept or regenerate
 3. **Media**: Thumbnail upload (required, <10MB) + multiple media files
@@ -454,6 +478,7 @@ No formal roles. Implicit roles:
 Draft system saves/restores to localStorage.
 
 ### Creator Profile
+
 - Public profile with banner, avatar, bio, achievements
 - Project list tab
 - Stats grid (total raised, project count, followers)
@@ -462,6 +487,7 @@ Draft system saves/restores to localStorage.
 - Achievement badges (auto-generated from milestones)
 
 ### Creator Analytics Dashboard
+
 - KPI Cards: Total Earnings, Unique Donors, Retention Rate, Active Projects
 - AI Insights: Auto-generated analysis via AI agent
 - AI Action Buttons: Improve Campaign, Promotion Tips, Optimize Goal
@@ -489,6 +515,7 @@ Draft system saves/restores to localStorage.
 ```
 
 ### Step 1: Create Project (`/create`)
+
 - 4-step wizard with animated transitions
 - Step 1: Title, tagline, categories (multi-select)
 - Step 2: AI generates campaign description (OpenAI GPT-4o-mini)
@@ -497,16 +524,19 @@ Draft system saves/restores to localStorage.
 - Draft auto-saved to localStorage
 
 ### Step 2: Configure Payments (`/creator/payments`)
+
 - Enter Razorpay Key ID and Key Secret
 - Stored in `creator_payment_configs` table
 - Falls back to global env vars if not configured
 
 ### Step 3: Manage Projects (`/edit/[id]`)
+
 - Edit title, descriptions, goal, deadline, categories
 - Manage media (view, delete, upload new)
 - Manage team members (add, remove)
 
 ### Step 4: Track Performance (`/creator/analytics`)
+
 - Real-time donation tracking
 - AI-powered insights and recommendations
 - Growth score calculation
@@ -514,14 +544,15 @@ Draft system saves/restores to localStorage.
 - Revenue forecasting
 
 ### Creator Pages
-| Page | Route | Purpose |
-|------|-------|---------|
-| Public Profile | `/creator/[id]` | Public view with projects, stats, achievements |
-| Analytics | `/creator/analytics` | Growth dashboard with AI insights |
-| Payments Config | `/creator/payments` | Razorpay setup |
-| Funds Received | `/creator/funds-got` | List of all donations received |
-| Edit Profile | `/creator/edit` | Legacy profile editor |
-| Profile Form | `/creator/profile` | Legacy creator profile |
+
+| Page            | Route                | Purpose                                        |
+| --------------- | -------------------- | ---------------------------------------------- |
+| Public Profile  | `/creator/[id]`      | Public view with projects, stats, achievements |
+| Analytics       | `/creator/analytics` | Growth dashboard with AI insights              |
+| Payments Config | `/creator/payments`  | Razorpay setup                                 |
+| Funds Received  | `/creator/funds-got` | List of all donations received                 |
+| Edit Profile    | `/creator/edit`      | Legacy profile editor                          |
+| Profile Form    | `/creator/profile`   | Legacy creator profile                         |
 
 ---
 
@@ -541,41 +572,47 @@ Draft system saves/restores to localStorage.
 ```
 
 ### Step 1: Discover Projects (`/explore`)
+
 - Browse all projects with filters and search
 - Sort by trending, newest, most funded
 - Real-time project updates
 
 ### Step 2: View Project (`/projects/[id]`)
+
 - Full project detail with AI intelligence scores
 - Read project story, view gallery, check roadmap
 - See team members
 - View similar projects
 
 ### Step 3: Fund Project (`/projects/[id]/fund`)
+
 - Select reward tier (₹100 / ₹500 / ₹1000) or custom amount
 - Payment via Razorpay Checkout modal
 - Real-time funding progress updates
 
 ### Step 4: Post-Payment
+
 - Auto-generated PDF receipt (jsPDF)
 - Receipt downloadable from payment history
 - Donation recorded in `public_donations`
 
 ### Backer Features
-| Feature | Description |
-|---------|-------------|
-| Watchlist | Save projects to localStorage watchlist |
-| Share | Share project link (native share or clipboard) |
-| Payment History | View all donations at `/payments` |
-| Receipt Download | PDF receipt for each donation |
-| Follow Creators | Follow/unfollow from creator profiles |
-| DM Creators | Direct message creators |
+
+| Feature          | Description                                    |
+| ---------------- | ---------------------------------------------- |
+| Watchlist        | Save projects to localStorage watchlist        |
+| Share            | Share project link (native share or clipboard) |
+| Payment History  | View all donations at `/payments`              |
+| Receipt Download | PDF receipt for each donation                  |
+| Follow Creators  | Follow/unfollow from creator profiles          |
+| DM Creators      | Direct message creators                        |
 
 ---
 
 ## 9. Payment Flow (Razorpay)
 
 ### Architecture: Per-Creator Integration
+
 Each creator configures their own Razorpay API keys. Payments go directly to the creator's Razorpay account, not a platform account.
 
 ### End-to-End Flow
@@ -614,6 +651,7 @@ Each creator configures their own Razorpay API keys. Payments go directly to the
 ```
 
 ### Security Measures
+
 - HMAC-SHA256 signature verification with `crypto.timingSafeEqual`
 - Raw body parsing for webhook (bodyParser disabled)
 - Idempotent donation recording (verify + webhook paths)
@@ -624,6 +662,7 @@ Each creator configures their own Razorpay API keys. Payments go directly to the
 ## 10. AI Features
 
 ### 1. AI Campaign Generator (`/api/ai/generate-campaign`)
+
 - **Provider**: OpenAI GPT-4o-mini
 - **Input**: Project title, category, funding goal
 - **Output**: 150-300 word professional campaign description
@@ -631,6 +670,7 @@ Each creator configures their own Razorpay API keys. Payments go directly to the
 - **Used in**: Step 2 of create wizard
 
 ### 2. AI Chat Agent (`/api/ai/agent`)
+
 - **Provider**: OpenRouter → Meta Llama 3 8B Instruct
 - **Input**: User message + optional chat history
 - **Context**: Fetches top 5 projects, computes freshness/momentum scores
@@ -639,6 +679,7 @@ Each creator configures their own Razorpay API keys. Payments go directly to the
 - **Used in**: Floating AI Chat widget + Analytics page
 
 ### 3. AI Funding Recommendation (`/api/ai/funding-recommendation`)
+
 - **Provider**: Pure algorithmic (no external API)
 - **Input**: Creator ID
 - **Scoring**: `0.4 × marketDemand + 0.3 × creatorSuccess + 0.2 × donorScore + 0.1 × engagement`
@@ -646,18 +687,22 @@ Each creator configures their own Razorpay API keys. Payments go directly to the
 - **Rate Limit**: 10 requests/minute
 
 ### 4. Intelligence Insight (Client-Side)
+
 - **Growth Catalyst Score** (0-100): Funding progress, goal size, category, deadline
 - **Performance Score** (0-100): Media count, team count, description length, prototype
 - **Derived Metrics**: Technical Feasibility, ROI, Market Alpha, Energy Optimization, Latency, Efficiency Tier
 - Displayed on every project detail page
 
 ### 5. Creator Analytics AI Actions
+
 Three AI-powered action buttons on the analytics dashboard:
+
 - **Improve Campaign**: Analyzes weaknesses, missing elements, priority actions
 - **Promotion Tips**: Platform strategy, content strategy, viral growth ideas
 - **Optimize Goal**: Recommended goal, reasoning, risk level, strategy
 
 ### 6. Donor Churn Prediction
+
 - Recency score (days since last donation × 1.5)
 - Frequency score (donation count based)
 - Trend score (average donation amount)
@@ -665,6 +710,7 @@ Three AI-powered action buttons on the analytics dashboard:
 - Status labels: Loyal / At Risk / High Risk
 
 ### 7. Revenue Forecast
+
 - 6-month forward prediction based on month-over-month growth rate
 - Calculates momentum from last two months and extrapolates
 
@@ -673,12 +719,14 @@ Three AI-powered action buttons on the analytics dashboard:
 ## 11. Social Features
 
 ### Follow/Unfollow
+
 - **Context**: `FollowContext.js` — global state tracking `followingIds`
 - **API**: Supabase `followers` table (insert/delete)
 - **UI**: Follow/Unfollow buttons on creator profiles
 - **Connections Page**: `/followers` — tabbed view (Followers / Following) with search
 
 ### Direct Messages
+
 - **Inbox**: `/dm` — lists conversations with last message + timestamp
 - **Chat**: `/dm/[userId]` — full chat interface with:
   - Real-time messages via Supabase Realtime
@@ -689,17 +737,20 @@ Three AI-powered action buttons on the analytics dashboard:
   - AI/Human toggle in chat header
 
 ### Saved Projects / Watchlist
+
 - **Storage**: localStorage (not Supabase)
 - **Functions**: `isSaved()`, `toggleSave()`, `getSaved()`
 - **UI**: Bookmark icon on project detail page
 - **Page**: `/saved` — grid of saved projects
 
 ### Team Members
+
 - **Management**: Add/remove during project creation or edit
 - **Display**: Avatar cards with name, role, email on project detail page
 - **Storage**: `team_members` table
 
 ### Project Chat
+
 - Real-time group chat for each project
 - File/image attachments (chat_attachments bucket)
 - Unread message indicators
@@ -709,26 +760,31 @@ Three AI-powered action buttons on the analytics dashboard:
 
 ## 12. API Endpoints
 
-| # | Route | Method | Auth | Rate Limit | Purpose |
-|---|-------|--------|------|------------|---------|
-| 1 | `/api/ai/agent` | POST | ✅ Bearer | 20/min | AI chat assistant (OpenRouter/Llama 3) |
-| 2 | `/api/ai/generate-campaign` | POST | ✅ Bearer | 5/min | AI campaign description (OpenAI) |
-| 3 | `/api/ai/funding-recommendation` | POST | ✅ Bearer | 10/min | AI category recommendation |
-| 4 | `/api/creator/razorpay-config` | GET/POST | ✅ Bearer | — | Load/save Razorpay credentials |
-| 5 | `/api/razorpay/create-order` | POST | ✅ Bearer | 10/min | Create Razorpay payment order |
-| 6 | `/api/razorpay/verify` | POST | ✅ Bearer | 10/min | Verify payment + record donation |
-| 7 | `/api/razorpay/webhook` | POST | ❌ Sig verify | — | Razorpay webhook handler |
-| 8 | `/api/receipts/generate` | POST | ✅ Bearer | — | Generate donation receipt data |
-| 9 | `/api/account/delete` | POST | ✅ Bearer | 3/min | Delete user account + all data |
-| 10 | `/api/export-analytics` | POST | ✅ Bearer | 5/min | Generate PDF analytics report |
+| #   | Route                            | Method   | Auth          | Rate Limit | Purpose                                |
+| --- | -------------------------------- | -------- | ------------- | ---------- | -------------------------------------- |
+| 1   | `/api/ai/agent`                  | POST     | ✅ Bearer     | 20/min     | AI chat assistant (OpenRouter/Llama 3) |
+| 2   | `/api/ai/generate-campaign`      | POST     | ✅ Bearer     | 5/min      | AI campaign description (OpenAI)       |
+| 3   | `/api/ai/funding-recommendation` | POST     | ✅ Bearer     | 10/min     | AI category recommendation             |
+| 4   | `/api/creator/razorpay-config`   | GET/POST | ✅ Bearer     | —          | Load/save Razorpay credentials         |
+| 5   | `/api/razorpay/create-order`     | POST     | ✅ Bearer     | 10/min     | Create Razorpay payment order          |
+| 6   | `/api/razorpay/verify`           | POST     | ✅ Bearer     | 10/min     | Verify payment + record donation       |
+| 7   | `/api/razorpay/webhook`          | POST     | ❌ Sig verify | —          | Razorpay webhook handler               |
+| 8   | `/api/receipts/generate`         | POST     | ✅ Bearer     | —          | Generate donation receipt data         |
+| 9   | `/api/account/delete`            | POST     | ✅ Bearer     | 3/min      | Delete user account + all data         |
+| 10  | `/api/export-analytics`          | POST     | ✅ Bearer     | 5/min      | Generate PDF analytics report          |
 
 ### Authentication Pattern
+
 All authenticated routes use the `withAuth` HOC:
+
 ```javascript
-export default withAuth(async function handler(req, res) {
-  const user = req.user; // Attached by withAuth
-  // ... business logic
-}, { rateLimit: { windowMs: 60000, max: N } });
+export default withAuth(
+  async function handler(req, res) {
+    const user = req.user; // Attached by withAuth
+    // ... business logic
+  },
+  { rateLimit: { windowMs: 60000, max: N } },
+);
 ```
 
 ---
@@ -736,17 +792,19 @@ export default withAuth(async function handler(req, res) {
 ## 13. Security Implementation
 
 ### Headers (Production Only)
-| Header | Value |
-|--------|-------|
-| `X-Frame-Options` | `DENY` |
-| `X-Content-Type-Options` | `nosniff` |
-| `Referrer-Policy` | `strict-origin-when-cross-origin` |
-| `X-XSS-Protection` | `1; mode=block` |
+
+| Header                      | Value                                          |
+| --------------------------- | ---------------------------------------------- |
+| `X-Frame-Options`           | `DENY`                                         |
+| `X-Content-Type-Options`    | `nosniff`                                      |
+| `Referrer-Policy`           | `strict-origin-when-cross-origin`              |
+| `X-XSS-Protection`          | `1; mode=block`                                |
 | `Strict-Transport-Security` | `max-age=63072000; includeSubDomains; preload` |
-| `Permissions-Policy` | `camera=(), microphone=(), geolocation=()` |
-| `poweredByHeader` | `false` |
+| `Permissions-Policy`        | `camera=(), microphone=(), geolocation=()`     |
+| `poweredByHeader`           | `false`                                        |
 
 ### Content Security Policy (Production)
+
 ```
 default-src 'self'
 script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com ...
@@ -758,12 +816,14 @@ style-src 'self' 'unsafe-inline' https://fonts.googleapis.com
 ```
 
 ### Rate Limiting
+
 - **Implementation**: In-memory sliding-window (`lib/rateLimit.js`)
 - **Key**: Bearer token prefix (first 16 chars) or IP from `x-forwarded-for`
 - **Cleanup**: Every 5 minutes, removes expired entries
 - **Response Headers**: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `Retry-After`
 
 ### Input Validation
+
 - Project title: min 3 chars
 - Short description: min 10 chars
 - Categories: at least 1
@@ -773,6 +833,7 @@ style-src 'self' 'unsafe-inline' https://fonts.googleapis.com
 - API routes: Method checking (405 for wrong HTTP method)
 
 ### Cryptographic Security
+
 - **Payment signatures**: HMAC-SHA256 with `crypto.timingSafeEqual` (prevents timing attacks)
 - **Webhook signatures**: Same HMAC-SHA256 + timingSafeEqual pattern
 - **Password storage**: Supabase (bcrypt)
@@ -781,16 +842,16 @@ style-src 'self' 'unsafe-inline' https://fonts.googleapis.com
 
 ## 14. Realtime Features
 
-| Channel | Table | Event | Location |
-|---------|-------|-------|----------|
-| `project-funding-realtime` | `projects` | UPDATE | Project detail page |
-| `project-funding-updates` | `projects` | UPDATE | Fund page |
-| `projects-live-updates` | `projects` | UPDATE | Explore page |
-| `creator-analytics-live` | `public_donations` | INSERT | Analytics dashboard |
-| `project-chat-${id}` | `project_messages` | INSERT | Project chat |
-| `dm-inbox` | `dm_messages` | INSERT | DM inbox |
-| `dm-${id}` | `dm_messages` | INSERT | DM chat |
-| `typing-${id}` | `typing_status` | ALL | DM chat |
+| Channel                    | Table              | Event  | Location            |
+| -------------------------- | ------------------ | ------ | ------------------- |
+| `project-funding-realtime` | `projects`         | UPDATE | Project detail page |
+| `project-funding-updates`  | `projects`         | UPDATE | Fund page           |
+| `projects-live-updates`    | `projects`         | UPDATE | Explore page        |
+| `creator-analytics-live`   | `public_donations` | INSERT | Analytics dashboard |
+| `project-chat-${id}`       | `project_messages` | INSERT | Project chat        |
+| `dm-inbox`                 | `dm_messages`      | INSERT | DM inbox            |
+| `dm-${id}`                 | `dm_messages`      | INSERT | DM chat             |
+| `typing-${id}`             | `typing_status`    | ALL    | DM chat             |
 
 ---
 
@@ -798,16 +859,16 @@ style-src 'self' 'unsafe-inline' https://fonts.googleapis.com
 
 ### Supabase Storage Buckets
 
-| Bucket | Purpose | Upload Flow |
-|--------|---------|-------------|
-| `project-thumbnails` | Project thumbnails | `lib/storage.js` (10MB limit) |
-| `projects` | Project media files | `lib/storage.js` |
-| `avatars` | User profile avatars | `pages/edit-profile.js` (4MB limit) |
-| `banners` | User profile banners | `pages/edit-profile.js` (8MB limit) |
-| `creator-photos` | Creator profile photos | `lib/uploadCreatorFile.js` |
-| `creator-qr` | Creator UPI QR codes | `lib/uploadCreatorFile.js` |
-| `chat_attachments` | Project chat files | `components/ProjectChat.jsx` |
-| `chat-attachments` | DM chat files | `pages/dm/[userId].js` |
+| Bucket               | Purpose                | Upload Flow                         |
+| -------------------- | ---------------------- | ----------------------------------- |
+| `project-thumbnails` | Project thumbnails     | `lib/storage.js` (10MB limit)       |
+| `projects`           | Project media files    | `lib/storage.js`                    |
+| `avatars`            | User profile avatars   | `pages/edit-profile.js` (4MB limit) |
+| `banners`            | User profile banners   | `pages/edit-profile.js` (8MB limit) |
+| `creator-photos`     | Creator profile photos | `lib/uploadCreatorFile.js`          |
+| `creator-qr`         | Creator UPI QR codes   | `lib/uploadCreatorFile.js`          |
+| `chat_attachments`   | Project chat files     | `components/ProjectChat.jsx`        |
+| `chat-attachments`   | DM chat files          | `pages/dm/[userId].js`              |
 
 ---
 
@@ -815,14 +876,14 @@ style-src 'self' 'unsafe-inline' https://fonts.googleapis.com
 
 ### Test Framework: Vitest + Testing Library
 
-| Test Category | Files | Coverage |
-|---------------|-------|----------|
-| API Routes | 10 files | ai, create-order, verify, webhook, receipts, razorpay-config, rateLimit, withAuth, funding-recommendation, generate-campaign |
-| Components | 3 files | FloatingAIChat, Login, Signup |
-| Libraries | 3 files | auth, projects, saved |
-| Integration | 1 file | payment-flow |
-| Accessibility | 1 file | a11y audit |
-| **Total** | **18 test files** | |
+| Test Category | Files             | Coverage                                                                                                                     |
+| ------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| API Routes    | 10 files          | ai, create-order, verify, webhook, receipts, razorpay-config, rateLimit, withAuth, funding-recommendation, generate-campaign |
+| Components    | 3 files           | FloatingAIChat, Login, Signup                                                                                                |
+| Libraries     | 3 files           | auth, projects, saved                                                                                                        |
+| Integration   | 1 file            | payment-flow                                                                                                                 |
+| Accessibility | 1 file            | a11y audit                                                                                                                   |
+| **Total**     | **18 test files** |                                                                                                                              |
 
 ---
 
@@ -850,6 +911,7 @@ OPENROUTER_API_KEY=              # Llama 3 (AI chat agent)
 ## 18. Known Limitations & Roadmap
 
 ### Current Limitations
+
 1. **No Admin Panel**: No admin dashboard for platform management
 2. **No Email Notifications**: No email alerts for donations, messages, or project updates
 3. **No OAuth Login**: Only email/password authentication (no Google, GitHub, etc.)
@@ -862,20 +924,21 @@ OPENROUTER_API_KEY=              # Llama 3 (AI chat agent)
 10. **Chat Bucket Naming Inconsistency**: Project chat uses `chat_attachments`, DM uses `chat-attachments`
 
 ### Suggested Roadmap
-| Phase | Feature | Priority |
-|-------|---------|----------|
-| **Phase 1** | Admin dashboard (user/project management) | High |
-| **Phase 1** | Email notifications (donation confirmations, new messages) | High |
-| **Phase 1** | OAuth login (Google, GitHub) | Medium |
-| **Phase 2** | Multi-currency support (USD, EUR, GBP) | Medium |
-| **Phase 2** | Full-text search (Algolia or Supabase full-text) | Medium |
-| **Phase 2** | Refund management flow | Medium |
-| **Phase 3** | Mobile app (React Native or PWA) | Low |
-| **Phase 3** | Video call integration (WebRTC) | Low |
-| **Phase 3** | Advanced analytics (cohort analysis, A/B testing) | Low |
+
+| Phase       | Feature                                                    | Priority |
+| ----------- | ---------------------------------------------------------- | -------- |
+| **Phase 1** | Admin dashboard (user/project management)                  | High     |
+| **Phase 1** | Email notifications (donation confirmations, new messages) | High     |
+| **Phase 1** | OAuth login (Google, GitHub)                               | Medium   |
+| **Phase 2** | Multi-currency support (USD, EUR, GBP)                     | Medium   |
+| **Phase 2** | Full-text search (Algolia or Supabase full-text)           | Medium   |
+| **Phase 2** | Refund management flow                                     | Medium   |
+| **Phase 3** | Mobile app (React Native or PWA)                           | Low      |
+| **Phase 3** | Video call integration (WebRTC)                            | Low      |
+| **Phase 3** | Advanced analytics (cohort analysis, A/B testing)          | Low      |
 
 ---
 
-*Report generated on July 25, 2026*
-*Project: Fundora — AI-Powered Crowdfunding Platform*
-*Total Components: 72 | Total Pages: 35 | Total API Routes: 10 | Total Tests: 18*
+_Report generated on July 25, 2026_
+_Project: Fundora — AI-Powered Crowdfunding Platform_
+_Total Components: 72 | Total Pages: 35 | Total API Routes: 10 | Total Tests: 18_

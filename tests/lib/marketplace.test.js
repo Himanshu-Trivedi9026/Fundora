@@ -10,7 +10,9 @@ describe("Marketplace Plugin Listing", () => {
       { id: 3, category: "analytics", status: "draft", rating: 0 },
     ];
 
-    const filtered = plugins.filter((p) => p.category === "analytics" && p.status === "published");
+    const filtered = plugins.filter(
+      (p) => p.category === "analytics" && p.status === "published",
+    );
     expect(filtered).toHaveLength(1);
     expect(filtered[0].id).toBe(1);
   });
@@ -49,7 +51,9 @@ describe("Plugin Reviews", () => {
     ];
 
     const isDuplicate = (pluginId, userId) =>
-      existingReviews.some((r) => r.pluginId === pluginId && r.userId === userId);
+      existingReviews.some(
+        (r) => r.pluginId === pluginId && r.userId === userId,
+      );
 
     expect(isDuplicate(1, "user1")).toBe(true);
     expect(isDuplicate(2, "user2")).toBe(false);

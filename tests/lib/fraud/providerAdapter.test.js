@@ -33,7 +33,9 @@ describe("ProviderAdapter", () => {
         }
       }
       const provider = new TestProvider();
-      await expect(provider.initialize()).rejects.toThrow("must be implemented");
+      await expect(provider.initialize()).rejects.toThrow(
+        "must be implemented",
+      );
     });
 
     it("should require analyzeRisk method", async () => {
@@ -44,7 +46,9 @@ describe("ProviderAdapter", () => {
         async initialize() {}
       }
       const provider = new TestProvider();
-      await expect(provider.analyzeRisk({})).rejects.toThrow("must be implemented");
+      await expect(provider.analyzeRisk({})).rejects.toThrow(
+        "must be implemented",
+      );
     });
   });
 
@@ -158,7 +162,9 @@ describe("ProviderAdapter", () => {
     });
 
     it("should reject non-BaseAIProvider instances", () => {
-      expect(() => registerProvider("bad", {})).toThrow("must extend BaseAIProvider");
+      expect(() => registerProvider("bad", {})).toThrow(
+        "must extend BaseAIProvider",
+      );
     });
   });
 

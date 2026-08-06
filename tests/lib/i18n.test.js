@@ -3,8 +3,28 @@
 import { describe, it, expect } from "vitest";
 
 describe("Translation Service", () => {
-  const supportedLocales = ["en", "hi", "bn", "ta", "te", "mr", "gu", "kn", "ml", "pa",
-    "ur", "or", "as", "mai", "sat", "ks", "ne", "sd", "fr", "es"];
+  const supportedLocales = [
+    "en",
+    "hi",
+    "bn",
+    "ta",
+    "te",
+    "mr",
+    "gu",
+    "kn",
+    "ml",
+    "pa",
+    "ur",
+    "or",
+    "as",
+    "mai",
+    "sat",
+    "ks",
+    "ne",
+    "sd",
+    "fr",
+    "es",
+  ];
 
   const rtlLocales = ["ur", "ar"];
 
@@ -36,7 +56,9 @@ describe("Translation Service", () => {
       });
       locales.sort((a, b) => b.q - a.q);
 
-      return locales.find((l) => supportedLocales.includes(l.locale))?.locale || "en";
+      return (
+        locales.find((l) => supportedLocales.includes(l.locale))?.locale || "en"
+      );
     };
 
     expect(parseAcceptLanguage("hi-IN;q=0.9,en;q=0.5")).toBe("hi");

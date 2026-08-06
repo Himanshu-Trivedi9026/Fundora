@@ -51,10 +51,7 @@ export default function FollowersPage() {
       const { data: followRows, error } = await supabase
         .from("followers")
         .select(tab === "followers" ? "follower_id" : "following_id")
-        .eq(
-          tab === "followers" ? "following_id" : "follower_id",
-          user.id
-        );
+        .eq(tab === "followers" ? "following_id" : "follower_id", user.id);
 
       if (error || !followRows || followRows.length === 0) {
         setList([]);
@@ -62,7 +59,7 @@ export default function FollowersPage() {
       }
 
       const ids = followRows.map((r) =>
-        tab === "followers" ? r.follower_id : r.following_id
+        tab === "followers" ? r.follower_id : r.following_id,
       );
 
       const { data: profiles } = await supabase
@@ -171,7 +168,11 @@ export default function FollowersPage() {
                     <motion.div
                       layoutId="activeTab"
                       className="absolute inset-0 bg-primary rounded-full shadow-lg"
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
+                      transition={{
+                        type: "spring",
+                        bounce: 0.2,
+                        duration: 0.5,
+                      }}
                     />
                   )}
                   <span className="relative z-10">Followers</span>
@@ -191,7 +192,11 @@ export default function FollowersPage() {
                     <motion.div
                       layoutId="activeTab"
                       className="absolute inset-0 bg-primary rounded-full shadow-lg"
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
+                      transition={{
+                        type: "spring",
+                        bounce: 0.2,
+                        duration: 0.5,
+                      }}
                     />
                   )}
                   <span className="relative z-10">Following</span>
@@ -204,11 +209,18 @@ export default function FollowersPage() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+            transition={{
+              duration: 0.5,
+              delay: 0.1,
+              ease: [0.25, 0.46, 0.45, 0.94],
+            }}
             className="max-w-2xl mx-auto mb-16 relative"
           >
             <div className="glass-card flex items-center px-6 py-4 rounded-full group focus-within:ring-2 focus-within:ring-primary/40">
-              <span className="material-symbols-outlined text-primary group-focus-within:scale-110 transition-transform" aria-hidden="true">
+              <span
+                className="material-symbols-outlined text-primary group-focus-within:scale-110 transition-transform"
+                aria-hidden="true"
+              >
                 search
               </span>
               <input
@@ -238,10 +250,7 @@ export default function FollowersPage() {
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
               >
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="glass-card p-6 rounded-xl opacity-60"
-                  >
+                  <div key={i} className="glass-card p-6 rounded-xl opacity-60">
                     <div className="flex items-start justify-between mb-4">
                       <div className="w-16 h-16 rounded-full shimmer" />
                       <div className="w-20 h-5 rounded-full shimmer" />
@@ -272,7 +281,10 @@ export default function FollowersPage() {
                   className="border-2 border-dashed border-outline-variant/30 p-6 rounded-xl flex flex-col items-center justify-center text-center bg-surface-container-low/30 hover:border-primary/50 transition-colors cursor-pointer col-span-full"
                 >
                   <div className="w-12 h-12 rounded-full bg-surface-variant flex items-center justify-center mb-4">
-                    <span className="material-symbols-outlined text-primary" aria-hidden="true">
+                    <span
+                      className="material-symbols-outlined text-primary"
+                      aria-hidden="true"
+                    >
                       person_add
                     </span>
                   </div>
@@ -294,7 +306,10 @@ export default function FollowersPage() {
                 exit={{ opacity: 0 }}
                 className="text-center py-16"
               >
-                <span className="material-symbols-outlined text-5xl text-on-surface-variant/30 block mb-4" aria-hidden="true">
+                <span
+                  className="material-symbols-outlined text-5xl text-on-surface-variant/30 block mb-4"
+                  aria-hidden="true"
+                >
                   search_off
                 </span>
                 <p className="text-on-surface-variant font-inter text-lg">
@@ -332,7 +347,10 @@ export default function FollowersPage() {
                     className="border-2 border-dashed border-outline-variant/30 p-6 rounded-xl flex flex-col items-center justify-center text-center bg-surface-container-low/30 hover:border-primary/50 transition-colors cursor-pointer group"
                   >
                     <div className="w-12 h-12 rounded-full bg-surface-variant flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                      <span className="material-symbols-outlined text-primary" aria-hidden="true">
+                      <span
+                        className="material-symbols-outlined text-primary"
+                        aria-hidden="true"
+                      >
                         person_add
                       </span>
                     </div>
@@ -362,7 +380,10 @@ export default function FollowersPage() {
                 className="px-12 py-4 bg-surface-container-highest text-on-surface font-inter text-sm rounded-xl hover:bg-surface-bright transition-colors border border-outline-variant/30 flex items-center gap-2 group"
               >
                 Load More Connections
-                <span className="material-symbols-outlined group-hover:translate-y-1 transition-transform" aria-hidden="true">
+                <span
+                  className="material-symbols-outlined group-hover:translate-y-1 transition-transform"
+                  aria-hidden="true"
+                >
                   expand_more
                 </span>
               </motion.button>

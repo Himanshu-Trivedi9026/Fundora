@@ -22,7 +22,8 @@ export default function MarketplaceDashboard() {
     fetchPlugins();
   }, []);
 
-  const filtered = filter === "all" ? plugins : plugins.filter((p) => p.status === filter);
+  const filtered =
+    filter === "all" ? plugins : plugins.filter((p) => p.status === filter);
 
   if (loading) {
     return (
@@ -42,33 +43,43 @@ export default function MarketplaceDashboard() {
         </div>
         <div className="bg-gray-900/60 border border-gray-800 rounded-xl p-4">
           <p className="text-gray-400 text-sm">Published</p>
-          <p className="text-2xl font-bold text-green-400">{plugins.filter((p) => p.status === "published").length}</p>
+          <p className="text-2xl font-bold text-green-400">
+            {plugins.filter((p) => p.status === "published").length}
+          </p>
         </div>
         <div className="bg-gray-900/60 border border-gray-800 rounded-xl p-4">
           <p className="text-gray-400 text-sm">Pending Review</p>
-          <p className="text-2xl font-bold text-yellow-400">{plugins.filter((p) => p.status === "pending_review").length}</p>
+          <p className="text-2xl font-bold text-yellow-400">
+            {plugins.filter((p) => p.status === "pending_review").length}
+          </p>
         </div>
         <div className="bg-gray-900/60 border border-gray-800 rounded-xl p-4">
           <p className="text-gray-400 text-sm">Downloads</p>
-          <p className="text-2xl font-bold text-blue-400">{plugins.reduce((s, p) => s + (p.downloads || 0), 0)}</p>
+          <p className="text-2xl font-bold text-blue-400">
+            {plugins.reduce((s, p) => s + (p.downloads || 0), 0)}
+          </p>
         </div>
       </div>
 
       {/* Filters */}
       <div className="flex gap-2">
-        {["all", "published", "pending_review", "draft", "disabled"].map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`px-3 py-1 rounded-lg text-sm ${
-              filter === f
-                ? "bg-purple-600 text-white"
-                : "bg-gray-800 text-gray-400 hover:bg-gray-700"
-            }`}
-          >
-            {f === "pending_review" ? "Pending" : f.charAt(0).toUpperCase() + f.slice(1)}
-          </button>
-        ))}
+        {["all", "published", "pending_review", "draft", "disabled"].map(
+          (f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-3 py-1 rounded-lg text-sm ${
+                filter === f
+                  ? "bg-purple-600 text-white"
+                  : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+              }`}
+            >
+              {f === "pending_review"
+                ? "Pending"
+                : f.charAt(0).toUpperCase() + f.slice(1)}
+            </button>
+          ),
+        )}
       </div>
 
       {/* Plugin list */}
@@ -93,21 +104,39 @@ export default function MarketplaceDashboard() {
                 </tr>
               ) : (
                 filtered.map((plugin, i) => (
-                  <tr key={plugin.id || i} className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors">
-                    <td className="p-4 text-white font-medium">{plugin.name || "Unnamed Plugin"}</td>
-                    <td className="p-4 text-gray-400">{plugin.category || "Uncategorized"}</td>
+                  <tr
+                    key={plugin.id || i}
+                    className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors"
+                  >
+                    <td className="p-4 text-white font-medium">
+                      {plugin.name || "Unnamed Plugin"}
+                    </td>
+                    <td className="p-4 text-gray-400">
+                      {plugin.category || "Uncategorized"}
+                    </td>
                     <td className="p-4">
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${
-                        plugin.status === "published" ? "bg-green-900/50 text-green-400" :
-                        plugin.status === "pending_review" ? "bg-yellow-900/50 text-yellow-400" :
-                        plugin.status === "disabled" ? "bg-red-900/50 text-red-400" :
-                        "bg-gray-700 text-gray-400"
-                      }`}>
+                      <span
+                        className={`px-2 py-1 rounded text-xs font-medium ${
+                          plugin.status === "published"
+                            ? "bg-green-900/50 text-green-400"
+                            : plugin.status === "pending_review"
+                              ? "bg-yellow-900/50 text-yellow-400"
+                              : plugin.status === "disabled"
+                                ? "bg-red-900/50 text-red-400"
+                                : "bg-gray-700 text-gray-400"
+                        }`}
+                      >
                         {plugin.status || "unknown"}
                       </span>
                     </td>
-                    <td className="p-4 text-gray-400">{plugin.avgRating ? `${plugin.avgRating.toFixed(1)} ⭐` : "N/A"}</td>
-                    <td className="p-4 text-gray-400">{(plugin.downloads || 0).toLocaleString()}</td>
+                    <td className="p-4 text-gray-400">
+                      {plugin.avgRating
+                        ? `${plugin.avgRating.toFixed(1)} ⭐`
+                        : "N/A"}
+                    </td>
+                    <td className="p-4 text-gray-400">
+                      {(plugin.downloads || 0).toLocaleString()}
+                    </td>
                   </tr>
                 ))
               )}

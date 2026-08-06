@@ -10,12 +10,12 @@ All functions follow the "never throw" pattern and return `{ success: boolean, d
 
 ### Signal Weights
 
-| Signal | Weight | Description |
-|--------|--------|-------------|
-| Content-Based | 0.35 | Category match + goal-range proximity |
-| Collaborative | 0.25 | Donors with similar history also funded this |
-| Trending | 0.20 | Recent donation velocity and acceleration |
-| Trust-Weighted | 0.20 | Platform trust score multiplier applied to composite |
+| Signal         | Weight | Description                                          |
+| -------------- | ------ | ---------------------------------------------------- |
+| Content-Based  | 0.35   | Category match + goal-range proximity                |
+| Collaborative  | 0.25   | Donors with similar history also funded this         |
+| Trending       | 0.20   | Recent donation velocity and acceleration            |
+| Trust-Weighted | 0.20   | Platform trust score multiplier applied to composite |
 
 ### Composite Score Formula
 
@@ -44,16 +44,19 @@ Generates personalised campaign recommendations for a specific donor.
 #### Signal Details
 
 **Content-Based Score** (0–1):
+
 - Category match: 1.0 if donor's top categories include campaign category, 0.5 default
 - Goal proximity: 1.0 if goal falls within donor's preferred range, degrades linearly outside
 - Formula: `categoryMatch × 0.6 + goalProximity × 0.4`
 
 **Collaborative Score** (0–1):
+
 - Frequency: How often similar donors funded this campaign (capped at 1.0)
 - Amount weight: Each donation weighted by `min(amount / 1000, 1)`
 - Formula: `frequencyScore × 0.6 + recencyScore × 0.4`
 
 **Trending Score** (0–1):
+
 - Velocity: Recent donations / timeframe, normalised to 0–1
 - Acceleration: Growth rate between current and previous period
 - Formula: `velocityNorm × 0.7 + accelerationNorm × 0.3`
@@ -65,15 +68,16 @@ Generates personalised campaign recommendations for a specific donor.
   {
     campaignId: "uuid",
     score: 0.782,
-    reason: "matches your interest in technology; trending right now; highly trusted creator",
+    reason:
+      "matches your interest in technology; trending right now; highly trusted creator",
     factors: {
       categoryMatch: 1.0,
       trendingScore: 0.65,
       trustScore: 0.85,
-      donorAffinity: 0.3
-    }
-  }
-]
+      donorAffinity: 0.3,
+    },
+  },
+];
 ```
 
 ## Campaign Donor Suggestions
@@ -91,12 +95,12 @@ Reverse lookup: finds donors likely to fund a specific campaign.
 
 #### Scoring Components
 
-| Component | Calculation |
-|-----------|------------|
-| Category score | `categoryMatches / totalDonations` |
-| Goal score | `goalMatches / totalDonations` (goal ratio > 0.3 = match) |
-| Frequency score | `donorCount / (totalUniqueDonors × 0.1)`, capped at 1.0 |
-| Amount score | `totalAmount / (donationCount × 500)`, capped at 1.0 |
+| Component       | Calculation                                               |
+| --------------- | --------------------------------------------------------- |
+| Category score  | `categoryMatches / totalDonations`                        |
+| Goal score      | `goalMatches / totalDonations` (goal ratio > 0.3 = match) |
+| Frequency score | `donorCount / (totalUniqueDonors × 0.1)`, capped at 1.0   |
+| Amount score    | `totalAmount / (donationCount × 500)`, capped at 1.0      |
 
 ## Similar Campaigns
 
@@ -107,21 +111,23 @@ Finds campaigns similar to a given reference campaign using embeddings or featur
 #### Dual-Path Strategy
 
 **Path 1 — Embedding-based** (preferred):
+
 - Constructs a search query from title + description + category
 - Calls `searchEmbeddings()` for vector similarity search
 - Weighted scoring: `embScore × 0.60 + goalSimilarity × 0.15 + categoryMatch × 0.10 + tagOverlap × 0.15`
 
 **Path 2 — Feature-based** (fallback):
+
 - Used when embeddings are unavailable
 - Scoring: `categoryMatch × 0.40 + goalSimilarity × 0.30 + tagOverlap × 0.30`
 
 #### Similarity Metrics
 
-| Metric | Calculation |
-|--------|------------|
+| Metric          | Calculation                             |
+| --------------- | --------------------------------------- |
 | Goal similarity | `min(goalA, goalB) / max(goalA, goalB)` |
-| Category match | 1.0 if categories match, 0 otherwise |
-| Tag overlap | Jaccard similarity of tag sets |
+| Category match  | 1.0 if categories match, 0 otherwise    |
+| Tag overlap     | Jaccard similarity of tag sets          |
 
 #### Output
 
@@ -130,11 +136,12 @@ Finds campaigns similar to a given reference campaign using embeddings or featur
   {
     campaignId: "uuid",
     score: 0.845,
-    reason: "same category (technology); similar goal amount; semantically similar",
+    reason:
+      "same category (technology); similar goal amount; semantically similar",
     sharedCategories: ["technology"],
-    goalSimilarity: 0.82
-  }
-]
+    goalSimilarity: 0.82,
+  },
+];
 ```
 
 ## Trending Campaigns
@@ -146,14 +153,15 @@ Ranks active campaigns by recent donation velocity.
 ### Timeframes
 
 | Timeframe | Days | Recency Weight |
-|-----------|------|----------------|
-| `7d` | 7 | 1.0 |
-| `30d` | 30 | 0.8 |
-| `90d` | 90 | 0.6 |
+| --------- | ---- | -------------- |
+| `7d`      | 7    | 1.0            |
+| `30d`     | 30   | 0.8            |
+| `90d`     | 90   | 0.6            |
 
 ### Velocity Calculation
 
 For each campaign:
+
 1. Count donations in the current period and previous period (same duration)
 2. `velocityRate = (recentDonations / daysActive) × recencyWeight`
 3. `recentGrowth = ((recent - previous) / previous) × 100` (percentage)
@@ -169,9 +177,9 @@ For each campaign:
     velocity: 1.45,
     reason: "23 donations this period; 85% growth; strong daily velocity",
     donationCount: 23,
-    recentGrowth: 85.0
-  }
-]
+    recentGrowth: 85.0,
+  },
+];
 ```
 
 ## Creator Recommendations
@@ -195,10 +203,11 @@ Recommends categories and goal ranges for a creator based on their track record.
   {
     category: "technology",
     goalRange: { min: 5000, max: 25000 },
-    reason: "75% success rate in this category; averages 120% funding; proven track record",
-    expectedSuccess: 0.72
-  }
-]
+    reason:
+      "75% success rate in this category; averages 120% funding; proven track record",
+    expectedSuccess: 0.72,
+  },
+];
 ```
 
 ## Cache Invalidation
@@ -212,6 +221,7 @@ Clears cached recommendations from the `recommendation_cache` table.
 - Both can be combined for targeted invalidation
 
 Should be called when:
+
 - A user makes a new donation
 - A campaign status changes
 - Creator trust scores are updated
@@ -219,20 +229,20 @@ Should be called when:
 
 ## Recommendation Types
 
-| Type Constant | Value | Description |
-|--------------|-------|-------------|
-| `CAMPAIGNS_FOR_DONOR` | `campaign_for_donor` | Personalised campaigns for a donor |
-| `SIMILAR_CAMPAIGNS` | `similar_campaigns` | Campaigns similar to a reference |
-| `TRENDING` | `trending` | Fast-rising campaigns |
-| `CREATOR_RECOMMENDATIONS` | `creator_recommendations` | Category/goal guidance for creators |
-| `CAMPAIGN_DONOR_SUGGESTIONS` | `campaign_donor_suggestions` | Donors likely to fund a campaign |
+| Type Constant                | Value                        | Description                         |
+| ---------------------------- | ---------------------------- | ----------------------------------- |
+| `CAMPAIGNS_FOR_DONOR`        | `campaign_for_donor`         | Personalised campaigns for a donor  |
+| `SIMILAR_CAMPAIGNS`          | `similar_campaigns`          | Campaigns similar to a reference    |
+| `TRENDING`                   | `trending`                   | Fast-rising campaigns               |
+| `CREATOR_RECOMMENDATIONS`    | `creator_recommendations`    | Category/goal guidance for creators |
+| `CAMPAIGN_DONOR_SUGGESTIONS` | `campaign_donor_suggestions` | Donors likely to fund a campaign    |
 
 ## Configuration
 
-| Constant | Value | Description |
-|----------|-------|-------------|
-| `MAX_HISTORY_SAMPLE` | 200 | Max historical donations per donor |
-| `MAX_SIMILAR_DONORS` | 50 | Max donors for collaborative filtering |
-| `SIGNAL_WEIGHTS` | See above | Configurable per-signal weights |
+| Constant             | Value     | Description                            |
+| -------------------- | --------- | -------------------------------------- |
+| `MAX_HISTORY_SAMPLE` | 200       | Max historical donations per donor     |
+| `MAX_SIMILAR_DONORS` | 50        | Max donors for collaborative filtering |
+| `SIGNAL_WEIGHTS`     | See above | Configurable per-signal weights        |
 
 All parameters can be adjusted by modifying the constants at the top of `recommendationEngine.js`. The weights are designed to be tuned based on A/B testing results.

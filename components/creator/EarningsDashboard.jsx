@@ -27,7 +27,11 @@ export default function EarningsDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("overview");
-  const [requestForm, setRequestForm] = useState({ escrowAccountId: "", bankAccountId: "", amount: "" });
+  const [requestForm, setRequestForm] = useState({
+    escrowAccountId: "",
+    bankAccountId: "",
+    amount: "",
+  });
   const [requestLoading, setRequestLoading] = useState(false);
 
   useEffect(() => {
@@ -83,7 +87,11 @@ export default function EarningsDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-12" role="status" aria-label="Loading earnings data">
+      <div
+        className="flex items-center justify-center p-12"
+        role="status"
+        aria-label="Loading earnings data"
+      >
         <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -91,9 +99,17 @@ export default function EarningsDashboard() {
 
   if (error) {
     return (
-      <div className="bg-red-900/20 border border-red-800 rounded-xl p-6 text-center" role="alert">
+      <div
+        className="bg-red-900/20 border border-red-800 rounded-xl p-6 text-center"
+        role="alert"
+      >
         <p className="text-red-400">{error}</p>
-        <button onClick={fetchData} className="mt-3 text-sm text-blue-400 hover:underline">Retry</button>
+        <button
+          onClick={fetchData}
+          className="mt-3 text-sm text-blue-400 hover:underline"
+        >
+          Retry
+        </button>
       </div>
     );
   }
@@ -124,14 +140,35 @@ export default function EarningsDashboard() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { label: "Available Balance", value: formatCurrency(balance?.available || 0), color: "text-green-400" },
-              { label: "Locked in Escrow", value: formatCurrency(balance?.locked || 0), color: "text-yellow-400" },
-              { label: "Total Released", value: formatCurrency(balance?.released || 0), color: "text-blue-400" },
-              { label: "Pending Payouts", value: formatCurrency(balance?.pending || 0), color: "text-orange-400" },
+              {
+                label: "Available Balance",
+                value: formatCurrency(balance?.available || 0),
+                color: "text-green-400",
+              },
+              {
+                label: "Locked in Escrow",
+                value: formatCurrency(balance?.locked || 0),
+                color: "text-yellow-400",
+              },
+              {
+                label: "Total Released",
+                value: formatCurrency(balance?.released || 0),
+                color: "text-blue-400",
+              },
+              {
+                label: "Pending Payouts",
+                value: formatCurrency(balance?.pending || 0),
+                color: "text-orange-400",
+              },
             ].map((stat) => (
-              <div key={stat.label} className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+              <div
+                key={stat.label}
+                className="bg-gray-900 border border-gray-800 rounded-xl p-5"
+              >
                 <p className="text-gray-400 text-xs">{stat.label}</p>
-                <p className={`text-2xl font-bold mt-2 ${stat.color}`}>{stat.value}</p>
+                <p className={`text-2xl font-bold mt-2 ${stat.color}`}>
+                  {stat.value}
+                </p>
               </div>
             ))}
           </div>
@@ -140,7 +177,11 @@ export default function EarningsDashboard() {
 
       {/* Campaigns Tab */}
       {activeTab === "campaigns" && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="space-y-4"
+        >
           {accounts.length > 0 ? (
             accounts.map((acc) => <EscrowCard key={acc.id} escrow={acc} />)
           ) : (
@@ -161,44 +202,75 @@ export default function EarningsDashboard() {
       {/* Request Payout Tab */}
       {activeTab === "request" && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <form onSubmit={handlePayoutRequest} className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
+          <form
+            onSubmit={handlePayoutRequest}
+            className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4"
+          >
             <h3 className="text-white font-semibold">Request Payout</h3>
             <div>
-              <label htmlFor="escrow-account" className="block text-gray-400 text-xs mb-1">Escrow Account</label>
+              <label
+                htmlFor="escrow-account"
+                className="block text-gray-400 text-xs mb-1"
+              >
+                Escrow Account
+              </label>
               <select
                 id="escrow-account"
                 value={requestForm.escrowAccountId}
-                onChange={(e) => setRequestForm({ ...requestForm, escrowAccountId: e.target.value })}
+                onChange={(e) =>
+                  setRequestForm({
+                    ...requestForm,
+                    escrowAccountId: e.target.value,
+                  })
+                }
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-purple-500"
                 required
               >
                 <option value="">Select escrow account</option>
                 {accounts.map((a) => (
                   <option key={a.id} value={a.id}>
-                    Campaign {a.campaign_id?.substring(0, 8)}... — {formatCurrency(a.creator_earnings)} available
+                    Campaign {a.campaign_id?.substring(0, 8)}... —{" "}
+                    {formatCurrency(a.creator_earnings)} available
                   </option>
                 ))}
               </select>
             </div>
             <div>
-              <label htmlFor="bank-account-id" className="block text-gray-400 text-xs mb-1">Bank Account ID</label>
+              <label
+                htmlFor="bank-account-id"
+                className="block text-gray-400 text-xs mb-1"
+              >
+                Bank Account ID
+              </label>
               <input
                 id="bank-account-id"
                 type="text"
                 value={requestForm.bankAccountId}
-                onChange={(e) => setRequestForm({ ...requestForm, bankAccountId: e.target.value })}
+                onChange={(e) =>
+                  setRequestForm({
+                    ...requestForm,
+                    bankAccountId: e.target.value,
+                  })
+                }
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-purple-500"
                 placeholder="Verified bank account UUID"
                 required
               />
             </div>
             <div>
-              <label htmlFor="payout-amount" className="block text-gray-400 text-xs mb-1">Amount (₹)</label>
+              <label
+                htmlFor="payout-amount"
+                className="block text-gray-400 text-xs mb-1"
+              >
+                Amount (₹)
+              </label>
               <input
                 id="payout-amount"
                 type="number"
                 value={requestForm.amount}
-                onChange={(e) => setRequestForm({ ...requestForm, amount: e.target.value })}
+                onChange={(e) =>
+                  setRequestForm({ ...requestForm, amount: e.target.value })
+                }
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-purple-500"
                 min="1"
                 required

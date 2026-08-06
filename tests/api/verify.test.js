@@ -55,7 +55,9 @@ vi.mock("@/lib/rateLimit", () => ({
 
 // Mock the notification engine so the donation → owner notification can be
 // asserted without hitting the real (mocked) supabaseAdmin chain.
-const mockSendNotification = vi.hoisted(() => vi.fn().mockResolvedValue({ success: true }));
+const mockSendNotification = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({ success: true }),
+);
 vi.mock("@/lib/notification", () => ({
   sendNotification: mockSendNotification,
   NOTIFICATION_TYPES: {
@@ -129,7 +131,9 @@ describe("POST /api/razorpay/verify", () => {
       .mockReset()
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnValue({ maybeSingle: mockIdempotencyMaybeSingle }),
+        eq: vi
+          .fn()
+          .mockReturnValue({ maybeSingle: mockIdempotencyMaybeSingle }),
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
@@ -137,7 +141,9 @@ describe("POST /api/razorpay/verify", () => {
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
+        eq: vi
+          .fn()
+          .mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
@@ -182,7 +188,9 @@ describe("POST /api/razorpay/verify", () => {
     await handler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ error: "razorpay_payment_id is required" });
+    expect(res.json).toHaveBeenCalledWith({
+      error: "razorpay_payment_id is required",
+    });
   });
 
   it("returns 400 when all required fields are missing", async () => {
@@ -192,7 +200,9 @@ describe("POST /api/razorpay/verify", () => {
     await handler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ error: "razorpay_payment_id is required" });
+    expect(res.json).toHaveBeenCalledWith({
+      error: "razorpay_payment_id is required",
+    });
   });
 
   it("returns 400 for invalid signature", async () => {
@@ -210,7 +220,9 @@ describe("POST /api/razorpay/verify", () => {
     await handler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ error: "Invalid payment signature" });
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Invalid payment signature",
+    });
   });
 
   it("returns 200 with donationId on valid signature", async () => {
@@ -218,7 +230,9 @@ describe("POST /api/razorpay/verify", () => {
       .mockReset()
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnValue({ maybeSingle: mockIdempotencyMaybeSingle }),
+        eq: vi
+          .fn()
+          .mockReturnValue({ maybeSingle: mockIdempotencyMaybeSingle }),
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
@@ -226,7 +240,9 @@ describe("POST /api/razorpay/verify", () => {
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
+        eq: vi
+          .fn()
+          .mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
@@ -286,7 +302,9 @@ describe("POST /api/razorpay/verify", () => {
       .mockReset()
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnValue({ maybeSingle: mockIdempotencyMaybeSingle }),
+        eq: vi
+          .fn()
+          .mockReturnValue({ maybeSingle: mockIdempotencyMaybeSingle }),
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
@@ -294,7 +312,9 @@ describe("POST /api/razorpay/verify", () => {
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
+        eq: vi
+          .fn()
+          .mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
@@ -364,7 +384,9 @@ describe("POST /api/razorpay/verify", () => {
       .mockReset()
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnValue({ maybeSingle: mockIdempotencyMaybeSingle }),
+        eq: vi
+          .fn()
+          .mockReturnValue({ maybeSingle: mockIdempotencyMaybeSingle }),
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
@@ -372,7 +394,9 @@ describe("POST /api/razorpay/verify", () => {
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
+        eq: vi
+          .fn()
+          .mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
@@ -426,17 +450,18 @@ describe("POST /api/razorpay/verify", () => {
         notificationType: "donation_received",
         actorId: "test-user-id",
         entityId: "proj-3",
-      })
+      }),
     );
   });
-
 
   it("returns 500 on database error", async () => {
     supabaseAdmin.from
       .mockReset()
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnValue({ maybeSingle: mockIdempotencyMaybeSingle }),
+        eq: vi
+          .fn()
+          .mockReturnValue({ maybeSingle: mockIdempotencyMaybeSingle }),
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
@@ -444,7 +469,9 @@ describe("POST /api/razorpay/verify", () => {
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
+        eq: vi
+          .fn()
+          .mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
@@ -497,7 +524,9 @@ describe("POST /api/razorpay/verify", () => {
     await handler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ error: "Failed to record donation" });
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Failed to record donation",
+    });
     consoleSpy.mockRestore();
   });
 

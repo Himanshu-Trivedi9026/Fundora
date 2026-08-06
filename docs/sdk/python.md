@@ -543,11 +543,11 @@ Every API key has configurable rate limits (default: 100 requests per 60-second 
 
 Every response includes these headers:
 
-| Header | Description |
-|--------|-------------|
-| `X-RateLimit-Limit` | Maximum requests allowed per window |
-| `X-RateLimit-Remaining` | Remaining requests in the current window |
-| `X-RateLimit-Reset` | Unix timestamp (seconds) when the window resets |
+| Header                  | Description                                     |
+| ----------------------- | ----------------------------------------------- |
+| `X-RateLimit-Limit`     | Maximum requests allowed per window             |
+| `X-RateLimit-Remaining` | Remaining requests in the current window        |
+| `X-RateLimit-Reset`     | Unix timestamp (seconds) when the window resets |
 
 ### Reading Rate Limit Headers
 

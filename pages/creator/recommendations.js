@@ -20,7 +20,9 @@ export default function RecommendationsPage() {
     queueMicrotask(() => setLoading(true));
     setError(null);
     try {
-      const res = await authFetch("/api/ai/recommendations?type=trending&limit=12");
+      const res = await authFetch(
+        "/api/ai/recommendations?type=trending&limit=12",
+      );
       if (!res.ok) throw new Error(`API returned ${res.status}`);
       const data = await res.json();
       const items = Array.isArray(data)
@@ -110,10 +112,7 @@ export default function RecommendationsPage() {
           {/* Loading state */}
           {loading && (
             <div className="flex items-center justify-center min-h-[40vh]">
-              <LoadingSpinner
-                size="lg"
-                text="Generating recommendations..."
-              />
+              <LoadingSpinner size="lg" text="Generating recommendations..." />
             </div>
           )}
 

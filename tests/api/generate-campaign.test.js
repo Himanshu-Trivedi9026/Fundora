@@ -4,7 +4,7 @@ import { vi } from "vitest";
 const mockCreate = vi.hoisted(() =>
   vi.fn().mockResolvedValue({
     choices: [{ message: { content: "Test campaign description" } }],
-  })
+  }),
 );
 
 vi.mock("openai", () => {
@@ -82,7 +82,11 @@ describe("POST /api/ai/generate-campaign", () => {
     const res = createMockRes();
     await handler(req, res);
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: expect.stringContaining("Missing required fields") }));
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        error: expect.stringContaining("Missing required fields"),
+      }),
+    );
   });
 
   it("returns 400 when category is missing", async () => {
@@ -93,14 +97,21 @@ describe("POST /api/ai/generate-campaign", () => {
   });
 
   it("returns 400 when goal is missing", async () => {
-    const req = createMockReq("POST", { title: "My Project", category: "Tech" });
+    const req = createMockReq("POST", {
+      title: "My Project",
+      category: "Tech",
+    });
     const res = createMockRes();
     await handler(req, res);
     expect(res.status).toHaveBeenCalledWith(400);
   });
 
   it("returns generated content on success", async () => {
-    const req = createMockReq("POST", { title: "My Project", category: "Tech", goal: 10000 });
+    const req = createMockReq("POST", {
+      title: "My Project",
+      category: "Tech",
+      goal: 10000,
+    });
     const res = createMockRes();
     await handler(req, res);
 
@@ -111,9 +122,11 @@ describe("POST /api/ai/generate-campaign", () => {
           expect.objectContaining({ role: "system" }),
           expect.objectContaining({ role: "user" }),
         ]),
-      })
+      }),
     );
-    expect(res.json).toHaveBeenCalledWith({ content: "Test campaign description" });
+    expect(res.json).toHaveBeenCalledWith({
+      content: "Test campaign description",
+    });
   });
 
   it("returns error when AI returns empty content", async () => {
@@ -121,20 +134,34 @@ describe("POST /api/ai/generate-campaign", () => {
       choices: [{ message: { content: "" } }],
     });
 
-    const req = createMockReq("POST", { title: "My Project", category: "Tech", goal: 10000 });
+    const req = createMockReq("POST", {
+      title: "My Project",
+      category: "Tech",
+      goal: 10000,
+    });
     const res = createMockRes();
     await handler(req, res);
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: expect.stringContaining("empty") }));
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ error: expect.stringContaining("empty") }),
+    );
   });
 
   it("returns 500 when OpenAI call fails", async () => {
     mockCreate.mockRejectedValueOnce(new Error("API error"));
 
-    const req = createMockReq("POST", { title: "My Project", category: "Tech", goal: 10000 });
+    const req = createMockReq("POST", {
+      title: "My Project",
+      category: "Tech",
+      goal: 10000,
+    });
     const res = createMockRes();
     await handler(req, res);
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: expect.stringContaining("AI generation failed") }));
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        error: expect.stringContaining("AI generation failed"),
+      }),
+    );
   });
 });

@@ -7,9 +7,7 @@ import {
   sanitizeVerificationRequest,
   sanitizeSessionResponse,
 } from "../../lib/verification/metadataEncryption";
-import {
-  hashIP,
-} from "../../lib/verification/auditLog";
+import { hashIP } from "../../lib/verification/auditLog";
 import {
   validateDocumentExtension,
   validateDocumentMime,
@@ -19,10 +17,7 @@ import {
   validateDocument,
   DOCUMENT_TYPES,
 } from "../../lib/verification/documentValidator";
-import {
-  generateOTP,
-  hashOTP,
-} from "../../lib/verification/phoneVerification";
+import { generateOTP, hashOTP } from "../../lib/verification/phoneVerification";
 
 /**
  * Edge Cases — Comprehensive boundary, injection, and stress tests.
@@ -63,7 +58,10 @@ describe("Edge Cases", () => {
       });
 
       it(`validates extension safely for: ${payload.substring(0, 30)}...`, () => {
-        const result = validateDocumentExtension(`${payload}.jpg`, DOCUMENT_TYPES.PAN_CARD);
+        const result = validateDocumentExtension(
+          `${payload}.jpg`,
+          DOCUMENT_TYPES.PAN_CARD,
+        );
         expect(result).toHaveProperty("valid");
       });
     }
@@ -71,11 +69,11 @@ describe("Edge Cases", () => {
 
   describe("XSS Injection in form fields", () => {
     const xssPayloads = [
-      '<script>alert(1)</script>',
-      '<img src=x onerror=alert(1)>',
+      "<script>alert(1)</script>",
+      "<img src=x onerror=alert(1)>",
       '"><script>alert("XSS")</script>',
-      'javascript:alert(1)',
-      '<svg onload=alert(1)>',
+      "javascript:alert(1)",
+      "<svg onload=alert(1)>",
       "{{7*7}}", // Template injection
       "${7*7}", // String interpolation
     ];
@@ -121,7 +119,10 @@ describe("Edge Cases", () => {
     for (const payload of pathPayloads) {
       it(`handles path traversal: ${payload}`, () => {
         // Extension validation should still work (it only checks extension)
-        const result = validateDocumentExtension(`${payload}.jpg`, DOCUMENT_TYPES.PAN_CARD);
+        const result = validateDocumentExtension(
+          `${payload}.jpg`,
+          DOCUMENT_TYPES.PAN_CARD,
+        );
         expect(result).toHaveProperty("valid");
         // Path traversal is handled at the upload/storage layer, not extension layer
       });
@@ -182,29 +183,58 @@ describe("Edge Cases", () => {
     });
 
     it("validateDocumentExtension handles null/undefined/empty", () => {
-      expect(validateDocumentExtension(null, DOCUMENT_TYPES.PAN_CARD).valid).toBe(false);
-      expect(validateDocumentExtension(undefined, DOCUMENT_TYPES.PAN_CARD).valid).toBe(false);
-      expect(validateDocumentExtension("", DOCUMENT_TYPES.PAN_CARD).valid).toBe(false);
+      expect(
+        validateDocumentExtension(null, DOCUMENT_TYPES.PAN_CARD).valid,
+      ).toBe(false);
+      expect(
+        validateDocumentExtension(undefined, DOCUMENT_TYPES.PAN_CARD).valid,
+      ).toBe(false);
+      expect(validateDocumentExtension("", DOCUMENT_TYPES.PAN_CARD).valid).toBe(
+        false,
+      );
     });
 
     it("validateDocumentMime handles null/undefined/empty", () => {
-      expect(validateDocumentMime(null, DOCUMENT_TYPES.PAN_CARD).valid).toBe(false);
-      expect(validateDocumentMime(undefined, DOCUMENT_TYPES.PAN_CARD).valid).toBe(false);
-      expect(validateDocumentMime("", DOCUMENT_TYPES.PAN_CARD).valid).toBe(false);
+      expect(validateDocumentMime(null, DOCUMENT_TYPES.PAN_CARD).valid).toBe(
+        false,
+      );
+      expect(
+        validateDocumentMime(undefined, DOCUMENT_TYPES.PAN_CARD).valid,
+      ).toBe(false);
+      expect(validateDocumentMime("", DOCUMENT_TYPES.PAN_CARD).valid).toBe(
+        false,
+      );
     });
 
     it("validateDocumentSize handles null/undefined/NaN/negative", () => {
-      expect(validateDocumentSize(null, DOCUMENT_TYPES.PAN_CARD).valid).toBe(false);
-      expect(validateDocumentSize(undefined, DOCUMENT_TYPES.PAN_CARD).valid).toBe(false);
-      expect(validateDocumentSize(NaN, DOCUMENT_TYPES.PAN_CARD).valid).toBe(false);
-      expect(validateDocumentSize(-1, DOCUMENT_TYPES.PAN_CARD).valid).toBe(false);
+      expect(validateDocumentSize(null, DOCUMENT_TYPES.PAN_CARD).valid).toBe(
+        false,
+      );
+      expect(
+        validateDocumentSize(undefined, DOCUMENT_TYPES.PAN_CARD).valid,
+      ).toBe(false);
+      expect(validateDocumentSize(NaN, DOCUMENT_TYPES.PAN_CARD).valid).toBe(
+        false,
+      );
+      expect(validateDocumentSize(-1, DOCUMENT_TYPES.PAN_CARD).valid).toBe(
+        false,
+      );
     });
 
     it("validateImageDimensions handles null/undefined/NaN/negative", () => {
-      expect(validateImageDimensions(null, null, DOCUMENT_TYPES.PAN_CARD).valid).toBe(false);
-      expect(validateImageDimensions(undefined, undefined, DOCUMENT_TYPES.PAN_CARD).valid).toBe(false);
-      expect(validateImageDimensions(NaN, NaN, DOCUMENT_TYPES.PAN_CARD).valid).toBe(false);
-      expect(validateImageDimensions(-1, -1, DOCUMENT_TYPES.PAN_CARD).valid).toBe(false);
+      expect(
+        validateImageDimensions(null, null, DOCUMENT_TYPES.PAN_CARD).valid,
+      ).toBe(false);
+      expect(
+        validateImageDimensions(undefined, undefined, DOCUMENT_TYPES.PAN_CARD)
+          .valid,
+      ).toBe(false);
+      expect(
+        validateImageDimensions(NaN, NaN, DOCUMENT_TYPES.PAN_CARD).valid,
+      ).toBe(false);
+      expect(
+        validateImageDimensions(-1, -1, DOCUMENT_TYPES.PAN_CARD).valid,
+      ).toBe(false);
     });
   });
 
@@ -303,7 +333,7 @@ describe("Edge Cases", () => {
       const doc = {
         id: "doc-1",
         ...Object.fromEntries(
-          Array.from({ length: 50 }, (_, i) => [`field_${i}`, `value_${i}`])
+          Array.from({ length: 50 }, (_, i) => [`field_${i}`, `value_${i}`]),
         ),
         provider_reference: "secret",
         storage_path: "/secret/path",
@@ -325,7 +355,7 @@ describe("Edge Cases", () => {
         id: "req-1",
         metadata: {
           ...Object.fromEntries(
-            Array.from({ length: 20 }, (_, i) => [`meta_${i}`, `val_${i}`])
+            Array.from({ length: 20 }, (_, i) => [`meta_${i}`, `val_${i}`]),
           ),
           device_metadata: { os: "iOS" },
           ip_address: "192.168.1.1",
@@ -342,10 +372,16 @@ describe("Edge Cases", () => {
 
   describe("Boundary values", () => {
     it("validateDocumentSize at exactly 10MB boundary", () => {
-      const atLimit = validateDocumentSize(10 * 1024 * 1024, DOCUMENT_TYPES.PAN_CARD);
+      const atLimit = validateDocumentSize(
+        10 * 1024 * 1024,
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(atLimit.valid).toBe(true);
 
-      const overLimit = validateDocumentSize(10 * 1024 * 1024 + 1, DOCUMENT_TYPES.PAN_CARD);
+      const overLimit = validateDocumentSize(
+        10 * 1024 * 1024 + 1,
+        DOCUMENT_TYPES.PAN_CARD,
+      );
       expect(overLimit.valid).toBe(false);
     });
 
@@ -438,7 +474,9 @@ describe("Edge Cases", () => {
     });
 
     it("concurrent hashOTP calls with same input produce same result", () => {
-      const results = Array.from({ length: 50 }, () => hashOTP("123456", "test-salt"));
+      const results = Array.from({ length: 50 }, () =>
+        hashOTP("123456", "test-salt"),
+      );
       const hashes = results.map((r) => r.hash);
       expect(new Set(hashes).size).toBe(1);
     });

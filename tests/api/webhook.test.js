@@ -3,19 +3,30 @@ import { vi } from "vitest";
 // ---- Hoisted mocks for vi.mock factories ----
 const mockSelect = vi.hoisted(() => vi.fn().mockReturnThis());
 const mockEq = vi.hoisted(() => vi.fn().mockReturnThis());
-const mockMaybeSingle = vi.hoisted(() => vi.fn().mockResolvedValue({ data: null, error: null }));
+const mockMaybeSingle = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({ data: null, error: null }),
+);
 // creator_verifications lookup performed by isCreatorVerified — approved by
 // default so the normal captured-payment path proceeds.
 const mockVerificationMaybeSingle = vi.hoisted(() =>
-  vi.fn().mockResolvedValue({ data: { verification_status: "approved" }, error: null })
+  vi.fn().mockResolvedValue({
+    data: { verification_status: "approved" },
+    error: null,
+  }),
 );
 // projects owner lookup added by the verification gate (webhook.js).
 const mockSingle = vi.hoisted(() =>
-  vi.fn().mockResolvedValue({ data: { owner_id: "owner-verified" }, error: null })
+  vi
+    .fn()
+    .mockResolvedValue({ data: { owner_id: "owner-verified" }, error: null }),
 );
-const mockInsert = vi.hoisted(() => vi.fn().mockResolvedValue({ data: null, error: null }));
+const mockInsert = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({ data: null, error: null }),
+);
 const mockUpdate = vi.hoisted(() => vi.fn().mockReturnThis());
-const mockRpc = vi.hoisted(() => vi.fn().mockResolvedValue({ data: null, error: null }));
+const mockRpc = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({ data: null, error: null }),
+);
 const mockTimingSafeEqual = vi.hoisted(() => vi.fn().mockReturnValue(true));
 // Server-side order resolution (project binding comes from the ORDER, never
 // from client-controllable payment notes).
@@ -33,7 +44,9 @@ vi.mock("@/lib/supabaseAdmin", () => ({
         select: mockSelect,
         eq: mockEq,
         maybeSingle:
-          table === "creator_verifications" ? mockVerificationMaybeSingle : mockMaybeSingle,
+          table === "creator_verifications"
+            ? mockVerificationMaybeSingle
+            : mockMaybeSingle,
         single: mockSingle,
         insert: mockInsert,
         update: mockUpdate,
@@ -111,7 +124,10 @@ describe("POST /api/razorpay/webhook", () => {
       data: { verification_status: "approved" },
       error: null,
     });
-    mockSingle.mockResolvedValue({ data: { owner_id: "owner-verified" }, error: null });
+    mockSingle.mockResolvedValue({
+      data: { owner_id: "owner-verified" },
+      error: null,
+    });
     mockInsert.mockResolvedValue({ data: null, error: null });
     mockRpc.mockResolvedValue({ data: null, error: null });
     mockTimingSafeEqual.mockReturnValue(true);
@@ -131,7 +147,19 @@ describe("POST /api/razorpay/webhook", () => {
   it("returns 400 for invalid signature", async () => {
     mockTimingSafeEqual.mockReturnValue(false);
 
-    const event = { event: "payment.captured", payload: { payment: { entity: { id: "pay_1", notes: { projectId: "proj-1" }, amount: 10000, email: "a@b.com" } } } };
+    const event = {
+      event: "payment.captured",
+      payload: {
+        payment: {
+          entity: {
+            id: "pay_1",
+            notes: { projectId: "proj-1" },
+            amount: 10000,
+            email: "a@b.com",
+          },
+        },
+      },
+    };
     const req = createMockReq("POST", event);
     const res = createMockRes();
     await handler(req, res);
@@ -206,7 +234,10 @@ describe("POST /api/razorpay/webhook", () => {
     // Razorpay does not retry. verify.js (authoritative) 403s the frontend.
     expect(mockInsert).not.toHaveBeenCalled();
     expect(mockRpc).not.toHaveBeenCalled();
-    expect(res.json).toHaveBeenCalledWith({ success: true, skipped: "creator_not_verified" });
+    expect(res.json).toHaveBeenCalledWith({
+      success: true,
+      skipped: "creator_not_verified",
+    });
   });
 
   it("skips donation credit when the owner lookup errors or owner is missing (fail-closed)", async () => {
@@ -230,11 +261,17 @@ describe("POST /api/razorpay/webhook", () => {
     await handler(req, res);
 
     expect(mockInsert).not.toHaveBeenCalled();
-    expect(res.json).toHaveBeenCalledWith({ success: true, skipped: "creator_not_verified" });
+    expect(res.json).toHaveBeenCalledWith({
+      success: true,
+      skipped: "creator_not_verified",
+    });
   });
 
   it("skips insert for duplicate donation (idempotency)", async () => {
-    mockMaybeSingle.mockResolvedValue({ data: { id: "existing-donation" }, error: null });
+    mockMaybeSingle.mockResolvedValue({
+      data: { id: "existing-donation" },
+      error: null,
+    });
 
     const event = {
       event: "payment.captured",
@@ -287,7 +324,10 @@ describe("POST /api/razorpay/webhook", () => {
   });
 
   it("returns 500 on insert error", async () => {
-    mockInsert.mockResolvedValue({ data: null, error: { message: "insert failed" } });
+    mockInsert.mockResolvedValue({
+      data: null,
+      error: { message: "insert failed" },
+    });
 
     const event = {
       event: "payment.captured",

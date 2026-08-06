@@ -100,7 +100,7 @@ function setRole(role) {
         select: vi.fn(() => ({
           eq: vi.fn(() => ({
             maybeSingle: vi.fn(() =>
-              Promise.resolve({ data: role ? { role } : null, error: null })
+              Promise.resolve({ data: role ? { role } : null, error: null }),
             ),
           })),
         })),
@@ -143,14 +143,16 @@ describe("POST /api/admin/identity-review — validation", () => {
     const res = createRes();
     await handler(createReq({ body: { action: "approve" } }), res);
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res._body.error).toContain("Action and verification ID are required");
+    expect(res._body.error).toContain(
+      "Action and verification ID are required",
+    );
   });
 
   it("rejects unknown action with 400", async () => {
     const res = createRes();
     await handler(
       createReq({ body: { action: "explode", verificationId: "req-1" } }),
-      res
+      res,
     );
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res._body.error).toContain("Invalid action");
@@ -160,7 +162,7 @@ describe("POST /api/admin/identity-review — validation", () => {
     const res = createRes();
     await handler(
       createReq({ body: { action: "reject", verificationId: "req-1" } }),
-      res
+      res,
     );
     expect(res.status).toHaveBeenCalledWith(400);
     expect(rejectRequest).not.toHaveBeenCalled();
@@ -170,7 +172,7 @@ describe("POST /api/admin/identity-review — validation", () => {
     const res = createRes();
     await handler(
       createReq({ body: { action: "resubmit", verificationId: "req-1" } }),
-      res
+      res,
     );
     expect(res.status).toHaveBeenCalledWith(400);
     expect(requestResubmission).not.toHaveBeenCalled();
@@ -191,9 +193,14 @@ describe("POST /api/admin/identity-review — action dispatch", () => {
       createReq({
         body: { action: "approve", verificationId: "req-1", notes: "good" },
       }),
-      res
+      res,
     );
-    expect(approveRequest).toHaveBeenCalledWith("req-1", "admin-9", "good", "admin-9");
+    expect(approveRequest).toHaveBeenCalledWith(
+      "req-1",
+      "admin-9",
+      "good",
+      "admin-9",
+    );
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res._body.success).toBe(true);
   });
@@ -205,9 +212,14 @@ describe("POST /api/admin/identity-review — action dispatch", () => {
       createReq({
         body: { action: "reject", verificationId: "req-2", reason: "Blurry" },
       }),
-      res
+      res,
     );
-    expect(rejectRequest).toHaveBeenCalledWith("req-2", "admin-9", "Blurry", "admin-9");
+    expect(rejectRequest).toHaveBeenCalledWith(
+      "req-2",
+      "admin-9",
+      "Blurry",
+      "admin-9",
+    );
     expect(res.status).toHaveBeenCalledWith(200);
   });
 
@@ -216,11 +228,20 @@ describe("POST /api/admin/identity-review — action dispatch", () => {
     const res = createRes();
     await handler(
       createReq({
-        body: { action: "resubmit", verificationId: "req-3", reason: "New docs" },
+        body: {
+          action: "resubmit",
+          verificationId: "req-3",
+          reason: "New docs",
+        },
       }),
-      res
+      res,
     );
-    expect(requestResubmission).toHaveBeenCalledWith("req-3", "admin-9", "New docs", "admin-9");
+    expect(requestResubmission).toHaveBeenCalledWith(
+      "req-3",
+      "admin-9",
+      "New docs",
+      "admin-9",
+    );
     expect(res.status).toHaveBeenCalledWith(200);
   });
 
@@ -231,9 +252,14 @@ describe("POST /api/admin/identity-review — action dispatch", () => {
       createReq({
         body: { action: "suspend", verificationId: "req-4", reason: "Fraud" },
       }),
-      res
+      res,
     );
-    expect(suspendVerification).toHaveBeenCalledWith("req-4", "admin-9", "Fraud", "admin-9");
+    expect(suspendVerification).toHaveBeenCalledWith(
+      "req-4",
+      "admin-9",
+      "Fraud",
+      "admin-9",
+    );
     expect(res.status).toHaveBeenCalledWith(200);
   });
 
@@ -244,7 +270,7 @@ describe("POST /api/admin/identity-review — action dispatch", () => {
       createReq({
         body: { action: "reject", verificationId: "nope", reason: "why" },
       }),
-      res
+      res,
     );
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res._body.error).toBe("not found");
@@ -255,7 +281,7 @@ describe("POST /api/admin/identity-review — action dispatch", () => {
     const res = createRes();
     await handler(
       createReq({ body: { action: "approve", verificationId: "req-1" } }),
-      res
+      res,
     );
     expect(res.status).toHaveBeenCalledWith(500);
   });
@@ -275,7 +301,10 @@ describe("POST /api/admin/identity-review — role gate", () => {
   });
 
   function authNone() {
-    supabaseAdmin.auth.getUser.mockResolvedValue({ data: { user: null }, error: null });
+    supabaseAdmin.auth.getUser.mockResolvedValue({
+      data: { user: null },
+      error: null,
+    });
   }
 
   it("rejects donor with 403", async () => {
@@ -298,7 +327,7 @@ describe("POST /api/admin/identity-review — role gate", () => {
     const res = createRes();
     await handler(
       createReq({ body: { action: "approve", verificationId: "req-1" } }),
-      res
+      res,
     );
     expect(res.status).toHaveBeenCalledWith(200);
   });

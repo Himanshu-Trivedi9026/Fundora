@@ -10,11 +10,20 @@ import { useState } from "react";
  * @param {string} props.status — Current verification status
  * @param {boolean} props.loading — Loading state
  */
-export default function GSTValidator({ value = "", onChange, onSubmit, status, loading = false }) {
+export default function GSTValidator({
+  value = "",
+  onChange,
+  onSubmit,
+  status,
+  loading = false,
+}) {
   const [error, setError] = useState("");
 
   const validate = (gst) => {
-    if (!gst) { setError(""); return true; }
+    if (!gst) {
+      setError("");
+      return true;
+    }
     const cleaned = gst.trim().toUpperCase();
     if (cleaned.length > 0 && cleaned.length !== 15) {
       setError("GST must be 15 characters");
@@ -39,7 +48,9 @@ export default function GSTValidator({ value = "", onChange, onSubmit, status, l
 
   return (
     <div className="space-y-2">
-      <label className="text-xs text-on-surface-variant font-inter block">GST Number</label>
+      <label className="text-xs text-on-surface-variant font-inter block">
+        GST Number
+      </label>
       <div className="flex gap-2">
         <input
           type="text"
@@ -66,7 +77,12 @@ export default function GSTValidator({ value = "", onChange, onSubmit, status, l
       {error && <p className="text-xs text-danger">{error}</p>}
       {status === "verified" && (
         <p className="text-xs text-success font-inter flex items-center gap-1">
-          <span className="material-symbols-outlined text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+          <span
+            className="material-symbols-outlined text-[12px]"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >
+            check_circle
+          </span>
           GST verified
         </p>
       )}

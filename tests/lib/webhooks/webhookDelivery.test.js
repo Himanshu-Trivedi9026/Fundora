@@ -53,7 +53,12 @@ describe("WebhookDelivery", () => {
                   attempt_count: 0,
                   max_attempts: 5,
                   payload: { event: "test" },
-                  webhooks: { id: "wh-1", url: "https://example.com/hook", secret: "whsec_abc", status: "active" },
+                  webhooks: {
+                    id: "wh-1",
+                    url: "https://example.com/hook",
+                    secret: "whsec_abc",
+                    status: "active",
+                  },
                 },
                 error: null,
               }),
@@ -96,7 +101,12 @@ describe("WebhookDelivery", () => {
                   attempt_count: 0,
                   max_attempts: 5,
                   payload: { event: "test" },
-                  webhooks: { id: "wh-1", url: "https://example.com/hook", secret: "whsec_abc", status: "active" },
+                  webhooks: {
+                    id: "wh-1",
+                    url: "https://example.com/hook",
+                    secret: "whsec_abc",
+                    status: "active",
+                  },
                 },
                 error: null,
               }),
@@ -132,7 +142,12 @@ describe("WebhookDelivery", () => {
                   attempt_count: 4, // Already at 4, this will be attempt 5 = max
                   max_attempts: 5,
                   payload: { event: "test" },
-                  webhooks: { id: "wh-1", url: "https://example.com/hook", secret: "whsec_abc", status: "active" },
+                  webhooks: {
+                    id: "wh-1",
+                    url: "https://example.com/hook",
+                    secret: "whsec_abc",
+                    status: "active",
+                  },
                 },
                 error: null,
               }),
@@ -149,7 +164,9 @@ describe("WebhookDelivery", () => {
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: { failure_count: 5 }, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: { failure_count: 5 }, error: null }),
             }),
           }),
         })
@@ -180,7 +197,12 @@ describe("WebhookDelivery", () => {
                 attempt_count: 0,
                 max_attempts: 5,
                 payload: {},
-                webhooks: { id: "wh-1", url: "https://example.com", secret: "s", status: "failed" },
+                webhooks: {
+                  id: "wh-1",
+                  url: "https://example.com",
+                  secret: "s",
+                  status: "failed",
+                },
               },
               error: null,
             }),
@@ -222,7 +244,12 @@ describe("WebhookDelivery", () => {
                   attempt_count: 0,
                   max_attempts: 5,
                   payload: { event: "test" },
-                  webhooks: { id: "wh-1", url: "https://example.com/hook", secret: "whsec_abc", status: "active" },
+                  webhooks: {
+                    id: "wh-1",
+                    url: "https://example.com/hook",
+                    secret: "whsec_abc",
+                    status: "active",
+                  },
                 },
                 error: null,
               }),

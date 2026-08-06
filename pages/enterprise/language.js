@@ -42,8 +42,12 @@ export default function LanguagePage() {
       <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#0d0d15] to-[#0a0a0f]">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-white">Internationalization Settings</h1>
-            <p className="text-gray-400 mt-1">Manage language packs and locale settings</p>
+            <h1 className="text-2xl font-bold text-white">
+              Internationalization Settings
+            </h1>
+            <p className="text-gray-400 mt-1">
+              Manage language packs and locale settings
+            </p>
           </div>
 
           {loading && (
@@ -62,10 +66,19 @@ export default function LanguagePage() {
 
           {error && (
             <GlassCard className="text-center py-12">
-              <span className="material-symbols-outlined text-4xl text-red-400 mb-3">error_outline</span>
-              <p className="text-red-400 text-lg font-medium">Failed to load language packs</p>
+              <span className="material-symbols-outlined text-4xl text-red-400 mb-3">
+                error_outline
+              </span>
+              <p className="text-red-400 text-lg font-medium">
+                Failed to load language packs
+              </p>
               <p className="text-gray-500 text-sm mt-1">{error}</p>
-              <Button variant="secondary" size="sm" className="mt-4" onClick={() => window.location.reload()}>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="mt-4"
+                onClick={() => window.location.reload()}
+              >
                 Retry
               </Button>
             </GlassCard>
@@ -73,9 +86,15 @@ export default function LanguagePage() {
 
           {!loading && !error && locales.length === 0 && (
             <GlassCard className="text-center py-12">
-              <span className="material-symbols-outlined text-4xl text-gray-500 mb-3">language</span>
-              <p className="text-gray-400 text-lg font-medium">No language packs available</p>
-              <p className="text-gray-600 text-sm mt-1">Language packs will appear here once configured.</p>
+              <span className="material-symbols-outlined text-4xl text-gray-500 mb-3">
+                language
+              </span>
+              <p className="text-gray-400 text-lg font-medium">
+                No language packs available
+              </p>
+              <p className="text-gray-600 text-sm mt-1">
+                Language packs will appear here once configured.
+              </p>
             </GlassCard>
           )}
 
@@ -83,24 +102,33 @@ export default function LanguagePage() {
             <>
               {/* Current Locale */}
               <GlassCard className="mb-6">
-                <h2 className="text-white font-semibold text-sm mb-3">Current Locale</h2>
+                <h2 className="text-white font-semibold text-sm mb-3">
+                  Current Locale
+                </h2>
                 <div className="flex items-center gap-4">
                   <span className="text-2xl">
-                    {locales.find((l) => l.code === currentLocale)?.flag || "🌐"}
+                    {locales.find((l) => l.code === currentLocale)?.flag ||
+                      "🌐"}
                   </span>
                   <div>
                     <p className="text-white font-medium">
-                      {locales.find((l) => l.code === currentLocale)?.name || currentLocale}
+                      {locales.find((l) => l.code === currentLocale)?.name ||
+                        currentLocale}
                     </p>
                     <p className="text-gray-500 text-xs">
-                      Code: <span className="text-gray-400 font-mono">{currentLocale}</span>
+                      Code:{" "}
+                      <span className="text-gray-400 font-mono">
+                        {currentLocale}
+                      </span>
                     </p>
                   </div>
                 </div>
               </GlassCard>
 
               {/* Language Selector */}
-              <h2 className="text-white font-semibold text-sm mb-4">Available Languages</h2>
+              <h2 className="text-white font-semibold text-sm mb-4">
+                Available Languages
+              </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {locales.map((lang) => (
                   <GlassCard
@@ -116,24 +144,31 @@ export default function LanguagePage() {
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">{lang.flag || "🌐"}</span>
                       <div className="flex-1">
-                        <h3 className="text-white text-sm font-medium">{lang.name}</h3>
-                        <p className="text-gray-500 text-[11px]">{(lang.code || lang.locale).toUpperCase()}</p>
+                        <h3 className="text-white text-sm font-medium">
+                          {lang.name}
+                        </h3>
+                        <p className="text-gray-500 text-[11px]">
+                          {(lang.code || lang.locale).toUpperCase()}
+                        </p>
                       </div>
                       {currentLocale === (lang.code || lang.locale) && (
-                        <span className="material-symbols-outlined text-indigo-400 text-[18px]">check_circle</span>
+                        <span className="material-symbols-outlined text-indigo-400 text-[18px]">
+                          check_circle
+                        </span>
                       )}
                     </div>
                     <div className="mt-2 flex items-center gap-2">
                       <span className="text-[11px] text-gray-500">
-                        {lang.translationCount || lang.count || 0} translation(s)
+                        {lang.translationCount || lang.count || 0}{" "}
+                        translation(s)
                       </span>
                       <span
                         className={`text-[10px] px-1.5 py-0.5 rounded-full ${
                           (lang.percentage || lang.progress || 0) >= 90
                             ? "bg-green-500/10 text-green-400"
                             : (lang.percentage || lang.progress || 0) >= 50
-                            ? "bg-yellow-500/10 text-yellow-400"
-                            : "bg-gray-500/10 text-gray-400"
+                              ? "bg-yellow-500/10 text-yellow-400"
+                              : "bg-gray-500/10 text-gray-400"
                         }`}
                       >
                         {lang.percentage || lang.progress || 0}%

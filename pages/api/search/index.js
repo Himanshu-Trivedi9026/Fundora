@@ -8,7 +8,10 @@ async function handler(req, res) {
     switch (req.method) {
       case "GET": {
         const { query, entity, page, limit, sort, ...filters } = req.query;
-        if (!query) return res.status(400).json({ success: false, error: "Query parameter required" });
+        if (!query)
+          return res
+            .status(400)
+            .json({ success: false, error: "Query parameter required" });
 
         const result = await search({
           query,
@@ -24,14 +27,19 @@ async function handler(req, res) {
 
       case "POST": {
         const { query, entities, perEntityLimit } = req.body;
-        if (!query) return res.status(400).json({ success: false, error: "Query required" });
+        if (!query)
+          return res
+            .status(400)
+            .json({ success: false, error: "Query required" });
 
         const result = await globalSearch(query, { entities, perEntityLimit });
         return res.status(200).json(result);
       }
 
       default:
-        return res.status(405).json({ success: false, error: "Method not allowed" });
+        return res
+          .status(405)
+          .json({ success: false, error: "Method not allowed" });
     }
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });

@@ -16,11 +16,15 @@ export default withAuth(async function handler(req, res, user) {
     if (!rl(req, res)) return;
 
     try {
-      const { category, severity, startDate, endDate, limit, offset, summary } = req.query;
+      const { category, severity, startDate, endDate, limit, offset, summary } =
+        req.query;
 
       // Summary mode
       if (summary === "true") {
-        const result = await getFraudEventSummary(user.id, parseInt(req.query.days, 10) || 30);
+        const result = await getFraudEventSummary(
+          user.id,
+          parseInt(req.query.days, 10) || 30,
+        );
         if (!result.success) {
           return res.status(500).json({ error: result.error });
         }

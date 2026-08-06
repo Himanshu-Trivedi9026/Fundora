@@ -79,7 +79,7 @@ describe("VerificationStatus", () => {
 
   it("hides icon when showIcon is false", () => {
     const { container } = render(
-      <VerificationStatus status="approved" showIcon={false} />
+      <VerificationStatus status="approved" showIcon={false} />,
     );
     expect(container.querySelector(".material-symbols-outlined")).toBeNull();
   });
@@ -104,7 +104,7 @@ describe("VerificationProgress", () => {
 
   it("hides labels when showLabels is false", () => {
     const { container } = render(
-      <VerificationProgress currentLevel={2} showLabels={false} />
+      <VerificationProgress currentLevel={2} showLabels={false} />,
     );
     const labels = container.querySelectorAll(".text-\\[8px\\]");
     expect(labels.length).toBe(0);
@@ -142,7 +142,11 @@ describe("VerificationSteps", () => {
 
   const mockHistory = [
     { action: "approved", new_level: 1, created_at: "2026-01-05T10:00:00Z" },
-    { action: "level_changed", new_level: 2, created_at: "2026-01-15T12:00:00Z" },
+    {
+      action: "level_changed",
+      new_level: 2,
+      created_at: "2026-01-15T12:00:00Z",
+    },
   ];
 
   it("renders null when verification is null", () => {
@@ -182,7 +186,12 @@ describe("VerificationSteps", () => {
   });
 
   it("displays dates from history", () => {
-    const { container } = render(<VerificationSteps verification={mockVerification} history={mockHistory} />);
+    const { container } = render(
+      <VerificationSteps
+        verification={mockVerification}
+        history={mockHistory}
+      />,
+    );
     // Should show dates for completed steps (small text elements)
     const dateElements = container.querySelectorAll(".text-\\[8px\\]");
     expect(dateElements.length).toBeGreaterThanOrEqual(1);

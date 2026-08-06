@@ -10,7 +10,7 @@ import { BaseVerificationProvider } from "../../lib/verification/baseProvider";
 describe("BaseVerificationProvider", () => {
   it("cannot be instantiated directly", () => {
     expect(() => new BaseVerificationProvider()).toThrow(
-      "BaseVerificationProvider is abstract"
+      "BaseVerificationProvider is abstract",
     );
   });
 
@@ -23,20 +23,36 @@ describe("BaseVerificationProvider", () => {
 
     const provider = new TestProvider();
     // Async methods return rejected promises
-    await expect(provider.submitVerification({})).rejects.toThrow("must be implemented");
-    await expect(provider.checkStatus("")).rejects.toThrow("must be implemented");
-    await expect(provider.handleWebhook({}, "")).rejects.toThrow("must be implemented");
+    await expect(provider.submitVerification({})).rejects.toThrow(
+      "must be implemented",
+    );
+    await expect(provider.checkStatus("")).rejects.toThrow(
+      "must be implemented",
+    );
+    await expect(provider.handleWebhook({}, "")).rejects.toThrow(
+      "must be implemented",
+    );
     // Sync methods throw directly
     expect(() => provider.mapStatus("")).toThrow("must be implemented");
-    expect(() => provider.calculateTrustScore({})).toThrow("must be implemented");
-    expect(() => provider.calculateRiskScore({})).toThrow("must be implemented");
-    expect(() => provider.verifyWebhookSignature("", "")).toThrow("must be implemented");
+    expect(() => provider.calculateTrustScore({})).toThrow(
+      "must be implemented",
+    );
+    expect(() => provider.calculateRiskScore({})).toThrow(
+      "must be implemented",
+    );
+    expect(() => provider.verifyWebhookSignature("", "")).toThrow(
+      "must be implemented",
+    );
   });
 
   it("stores config properties", () => {
     class TestProvider extends BaseVerificationProvider {
       constructor() {
-        super({ providerName: "test", apiKey: "key123", baseUrl: "https://api.test.com" });
+        super({
+          providerName: "test",
+          apiKey: "key123",
+          baseUrl: "https://api.test.com",
+        });
       }
     }
 
@@ -129,7 +145,7 @@ describe("Provider Registry", () => {
 
   it("rejects non-BaseVerificationProvider instances", () => {
     expect(() => registerProvider("bad", { notAProvider: true })).toThrow(
-      "must extend BaseVerificationProvider"
+      "must extend BaseVerificationProvider",
     );
   });
 });

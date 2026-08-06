@@ -88,7 +88,9 @@ export default function ReviewTimeline({ events = [] }) {
             <div
               className={`absolute -left-6 top-1 w-[22px] h-[22px] rounded-full border-2 flex items-center justify-center z-10 ${status.bg} ${status.border}`}
             >
-              <span className={`material-symbols-outlined text-[12px] ${status.color}`}>
+              <span
+                className={`material-symbols-outlined text-[12px] ${status.color}`}
+              >
                 {icon}
               </span>
             </div>

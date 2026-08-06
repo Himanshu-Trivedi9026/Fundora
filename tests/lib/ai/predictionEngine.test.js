@@ -117,7 +117,9 @@ describe("Prediction Engine", () => {
       const campaign = makeCampaign();
 
       // 1. fetchCampaignWithCreator
-      supabaseAdmin.from.mockReturnValueOnce(mockSelectSingle({ data: campaign, error: null }));
+      supabaseAdmin.from.mockReturnValueOnce(
+        mockSelectSingle({ data: campaign, error: null }),
+      );
 
       const result = await predictCampaignSuccess({ campaignId: "camp-1" });
 
@@ -135,7 +137,9 @@ describe("Prediction Engine", () => {
     it("should return low probability for campaign with zero funding", async () => {
       const campaign = makeCampaign({ current_amount: 0 });
 
-      supabaseAdmin.from.mockReturnValueOnce(mockSelectSingle({ data: campaign, error: null }));
+      supabaseAdmin.from.mockReturnValueOnce(
+        mockSelectSingle({ data: campaign, error: null }),
+      );
 
       const result = await predictCampaignSuccess({ campaignId: "camp-1" });
 
@@ -153,10 +157,12 @@ describe("Prediction Engine", () => {
 
     it("should fail when campaign is not found", async () => {
       supabaseAdmin.from.mockReturnValueOnce(
-        mockSelectSingle({ data: null, error: { message: "not found" } })
+        mockSelectSingle({ data: null, error: { message: "not found" } }),
       );
 
-      const result = await predictCampaignSuccess({ campaignId: "nonexistent" });
+      const result = await predictCampaignSuccess({
+        campaignId: "nonexistent",
+      });
 
       expect(result.success).toBe(false);
       expect(result.error).toContain("Campaign not found");
@@ -204,9 +210,14 @@ describe("Prediction Engine", () => {
     });
 
     it("should return immediately when goal is already met", async () => {
-      const campaign = makeCampaign({ current_amount: 10000, goal_amount: 10000 });
+      const campaign = makeCampaign({
+        current_amount: 10000,
+        goal_amount: 10000,
+      });
 
-      supabaseAdmin.from.mockReturnValueOnce(mockSelectSingle({ data: campaign, error: null }));
+      supabaseAdmin.from.mockReturnValueOnce(
+        mockSelectSingle({ data: campaign, error: null }),
+      );
 
       const result = await predictFundingTimeline({ campaignId: "camp-1" });
 
@@ -234,27 +245,36 @@ describe("Prediction Engine", () => {
       // 2x lookback window — many donations spread across time
       const donations = Array.from({ length: 20 }, (_, i) => ({
         amount: 50,
-        created_at: new Date(fullWindowAgo.getTime() + i * 3 * 86400000).toISOString(),
+        created_at: new Date(
+          fullWindowAgo.getTime() + i * 3 * 86400000,
+        ).toISOString(),
       }));
 
       supabaseAdmin.from.mockReturnValueOnce({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             gte: vi.fn().mockReturnValue({
-              order: vi.fn().mockResolvedValue({ data: donations, error: null }),
+              order: vi
+                .fn()
+                .mockResolvedValue({ data: donations, error: null }),
             }),
           }),
         }),
       });
 
-      const result = await predictDonationVelocity({ campaignId: "camp-1", windowDays: 30 });
+      const result = await predictDonationVelocity({
+        campaignId: "camp-1",
+        windowDays: 30,
+      });
 
       expect(result.success).toBe(true);
       expect(result.data).toHaveProperty("currentVelocity");
       expect(result.data).toHaveProperty("predictedVelocity");
       expect(result.data).toHaveProperty("trend");
       expect(result.data).toHaveProperty("confidence");
-      expect(["increasing", "stable", "decreasing"]).toContain(result.data.trend);
+      expect(["increasing", "stable", "decreasing"]).toContain(
+        result.data.trend,
+      );
     });
 
     it("should return stable trend with low confidence for sparse data", async () => {
@@ -263,7 +283,10 @@ describe("Prediction Engine", () => {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             gte: vi.fn().mockReturnValue({
-              order: vi.fn().mockResolvedValue({ data: [{ amount: 50, created_at: new Date().toISOString() }], error: null }),
+              order: vi.fn().mockResolvedValue({
+                data: [{ amount: 50, created_at: new Date().toISOString() }],
+                error: null,
+              }),
             }),
           }),
         }),
@@ -323,7 +346,9 @@ describe("Prediction Engine", () => {
       expect(result.data).toHaveProperty("probability");
       expect(result.data).toHaveProperty("keyRiskFactors");
       expect(result.data).toHaveProperty("mitigationSuggestions");
-      expect(["low", "medium", "high", "critical"]).toContain(result.data.riskLevel);
+      expect(["low", "medium", "high", "critical"]).toContain(
+        result.data.riskLevel,
+      );
       // With very low funding and low trust, should have multiple risk factors
       expect(result.data.keyRiskFactors.length).toBeGreaterThan(0);
       expect(result.data.mitigationSuggestions.length).toBeGreaterThan(0);
@@ -355,7 +380,10 @@ describe("Prediction Engine", () => {
             eq: vi.fn().mockReturnValue({
               gte: vi.fn().mockReturnValue({
                 order: vi.fn().mockResolvedValue({
-                  data: Array.from({ length: 20 }, () => ({ amount: 50, created_at: new Date().toISOString() })),
+                  data: Array.from({ length: 20 }, () => ({
+                    amount: 50,
+                    created_at: new Date().toISOString(),
+                  })),
                   error: null,
                 }),
               }),
@@ -386,11 +414,23 @@ describe("Prediction Engine", () => {
         donor_id: "donor-1",
         campaign_id: "camp-1",
         created_at: new Date(Date.now() - 10 * 86400000).toISOString(), // 10 days ago
-        donor: { id: "donor-1", trust_score: 0.9, refund_count: 0, total_donations: 10 },
-        campaign: { id: "camp-1", status: "active", goal_amount: 10000, current_amount: 8000 },
+        donor: {
+          id: "donor-1",
+          trust_score: 0.9,
+          refund_count: 0,
+          total_donations: 10,
+        },
+        campaign: {
+          id: "camp-1",
+          status: "active",
+          goal_amount: 10000,
+          current_amount: 8000,
+        },
       };
 
-      supabaseAdmin.from.mockReturnValueOnce(mockSelectSingle({ data: donation, error: null }));
+      supabaseAdmin.from.mockReturnValueOnce(
+        mockSelectSingle({ data: donation, error: null }),
+      );
 
       const result = await predictRefundProbability({ donationId: "don-1" });
 
@@ -407,11 +447,23 @@ describe("Prediction Engine", () => {
         donor_id: "donor-2",
         campaign_id: "camp-1",
         created_at: new Date(Date.now() - 2 * 3600000).toISOString(), // 2 hours ago
-        donor: { id: "donor-2", trust_score: 0.1, refund_count: 5, total_donations: 10 },
-        campaign: { id: "camp-1", status: "active", goal_amount: 10000, current_amount: 500 },
+        donor: {
+          id: "donor-2",
+          trust_score: 0.1,
+          refund_count: 5,
+          total_donations: 10,
+        },
+        campaign: {
+          id: "camp-1",
+          status: "active",
+          goal_amount: 10000,
+          current_amount: 500,
+        },
       };
 
-      supabaseAdmin.from.mockReturnValueOnce(mockSelectSingle({ data: donation, error: null }));
+      supabaseAdmin.from.mockReturnValueOnce(
+        mockSelectSingle({ data: donation, error: null }),
+      );
 
       const result = await predictRefundProbability({ donationId: "don-2" });
 
@@ -442,11 +494,18 @@ describe("Prediction Engine", () => {
           id: "camp-1",
           status: "active",
           creator_id: "creator-1",
-          creator: { id: "creator-1", trust_score: 0.8, reputation_score: 0.9, total_campaigns: 3 },
+          creator: {
+            id: "creator-1",
+            trust_score: 0.8,
+            reputation_score: 0.9,
+            total_campaigns: 3,
+          },
         },
       };
 
-      supabaseAdmin.from.mockReturnValueOnce(mockSelectSingle({ data: milestone, error: null }));
+      supabaseAdmin.from.mockReturnValueOnce(
+        mockSelectSingle({ data: milestone, error: null }),
+      );
 
       const result = await predictMilestoneCompletion({ milestoneId: "ms-1" });
 
@@ -467,7 +526,12 @@ describe("Prediction Engine", () => {
           id: "camp-1",
           status: "active",
           creator_id: "creator-1",
-          creator: { id: "creator-1", trust_score: 0.4, reputation_score: 0.3, total_campaigns: 1 },
+          creator: {
+            id: "creator-1",
+            trust_score: 0.4,
+            reputation_score: 0.3,
+            total_campaigns: 1,
+          },
         },
       };
 
@@ -480,7 +544,10 @@ describe("Prediction Engine", () => {
             limit: vi.fn().mockResolvedValue({
               data: [
                 { status: "failed", campaign: [{ creator_id: "creator-1" }] },
-                { status: "completed", campaign: [{ creator_id: "creator-1" }] },
+                {
+                  status: "completed",
+                  campaign: [{ creator_id: "creator-1" }],
+                },
               ],
               error: null,
             }),
@@ -523,7 +590,9 @@ describe("Prediction Engine", () => {
       const olderDonations = Array.from({ length: 5 }, (_, i) => ({
         id: `d${i + 10}`,
         amount: 30,
-        created_at: new Date(Date.now() - (45 + i * 3) * 86400000).toISOString(),
+        created_at: new Date(
+          Date.now() - (45 + i * 3) * 86400000,
+        ).toISOString(),
       }));
 
       // 1. Fetch creator
@@ -533,7 +602,9 @@ describe("Prediction Engine", () => {
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              gte: vi.fn().mockResolvedValue({ data: recentDonations, error: null }),
+              gte: vi
+                .fn()
+                .mockResolvedValue({ data: recentDonations, error: null }),
             }),
           }),
         })
@@ -542,7 +613,9 @@ describe("Prediction Engine", () => {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               gte: vi.fn().mockReturnValue({
-                lt: vi.fn().mockResolvedValue({ data: olderDonations, error: null }),
+                lt: vi
+                  .fn()
+                  .mockResolvedValue({ data: olderDonations, error: null }),
               }),
             }),
           }),
@@ -556,7 +629,9 @@ describe("Prediction Engine", () => {
       expect(result.data).toHaveProperty("trend");
       expect(result.data).toHaveProperty("projectedFollowers");
       expect(result.data).toHaveProperty("projectedDonations");
-      expect(["accelerating", "steady", "declining"]).toContain(result.data.trend);
+      expect(["accelerating", "steady", "declining"]).toContain(
+        result.data.trend,
+      );
       expect(result.data.projectedFollowers).toBeGreaterThanOrEqual(0);
     });
 
@@ -569,7 +644,7 @@ describe("Prediction Engine", () => {
 
     it("should fail when creator is not found", async () => {
       supabaseAdmin.from.mockReturnValueOnce(
-        mockSelectSingle({ data: null, error: { message: "not found" } })
+        mockSelectSingle({ data: null, error: { message: "not found" } }),
       );
 
       const result = await predictCreatorGrowth({ creatorId: "nonexistent" });
@@ -587,7 +662,9 @@ describe("Prediction Engine", () => {
       // Two campaigns in sequence — each needs fetchCampaignWithCreator
       supabaseAdmin.from
         .mockReturnValueOnce(mockSelectSingle({ data: campaign1, error: null }))
-        .mockReturnValueOnce(mockSelectSingle({ data: campaign2, error: null }));
+        .mockReturnValueOnce(
+          mockSelectSingle({ data: campaign2, error: null }),
+        );
 
       const result = await batchPredict({
         entityType: "campaign",
@@ -610,14 +687,21 @@ describe("Prediction Engine", () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.data[0].prediction.error).toContain("Cannot predict campaign success for entity type: donation");
+      expect(result.data[0].prediction.error).toContain(
+        "Cannot predict campaign success for entity type: donation",
+      );
     });
 
     it("should reject missing entityType", async () => {
-      const result = await batchPredict({ entityIds: ["c1"], predictionType: PREDICTION_TYPES.CAMPAIGN_SUCCESS });
+      const result = await batchPredict({
+        entityIds: ["c1"],
+        predictionType: PREDICTION_TYPES.CAMPAIGN_SUCCESS,
+      });
 
       expect(result.success).toBe(false);
-      expect(result.error).toContain("entityType and a non-empty entityIds array are required");
+      expect(result.error).toContain(
+        "entityType and a non-empty entityIds array are required",
+      );
     });
 
     it("should reject empty entityIds array", async () => {
@@ -628,7 +712,9 @@ describe("Prediction Engine", () => {
       });
 
       expect(result.success).toBe(false);
-      expect(result.error).toContain("entityType and a non-empty entityIds array are required");
+      expect(result.error).toContain(
+        "entityType and a non-empty entityIds array are required",
+      );
     });
   });
 

@@ -23,7 +23,10 @@ export default function ProjectStory({ project }) {
 
       <div className="space-y-4">
         {description.split("\n").map((paragraph, i) => (
-          <p key={i} className="text-on-surface-variant font-inter text-sm md:text-base leading-relaxed">
+          <p
+            key={i}
+            className="text-on-surface-variant font-inter text-sm md:text-base leading-relaxed"
+          >
             {paragraph}
           </p>
         ))}
@@ -37,7 +40,12 @@ export default function ProjectStory({ project }) {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 border border-primary/20 text-primary font-inter text-sm hover:bg-primary/20 transition-colors"
         >
-          <span className="material-symbols-outlined text-lg" aria-hidden="true">open_in_new</span>
+          <span
+            className="material-symbols-outlined text-lg"
+            aria-hidden="true"
+          >
+            open_in_new
+          </span>
           View Prototype (opens in new tab)
         </motion.a>
       )}

@@ -60,10 +60,18 @@ export default function EventsPage() {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-2xl font-bold text-white">Event Bus</h1>
-              <p className="text-gray-400 mt-1">Event history and system activity stream</p>
+              <p className="text-gray-400 mt-1">
+                Event history and system activity stream
+              </p>
             </div>
-            <Button variant="secondary" size="sm" onClick={() => fetchEvents(filterType)}>
-              <span className="material-symbols-outlined text-[16px]">refresh</span>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => fetchEvents(filterType)}
+            >
+              <span className="material-symbols-outlined text-[16px]">
+                refresh
+              </span>
               Refresh
             </Button>
           </div>
@@ -88,7 +96,10 @@ export default function EventsPage() {
           {loading && (
             <div className="space-y-3">
               {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="glass-card p-4 animate-pulse flex items-center gap-4">
+                <div
+                  key={i}
+                  className="glass-card p-4 animate-pulse flex items-center gap-4"
+                >
                   <div className="w-8 h-8 rounded-full bg-white/[0.06]" />
                   <div className="flex-1">
                     <div className="h-3 bg-white/[0.06] rounded w-1/4 mb-2" />
@@ -102,10 +113,19 @@ export default function EventsPage() {
 
           {error && (
             <GlassCard className="text-center py-12">
-              <span className="material-symbols-outlined text-4xl text-red-400 mb-3">error_outline</span>
-              <p className="text-red-400 text-lg font-medium">Failed to load events</p>
+              <span className="material-symbols-outlined text-4xl text-red-400 mb-3">
+                error_outline
+              </span>
+              <p className="text-red-400 text-lg font-medium">
+                Failed to load events
+              </p>
               <p className="text-gray-500 text-sm mt-1">{error}</p>
-              <Button variant="secondary" size="sm" className="mt-4" onClick={() => fetchEvents(filterType)}>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="mt-4"
+                onClick={() => fetchEvents(filterType)}
+              >
                 Retry
               </Button>
             </GlassCard>
@@ -113,8 +133,12 @@ export default function EventsPage() {
 
           {!loading && !error && events.length === 0 && (
             <GlassCard className="text-center py-12">
-              <span className="material-symbols-outlined text-4xl text-gray-500 mb-3">timeline</span>
-              <p className="text-gray-400 text-lg font-medium">No events found</p>
+              <span className="material-symbols-outlined text-4xl text-gray-500 mb-3">
+                timeline
+              </span>
+              <p className="text-gray-400 text-lg font-medium">
+                No events found
+              </p>
               <p className="text-gray-600 text-sm mt-1">
                 {filterType
                   ? `No events of type "${filterType}" recorded yet.`
@@ -126,35 +150,42 @@ export default function EventsPage() {
           {!loading && !error && events.length > 0 && (
             <div className="space-y-2">
               {events.map((evt, idx) => (
-                <GlassCard key={evt.id || idx} padding="sm" className="flex items-center gap-4">
+                <GlassCard
+                  key={evt.id || idx}
+                  padding="sm"
+                  className="flex items-center gap-4"
+                >
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                       evt.status === "error"
                         ? "bg-red-500/10"
                         : evt.status === "completed" || evt.status === "success"
-                        ? "bg-green-500/10"
-                        : "bg-white/[0.06]"
+                          ? "bg-green-500/10"
+                          : "bg-white/[0.06]"
                     }`}
                   >
                     <span
                       className={`material-symbols-outlined text-[16px] ${
                         evt.status === "error"
                           ? "text-red-400"
-                          : evt.status === "completed" || evt.status === "success"
-                          ? "text-green-400"
-                          : "text-gray-400"
+                          : evt.status === "completed" ||
+                              evt.status === "success"
+                            ? "text-green-400"
+                            : "text-gray-400"
                       }`}
                     >
                       {evt.status === "error"
                         ? "error"
                         : evt.status === "completed" || evt.status === "success"
-                        ? "check_circle"
-                        : "circle"}
+                          ? "check_circle"
+                          : "circle"}
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-white text-xs font-medium capitalize">{evt.eventType || evt.type || "unknown"}</span>
+                      <span className="text-white text-xs font-medium capitalize">
+                        {evt.eventType || evt.type || "unknown"}
+                      </span>
                       {evt.source && (
                         <span className="text-[10px] text-gray-600 bg-white/[0.04] px-1.5 py-0.5 rounded">
                           {evt.source}
@@ -170,14 +201,17 @@ export default function EventsPage() {
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="text-gray-500 text-[11px]">{formatTimestamp(evt.timestamp || evt.createdAt)}</p>
+                    <p className="text-gray-500 text-[11px]">
+                      {formatTimestamp(evt.timestamp || evt.createdAt)}
+                    </p>
                     <span
                       className={`text-[10px] font-medium ${
                         evt.status === "error"
                           ? "text-red-400"
-                          : evt.status === "completed" || evt.status === "success"
-                          ? "text-green-400"
-                          : "text-gray-400"
+                          : evt.status === "completed" ||
+                              evt.status === "success"
+                            ? "text-green-400"
+                            : "text-gray-400"
                       }`}
                     >
                       {evt.status || "pending"}

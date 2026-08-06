@@ -13,10 +13,15 @@ export default function RejectedDocuments({ documents = [], onResubmit }) {
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <span className="material-symbols-outlined text-danger text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+        <span
+          className="material-symbols-outlined text-danger text-[16px]"
+          style={{ fontVariationSettings: "'FILL' 1" }}
+        >
           error
         </span>
-        <h3 className="font-geist text-sm font-semibold text-danger">Documents Need Attention</h3>
+        <h3 className="font-geist text-sm font-semibold text-danger">
+          Documents Need Attention
+        </h3>
       </div>
       <div className="space-y-2">
         {documents.map((doc) => (
@@ -26,11 +31,17 @@ export default function RejectedDocuments({ documents = [], onResubmit }) {
             animate={{ opacity: 1, x: 0 }}
             className="flex items-center gap-3 p-3 rounded-xl bg-danger/5 border border-danger/10"
           >
-            <span className="material-symbols-outlined text-danger text-[16px]">upload_file</span>
+            <span className="material-symbols-outlined text-danger text-[16px]">
+              upload_file
+            </span>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-inter text-on-surface">{doc.document_type?.replace(/_/g, " ")}</p>
+              <p className="text-sm font-inter text-on-surface">
+                {doc.document_type?.replace(/_/g, " ")}
+              </p>
               {doc.rejection_reason && (
-                <p className="text-xs text-on-surface-variant font-inter truncate">{doc.rejection_reason}</p>
+                <p className="text-xs text-on-surface-variant font-inter truncate">
+                  {doc.rejection_reason}
+                </p>
               )}
             </div>
             {onResubmit && (

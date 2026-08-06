@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { ROLES, AREA_ROLES, roleHome, protectedArea, requiresVerification } from "./lib/roles";
+import {
+  ROLES,
+  AREA_ROLES,
+  roleHome,
+  protectedArea,
+  requiresVerification,
+} from "./lib/roles";
 
 /**
  * Next.js Proxy — server-side auth + role gate for protected routes.
@@ -38,7 +44,7 @@ function isProtected(pathname) {
   if (rule) return rule;
 
   return EXTRA_AUTH_PATHS.some(
-    (p) => pathname === p || pathname.startsWith(p + "/")
+    (p) => pathname === p || pathname.startsWith(p + "/"),
   )
     ? { authOnly: true }
     : null;
@@ -57,15 +63,15 @@ export async function proxy(request) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
+            request.cookies.set(name, value),
           );
           supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            supabaseResponse.cookies.set(name, value, options),
           );
         },
       },
-    }
+    },
   );
 
   const pathname = request.nextUrl.pathname;
@@ -107,7 +113,11 @@ export async function proxy(request) {
         return NextResponse.redirect(verifyUrl);
       }
     } catch (err) {
-      console.error("[proxy] verification lookup failed for", user.id, err?.message);
+      console.error(
+        "[proxy] verification lookup failed for",
+        user.id,
+        err?.message,
+      );
       const verifyUrl = new URL("/creator/verification", request.url);
       verifyUrl.searchParams.set("from", pathname);
       return NextResponse.redirect(verifyUrl);
@@ -134,7 +144,11 @@ export async function proxy(request) {
     // observed at runtime (307 -> /investor/dashboard). Fail open so the
     // client-side RoleContext can refine the real role.
     if (roleError) {
-      console.error("[proxy] role lookup failed for", user.id, roleError.message);
+      console.error(
+        "[proxy] role lookup failed for",
+        user.id,
+        roleError.message,
+      );
       return supabaseResponse;
     }
 

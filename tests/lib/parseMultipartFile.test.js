@@ -24,7 +24,9 @@ function buildMultipart({ fields = {}, files = [] }) {
 
   for (const { fieldName, filename, contentType, content } of files) {
     line(`--${BOUNDARY}`);
-    line(`Content-Disposition: form-data; name="${fieldName}"; filename="${filename}"`);
+    line(
+      `Content-Disposition: form-data; name="${fieldName}"; filename="${filename}"`,
+    );
     line(`Content-Type: ${contentType}`);
     line("");
     if (Buffer.isBuffer(content)) {

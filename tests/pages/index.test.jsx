@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import Home, { getStaticProps } from "../../pages/index";
-import { loadLandingPageData, EMPTY_STATS } from "../../lib/landing/landingData";
+import {
+  loadLandingPageData,
+  EMPTY_STATS,
+} from "../../lib/landing/landingData";
 import { supabaseServer } from "../../lib/supabaseServer";
 
 // Keep the real supabaseClient mock from tests/setup.js (components subscribe
@@ -65,7 +68,10 @@ describe("pages/index", () => {
   describe("getStaticProps (ISR)", () => {
     it("returns public stats + trending with revalidate: 60", async () => {
       const initialStats = { ...EMPTY_STATS, totalRaised: 100000 };
-      const initialTrending = { projects: [{ id: "p1", title: "Alpha" }], creatorMap: {} };
+      const initialTrending = {
+        projects: [{ id: "p1", title: "Alpha" }],
+        creatorMap: {},
+      };
       vi.mocked(loadLandingPageData).mockResolvedValueOnce({
         initialStats,
         initialTrending,
@@ -86,7 +92,11 @@ describe("pages/index", () => {
     it("renders hero, stats, and trending sections", async () => {
       render(
         <Home
-          initialStats={{ ...EMPTY_STATS, totalRaised: 100000, totalBackers: 4 }}
+          initialStats={{
+            ...EMPTY_STATS,
+            totalRaised: 100000,
+            totalBackers: 4,
+          }}
           initialTrending={{
             projects: [
               {
@@ -105,7 +115,9 @@ describe("pages/index", () => {
       );
 
       // Hero renders server-side with the guest CTA (no client role fetch).
-      expect(screen.getByRole("heading", { name: /Fundora/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: /Fundora/i }),
+      ).toBeInTheDocument();
 
       // Stats render from the ISR payload — no ₹0 flash, real values.
       expect(screen.getByText("Capital Raised")).toBeInTheDocument();
@@ -117,7 +129,9 @@ describe("pages/index", () => {
 
       // Below-the-fold lazy sections hydrate into the same markup.
       await waitFor(() => {
-        expect(screen.getByText("The Intelligent Ecosystem")).toBeInTheDocument();
+        expect(
+          screen.getByText("The Intelligent Ecosystem"),
+        ).toBeInTheDocument();
       });
     });
   });

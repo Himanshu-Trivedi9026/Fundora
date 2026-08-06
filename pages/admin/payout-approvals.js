@@ -27,7 +27,9 @@ function formatCurrency(cents) {
 function formatDate(ts) {
   if (!ts) return "—";
   return new Date(ts).toLocaleDateString("en-IN", {
-    year: "numeric", month: "short", day: "numeric",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   });
 }
 
@@ -44,7 +46,10 @@ export default function AdminPayoutApprovals() {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user) { router.push("/login"); return; }
+    if (!user) {
+      router.push("/login");
+      return;
+    }
     fetchPayouts();
   }, [user, authLoading, router]);
 
@@ -104,7 +109,6 @@ export default function AdminPayoutApprovals() {
     <PageLayout>
       <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#0d0d15] to-[#0a0a0f]">
         <div className="max-w-7xl mx-auto px-4 py-8">
-
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-2xl md:text-3xl font-bold text-white font-geist">
@@ -127,9 +131,16 @@ export default function AdminPayoutApprovals() {
             <div className="flex items-center justify-center min-h-[40vh]">
               <GlassCard>
                 <div className="text-center py-8">
-                  <span className="material-symbols-outlined text-[48px] text-red-400 mb-4">error</span>
+                  <span className="material-symbols-outlined text-[48px] text-red-400 mb-4">
+                    error
+                  </span>
                   <p className="text-red-300">{error}</p>
-                  <Button onClick={fetchPayouts} variant="secondary" size="sm" className="mt-4">
+                  <Button
+                    onClick={fetchPayouts}
+                    variant="secondary"
+                    size="sm"
+                    className="mt-4"
+                  >
                     Retry
                   </Button>
                 </div>
@@ -162,23 +173,42 @@ export default function AdminPayoutApprovals() {
                         <h3 className="text-white font-semibold font-geist">
                           {formatCurrency(p.amount)}
                         </h3>
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                          p.status === "pending" ? "bg-yellow-500/20 text-yellow-400"
-                          : p.status === "approved" ? "bg-green-500/20 text-green-400"
-                          : p.status === "rejected" ? "bg-red-500/20 text-red-400"
-                          : "bg-gray-500/20 text-gray-400"
-                        }`}>
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                            p.status === "pending"
+                              ? "bg-yellow-500/20 text-yellow-400"
+                              : p.status === "approved"
+                                ? "bg-green-500/20 text-green-400"
+                                : p.status === "rejected"
+                                  ? "bg-red-500/20 text-red-400"
+                                  : "bg-gray-500/20 text-gray-400"
+                          }`}
+                        >
                           {p.status}
                         </span>
                       </div>
                       <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400">
-                        <span>Creator: {p.creator?.full_name || p.creator?.email || p.creator_id?.substring(0, 12) || "Unknown"}</span>
-                        {p.created_at && <span>Requested: {formatDate(p.created_at)}</span>}
-                        {p.fee_amount != null && <span>Fee: {formatCurrency(p.fee_amount)}</span>}
-                        {p.net_amount != null && <span>Net: {formatCurrency(p.net_amount)}</span>}
+                        <span>
+                          Creator:{" "}
+                          {p.creator?.full_name ||
+                            p.creator?.email ||
+                            p.creator_id?.substring(0, 12) ||
+                            "Unknown"}
+                        </span>
+                        {p.created_at && (
+                          <span>Requested: {formatDate(p.created_at)}</span>
+                        )}
+                        {p.fee_amount != null && (
+                          <span>Fee: {formatCurrency(p.fee_amount)}</span>
+                        )}
+                        {p.net_amount != null && (
+                          <span>Net: {formatCurrency(p.net_amount)}</span>
+                        )}
                       </div>
                       {p.rejection_reason && (
-                        <p className="text-xs text-red-400 mt-1">Reason: {p.rejection_reason}</p>
+                        <p className="text-xs text-red-400 mt-1">
+                          Reason: {p.rejection_reason}
+                        </p>
                       )}
                     </div>
 
@@ -234,7 +264,10 @@ export default function AdminPayoutApprovals() {
                   <Button
                     variant="secondary"
                     size="sm"
-                    onClick={() => { setRejectModal(null); setRejectReason(""); }}
+                    onClick={() => {
+                      setRejectModal(null);
+                      setRejectReason("");
+                    }}
                   >
                     Cancel
                   </Button>
@@ -242,7 +275,9 @@ export default function AdminPayoutApprovals() {
                     variant="danger"
                     size="sm"
                     disabled={!rejectReason.trim()}
-                    onClick={() => handleAction(rejectModal, "reject", rejectReason.trim())}
+                    onClick={() =>
+                      handleAction(rejectModal, "reject", rejectReason.trim())
+                    }
                   >
                     Confirm Reject
                   </Button>

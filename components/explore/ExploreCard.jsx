@@ -17,7 +17,12 @@ export const cardVariants = {
  * ExploreCard — Glass-card project card with bookmark, avatar group, category pill, progress bar.
  * Preserves save/bookmark logic from lib/saved.js.
  */
-export default function ExploreCard({ project, currentUserId, creatorName, creatorVerificationLevel }) {
+export default function ExploreCard({
+  project,
+  currentUserId,
+  creatorName,
+  creatorVerificationLevel,
+}) {
   const router = useRouter();
   /* Lazy-init save state from localStorage — avoids setState in effect */
   const [saved, setSaved] = useState(() => {
@@ -68,15 +73,13 @@ export default function ExploreCard({ project, currentUserId, creatorName, creat
     ? Math.max(
         0,
         Math.ceil(
-          (new Date(project.deadline) - new Date()) / (1000 * 60 * 60 * 24)
-        )
+          (new Date(project.deadline) - new Date()) / (1000 * 60 * 60 * 24),
+        ),
       )
     : null;
 
   const category =
-    project.category ||
-    (project.categories && project.categories[0]) ||
-    null;
+    project.category || (project.categories && project.categories[0]) || null;
 
   return (
     <motion.article
@@ -107,7 +110,10 @@ export default function ExploreCard({ project, currentUserId, creatorName, creat
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <span className="material-symbols-outlined text-4xl text-on-surface-variant/20" aria-hidden="true">
+            <span
+              className="material-symbols-outlined text-4xl text-on-surface-variant/20"
+              aria-hidden="true"
+            >
               rocket_launch
             </span>
           </div>
@@ -130,7 +136,14 @@ export default function ExploreCard({ project, currentUserId, creatorName, creat
             onClick={handleSave}
             aria-label={saved ? "Unsave project" : "Save project"}
             className="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors shrink-0 ml-2"
-            style={saved ? { fontVariationSettings: "'FILL' 1", color: "var(--color-primary)" } : {}}
+            style={
+              saved
+                ? {
+                    fontVariationSettings: "'FILL' 1",
+                    color: "var(--color-primary)",
+                  }
+                : {}
+            }
           >
             bookmark
           </button>
@@ -146,9 +159,12 @@ export default function ExploreCard({ project, currentUserId, creatorName, creat
           {/* Progress bar */}
           <div className="space-y-2">
             <div className="flex justify-between text-xs font-inter">
-              <span className="text-on-surface-variant">{fundedPercent}% funded</span>
+              <span className="text-on-surface-variant">
+                {fundedPercent}% funded
+              </span>
               <span className="text-on-surface">
-                ₹{(project.pledged || 0).toLocaleString("en-IN")} / ₹{(project.goal || 0).toLocaleString("en-IN")}
+                ₹{(project.pledged || 0).toLocaleString("en-IN")} / ₹
+                {(project.goal || 0).toLocaleString("en-IN")}
               </span>
             </div>
             <div
@@ -178,7 +194,12 @@ export default function ExploreCard({ project, currentUserId, creatorName, creat
               }}
               className="w-full bg-primary text-on-primary py-2.5 rounded-lg font-inter text-sm font-semibold shadow-lg shadow-primary/20 hover:opacity-90 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2"
             >
-              <span className="material-symbols-outlined text-[16px]" aria-hidden="true">bolt</span>
+              <span
+                className="material-symbols-outlined text-[16px]"
+                aria-hidden="true"
+              >
+                bolt
+              </span>
               Fund this Project
             </button>
           )}
@@ -190,7 +211,12 @@ export default function ExploreCard({ project, currentUserId, creatorName, creat
                 {creatorName ? creatorName.charAt(0).toUpperCase() : "?"}
               </div>
               {creatorVerificationLevel >= 2 && (
-                <span className="material-symbols-outlined text-success text-[12px] ml-1" style={{ fontVariationSettings: "'FILL' 1" }} role="img" aria-label="Verified Creator">
+                <span
+                  className="material-symbols-outlined text-success text-[12px] ml-1"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                  role="img"
+                  aria-label="Verified Creator"
+                >
                   verified
                 </span>
               )}

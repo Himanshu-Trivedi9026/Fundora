@@ -1,5 +1,8 @@
 // API — Database health check
-import { checkDatabaseHealth, getPoolStats } from "../../../lib/performance/index.js";
+import {
+  checkDatabaseHealth,
+  getPoolStats,
+} from "../../../lib/performance/index.js";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {

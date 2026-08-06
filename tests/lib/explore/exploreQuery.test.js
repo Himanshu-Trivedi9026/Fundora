@@ -72,7 +72,10 @@ describe("buildExploreQuery", () => {
   it("defaults to newest (created_at desc)", () => {
     const { client, calls } = createClient();
     buildExploreQuery(client);
-    expect(calls).toContainEqual(["order", ["created_at", { ascending: false }]]);
+    expect(calls).toContainEqual([
+      "order",
+      ["created_at", { ascending: false }],
+    ]);
   });
 
   it("maps every sort option to the correct column + direction", () => {
@@ -85,7 +88,7 @@ describe("buildExploreQuery", () => {
     };
     // EXPLORE_SORT_OPTIONS and SORT_DEFINITIONS must stay in lockstep.
     expect(EXPLORE_SORT_OPTIONS.map((o) => o.value).sort()).toEqual(
-      Object.keys(expectations).sort()
+      Object.keys(expectations).sort(),
     );
 
     for (const [sort, expected] of Object.entries(expectations)) {
@@ -98,7 +101,10 @@ describe("buildExploreQuery", () => {
   it("falls back to newest on an unknown sort", () => {
     const { client, calls } = createClient();
     buildExploreQuery(client, { sort: "bogus" });
-    expect(calls).toContainEqual(["order", ["created_at", { ascending: false }]]);
+    expect(calls).toContainEqual([
+      "order",
+      ["created_at", { ascending: false }],
+    ]);
   });
 
   it("applies category filter via overlaps (no category column)", () => {
@@ -108,7 +114,9 @@ describe("buildExploreQuery", () => {
     });
 
     // Must NOT reference a `category` column (it does not exist live → 400).
-    expect(calls.some(([m, [col]]) => m === "eq" && col === "category")).toBe(false);
+    expect(calls.some(([m, [col]]) => m === "eq" && col === "category")).toBe(
+      false,
+    );
     expect(calls).toContainEqual([
       "overlaps",
       ["categories", ["Artificial Intelligence", "Technology & Web3"]],

@@ -50,7 +50,14 @@ const project = (id, title, overrides = {}) => ({
   ...overrides,
 });
 
-const donation = (id, amount, status, project_id, created_at, overrides = {}) => ({
+const donation = (
+  id,
+  amount,
+  status,
+  project_id,
+  created_at,
+  overrides = {},
+) => ({
   id,
   amount,
   status,
@@ -192,10 +199,18 @@ describe("derivePortfolioMetrics", () => {
     // Two settled projects (60/40 split) — mixed funding progress.
     const stats = derivePortfolioStats([
       donation("d1", 6000, "paid", "p1", "2026-05-01", {
-        projects: project("p1", "Alpha Fund", { goal: 200000, pledged: 150000, categories: ["AI"] }),
+        projects: project("p1", "Alpha Fund", {
+          goal: 200000,
+          pledged: 150000,
+          categories: ["AI"],
+        }),
       }),
       donation("d2", 4000, "paid", "p2", "2026-06-01", {
-        projects: project("p2", "Beta Fund", { goal: 100000, pledged: 50000, categories: ["Climate"] }),
+        projects: project("p2", "Beta Fund", {
+          goal: 100000,
+          pledged: 50000,
+          categories: ["Climate"],
+        }),
       }),
       // Pending donations are ignored for these settled-only figures.
       donation("d3", 9000, "pending", "p3", "2026-07-01"),
@@ -233,14 +248,21 @@ describe("derivePortfolioMetrics", () => {
 
   it("returns safe zero values for an empty portfolio (no NaN)", () => {
     const m = derivePortfolioMetrics(derivePortfolioStats([]));
-    expect(m).toEqual({ roi: 0, currentValue: 0, diversification: 0, categoryAllocation: [] });
+    expect(m).toEqual({
+      roi: 0,
+      currentValue: 0,
+      diversification: 0,
+      categoryAllocation: [],
+    });
   });
 });
 
 describe("loadInvestorPortfolio", () => {
   it("fires donations, saved count, and follower count in parallel", () => {
     const { client, from } = makeClient({
-      public_donations: { data: [donation("d1", 5000, "paid", "p1", "2026-05-01")] },
+      public_donations: {
+        data: [donation("d1", 5000, "paid", "p1", "2026-05-01")],
+      },
       saved_projects: { data: null, count: 3 },
       followers: { data: null, count: 7 },
     });
@@ -266,10 +288,14 @@ describe("loadInvestorPortfolio", () => {
     });
     await loadInvestorPortfolio(client, "u42");
 
-    const donationsChain = captured.find((c) => c.table === "public_donations").chain;
+    const donationsChain = captured.find(
+      (c) => c.table === "public_donations",
+    ).chain;
     expect(donationsChain.select).toHaveBeenCalledWith(DONATION_SELECT);
     expect(donationsChain.eq).toHaveBeenCalledWith("payer_id", "u42");
-    expect(donationsChain.order).toHaveBeenCalledWith("created_at", { ascending: false });
+    expect(donationsChain.order).toHaveBeenCalledWith("created_at", {
+      ascending: false,
+    });
   });
 });
 
@@ -342,19 +368,35 @@ describe("loadRecommendedProjects", () => {
         data: [
           // Two settled AI donations → AI is the top preferred category.
           donation("d1", 500, "paid", "funded-a", "2026-05-01", {
-            projects: project("funded-a", "Already Backed", { categories: ["AI"] }),
+            projects: project("funded-a", "Already Backed", {
+              categories: ["AI"],
+            }),
           }),
           donation("d2", 300, "paid", "funded-b", "2026-05-02", {
-            projects: project("funded-b", "Also Backed", { categories: ["AI"] }),
+            projects: project("funded-b", "Also Backed", {
+              categories: ["AI"],
+            }),
           }),
         ],
       },
       projects: {
         data: [
-          project("cand-a", "AI Startup", { categories: ["AI"], pledged: 90000, owner_id: "u1" }),
-          project("cand-b", "AI Alternative", { categories: ["AI", "SaaS"], pledged: 70000, owner_id: "u2" }),
+          project("cand-a", "AI Startup", {
+            categories: ["AI"],
+            pledged: 90000,
+            owner_id: "u1",
+          }),
+          project("cand-b", "AI Alternative", {
+            categories: ["AI", "SaaS"],
+            pledged: 70000,
+            owner_id: "u2",
+          }),
           project("funded-a", "Already Backed", { categories: ["AI"] }), // excluded
-          project("cand-c", "Climate Co", { categories: ["Climate"], pledged: 80000, owner_id: "u2" }),
+          project("cand-c", "Climate Co", {
+            categories: ["Climate"],
+            pledged: 80000,
+            owner_id: "u2",
+          }),
         ],
       },
       profiles: {
@@ -365,11 +407,8 @@ describe("loadRecommendedProjects", () => {
       },
     });
 
-    const { recommendations, creatorMap, preferredCategories } = await loadRecommendedProjects(
-      client,
-      "u1",
-      { limit: 3 },
-    );
+    const { recommendations, creatorMap, preferredCategories } =
+      await loadRecommendedProjects(client, "u1", { limit: 3 });
 
     expect(preferredCategories).toEqual(["AI"]);
     // Funded project excluded.
@@ -381,7 +420,9 @@ describe("loadRecommendedProjects", () => {
     // Reasons are present and include the category match + score.
     const aiRec = recommendations.find((r) => r.project.id === "cand-a");
     expect(aiRec.reasons).toContain("Matches your interest in AI");
-    expect(aiRec.reasons.some((r) => r.startsWith("AI growth score"))).toBe(true);
+    expect(aiRec.reasons.some((r) => r.startsWith("AI growth score"))).toBe(
+      true,
+    );
     // A funded project sharing the category → similarity reason (newest one wins).
     expect(aiRec.reasons.some((r) => r.startsWith("Similar to"))).toBe(true);
     // score is the pure growth score (0-98), displayable as /100.
@@ -394,18 +435,23 @@ describe("loadRecommendedProjects", () => {
     expect(projectsChain.select).toHaveBeenCalledWith(RECOMMENDED_SELECT);
     expect(projectsChain.eq).toHaveBeenCalledWith("deleted", false);
     expect(projectsChain.overlaps).toHaveBeenCalledWith("categories", ["AI"]);
-    expect(projectsChain.order).toHaveBeenCalledWith("pledged", { ascending: false });
+    expect(projectsChain.order).toHaveBeenCalledWith("pledged", {
+      ascending: false,
+    });
     expect(projectsChain.limit).toHaveBeenCalledWith(6); // limit * 2
   });
 
   it("degrades to a trending query (no overlaps filter) when the user has no preferences", async () => {
     const { client, captured } = makeClient({
       public_donations: { data: [] },
-      projects: { data: [project("cand-a", "Top Campaign", { pledged: 90000 })] },
+      projects: {
+        data: [project("cand-a", "Top Campaign", { pledged: 90000 })],
+      },
       profiles: { data: [] },
     });
 
-    const { recommendations, preferredCategories } = await loadRecommendedProjects(client, "u1");
+    const { recommendations, preferredCategories } =
+      await loadRecommendedProjects(client, "u1");
 
     expect(preferredCategories).toEqual([]);
     const projectsChain = captured.find((c) => c.table === "projects").chain;
@@ -434,11 +480,18 @@ describe("deriveAiInsights", () => {
     ]);
     const insights = deriveAiInsights({
       stats,
-      donations: stats ? [donation("d1", 500, "paid", "p1", "2026-05-01", {
-        projects: project("p1", "AI Fund", { categories: ["AI"] }),
-      })] : [],
+      donations: stats
+        ? [
+            donation("d1", 500, "paid", "p1", "2026-05-01", {
+              projects: project("p1", "AI Fund", { categories: ["AI"] }),
+            }),
+          ]
+        : [],
       recommendations: [
-        { project: project("cand-a", "AI Co", { categories: ["AI"] }), score: 80 },
+        {
+          project: project("cand-a", "AI Co", { categories: ["AI"] }),
+          score: 80,
+        },
       ],
     });
 
@@ -452,7 +505,11 @@ describe("deriveAiInsights", () => {
   });
 
   it("returns safe nulls for a new investor", () => {
-    const insights = deriveAiInsights({ stats: derivePortfolioStats([]), donations: [], recommendations: [] });
+    const insights = deriveAiInsights({
+      stats: derivePortfolioStats([]),
+      donations: [],
+      recommendations: [],
+    });
     expect(insights.strongestSector).toBeNull();
     expect(insights.nextRecommendedCategory).toBeNull();
     expect(insights.topPick).toBeNull();
@@ -463,10 +520,27 @@ describe("deriveAiInsights", () => {
 
 describe("deriveAnalytics", () => {
   const sampleDonations = [
-    donation("d1", 1000, "paid", "p1", "2025-01-10", { projects: project("p1", "Alpha", { categories: ["AI"], pledged: 60000 }) }),
-    donation("d2", 2000, "paid", "p2", "2026-06-05", { projects: project("p2", "Beta", { categories: ["Climate"], pledged: 60000 }) }),
-    donation("d3", 500, "pending", "p2", "2026-07-01", { projects: project("p2", "Beta", { categories: ["Climate"], pledged: 60000 }) }),
-    donation("d4", 3000, "paid", "p3", "2026-07-10", { projects: project("p3", "Gamma", { categories: ["AI", "Health"], pledged: 60000 }) }),
+    donation("d1", 1000, "paid", "p1", "2025-01-10", {
+      projects: project("p1", "Alpha", { categories: ["AI"], pledged: 60000 }),
+    }),
+    donation("d2", 2000, "paid", "p2", "2026-06-05", {
+      projects: project("p2", "Beta", {
+        categories: ["Climate"],
+        pledged: 60000,
+      }),
+    }),
+    donation("d3", 500, "pending", "p2", "2026-07-01", {
+      projects: project("p2", "Beta", {
+        categories: ["Climate"],
+        pledged: 60000,
+      }),
+    }),
+    donation("d4", 3000, "paid", "p3", "2026-07-10", {
+      projects: project("p3", "Gamma", {
+        categories: ["AI", "Health"],
+        pledged: 60000,
+      }),
+    }),
   ];
 
   it("builds cumulative growth, monthly totals, and the dual-series trends", () => {
@@ -478,13 +552,19 @@ describe("deriveAnalytics", () => {
     expect(a.performance.largestDonation).toBe(3000);
 
     // Cumulative invested over months: Jan 1000, Jun 3000, Jul 6000.
-    expect(a.investmentGrowth[a.investmentGrowth.length - 1].invested).toBe(6000);
+    expect(a.investmentGrowth[a.investmentGrowth.length - 1].invested).toBe(
+      6000,
+    );
     expect(a.investmentGrowth.map((g) => g.month)).toEqual(
       expect.arrayContaining(["Jan 25", "Jun 26", "Jul 26"]),
     );
     // Historical trends align with the same series + per-month counts.
     expect(a.historicalTrends.length).toBe(3);
-    expect(a.historicalTrends[0]).toMatchObject({ month: "Jan 25", invested: 1000, donations: 1 });
+    expect(a.historicalTrends[0]).toMatchObject({
+      month: "Jan 25",
+      invested: 1000,
+      donations: 1,
+    });
   });
 
   it("filters every widget by the global range", () => {
@@ -496,21 +576,34 @@ describe("deriveAnalytics", () => {
 
     const a90 = deriveAnalytics(sampleDonations, { range: "90d", now: NOW_MS });
     // d2 (Jun 05), d3 (Jul 01), d4 (Jul 10) — pending excluded from invested.
-    expect(a90.counts).toEqual({ completed: 2, pending: 1, failed: 0, refunded: 0 });
+    expect(a90.counts).toEqual({
+      completed: 2,
+      pending: 1,
+      failed: 0,
+      refunded: 0,
+    });
     expect(a90.performance.totalInvested).toBe(5000);
   });
 
   it("rolls up the by-project donut to top 6 + Others", () => {
     const many = [];
     for (let i = 1; i <= 8; i += 1) {
-      many.push(donation(`d${i}`, 100 * i, "paid", `p${i}`, "2026-06-01", {
-        projects: project(`p${i}`, `Project ${i}`, { categories: ["AI"] }),
-      }));
+      many.push(
+        donation(`d${i}`, 100 * i, "paid", `p${i}`, "2026-06-01", {
+          projects: project(`p${i}`, `Project ${i}`, { categories: ["AI"] }),
+        }),
+      );
     }
     const a = deriveAnalytics(many, { range: "all", now: NOW_MS });
     expect(a.portfolioAllocation.byProject).toHaveLength(7); // 6 + Others
-    expect(a.portfolioAllocation.byProject[a.portfolioAllocation.byProject.length - 1].name).toBe("Others");
-    expect(a.portfolioAllocation.byCategory).toEqual([{ name: "AI", value: 3600 }]);
+    expect(
+      a.portfolioAllocation.byProject[
+        a.portfolioAllocation.byProject.length - 1
+      ].name,
+    ).toBe("Others");
+    expect(a.portfolioAllocation.byCategory).toEqual([
+      { name: "AI", value: 3600 },
+    ]);
   });
 
   it("attributes multi-category donations to each sector and sorts the funding timeline oldest-first", () => {

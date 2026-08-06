@@ -27,8 +27,15 @@ vi.mock("../../lib/verification/auditLog", () => ({
   logAuditEvent: vi.fn().mockResolvedValue({ success: true }),
 }));
 
-import { hasPermission, PERMISSIONS, PLATFORM_ROLES } from "../../lib/rbac/rbacEngine";
-import { createOrganization, addMember } from "../../lib/organization/organizationEngine";
+import {
+  hasPermission,
+  PERMISSIONS,
+  PLATFORM_ROLES,
+} from "../../lib/rbac/rbacEngine";
+import {
+  createOrganization,
+  addMember,
+} from "../../lib/organization/organizationEngine";
 import { supabaseAdmin } from "../../lib/supabaseAdmin";
 
 // Helper to build checkPlatformAdmin mock: from→select→eq→eq→is→maybeSingle
@@ -88,7 +95,9 @@ describe("RBAC Integration", () => {
         {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+              maybeSingle: vi
+                .fn()
+                .mockResolvedValue({ data: null, error: null }),
             }),
           }),
         },
@@ -114,7 +123,10 @@ describe("RBAC Integration", () => {
             eq: vi.fn().mockReturnValue({
               eq: vi.fn().mockReturnValue({
                 eq: vi.fn().mockReturnValue({
-                  single: vi.fn().mockResolvedValue({ data: { role: "owner" }, error: null }),
+                  single: vi.fn().mockResolvedValue({
+                    data: { role: "owner" },
+                    error: null,
+                  }),
                 }),
               }),
             }),
@@ -125,7 +137,9 @@ describe("RBAC Integration", () => {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               eq: vi.fn().mockReturnValue({
-                maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+                maybeSingle: vi
+                  .fn()
+                  .mockResolvedValue({ data: null, error: null }),
               }),
             }),
           }),
@@ -171,7 +185,11 @@ describe("RBAC Integration", () => {
 
       expect(memberResult.success).toBe(true);
 
-      const permResult = await hasPermission("member-1", "org-1", PERMISSIONS.CAMPAIGN_READ);
+      const permResult = await hasPermission(
+        "member-1",
+        "org-1",
+        PERMISSIONS.CAMPAIGN_READ,
+      );
       expect(permResult.success).toBe(true);
       expect(permResult.data.allowed).toBe(true);
       expect(permResult.data.role).toBe("campaign_manager");
@@ -182,10 +200,14 @@ describe("RBAC Integration", () => {
     it("should allow platform admin to access any permission", async () => {
       // Only 1 from() call needed — checkPlatformAdmin returns early
       supabaseAdmin.from.mockReturnValue(
-        mockAdminCheck({ data: { role: "platform_admin" }, error: null })
+        mockAdminCheck({ data: { role: "platform_admin" }, error: null }),
       );
 
-      const result = await hasPermission("admin-1", "any-org", PERMISSIONS.PLATFORM_ADMIN);
+      const result = await hasPermission(
+        "admin-1",
+        "any-org",
+        PERMISSIONS.PLATFORM_ADMIN,
+      );
       expect(result.success).toBe(true);
       expect(result.data.allowed).toBe(true);
       expect(result.data.role).toBe(PLATFORM_ROLES.PLATFORM_ADMIN);
@@ -203,7 +225,11 @@ describe("RBAC Integration", () => {
 
       supabaseAdmin.from.mockImplementation(() => fromChains[fromIdx++]);
 
-      const result = await hasPermission("stranger-1", "org-1", PERMISSIONS.FINANCE_MANAGE);
+      const result = await hasPermission(
+        "stranger-1",
+        "org-1",
+        PERMISSIONS.FINANCE_MANAGE,
+      );
       expect(result.success).toBe(true);
       expect(result.data.allowed).toBe(false);
       expect(result.data.reason).toContain("Not a member");

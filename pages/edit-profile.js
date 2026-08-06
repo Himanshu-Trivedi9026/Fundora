@@ -11,20 +11,51 @@ import SEO from "../components/SEO";
 /* ─── Animation Variants ─── */
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+  },
 };
 
 const stagger = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+  },
 };
 
 /* ─── Social platform config ─── */
 const SOCIAL_PLATFORMS = [
-  { key: "twitter", label: "Twitter", placeholder: "Twitter profile link", icon: "tag", color: "#1DA1F2" },
-  { key: "linkedin", label: "LinkedIn", placeholder: "LinkedIn profile link", icon: "work", color: "#0A66C2" },
-  { key: "github", label: "GitHub", placeholder: "GitHub profile link", icon: "code", color: "#f0f0f0" },
-  { key: "instagram", label: "Instagram", placeholder: "Instagram profile link", icon: "photo_camera", color: "#E4405F" },
+  {
+    key: "twitter",
+    label: "Twitter",
+    placeholder: "Twitter profile link",
+    icon: "tag",
+    color: "#1DA1F2",
+  },
+  {
+    key: "linkedin",
+    label: "LinkedIn",
+    placeholder: "LinkedIn profile link",
+    icon: "work",
+    color: "#0A66C2",
+  },
+  {
+    key: "github",
+    label: "GitHub",
+    placeholder: "GitHub profile link",
+    icon: "code",
+    color: "#f0f0f0",
+  },
+  {
+    key: "instagram",
+    label: "Instagram",
+    placeholder: "Instagram profile link",
+    icon: "photo_camera",
+    color: "#E4405F",
+  },
 ];
 
 export default function EditProfile() {
@@ -91,8 +122,10 @@ export default function EditProfile() {
   // Clean up blob URLs on unmount
   useEffect(() => {
     return () => {
-      if (avatarPreview && avatarPreview.startsWith("blob:")) URL.revokeObjectURL(avatarPreview);
-      if (bannerPreview && bannerPreview.startsWith("blob:")) URL.revokeObjectURL(bannerPreview);
+      if (avatarPreview && avatarPreview.startsWith("blob:"))
+        URL.revokeObjectURL(avatarPreview);
+      if (bannerPreview && bannerPreview.startsWith("blob:"))
+        URL.revokeObjectURL(bannerPreview);
     };
   }, [avatarPreview, bannerPreview]);
 
@@ -127,7 +160,8 @@ export default function EditProfile() {
       return;
     }
     setAvatarFile(file);
-    if (avatarPreview && avatarPreview.startsWith("blob:")) URL.revokeObjectURL(avatarPreview);
+    if (avatarPreview && avatarPreview.startsWith("blob:"))
+      URL.revokeObjectURL(avatarPreview);
     setAvatarPreview(URL.createObjectURL(file));
   }
 
@@ -139,7 +173,8 @@ export default function EditProfile() {
       return;
     }
     setBannerFile(file);
-    if (bannerPreview && bannerPreview.startsWith("blob:")) URL.revokeObjectURL(bannerPreview);
+    if (bannerPreview && bannerPreview.startsWith("blob:"))
+      URL.revokeObjectURL(bannerPreview);
     setBannerPreview(URL.createObjectURL(file));
   }
 
@@ -150,7 +185,9 @@ export default function EditProfile() {
     const avatar_url = await uploadImage(avatarFile, "avatars");
     const banner_url = await uploadImage(bannerFile, "banners");
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     const { error } = await supabase
       .from("profiles")
@@ -186,9 +223,15 @@ export default function EditProfile() {
   if (!profile)
     return (
       <div className="min-h-screen flex items-center justify-center bg-surface-dim">
-        <div className="flex flex-col items-center gap-4" role="status" aria-label="Loading profile">
+        <div
+          className="flex flex-col items-center gap-4"
+          role="status"
+          aria-label="Loading profile"
+        >
           <div className="w-10 h-10 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-          <p className="text-on-surface-variant text-sm font-inter">Loading profile...</p>
+          <p className="text-on-surface-variant text-sm font-inter">
+            Loading profile...
+          </p>
         </div>
       </div>
     );
@@ -225,7 +268,6 @@ export default function EditProfile() {
 
           <form onSubmit={updateProfile}>
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
               {/* ─── Sidebar Navigation ─── */}
               <motion.aside
                 variants={stagger}
@@ -249,7 +291,12 @@ export default function EditProfile() {
                         : "hover:bg-surface-container-high text-on-surface-variant"
                     }`}
                   >
-                    <span className="material-symbols-outlined text-[20px]" aria-hidden="true">{item.icon}</span>
+                    <span
+                      className="material-symbols-outlined text-[20px]"
+                      aria-hidden="true"
+                    >
+                      {item.icon}
+                    </span>
                     <span>{item.label}</span>
                   </motion.a>
                 ))}
@@ -266,7 +313,8 @@ export default function EditProfile() {
                   backdropFilter: "blur(24px) saturate(1.2)",
                   WebkitBackdropFilter: "blur(24px) saturate(1.2)",
                   border: "1px solid rgba(73, 68, 84, 0.3)",
-                  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.37), inset 0 1px 0 rgba(255,255,255,0.04)",
+                  boxShadow:
+                    "0 8px 32px rgba(0, 0, 0, 0.37), inset 0 1px 0 rgba(255,255,255,0.04)",
                 }}
               >
                 {/* Top gradient accent line */}
@@ -275,7 +323,12 @@ export default function EditProfile() {
                 {/* ─── Profile Media Section ─── */}
                 <motion.section variants={fadeUp}>
                   <h2 className="font-geist text-xl font-semibold text-on-surface mb-6 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-[22px]" aria-hidden="true">image</span>
+                    <span
+                      className="material-symbols-outlined text-primary text-[22px]"
+                      aria-hidden="true"
+                    >
+                      image
+                    </span>
                     Profile Identity
                   </h2>
 
@@ -304,11 +357,20 @@ export default function EditProfile() {
 
                         {/* Upload overlay */}
                         <div className="relative z-10 flex flex-col items-center bg-surface/60 backdrop-blur-md p-5 rounded-xl border border-white/10">
-                          <span className="material-symbols-outlined text-primary text-[28px] mb-2" aria-hidden="true">cloud_upload</span>
-                          <span className="font-geist text-sm font-medium text-on-surface">
-                            {bannerFile ? "Click to replace banner" : "Click to upload banner"}
+                          <span
+                            className="material-symbols-outlined text-primary text-[28px] mb-2"
+                            aria-hidden="true"
+                          >
+                            cloud_upload
                           </span>
-                          <span className="text-xs text-on-surface-variant mt-1">Recommended: 1500 x 500 px</span>
+                          <span className="font-geist text-sm font-medium text-on-surface">
+                            {bannerFile
+                              ? "Click to replace banner"
+                              : "Click to upload banner"}
+                          </span>
+                          <span className="text-xs text-on-surface-variant mt-1">
+                            Recommended: 1500 x 500 px
+                          </span>
                         </div>
 
                         <input
@@ -339,7 +401,12 @@ export default function EditProfile() {
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center bg-surface-container-high">
-                              <span className="material-symbols-outlined text-on-surface-variant text-[40px]" aria-hidden="true">person</span>
+                              <span
+                                className="material-symbols-outlined text-on-surface-variant text-[40px]"
+                                aria-hidden="true"
+                              >
+                                person
+                              </span>
                             </div>
                           )}
                         </div>
@@ -348,7 +415,12 @@ export default function EditProfile() {
                           onClick={() => avatarInputRef.current?.click()}
                           className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-full cursor-pointer"
                         >
-                          <span className="material-symbols-outlined text-white text-[28px]" aria-hidden="true">photo_camera</span>
+                          <span
+                            className="material-symbols-outlined text-white text-[28px]"
+                            aria-hidden="true"
+                          >
+                            photo_camera
+                          </span>
                         </div>
                         <input
                           ref={avatarInputRef}
@@ -360,8 +432,12 @@ export default function EditProfile() {
                         />
                       </div>
                       <div className="pb-2">
-                        <h3 className="text-on-surface font-geist font-semibold">Avatar</h3>
-                        <p className="text-on-surface-variant text-sm">Update your profile picture</p>
+                        <h3 className="text-on-surface font-geist font-semibold">
+                          Avatar
+                        </h3>
+                        <p className="text-on-surface-variant text-sm">
+                          Update your profile picture
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -370,14 +446,22 @@ export default function EditProfile() {
                 {/* ─── Personal Information ─── */}
                 <motion.section variants={fadeUp} className="space-y-6">
                   <h2 className="font-geist text-xl font-semibold text-on-surface mb-6 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-[22px]" aria-hidden="true">badge</span>
+                    <span
+                      className="material-symbols-outlined text-primary text-[22px]"
+                      aria-hidden="true"
+                    >
+                      badge
+                    </span>
                     Personal Details
                   </h2>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Full Name */}
                     <div className="space-y-2">
-                      <label htmlFor="ep-name" className="block text-xs font-medium text-on-surface-variant uppercase tracking-widest px-1">
+                      <label
+                        htmlFor="ep-name"
+                        className="block text-xs font-medium text-on-surface-variant uppercase tracking-widest px-1"
+                      >
                         Full Name
                       </label>
                       <input
@@ -393,11 +477,17 @@ export default function EditProfile() {
 
                     {/* Website */}
                     <div className="space-y-2">
-                      <label htmlFor="ep-website" className="block text-xs font-medium text-on-surface-variant uppercase tracking-widest px-1">
+                      <label
+                        htmlFor="ep-website"
+                        className="block text-xs font-medium text-on-surface-variant uppercase tracking-widest px-1"
+                      >
                         Website URL
                       </label>
                       <div className="relative">
-                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]" aria-hidden="true">
+                        <span
+                          className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]"
+                          aria-hidden="true"
+                        >
                           language
                         </span>
                         <input
@@ -415,10 +505,16 @@ export default function EditProfile() {
                     {/* Bio */}
                     <div className="md:col-span-2 space-y-2">
                       <div className="flex justify-between px-1">
-                        <label htmlFor="ep-bio" className="block text-xs font-medium text-on-surface-variant uppercase tracking-widest">
+                        <label
+                          htmlFor="ep-bio"
+                          className="block text-xs font-medium text-on-surface-variant uppercase tracking-widest"
+                        >
                           Bio
                         </label>
-                        <span id="bio-counter" className={`text-xs ${bio.length > 200 ? "text-danger" : "text-on-surface-variant/60"}`}>
+                        <span
+                          id="bio-counter"
+                          className={`text-xs ${bio.length > 200 ? "text-danger" : "text-on-surface-variant/60"}`}
+                        >
                           {bio.length} / 200
                         </span>
                       </div>
@@ -440,44 +536,64 @@ export default function EditProfile() {
                 {/* ─── Social Connectivity ─── */}
                 <motion.section variants={fadeUp}>
                   <h2 className="font-geist text-xl font-semibold text-on-surface mb-6 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-[22px]" aria-hidden="true">hub</span>
+                    <span
+                      className="material-symbols-outlined text-primary text-[22px]"
+                      aria-hidden="true"
+                    >
+                      hub
+                    </span>
                     Social Connectivity
                   </h2>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {SOCIAL_PLATFORMS.map(({ key, label, placeholder, icon }) => {
-                      const socialState = { twitter, linkedin, github, instagram }[key];
-                      const socialSetter = {
-                        twitter: setTwitter,
-                        linkedin: setLinkedin,
-                        github: setGithub,
-                        instagram: setInstagram,
-                      }[key];
+                    {SOCIAL_PLATFORMS.map(
+                      ({ key, label, placeholder, icon }) => {
+                        const socialState = {
+                          twitter,
+                          linkedin,
+                          github,
+                          instagram,
+                        }[key];
+                        const socialSetter = {
+                          twitter: setTwitter,
+                          linkedin: setLinkedin,
+                          github: setGithub,
+                          instagram: setInstagram,
+                        }[key];
 
-                      return (
-                        <div
-                          key={key}
-                          className="group flex items-center gap-3 bg-surface-container-low p-2.5 rounded-xl border border-outline-variant/20 focus-within:border-primary/50 transition-all"
-                        >
-                          <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container-highest shrink-0">
-                            <span className="material-symbols-outlined text-on-surface-variant text-[20px]" aria-hidden="true">{icon}</span>
+                        return (
+                          <div
+                            key={key}
+                            className="group flex items-center gap-3 bg-surface-container-low p-2.5 rounded-xl border border-outline-variant/20 focus-within:border-primary/50 transition-all"
+                          >
+                            <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container-highest shrink-0">
+                              <span
+                                className="material-symbols-outlined text-on-surface-variant text-[20px]"
+                                aria-hidden="true"
+                              >
+                                {icon}
+                              </span>
+                            </div>
+                            <input
+                              type="text"
+                              value={socialState}
+                              onChange={(e) => socialSetter(e.target.value)}
+                              placeholder={placeholder}
+                              aria-label={label}
+                              className="flex-grow bg-transparent border-none outline-none text-sm text-on-surface placeholder:text-outline/40 font-inter"
+                            />
                           </div>
-                          <input
-                            type="text"
-                            value={socialState}
-                            onChange={(e) => socialSetter(e.target.value)}
-                            placeholder={placeholder}
-                            aria-label={label}
-                            className="flex-grow bg-transparent border-none outline-none text-sm text-on-surface placeholder:text-outline/40 font-inter"
-                          />
-                        </div>
-                      );
-                    })}
+                        );
+                      },
+                    )}
                   </div>
                 </motion.section>
 
                 {/* ─── Form Actions ─── */}
-                <motion.div variants={fadeUp} className="pt-8 border-t border-outline-variant/30 flex flex-col sm:flex-row items-center justify-end gap-4">
+                <motion.div
+                  variants={fadeUp}
+                  className="pt-8 border-t border-outline-variant/30 flex flex-col sm:flex-row items-center justify-end gap-4"
+                >
                   <button
                     type="button"
                     onClick={() => router.back()}
@@ -498,12 +614,16 @@ export default function EditProfile() {
                     ) : (
                       <>
                         Save Changes
-                        <span className="material-symbols-outlined text-[18px]" aria-hidden="true">done_all</span>
+                        <span
+                          className="material-symbols-outlined text-[18px]"
+                          aria-hidden="true"
+                        >
+                          done_all
+                        </span>
                       </>
                     )}
                   </button>
                 </motion.div>
-
               </motion.div>
             </div>
           </form>

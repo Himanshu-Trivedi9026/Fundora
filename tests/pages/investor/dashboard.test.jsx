@@ -32,7 +32,11 @@ vi.mock("../../../components/PageLayout", () => ({
 
 function mockUseRoleValue(overrides = {}) {
   vi.mocked(useRole).mockReturnValue({
-    user: { id: "u1", email: "investor@fundora.dev", user_metadata: { full_name: "Investor One" } },
+    user: {
+      id: "u1",
+      email: "investor@fundora.dev",
+      user_metadata: { full_name: "Investor One" },
+    },
     profile: null,
     role: ROLES.INVESTOR,
     isAdmin: false,
@@ -78,7 +82,14 @@ const project = (id, title, overrides = {}) => ({
   ...overrides,
 });
 
-const donation = (id, amount, status, project_id, created_at, projOverrides = {}) => ({
+const donation = (
+  id,
+  amount,
+  status,
+  project_id,
+  created_at,
+  projOverrides = {},
+) => ({
   id,
   amount,
   status,
@@ -97,13 +108,22 @@ describe("pages/investor/dashboard (Overview)", () => {
   it("renders all Overview sections in order with AI Recommendations below Portfolio Summary", async () => {
     mockTables({
       public_donations: {
-        data: [donation("d1", 5000, "paid", "p1", "2026-05-01", { categories: ["AI"], title: "Alpha Fund" })],
+        data: [
+          donation("d1", 5000, "paid", "p1", "2026-05-01", {
+            categories: ["AI"],
+            title: "Alpha Fund",
+          }),
+        ],
       },
       saved_projects: { data: null, count: 2 },
       followers: { data: null, count: 3 },
       projects: {
         data: [
-          project("cand-a", "Beta Startup", { owner_id: "u9", categories: ["AI"], pledged: 90000 }),
+          project("cand-a", "Beta Startup", {
+            owner_id: "u9",
+            categories: ["AI"],
+            pledged: 90000,
+          }),
         ],
       },
       profiles: { data: [{ id: "u9", full_name: "Alice Founder" }] },
@@ -132,7 +152,8 @@ describe("pages/investor/dashboard (Overview)", () => {
     ].map((t) => screen.getByText(t));
     for (let i = 1; i < order.length; i += 1) {
       expect(
-        order[i - 1].compareDocumentPosition(order[i]) & Node.DOCUMENT_POSITION_FOLLOWING,
+        order[i - 1].compareDocumentPosition(order[i]) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
       ).toBeTruthy();
     }
 
@@ -140,23 +161,31 @@ describe("pages/investor/dashboard (Overview)", () => {
     expect(screen.getByText(/overall score/i)).toBeInTheDocument();
 
     // Quick Actions exposes the new Analytics + My Investments entry points.
-    const analyticsAction = screen.getByRole("link", { name: /track your performance/i });
+    const analyticsAction = screen.getByRole("link", {
+      name: /track your performance/i,
+    });
     expect(analyticsAction).toHaveAttribute("href", "/investor/analytics");
-    const investmentsAction = screen.getByRole("link", { name: /review your donations/i });
+    const investmentsAction = screen.getByRole("link", {
+      name: /review your donations/i,
+    });
     expect(investmentsAction).toHaveAttribute("href", "/investor/investments");
 
     // AI Recommendations premium card shows derived insights. "AI growth
     // score N/100" appears both on the top-pick card and in each
     // recommendation's reason list, so use getAllByText.
     expect(screen.getAllByText("Beta Startup").length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/AI growth score \d+\/100/).length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText(/AI growth score \d+\/100/).length,
+    ).toBeGreaterThan(0);
     expect(screen.getByText(/strongest sector/i)).toBeInTheDocument();
     expect(screen.getByText("AI")).toBeInTheDocument();
 
     // Recent Activity + Latest Investments surface the settled donation.
     expect(screen.getAllByText("Alpha Fund").length).toBeGreaterThan(0);
     // Recommendation card reason list includes category match + similarity.
-    expect(screen.getByText(/Matches your interest in AI/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Matches your interest in AI/i),
+    ).toBeInTheDocument();
     expect(screen.getByText(/Similar to Alpha Fund/i)).toBeInTheDocument();
     // Batch-fetched creator name (ProjectCard renders "By: {name}").
     expect(screen.getByText(/By: Alice Founder/i)).toBeInTheDocument();
@@ -170,7 +199,12 @@ describe("pages/investor/dashboard (Overview)", () => {
       saved_projects: { data: null, count: 0 },
       followers: { data: null, count: 0 },
       projects: {
-        data: [project("cand-t", "Trending Pick", { owner_id: "u9", categories: ["AI"] })],
+        data: [
+          project("cand-t", "Trending Pick", {
+            owner_id: "u9",
+            categories: ["AI"],
+          }),
+        ],
       },
       profiles: { data: [{ id: "u9", full_name: "Alice Founder" }] },
     });
@@ -178,7 +212,9 @@ describe("pages/investor/dashboard (Overview)", () => {
     render(<InvestorDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByText("Start your investment journey")).toBeInTheDocument();
+      expect(
+        screen.getByText("Start your investment journey"),
+      ).toBeInTheDocument();
     });
 
     // No per-widget empties for the portfolio-derived sections — they are
@@ -197,7 +233,9 @@ describe("pages/investor/dashboard (Overview)", () => {
     // Quick Action on the Overview, so every matching link must target Explore.
     const ctaLinks = screen.getAllByRole("link", { name: /explore projects/i });
     expect(ctaLinks.length).toBeGreaterThan(0);
-    ctaLinks.forEach((link) => expect(link).toHaveAttribute("href", "/explore"));
+    ctaLinks.forEach((link) =>
+      expect(link).toHaveAttribute("href", "/explore"),
+    );
   });
 
   it("renders a retryable error card when the data load fails", async () => {
@@ -208,13 +246,16 @@ describe("pages/investor/dashboard (Overview)", () => {
       limit: vi.fn().mockReturnThis(),
       overlaps: vi.fn().mockReturnThis(),
       in: vi.fn().mockReturnThis(),
-      then: (resolve) => resolve({ data: null, count: 0, error: new Error("boom") }),
+      then: (resolve) =>
+        resolve({ data: null, count: 0, error: new Error("boom") }),
     }));
 
     render(<InvestorDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByText(/Failed to load dashboard data/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Failed to load dashboard data/i),
+      ).toBeInTheDocument();
     });
     expect(screen.getByRole("button", { name: /retry/i })).toBeInTheDocument();
   });

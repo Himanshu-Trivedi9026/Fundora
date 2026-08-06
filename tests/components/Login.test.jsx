@@ -20,7 +20,9 @@ vi.mock("../../lib/supabaseClient", () => ({
     from: vi.fn().mockReturnThis(),
     select: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
-    maybeSingle: vi.fn().mockResolvedValue({ data: { role: "donor" }, error: null }),
+    maybeSingle: vi
+      .fn()
+      .mockResolvedValue({ data: { role: "donor" }, error: null }),
   },
 }));
 
@@ -48,9 +50,15 @@ describe("LoginPage", () => {
   beforeEach(() => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     vi.clearAllMocks();
-    supabase.auth.signInWithPassword.mockResolvedValue({ data: {}, error: null });
+    supabase.auth.signInWithPassword.mockResolvedValue({
+      data: {},
+      error: null,
+    });
     supabase.auth.resend.mockResolvedValue({ error: null });
-    supabase.maybeSingle.mockResolvedValue({ data: { role: "donor" }, error: null });
+    supabase.maybeSingle.mockResolvedValue({
+      data: { role: "donor" },
+      error: null,
+    });
     mockRouter();
   });
 
@@ -72,7 +80,9 @@ describe("LoginPage", () => {
   it("renders brand heading", () => {
     render(<LoginPage />);
 
-    expect(screen.getAllByText("Architectural Intelligence.").length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText("Architectural Intelligence.").length,
+    ).toBeGreaterThan(0);
   });
 
   it('renders "Login" heading', () => {
@@ -92,7 +102,9 @@ describe("LoginPage", () => {
     await user.type(password, "password123");
 
     // Re-query fresh DOM references after React re-renders
-    expect(screen.getByLabelText("Email Address")).toHaveValue("test@example.com");
+    expect(screen.getByLabelText("Email Address")).toHaveValue(
+      "test@example.com",
+    );
     expect(screen.getByLabelText("Password")).toHaveValue("password123");
   });
 
@@ -138,7 +150,10 @@ describe("LoginPage", () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     let resolveLogin;
     supabase.auth.signInWithPassword.mockImplementation(
-      () => new Promise((resolve) => { resolveLogin = resolve; })
+      () =>
+        new Promise((resolve) => {
+          resolveLogin = resolve;
+        }),
     );
 
     render(<LoginPage />);
@@ -151,21 +166,28 @@ describe("LoginPage", () => {
     await user.click(screen.getByRole("button", { name: /login/i }));
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /logging in/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /logging in/i }),
+      ).toBeInTheDocument();
     });
     expect(screen.getByRole("button", { name: /logging in/i })).toBeDisabled();
 
     resolveLogin({ data: {}, error: null });
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /login/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /login/i }),
+      ).toBeInTheDocument();
     });
   });
 
   it('redirects to "/" on successful login', async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     const router = mockRouter();
-    supabase.auth.signInWithPassword.mockResolvedValue({ data: {}, error: null });
+    supabase.auth.signInWithPassword.mockResolvedValue({
+      data: {},
+      error: null,
+    });
 
     render(<LoginPage />);
 
@@ -190,7 +212,10 @@ describe("LoginPage", () => {
       data: { session: { user: { id: "u1" } } },
       error: null,
     });
-    supabase.maybeSingle.mockResolvedValue({ data: { role: "creator" }, error: null });
+    supabase.maybeSingle.mockResolvedValue({
+      data: { role: "creator" },
+      error: null,
+    });
 
     render(<LoginPage />);
 
@@ -215,11 +240,17 @@ describe("LoginPage", () => {
         data: { session: { user: { id: "u1" } } },
         error: null,
       });
-      supabase.maybeSingle.mockResolvedValue({ data: { role: "creator" }, error: null });
+      supabase.maybeSingle.mockResolvedValue({
+        data: { role: "creator" },
+        error: null,
+      });
 
       render(<LoginPage />);
 
-      await user.type(screen.getByLabelText("Email Address"), "creator@example.com");
+      await user.type(
+        screen.getByLabelText("Email Address"),
+        "creator@example.com",
+      );
       await user.type(screen.getByLabelText("Password"), "password123");
       await user.click(screen.getByRole("button", { name: /login/i }));
 
@@ -235,11 +266,17 @@ describe("LoginPage", () => {
         data: { session: { user: { id: "u2" } } },
         error: null,
       });
-      supabase.maybeSingle.mockResolvedValue({ data: { role: "donor" }, error: null });
+      supabase.maybeSingle.mockResolvedValue({
+        data: { role: "donor" },
+        error: null,
+      });
 
       render(<LoginPage />);
 
-      await user.type(screen.getByLabelText("Email Address"), "investor@example.com");
+      await user.type(
+        screen.getByLabelText("Email Address"),
+        "investor@example.com",
+      );
       await user.type(screen.getByLabelText("Password"), "password123");
       await user.click(screen.getByRole("button", { name: /login/i }));
 
@@ -255,11 +292,17 @@ describe("LoginPage", () => {
         data: { session: { user: { id: "u3" } } },
         error: null,
       });
-      supabase.maybeSingle.mockResolvedValue({ data: { role: "platform_admin" }, error: null });
+      supabase.maybeSingle.mockResolvedValue({
+        data: { role: "platform_admin" },
+        error: null,
+      });
 
       render(<LoginPage />);
 
-      await user.type(screen.getByLabelText("Email Address"), "admin@example.com");
+      await user.type(
+        screen.getByLabelText("Email Address"),
+        "admin@example.com",
+      );
       await user.type(screen.getByLabelText("Password"), "password123");
       await user.click(screen.getByRole("button", { name: /login/i }));
 
@@ -269,7 +312,7 @@ describe("LoginPage", () => {
     });
   });
 
-  it('blocks unverified accounts and offers to resend the verification email', async () => {
+  it("blocks unverified accounts and offers to resend the verification email", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     supabase.auth.signInWithPassword.mockResolvedValue({
       data: null,
@@ -331,6 +374,10 @@ describe("LoginPage", () => {
   it("displays the login subheading text", () => {
     render(<LoginPage />);
 
-    expect(screen.getByText("Secure access to the world's most sophisticated crowdfunding ecosystem.")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Secure access to the world's most sophisticated crowdfunding ecosystem.",
+      ),
+    ).toBeInTheDocument();
   });
 });

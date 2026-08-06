@@ -2,7 +2,14 @@
 // POST /api/observability/alerts — Create alert
 // PUT /api/observability/alerts — Acknowledge/resolve/silence alert
 import { withAuth } from "../../../lib/withAuth.js";
-import { getAlerts, createAlert, acknowledgeAlert, resolveAlert, silenceAlert, getAlertStats } from "../../../lib/observability/alertManager.js";
+import {
+  getAlerts,
+  createAlert,
+  acknowledgeAlert,
+  resolveAlert,
+  silenceAlert,
+  getAlertStats,
+} from "../../../lib/observability/alertManager.js";
 
 async function handler(req, res) {
   try {
@@ -26,7 +33,10 @@ async function handler(req, res) {
 
       case "PUT": {
         const { action, alertId } = req.body;
-        if (!alertId) return res.status(400).json({ success: false, error: "alertId required" });
+        if (!alertId)
+          return res
+            .status(400)
+            .json({ success: false, error: "alertId required" });
 
         let result;
         switch (action) {
@@ -40,14 +50,18 @@ async function handler(req, res) {
             result = await silenceAlert(alertId);
             break;
           default:
-            return res.status(400).json({ success: false, error: "Invalid action" });
+            return res
+              .status(400)
+              .json({ success: false, error: "Invalid action" });
         }
 
         return res.status(200).json(result);
       }
 
       default:
-        return res.status(405).json({ success: false, error: "Method not allowed" });
+        return res
+          .status(405)
+          .json({ success: false, error: "Method not allowed" });
     }
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });

@@ -7,14 +7,54 @@
 import { motion } from "framer-motion";
 
 const ENTRY_TYPES = {
-  donation: { bg: "bg-green-900/40", text: "text-green-400", label: "Donation", icon: "💰" },
-  refund: { bg: "bg-orange-900/40", text: "text-orange-400", label: "Refund", icon: "↩️" },
-  release: { bg: "bg-blue-900/40", text: "text-blue-400", label: "Release", icon: "📤" },
-  milestone_release: { bg: "bg-indigo-900/40", text: "text-indigo-400", label: "Milestone Release", icon: "🎯" },
-  fee: { bg: "bg-purple-900/40", text: "text-purple-400", label: "Fee", icon: "💸" },
-  adjustment: { bg: "bg-gray-700", text: "text-gray-300", label: "Adjustment", icon: "⚖️" },
-  chargeback: { bg: "bg-red-900/40", text: "text-red-400", label: "Chargeback", icon: "🔄" },
-  payout: { bg: "bg-cyan-900/40", text: "text-cyan-400", label: "Payout", icon: "🏦" },
+  donation: {
+    bg: "bg-green-900/40",
+    text: "text-green-400",
+    label: "Donation",
+    icon: "💰",
+  },
+  refund: {
+    bg: "bg-orange-900/40",
+    text: "text-orange-400",
+    label: "Refund",
+    icon: "↩️",
+  },
+  release: {
+    bg: "bg-blue-900/40",
+    text: "text-blue-400",
+    label: "Release",
+    icon: "📤",
+  },
+  milestone_release: {
+    bg: "bg-indigo-900/40",
+    text: "text-indigo-400",
+    label: "Milestone Release",
+    icon: "🎯",
+  },
+  fee: {
+    bg: "bg-purple-900/40",
+    text: "text-purple-400",
+    label: "Fee",
+    icon: "💸",
+  },
+  adjustment: {
+    bg: "bg-gray-700",
+    text: "text-gray-300",
+    label: "Adjustment",
+    icon: "⚖️",
+  },
+  chargeback: {
+    bg: "bg-red-900/40",
+    text: "text-red-400",
+    label: "Chargeback",
+    icon: "🔄",
+  },
+  payout: {
+    bg: "bg-cyan-900/40",
+    text: "text-cyan-400",
+    label: "Payout",
+    icon: "🏦",
+  },
 };
 
 function formatCurrency(amount) {
@@ -41,7 +81,12 @@ function formatDate(dateStr) {
   });
 }
 
-export default function LedgerTable({ entries = [], total = 0, onPageChange, currentPage = 1 }) {
+export default function LedgerTable({
+  entries = [],
+  total = 0,
+  onPageChange,
+  currentPage = 1,
+}) {
   const totalPages = Math.ceil(total / 50);
 
   if (!entries.length) {
@@ -57,7 +102,9 @@ export default function LedgerTable({ entries = [], total = 0, onPageChange, cur
       {/* Header */}
       <div className="px-5 py-3 border-b border-gray-800">
         <h3 className="text-white font-semibold text-sm">Transaction Ledger</h3>
-        <p className="text-gray-500 text-xs mt-1">{total} entries • Append-only</p>
+        <p className="text-gray-500 text-xs mt-1">
+          {total} entries • Append-only
+        </p>
       </div>
 
       {/* Table */}
@@ -65,16 +112,27 @@ export default function LedgerTable({ entries = [], total = 0, onPageChange, cur
         <table className="w-full" role="table">
           <thead>
             <tr className="border-b border-gray-800">
-              <th className="px-5 py-3 text-left text-xs text-gray-400 font-medium">Date</th>
-              <th className="px-5 py-3 text-left text-xs text-gray-400 font-medium">Type</th>
-              <th className="px-5 py-3 text-right text-xs text-gray-400 font-medium">Amount</th>
-              <th className="px-5 py-3 text-left text-xs text-gray-400 font-medium">Description</th>
-              <th className="px-5 py-3 text-right text-xs text-gray-400 font-medium">Balance After</th>
+              <th className="px-5 py-3 text-left text-xs text-gray-400 font-medium">
+                Date
+              </th>
+              <th className="px-5 py-3 text-left text-xs text-gray-400 font-medium">
+                Type
+              </th>
+              <th className="px-5 py-3 text-right text-xs text-gray-400 font-medium">
+                Amount
+              </th>
+              <th className="px-5 py-3 text-left text-xs text-gray-400 font-medium">
+                Description
+              </th>
+              <th className="px-5 py-3 text-right text-xs text-gray-400 font-medium">
+                Balance After
+              </th>
             </tr>
           </thead>
           <tbody>
             {entries.map((entry, idx) => {
-              const type = ENTRY_TYPES[entry.entry_type] || ENTRY_TYPES.adjustment;
+              const type =
+                ENTRY_TYPES[entry.entry_type] || ENTRY_TYPES.adjustment;
               const isCredit = ["donation"].includes(entry.entry_type);
 
               return (
@@ -89,15 +147,22 @@ export default function LedgerTable({ entries = [], total = 0, onPageChange, cur
                     {formatDate(entry.created_at)}
                   </td>
                   <td className="px-5 py-3">
-                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${type.bg} ${type.text}`}>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${type.bg} ${type.text}`}
+                    >
                       <span>{type.icon}</span>
                       {type.label}
                     </span>
                   </td>
-                  <td className={`px-5 py-3 text-right font-mono text-sm font-medium ${isCredit ? "text-green-400" : "text-red-400"}`}>
+                  <td
+                    className={`px-5 py-3 text-right font-mono text-sm font-medium ${isCredit ? "text-green-400" : "text-red-400"}`}
+                  >
                     {formatCurrency(entry.amount)}
                   </td>
-                  <td className="px-5 py-3 text-gray-400 text-sm max-w-[200px] truncate" title={entry.description}>
+                  <td
+                    className="px-5 py-3 text-gray-400 text-sm max-w-[200px] truncate"
+                    title={entry.description}
+                  >
                     {entry.description}
                   </td>
                   <td className="px-5 py-3 text-right text-white font-mono text-sm">

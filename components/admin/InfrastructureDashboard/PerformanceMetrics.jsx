@@ -42,7 +42,9 @@ export default function PerformanceMetrics() {
         <div className="animate-pulse space-y-3">
           <div className="h-6 bg-gray-800 rounded w-1/3" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[1, 2, 3, 4].map((i) => <div key={i} className="h-16 bg-gray-800 rounded" />)}
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-16 bg-gray-800 rounded" />
+            ))}
           </div>
         </div>
       </div>
@@ -57,24 +59,21 @@ export default function PerformanceMetrics() {
     );
   }
 
-  const {
-    uptime,
-    node,
-    platform,
-    memory,
-    database,
-    cache,
-    jobs,
-    endpoints,
-  } = metrics || {};
+  const { uptime, node, platform, memory, database, cache, jobs, endpoints } =
+    metrics || {};
 
   return (
     <div className="space-y-6">
       {/* System Info */}
       <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
-        <h3 className="text-lg font-semibold text-white mb-4">System Overview</h3>
+        <h3 className="text-lg font-semibold text-white mb-4">
+          System Overview
+        </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard label="Uptime" value={uptime ? `${Math.floor(uptime / 60)}m` : "—"} />
+          <StatCard
+            label="Uptime"
+            value={uptime ? `${Math.floor(uptime / 60)}m` : "—"}
+          />
           <StatCard label="Node.js" value={node} />
           <StatCard label="Platform" value={platform} />
           <StatCard label="Environment" value={metrics?.environment} />
@@ -94,13 +93,21 @@ export default function PerformanceMetrics() {
 
       {/* Database & Cache */}
       <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
-        <h3 className="text-lg font-semibold text-white mb-4">Database & Cache</h3>
+        <h3 className="text-lg font-semibold text-white mb-4">
+          Database & Cache
+        </h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <StatCard label="DB Status" value={database?.status} />
           <StatCard
             label="DB Response"
-            value={database?.responseTimeMs ? `${database.responseTimeMs}ms` : "—"}
-            sub={database?.lastCheck ? new Date(database.lastCheck).toLocaleString() : ""}
+            value={
+              database?.responseTimeMs ? `${database.responseTimeMs}ms` : "—"
+            }
+            sub={
+              database?.lastCheck
+                ? new Date(database.lastCheck).toLocaleString()
+                : ""
+            }
           />
           <StatCard label="Cache Items" value={cache?.memoryItems ?? 0} />
           <StatCard label="Active Locks" value={cache?.activeLocks ?? 0} />
@@ -112,7 +119,9 @@ export default function PerformanceMetrics() {
       {/* Pool Stats */}
       {database?.pool && (
         <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
-          <h3 className="text-lg font-semibold text-white mb-4">Connection Pool</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">
+            Connection Pool
+          </h3>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             <StatCard label="Active" value={database.pool.active} />
             <StatCard label="Idle" value={database.pool.idle} />
@@ -126,7 +135,9 @@ export default function PerformanceMetrics() {
       {/* Endpoint Metrics */}
       {endpoints?.details && endpoints.details.length > 0 && (
         <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
-          <h3 className="text-lg font-semibold text-white mb-4">Endpoint Metrics (Top 20)</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">
+            Endpoint Metrics (Top 20)
+          </h3>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
@@ -141,11 +152,21 @@ export default function PerformanceMetrics() {
               <tbody>
                 {endpoints.details.map((ep, i) => (
                   <tr key={i} className="border-b border-gray-800/50">
-                    <td className="py-2 text-gray-300">{ep.method} {ep.path}</td>
-                    <td className="py-2 text-right text-gray-400">{ep.count}</td>
-                    <td className="py-2 text-right text-gray-400">{ep.avgDuration}</td>
-                    <td className="py-2 text-right text-gray-400">{ep.maxDuration}</td>
-                    <td className="py-2 text-right text-gray-400">{ep.minDuration}</td>
+                    <td className="py-2 text-gray-300">
+                      {ep.method} {ep.path}
+                    </td>
+                    <td className="py-2 text-right text-gray-400">
+                      {ep.count}
+                    </td>
+                    <td className="py-2 text-right text-gray-400">
+                      {ep.avgDuration}
+                    </td>
+                    <td className="py-2 text-right text-gray-400">
+                      {ep.maxDuration}
+                    </td>
+                    <td className="py-2 text-right text-gray-400">
+                      {ep.minDuration}
+                    </td>
                   </tr>
                 ))}
               </tbody>

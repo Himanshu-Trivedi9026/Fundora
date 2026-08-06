@@ -8,7 +8,6 @@ export default function HomeHero() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-[#020617] via-[#020617] to-[#020617] text-white">
-
       {/* Animated Background Blobs */}
       <div className="absolute inset-0">
         <div className="absolute -top-40 -left-40 w-[520px] h-[520px] bg-blue-600/30 rounded-full blur-[180px] animate-pulse" />
@@ -18,7 +17,6 @@ export default function HomeHero() {
 
       {/* CONTENT */}
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 min-h-screen">
-
         {/* Floating Oval Logo */}
         <motion.div
           animate={{ y: [0, -18, 0] }}
@@ -60,16 +58,18 @@ export default function HomeHero() {
           className="max-w-2xl text-slate-300 text-base md:text-lg leading-relaxed mb-12"
         >
           Fundora is a modern crowdfunding ecosystem where creators, innovators,
-          and communities unite to transform ideas into reality.
-          Discover powerful projects, support visionaries, and contribute
-          to a better tomorrow.
+          and communities unite to transform ideas into reality. Discover
+          powerful projects, support visionaries, and contribute to a better
+          tomorrow.
         </motion.p>
 
         {/* CTA */}
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => { router.push("/explore"); }}
+          onClick={() => {
+            router.push("/explore");
+          }}
           className="px-12 py-4 rounded-full text-lg font-semibold
                      bg-gradient-to-r from-blue-600 to-purple-600
                      shadow-[0_0_35px_rgba(99,102,241,0.7)]
@@ -78,7 +78,6 @@ export default function HomeHero() {
         >
           Let&rsquo;s Contribute Together for Future
         </motion.button>
-
       </div>
     </div>
   );

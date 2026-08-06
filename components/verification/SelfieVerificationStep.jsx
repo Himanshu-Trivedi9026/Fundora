@@ -12,7 +12,11 @@ import { uploadDocumentFile } from "../../lib/verification/verificationApi";
  * The captured photo is uploaded for real (documentType 'selfie') — the
  * Next button stays disabled until the server confirms the upload.
  */
-export default function SelfieVerificationStep({ onNext, onBack, onStateChange }) {
+export default function SelfieVerificationStep({
+  onNext,
+  onBack,
+  onStateChange,
+}) {
   const [mode, setMode] = useState(null); // 'camera' | 'upload' | null
   const [previewUrl, setPreviewUrl] = useState(null);
   const [capturedFile, setCapturedFile] = useState(null);
@@ -51,7 +55,7 @@ export default function SelfieVerificationStep({ onNext, onBack, onStateChange }
     } catch (err) {
       console.error("Camera access denied:", err);
       setCameraError(
-        "Camera access denied. Please allow camera permissions or use file upload."
+        "Camera access denied. Please allow camera permissions or use file upload.",
       );
     }
   };
@@ -77,14 +81,17 @@ export default function SelfieVerificationStep({ onNext, onBack, onStateChange }
             setUploadProgress({ progress: p, status: "uploading" }),
         });
         setUploadProgress({ progress: 100, status: "complete" });
-        onStateChange?.({ selfieUploaded: true, selfieDocument: result?.document || null });
+        onStateChange?.({
+          selfieUploaded: true,
+          selfieDocument: result?.document || null,
+        });
       } catch (err) {
         console.error("Selfie upload error:", err);
         setUploadProgress({ progress: 0, status: "error", error: err.message });
         onStateChange?.({ selfieUploaded: false, selfieDocument: null });
       }
     },
-    [onStateChange]
+    [onStateChange],
   );
 
   // Capture photo from video
@@ -112,7 +119,7 @@ export default function SelfieVerificationStep({ onNext, onBack, onStateChange }
         }
       },
       "image/jpeg",
-      0.9
+      0.9,
     );
   }, [stopCamera, uploadSelfie]);
 
@@ -127,7 +134,7 @@ export default function SelfieVerificationStep({ onNext, onBack, onStateChange }
         uploadSelfie(file);
       }
     },
-    [uploadSelfie]
+    [uploadSelfie],
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -373,7 +380,8 @@ export default function SelfieVerificationStep({ onNext, onBack, onStateChange }
                     error
                   </span>
                   <span className="text-sm text-danger font-inter">
-                    {uploadProgress.error || "Photo upload failed. Please retake."}
+                    {uploadProgress.error ||
+                      "Photo upload failed. Please retake."}
                   </span>
                 </div>
               )}

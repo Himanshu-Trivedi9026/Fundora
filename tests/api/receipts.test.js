@@ -162,7 +162,9 @@ describe("POST /api/receipts/generate", () => {
       projects: { title: "IDOR Test" },
     };
 
-    const mockSingle = vi.fn().mockResolvedValue({ data: mockDonation, error: null });
+    const mockSingle = vi
+      .fn()
+      .mockResolvedValue({ data: mockDonation, error: null });
 
     supabaseAdmin.from.mockReturnValue({
       select: vi.fn().mockReturnThis(),
@@ -186,7 +188,10 @@ describe("POST /api/receipts/generate", () => {
     supabaseAdmin.from.mockReturnValue({
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({ data: null, error: { message: "DB connection failed" } }),
+      single: vi.fn().mockResolvedValue({
+        data: null,
+        error: { message: "DB connection failed" },
+      }),
     });
 
     const req = createReq("POST", { donationId: "donation-fail" });
@@ -222,7 +227,7 @@ describe("POST /api/receipts/generate", () => {
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
         receipt: expect.objectContaining({ project: "Unknown" }),
-      })
+      }),
     );
   });
 });

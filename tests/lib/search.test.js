@@ -26,7 +26,9 @@ describe("Search Engine", () => {
   it("should perform exact and fuzzy matching via ilike patterns", () => {
     const query = "test";
     const items = ["Test Plugin", "test platform", "Something Else"];
-    const matching = items.filter((i) => i.toLowerCase().includes(query.toLowerCase()));
+    const matching = items.filter((i) =>
+      i.toLowerCase().includes(query.toLowerCase()),
+    );
 
     expect(matching).toHaveLength(2);
     expect(matching).toContain("Test Plugin");
@@ -35,7 +37,10 @@ describe("Search Engine", () => {
 
   it("should support range filters", () => {
     const items = [
-      { price: 10 }, { price: 50 }, { price: 100 }, { price: 200 },
+      { price: 10 },
+      { price: 50 },
+      { price: 100 },
+      { price: 200 },
     ];
 
     const filtered = items.filter((i) => i.price >= 50 && i.price <= 150);
@@ -44,9 +49,7 @@ describe("Search Engine", () => {
   });
 
   it("should sort by field direction", () => {
-    const items = [
-      { name: "C" }, { name: "A" }, { name: "B" },
-    ];
+    const items = [{ name: "C" }, { name: "A" }, { name: "B" }];
 
     const ascending = [...items].sort((a, b) => a.name.localeCompare(b.name));
     const descending = [...items].sort((a, b) => b.name.localeCompare(a.name));
@@ -94,10 +97,17 @@ describe("Facet Engine", () => {
 
 describe("Autocomplete Engine", () => {
   it("should match suggestions by prefix", () => {
-    const suggestions = ["analytics", "api gateway", "anomaly detection", "blockchain"];
+    const suggestions = [
+      "analytics",
+      "api gateway",
+      "anomaly detection",
+      "blockchain",
+    ];
     const query = "an";
 
-    const matched = suggestions.filter((s) => s.toLowerCase().includes(query.toLowerCase()));
+    const matched = suggestions.filter((s) =>
+      s.toLowerCase().includes(query.toLowerCase()),
+    );
     expect(matched).toEqual(["analytics", "anomaly detection"]);
   });
 
@@ -126,7 +136,10 @@ describe("Autocomplete Engine", () => {
 describe("Search Analytics", () => {
   it("should calculate zero-result rate", () => {
     const searches = [
-      { result_count: 0 }, { result_count: 5 }, { result_count: 0 }, { result_count: 10 },
+      { result_count: 0 },
+      { result_count: 5 },
+      { result_count: 0 },
+      { result_count: 10 },
     ];
 
     const zeroResults = searches.filter((s) => s.result_count === 0);
@@ -137,7 +150,9 @@ describe("Search Analytics", () => {
 
   it("should group searches by entity type", () => {
     const searches = [
-      { entity_type: "projects" }, { entity_type: "projects" }, { entity_type: "users" },
+      { entity_type: "projects" },
+      { entity_type: "projects" },
+      { entity_type: "users" },
     ];
 
     const breakdown = {};

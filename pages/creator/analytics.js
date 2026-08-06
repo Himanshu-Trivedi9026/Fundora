@@ -7,16 +7,25 @@ import Footer from "../../components/Footer";
 
 // Lazy-load recharts (~8.3MB) — only loaded when this page renders
 const RevenueForecastChart = dynamic(
-  () => import("../../components/AnalyticsCharts").then((m) => m.RevenueForecastChart),
-  { ssr: false }
+  () =>
+    import("../../components/AnalyticsCharts").then(
+      (m) => m.RevenueForecastChart,
+    ),
+  { ssr: false },
 );
 const EarningsOverTimeChart = dynamic(
-  () => import("../../components/AnalyticsCharts").then((m) => m.EarningsOverTimeChart),
-  { ssr: false }
+  () =>
+    import("../../components/AnalyticsCharts").then(
+      (m) => m.EarningsOverTimeChart,
+    ),
+  { ssr: false },
 );
 const FundingByProjectChart = dynamic(
-  () => import("../../components/AnalyticsCharts").then((m) => m.FundingByProjectChart),
-  { ssr: false }
+  () =>
+    import("../../components/AnalyticsCharts").then(
+      (m) => m.FundingByProjectChart,
+    ),
+  { ssr: false },
 );
 
 /* ─── Animation Variants ─── */
@@ -80,7 +89,7 @@ export default function CreatorAnalytics() {
 
   const retentionRate = useMemo(() => {
     const returning = Object.values(donorMap).filter(
-      (d) => d.donationCount > 1
+      (d) => d.donationCount > 1,
     ).length;
 
     return totalUniqueDonors === 0
@@ -94,11 +103,11 @@ export default function CreatorAnalytics() {
     if (!projects.length) return null;
 
     const successfulProjects = projects.filter(
-      (p) => (p.pledged || 0) >= (p.goal || 1)
+      (p) => (p.pledged || 0) >= (p.goal || 1),
     ).length;
 
     const successRate = Math.round(
-      (successfulProjects / projects.length) * 100
+      (successfulProjects / projects.length) * 100,
     );
 
     const donorProjectSpread = {};
@@ -112,8 +121,9 @@ export default function CreatorAnalytics() {
       donorProjectSpread[d.payer_id].add(d.project_id);
     });
 
-    const multiProjectDonors = Object.values(donorProjectSpread)
-      .filter((set) => set.size > 1).length;
+    const multiProjectDonors = Object.values(donorProjectSpread).filter(
+      (set) => set.size > 1,
+    ).length;
 
     const donorExpansion =
       totalUniqueDonors === 0
@@ -124,7 +134,7 @@ export default function CreatorAnalytics() {
       0.35 * successRate +
         0.3 * retentionRate +
         0.2 * donorExpansion +
-        0.15 * Math.min(totalUniqueDonors * 5, 100)
+        0.15 * Math.min(totalUniqueDonors * 5, 100),
     );
 
     const monthMap = {};
@@ -138,16 +148,11 @@ export default function CreatorAnalytics() {
     });
 
     const bestMonth =
-      Object.entries(monthMap).sort((a, b) => b[1] - a[1])[0]?.[0] ||
-      "Unknown";
+      Object.entries(monthMap).sort((a, b) => b[1] - a[1])[0]?.[0] || "Unknown";
 
     const fundingProbability = Math.min(
       95,
-      Math.round(
-        0.5 * successRate +
-          0.3 * retentionRate +
-          0.2 * growthScore
-      )
+      Math.round(0.5 * successRate + 0.3 * retentionRate + 0.2 * growthScore),
     );
 
     return {
@@ -163,12 +168,14 @@ export default function CreatorAnalytics() {
 
   const totalEarnings = useMemo(
     () => donations.reduce((s, d) => s + d.amount, 0),
-    [donations]
+    [donations],
   );
 
   const generateAIInsights = useCallback(async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       const headers = { "Content-Type": "application/json" };
       if (session?.access_token) {
         headers.Authorization = `Bearer ${session.access_token}`;
@@ -202,7 +209,7 @@ No paragraphs.`,
 
       setAiActionData({
         type: "auto",
-        content: data.reply
+        content: data.reply,
       });
     } catch (err) {
       console.error("AI Insight Error:", err);
@@ -245,7 +252,7 @@ No paragraphs.`,
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "public_donations" },
-        loadAnalytics
+        loadAnalytics,
       )
       .subscribe();
 
@@ -326,7 +333,9 @@ Rules:
 • Be practical`;
       }
 
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       const headers = { "Content-Type": "application/json" };
       if (session?.access_token) {
         headers.Authorization = `Bearer ${session.access_token}`;
@@ -342,7 +351,7 @@ Rules:
 
       setAiActionData({
         type,
-        content: data.reply
+        content: data.reply,
       });
     } catch (err) {
       console.error("AI Action Error:", err);
@@ -354,42 +363,38 @@ Rules:
   const churnPredictions = useMemo(() => {
     const today = new Date();
 
-    return Object.entries(donorMap).map(([payer, d]) => {
-      const daysSinceLast =
-        Math.floor((today - d.lastDonation) / (1000 * 60 * 60 * 24));
+    return Object.entries(donorMap)
+      .map(([payer, d]) => {
+        const daysSinceLast = Math.floor(
+          (today - d.lastDonation) / (1000 * 60 * 60 * 24),
+        );
 
-      const recencyScore = Math.min(daysSinceLast * 1.5, 100);
+        const recencyScore = Math.min(daysSinceLast * 1.5, 100);
 
-      const frequencyScore =
-        d.donationCount >= 5
-          ? 10
-          : 60 - d.donationCount * 10;
+        const frequencyScore =
+          d.donationCount >= 5 ? 10 : 60 - d.donationCount * 10;
 
-      const avgDonation = d.totalDonated / d.donationCount;
+        const avgDonation = d.totalDonated / d.donationCount;
 
-      const trendScore =
-        avgDonation > 2000
-          ? 10
-          : 50;
+        const trendScore = avgDonation > 2000 ? 10 : 50;
 
-      const churnScore = Math.round(
-        0.4 * recencyScore +
-        0.35 * frequencyScore +
-        0.25 * trendScore
-      );
+        const churnScore = Math.round(
+          0.4 * recencyScore + 0.35 * frequencyScore + 0.25 * trendScore,
+        );
 
-      let status = "\u{1F7E2} Loyal";
+        let status = "\u{1F7E2} Loyal";
 
-      if (churnScore > 70) status = "\u{1F534} High Risk";
-      else if (churnScore > 40) status = "\u{1F7E1} At Risk";
+        if (churnScore > 70) status = "\u{1F534} High Risk";
+        else if (churnScore > 40) status = "\u{1F7E1} At Risk";
 
-      return {
-        payer,
-        churnScore,
-        status,
-        lastDonationDays: daysSinceLast
-      };
-    }).sort((a,b) => b.churnScore - a.churnScore);
+        return {
+          payer,
+          churnScore,
+          status,
+          lastDonationDays: daysSinceLast,
+        };
+      })
+      .sort((a, b) => b.churnScore - a.churnScore);
   }, [donorMap]);
 
   /* ================= AI PROJECT RECOMMENDATION ================= */
@@ -414,12 +419,10 @@ Rules:
       "General";
 
     const avgGoal =
-      projects.reduce((s, p) => s + (p.goal || 0), 0) /
-      (projects.length || 1);
+      projects.reduce((s, p) => s + (p.goal || 0), 0) / (projects.length || 1);
 
     const avgDonation =
-      donations.reduce((s, d) => s + d.amount, 0) /
-      (donations.length || 1);
+      donations.reduce((s, d) => s + d.amount, 0) / (donations.length || 1);
 
     return {
       category: bestCategory,
@@ -480,7 +483,7 @@ Rules:
         acc[date] = acc[date] || { date, amount: 0 };
         acc[date].amount += d.amount;
         return acc;
-      }, {})
+      }, {}),
     );
   }, [donations]);
 
@@ -490,7 +493,7 @@ Rules:
         name: p.title,
         amount: p.pledged || 0,
       })),
-    [projects]
+    [projects],
   );
 
   /* ================= UI ================= */
@@ -535,7 +538,9 @@ Rules:
     },
     {
       label: "Donor Expansion",
-      value: isNaN(growthEngine?.donorExpansion) ? 0 : (growthEngine?.donorExpansion || 0),
+      value: isNaN(growthEngine?.donorExpansion)
+        ? 0
+        : growthEngine?.donorExpansion || 0,
       color: "bg-primary",
       suffix: "%",
     },
@@ -587,7 +592,6 @@ Rules:
         </div>
 
         <div className="max-w-7xl mx-auto px-6 lg:px-16">
-
           {/* ═══════════ HEADER ═══════════ */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -607,11 +611,18 @@ Rules:
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+            transition={{
+              duration: 0.5,
+              delay: 0.1,
+              ease: [0.25, 0.46, 0.45, 0.94],
+            }}
             className="glass-card border-l-4 border-primary p-6 rounded-xl mb-8 relative overflow-hidden"
           >
             <div className="absolute top-4 right-4">
-              <span className="material-symbols-outlined text-primary text-3xl animate-pulse" aria-hidden="true">
+              <span
+                className="material-symbols-outlined text-primary text-3xl animate-pulse"
+                aria-hidden="true"
+              >
                 auto_awesome
               </span>
             </div>
@@ -638,14 +649,23 @@ Rules:
                 className="glass-card p-6 rounded-xl"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <div className={`w-10 h-10 rounded-lg ${kpi.bg} flex items-center justify-center`}>
-                    <span className={`material-symbols-outlined text-xl ${kpi.color}`} aria-hidden="true">
+                  <div
+                    className={`w-10 h-10 rounded-lg ${kpi.bg} flex items-center justify-center`}
+                  >
+                    <span
+                      className={`material-symbols-outlined text-xl ${kpi.color}`}
+                      aria-hidden="true"
+                    >
                       {kpi.icon}
                     </span>
                   </div>
                 </div>
-                <p className="text-on-surface-variant font-inter text-sm mb-1">{kpi.label}</p>
-                <p className="font-geist text-2xl font-bold text-on-surface">{kpi.value}</p>
+                <p className="text-on-surface-variant font-inter text-sm mb-1">
+                  {kpi.label}
+                </p>
+                <p className="font-geist text-2xl font-bold text-on-surface">
+                  {kpi.value}
+                </p>
               </motion.div>
             ))}
           </motion.div>
@@ -662,7 +682,12 @@ Rules:
             >
               <div className="glass-card p-6 rounded-xl h-full">
                 <div className="flex items-center gap-2 mb-6">
-                  <span className="material-symbols-outlined text-primary" aria-hidden="true">lightbulb</span>
+                  <span
+                    className="material-symbols-outlined text-primary"
+                    aria-hidden="true"
+                  >
+                    lightbulb
+                  </span>
                   <h3 className="font-geist text-lg font-semibold text-on-surface">
                     Project Recommendations
                   </h3>
@@ -708,12 +733,21 @@ Rules:
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+              transition={{
+                duration: 0.6,
+                delay: 0.1,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
               className="lg:col-span-8"
             >
               <div className="glass-card p-6 rounded-xl h-full">
                 <div className="flex items-center gap-2 mb-6">
-                  <span className="material-symbols-outlined text-primary" aria-hidden="true">speed</span>
+                  <span
+                    className="material-symbols-outlined text-primary"
+                    aria-hidden="true"
+                  >
+                    speed
+                  </span>
                   <h3 className="font-geist text-lg font-semibold text-on-surface">
                     Advanced Creator Growth Engine
                   </h3>
@@ -727,13 +761,15 @@ Rules:
                         <span className="text-on-surface font-inter text-sm font-medium">
                           Growth Score
                         </span>
-                        <span className={`font-geist text-lg font-bold ${
-                          growthEngine.growthScore > 70
-                            ? "text-success"
-                            : growthEngine.growthScore > 40
-                            ? "text-warning"
-                            : "text-danger"
-                        }`}>
+                        <span
+                          className={`font-geist text-lg font-bold ${
+                            growthEngine.growthScore > 70
+                              ? "text-success"
+                              : growthEngine.growthScore > 40
+                                ? "text-warning"
+                                : "text-danger"
+                          }`}
+                        >
                           {growthEngine.growthScore}/100
                         </span>
                       </div>
@@ -749,8 +785,8 @@ Rules:
                             growthEngine.growthScore > 70
                               ? "bg-success"
                               : growthEngine.growthScore > 40
-                              ? "bg-warning"
-                              : "bg-danger"
+                                ? "bg-warning"
+                                : "bg-danger"
                           }`}
                           role="progressbar"
                           aria-valuenow={growthEngine.growthScore}
@@ -763,30 +799,49 @@ Rules:
 
                     {/* Other metrics — progress bars */}
                     <div className="space-y-4">
-                      {growthMetrics.filter((m) => m.isText === undefined).map((metric) => (
-                        <div key={metric.label}>
-                          <div className="flex justify-between items-center mb-1.5">
-                            <span className="text-on-surface-variant font-inter text-sm">
-                              {metric.label}
-                            </span>
-                            <span className="text-on-surface font-inter text-sm font-medium">
-                              {metric.value}{metric.suffix || ""}
-                            </span>
+                      {growthMetrics
+                        .filter((m) => m.isText === undefined)
+                        .map((metric) => (
+                          <div key={metric.label}>
+                            <div className="flex justify-between items-center mb-1.5">
+                              <span className="text-on-surface-variant font-inter text-sm">
+                                {metric.label}
+                              </span>
+                              <span className="text-on-surface font-inter text-sm font-medium">
+                                {metric.value}
+                                {metric.suffix || ""}
+                              </span>
+                            </div>
+                            <div
+                              className="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden"
+                              role="progressbar"
+                              aria-valuenow={Math.min(
+                                100,
+                                typeof metric.value === "number"
+                                  ? metric.value
+                                  : 0,
+                              )}
+                              aria-valuemin={0}
+                              aria-valuemax={100}
+                              aria-label={metric.label}
+                            >
+                              <motion.div
+                                initial={{ width: 0 }}
+                                whileInView={{
+                                  width: `${Math.min(100, typeof metric.value === "number" ? metric.value : 0)}%`,
+                                }}
+                                viewport={{ once: true }}
+                                transition={{
+                                  duration: 1,
+                                  ease: "easeOut",
+                                  delay: 0.2,
+                                }}
+                                className={`h-full rounded-full ${metric.color}`}
+                                aria-hidden="true"
+                              />
+                            </div>
                           </div>
-                          <div className="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden" role="progressbar" aria-valuenow={Math.min(100, typeof metric.value === "number" ? metric.value : 0)} aria-valuemin={0} aria-valuemax={100} aria-label={metric.label}>
-                            <motion.div
-                              initial={{ width: 0 }}
-                              whileInView={{
-                                width: `${Math.min(100, typeof metric.value === "number" ? metric.value : 0)}%`,
-                              }}
-                              viewport={{ once: true }}
-                              transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-                              className={`h-full rounded-full ${metric.color}`}
-                              aria-hidden="true"
-                            />
-                          </div>
-                        </div>
-                      ))}
+                        ))}
 
                       {/* Best Month — text row */}
                       <div className="flex justify-between items-center py-2 border-t border-outline-variant/20">
@@ -845,7 +900,12 @@ Rules:
               className="glass-card p-6 rounded-xl mb-8"
             >
               <div className="flex items-center gap-2 mb-4">
-                <span className="material-symbols-outlined text-primary animate-pulse" aria-hidden="true">psychology</span>
+                <span
+                  className="material-symbols-outlined text-primary animate-pulse"
+                  aria-hidden="true"
+                >
+                  psychology
+                </span>
                 <h3 className="font-geist text-lg font-semibold text-on-surface">
                   AI {aiActionData.type.toUpperCase()} Analysis
                 </h3>
@@ -867,7 +927,12 @@ Rules:
               className="glass-card p-6 rounded-xl"
             >
               <div className="flex items-center gap-2 mb-6">
-                <span className="material-symbols-outlined text-primary" aria-hidden="true">bar_chart</span>
+                <span
+                  className="material-symbols-outlined text-primary"
+                  aria-hidden="true"
+                >
+                  bar_chart
+                </span>
                 <h3 className="font-geist text-lg font-semibold text-on-surface">
                   Earnings Over Time
                 </h3>
@@ -880,11 +945,20 @@ Rules:
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+              transition={{
+                duration: 0.6,
+                delay: 0.1,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
               className="glass-card p-6 rounded-xl"
             >
               <div className="flex items-center gap-2 mb-6">
-                <span className="material-symbols-outlined text-primary" aria-hidden="true">pie_chart</span>
+                <span
+                  className="material-symbols-outlined text-primary"
+                  aria-hidden="true"
+                >
+                  pie_chart
+                </span>
                 <h3 className="font-geist text-lg font-semibold text-on-surface">
                   Funding by Project
                 </h3>
@@ -892,8 +966,14 @@ Rules:
               {fundingByProject.length > 0 ? (
                 <div className="space-y-4">
                   {fundingByProject.map((item, i) => {
-                    const maxAmount = Math.max(...fundingByProject.map((f) => f.amount), 1);
-                    const progress = Math.min((item.amount / maxAmount) * 100, 100);
+                    const maxAmount = Math.max(
+                      ...fundingByProject.map((f) => f.amount),
+                      1,
+                    );
+                    const progress = Math.min(
+                      (item.amount / maxAmount) * 100,
+                      100,
+                    );
 
                     return (
                       <div key={i}>
@@ -905,12 +985,23 @@ Rules:
                             ₹{item.amount.toLocaleString()}
                           </span>
                         </div>
-                        <div className="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label={item.name}>
+                        <div
+                          className="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden"
+                          role="progressbar"
+                          aria-valuenow={progress}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          aria-label={item.name}
+                        >
                           <motion.div
                             initial={{ width: 0 }}
                             whileInView={{ width: `${progress}%` }}
                             viewport={{ once: true }}
-                            transition={{ duration: 1, ease: "easeOut", delay: i * 0.1 }}
+                            transition={{
+                              duration: 1,
+                              ease: "easeOut",
+                              delay: i * 0.1,
+                            }}
                             className="h-full bg-gradient-to-r from-primary-container to-primary rounded-full"
                             aria-hidden="true"
                           />
@@ -920,7 +1011,9 @@ Rules:
                   })}
                 </div>
               ) : (
-                <p className="text-on-surface-variant font-inter text-sm">No project data</p>
+                <p className="text-on-surface-variant font-inter text-sm">
+                  No project data
+                </p>
               )}
             </motion.div>
           </div>
@@ -936,14 +1029,21 @@ Rules:
               className="glass-card p-6 rounded-xl border-l-4 border-danger"
             >
               <div className="flex items-center gap-2 mb-6">
-                <span className="material-symbols-outlined text-danger" aria-hidden="true">warning</span>
+                <span
+                  className="material-symbols-outlined text-danger"
+                  aria-hidden="true"
+                >
+                  warning
+                </span>
                 <h3 className="font-geist text-lg font-semibold text-on-surface">
                   Donor Churn Risk
                 </h3>
               </div>
 
               {churnPredictions.length === 0 ? (
-                <p className="text-on-surface-variant font-inter text-sm">No donor data</p>
+                <p className="text-on-surface-variant font-inter text-sm">
+                  No donor data
+                </p>
               ) : (
                 <div className="space-y-0">
                   {churnPredictions.slice(0, 5).map((d, i) => (
@@ -955,9 +1055,15 @@ Rules:
                         Donor #{i + 1}
                       </span>
                       <div className="flex items-center gap-2">
-                        <span className={`font-inter text-sm ${
-                          d.churnScore > 70 ? "text-danger" : d.churnScore > 40 ? "text-warning" : "text-success"
-                        }`}>
+                        <span
+                          className={`font-inter text-sm ${
+                            d.churnScore > 70
+                              ? "text-danger"
+                              : d.churnScore > 40
+                                ? "text-warning"
+                                : "text-success"
+                          }`}
+                        >
                           {d.status}
                         </span>
                         <span className="text-on-surface-variant font-inter text-xs">
@@ -975,11 +1081,20 @@ Rules:
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+              transition={{
+                duration: 0.6,
+                delay: 0.1,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
               className="glass-card p-6 rounded-xl border-l-4 border-success"
             >
               <div className="flex items-center gap-2 mb-6">
-                <span className="material-symbols-outlined text-success" aria-hidden="true">show_chart</span>
+                <span
+                  className="material-symbols-outlined text-success"
+                  aria-hidden="true"
+                >
+                  show_chart
+                </span>
                 <h3 className="font-geist text-lg font-semibold text-on-surface">
                   Revenue Prediction
                 </h3>
@@ -987,7 +1102,6 @@ Rules:
               <RevenueForecastChart data={revenueForecast} />
             </motion.div>
           </div>
-
         </div>
       </main>
 

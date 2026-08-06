@@ -72,7 +72,9 @@ describe("ComplianceEngine", () => {
         .mockReturnValueOnce({
           insert: vi.fn().mockReturnValue({
             select: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockCase, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockCase, error: null }),
             }),
           }),
         });
@@ -94,7 +96,10 @@ describe("ComplianceEngine", () => {
     });
 
     it("should validate case type", async () => {
-      const result = await createComplianceCase({ caseType: "invalid_type", subjectUserId: "user-1" });
+      const result = await createComplianceCase({
+        caseType: "invalid_type",
+        subjectUserId: "user-1",
+      });
       expect(result.success).toBe(false);
     });
   });
@@ -105,7 +110,11 @@ describe("ComplianceEngine", () => {
       supabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnValue({
           order: vi.fn().mockReturnValue({
-            range: vi.fn().mockResolvedValue({ data: [{ id: "case-1" }], count: 1, error: null }),
+            range: vi.fn().mockResolvedValue({
+              data: [{ id: "case-1" }],
+              count: 1,
+              error: null,
+            }),
           }),
         }),
       });
@@ -117,15 +126,25 @@ describe("ComplianceEngine", () => {
 
   describe("resolveComplianceCase", () => {
     it("should resolve a compliance case", async () => {
-      const mockCase = { id: "case-1", status: "investigating", case_number: "COMP-2026-00001" };
-      const mockResolved = { ...mockCase, status: "resolved", resolution_type: "dismissed" };
+      const mockCase = {
+        id: "case-1",
+        status: "investigating",
+        case_number: "COMP-2026-00001",
+      };
+      const mockResolved = {
+        ...mockCase,
+        status: "resolved",
+        resolution_type: "dismissed",
+      };
 
       // 1. Fetch case: select("*").eq("id", caseId).single()
       supabaseAdmin.from
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockCase, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockCase, error: null }),
             }),
           }),
         })
@@ -134,33 +153,56 @@ describe("ComplianceEngine", () => {
           update: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               select: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: mockResolved, error: null }),
+                single: vi
+                  .fn()
+                  .mockResolvedValue({ data: mockResolved, error: null }),
               }),
             }),
           }),
         });
 
-      const result = await resolveComplianceCase("case-1", "dismissed", "No evidence found", "admin-1");
+      const result = await resolveComplianceCase(
+        "case-1",
+        "dismissed",
+        "No evidence found",
+        "admin-1",
+      );
       expect(result.success).toBe(true);
     });
 
     it("should require all params", async () => {
-      const result = await resolveComplianceCase("case-1", "dismissed", null, "admin-1");
+      const result = await resolveComplianceCase(
+        "case-1",
+        "dismissed",
+        null,
+        "admin-1",
+      );
       expect(result.success).toBe(false);
     });
   });
 
   describe("escalateComplianceCase", () => {
     it("should escalate a compliance case", async () => {
-      const mockCase = { id: "case-1", status: "open", priority: "medium", case_number: "COMP-2026-00001" };
-      const mockEscalated = { ...mockCase, status: "escalated", priority: "urgent" };
+      const mockCase = {
+        id: "case-1",
+        status: "open",
+        priority: "medium",
+        case_number: "COMP-2026-00001",
+      };
+      const mockEscalated = {
+        ...mockCase,
+        status: "escalated",
+        priority: "urgent",
+      };
 
       // 1. Fetch case
       supabaseAdmin.from
         .mockReturnValueOnce({
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockCase, error: null }),
+              single: vi
+                .fn()
+                .mockResolvedValue({ data: mockCase, error: null }),
             }),
           }),
         })
@@ -169,13 +211,19 @@ describe("ComplianceEngine", () => {
           update: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               select: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: mockEscalated, error: null }),
+                single: vi
+                  .fn()
+                  .mockResolvedValue({ data: mockEscalated, error: null }),
               }),
             }),
           }),
         });
 
-      const result = await escalateComplianceCase("case-1", "Needs higher authority", "admin-1");
+      const result = await escalateComplianceCase(
+        "case-1",
+        "Needs higher authority",
+        "admin-1",
+      );
       expect(result.success).toBe(true);
     });
   });

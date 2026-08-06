@@ -4,7 +4,9 @@ import { authFetch } from "../../../lib/authFetch";
 const MetricCard = ({ label, value, status }) => (
   <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
     <p className="text-sm text-gray-400">{label}</p>
-    <p className={`text-2xl font-bold mt-1 ${status === "ok" ? "text-green-400" : status === "warn" ? "text-yellow-400" : "text-blue-400"}`}>
+    <p
+      className={`text-2xl font-bold mt-1 ${status === "ok" ? "text-green-400" : status === "warn" ? "text-yellow-400" : "text-blue-400"}`}
+    >
       {value}
     </p>
   </div>
@@ -53,20 +55,26 @@ export default function SystemHealthPanel() {
     return (
       <div className="bg-red-900/20 border border-red-800 rounded-xl p-6">
         <p className="text-red-400">Failed to load health data: {error}</p>
-        <button onClick={fetchHealth} className="mt-2 text-sm text-red-300 underline">
+        <button
+          onClick={fetchHealth}
+          className="mt-2 text-sm text-red-300 underline"
+        >
           Retry
         </button>
       </div>
     );
   }
 
-  const { database, systemHealth, recentDeployments, cache, jobs } = healthData || {};
+  const { database, systemHealth, recentDeployments, cache, jobs } =
+    healthData || {};
 
   return (
     <div className="space-y-6">
       {/* Database Status */}
       <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
-        <h3 className="text-lg font-semibold text-white mb-4">Database Status</h3>
+        <h3 className="text-lg font-semibold text-white mb-4">
+          Database Status
+        </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <MetricCard
             label="Reachable"
@@ -75,7 +83,9 @@ export default function SystemHealthPanel() {
           />
           <MetricCard
             label="Response Time"
-            value={database?.responseTime ? `${database.responseTime}ms` : "N/A"}
+            value={
+              database?.responseTime ? `${database.responseTime}ms` : "N/A"
+            }
             status={database?.responseTime < 200 ? "ok" : "warn"}
           />
           <MetricCard
@@ -97,13 +107,17 @@ export default function SystemHealthPanel() {
           <MetricCard label="Active Locks" value={cache?.activeLocks ?? 0} />
           <MetricCard label="Active Jobs" value={jobs?.active ?? 0} />
         </div>
-        <p className="text-xs text-gray-500 mt-4">Handlers registered: {jobs?.handlers ?? 0}</p>
+        <p className="text-xs text-gray-500 mt-4">
+          Handlers registered: {jobs?.handlers ?? 0}
+        </p>
       </div>
 
       {/* System Health Checks */}
       {systemHealth && systemHealth.length > 0 && (
         <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
-          <h3 className="text-lg font-semibold text-white mb-4">Component Health</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">
+            Component Health
+          </h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -120,13 +134,23 @@ export default function SystemHealthPanel() {
                   <tr key={i} className="border-b border-gray-800/50">
                     <td className="py-2 text-gray-300">{check.component}</td>
                     <td className="py-2">
-                      <span className={`px-2 py-0.5 rounded text-xs ${check.status === "healthy" ? "bg-green-900/50 text-green-400" : "bg-red-900/50 text-red-400"}`}>
+                      <span
+                        className={`px-2 py-0.5 rounded text-xs ${check.status === "healthy" ? "bg-green-900/50 text-green-400" : "bg-red-900/50 text-red-400"}`}
+                      >
                         {check.status}
                       </span>
                     </td>
-                    <td className="py-2 text-gray-400">{check.metric_value ?? "—"}</td>
-                    <td className="py-2 text-gray-400">{check.threshold_value ?? "—"}</td>
-                    <td className="py-2 text-gray-400">{check.checked_at ? new Date(check.checked_at).toLocaleString() : "—"}</td>
+                    <td className="py-2 text-gray-400">
+                      {check.metric_value ?? "—"}
+                    </td>
+                    <td className="py-2 text-gray-400">
+                      {check.threshold_value ?? "—"}
+                    </td>
+                    <td className="py-2 text-gray-400">
+                      {check.checked_at
+                        ? new Date(check.checked_at).toLocaleString()
+                        : "—"}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -138,18 +162,27 @@ export default function SystemHealthPanel() {
       {/* Recent Deployments */}
       {recentDeployments && recentDeployments.length > 0 && (
         <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
-          <h3 className="text-lg font-semibold text-white mb-4">Recent Deployments</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">
+            Recent Deployments
+          </h3>
           <div className="space-y-3">
             {recentDeployments.map((dep) => (
-              <div key={dep.id} className="flex items-center justify-between bg-gray-800/30 rounded-lg p-3">
+              <div
+                key={dep.id}
+                className="flex items-center justify-between bg-gray-800/30 rounded-lg p-3"
+              >
                 <div>
-                  <p className="text-sm font-medium text-gray-200">{dep.version}</p>
+                  <p className="text-sm font-medium text-gray-200">
+                    {dep.version}
+                  </p>
                   <p className="text-xs text-gray-500">
                     {dep.environment} · {dep.branch}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`px-2 py-0.5 rounded text-xs ${dep.status === "deployed" || dep.status === "healthy" ? "bg-green-900/50 text-green-400" : dep.status === "deploying" ? "bg-blue-900/50 text-blue-400" : dep.status === "failed" ? "bg-red-900/50 text-red-400" : "bg-gray-800 text-gray-400"}`}>
+                  <span
+                    className={`px-2 py-0.5 rounded text-xs ${dep.status === "deployed" || dep.status === "healthy" ? "bg-green-900/50 text-green-400" : dep.status === "deploying" ? "bg-blue-900/50 text-blue-400" : dep.status === "failed" ? "bg-red-900/50 text-red-400" : "bg-gray-800 text-gray-400"}`}
+                  >
                     {dep.status}
                   </span>
                   <span className="text-xs text-gray-500">

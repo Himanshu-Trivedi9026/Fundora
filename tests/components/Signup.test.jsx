@@ -67,7 +67,9 @@ describe("SignupPage", () => {
   it('renders "Create Account" heading', () => {
     render(<SignupPage />);
 
-    expect(screen.getByRole("heading", { name: "Create Account" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Create Account" }),
+    ).toBeInTheDocument();
   });
 
   it("calls supabase.auth.signUp on form submit with correct data", async () => {
@@ -114,7 +116,11 @@ describe("SignupPage", () => {
     await user.click(screen.getByRole("button", { name: /create account/i }));
 
     await waitFor(() => {
-      expect(screen.getByText(/Account created! Please verify your email before logging in/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          /Account created! Please verify your email before logging in/i,
+        ),
+      ).toBeInTheDocument();
     });
   });
 
@@ -135,7 +141,9 @@ describe("SignupPage", () => {
     await user.click(screen.getByRole("button", { name: /create account/i }));
 
     await waitFor(() => {
-      expect(screen.getByText(/already exists.*log in instead/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/already exists.*log in instead/i),
+      ).toBeInTheDocument();
     });
   });
 
@@ -154,7 +162,9 @@ describe("SignupPage", () => {
     await user.click(screen.getByRole("button", { name: /create account/i }));
 
     await waitFor(() => {
-      expect(screen.getByText(/verification email has been sent to this address/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/verification email has been sent to this address/i),
+      ).toBeInTheDocument();
     });
   });
 
@@ -185,7 +195,10 @@ describe("SignupPage", () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     let resolveSignUp;
     supabase.auth.signUp.mockImplementation(
-      () => new Promise((resolve) => { resolveSignUp = resolve; })
+      () =>
+        new Promise((resolve) => {
+          resolveSignUp = resolve;
+        }),
     );
 
     render(<SignupPage />);
@@ -200,14 +213,18 @@ describe("SignupPage", () => {
     await user.click(screen.getByRole("button", { name: /create account/i }));
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /creating/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /creating/i }),
+      ).toBeInTheDocument();
     });
     expect(screen.getByRole("button", { name: /creating/i })).toBeDisabled();
 
     resolveSignUp({ data: {}, error: null });
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /create account/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /create account/i }),
+      ).toBeInTheDocument();
     });
   });
 
@@ -222,7 +239,9 @@ describe("SignupPage", () => {
   it("renders brand heading", () => {
     render(<SignupPage />);
 
-    expect(screen.getAllByText("Establish your venture").length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText("Establish your venture").length,
+    ).toBeGreaterThan(0);
   });
 
   it("renders Footer", () => {
@@ -277,7 +296,10 @@ describe("SignupPage", () => {
   describe("role-first onboarding (role from URL)", () => {
     async function fillAndSubmit(user) {
       await user.type(screen.getByLabelText("Full Name"), "Jane Doe");
-      await user.type(screen.getByLabelText("Email Address"), "jane@example.com");
+      await user.type(
+        screen.getByLabelText("Email Address"),
+        "jane@example.com",
+      );
       await user.type(screen.getByLabelText("Password"), "password123");
       await user.click(screen.getByRole("button", { name: /create account/i }));
     }
@@ -329,8 +351,10 @@ describe("SignupPage", () => {
 
       // The badge's role label is its own <span>, so match the paragraph's
       // combined text content rather than a single regex against one node.
-      const badge = screen.getByText((_, element) =>
-        element?.tagName === "P" && element.textContent.includes("joining as"),
+      const badge = screen.getByText(
+        (_, element) =>
+          element?.tagName === "P" &&
+          element.textContent.includes("joining as"),
       );
       expect(badge.textContent.replace(/\s+/g, " ").trim()).toBe(
         "You're joining as Creator",
@@ -340,8 +364,10 @@ describe("SignupPage", () => {
     it("shows Investor in the badge when the role defaults to donor", () => {
       render(<SignupPage />);
 
-      const badge = screen.getByText((_, element) =>
-        element?.tagName === "P" && element.textContent.includes("joining as"),
+      const badge = screen.getByText(
+        (_, element) =>
+          element?.tagName === "P" &&
+          element.textContent.includes("joining as"),
       );
       expect(badge.textContent.replace(/\s+/g, " ").trim()).toBe(
         "You're joining as Investor",

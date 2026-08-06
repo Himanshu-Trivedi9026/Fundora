@@ -45,7 +45,12 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 // ---- Helpers ----
 
-function createReq({ method = "GET", query = {}, body = {}, token = "token-1" } = {}) {
+function createReq({
+  method = "GET",
+  query = {},
+  body = {},
+  token = "token-1",
+} = {}) {
   return {
     method,
     query,
@@ -97,7 +102,10 @@ function authAs(userId, email = "user@example.com") {
 }
 
 function authNone() {
-  supabaseAdmin.auth.getUser.mockResolvedValue({ data: { user: null }, error: null });
+  supabaseAdmin.auth.getUser.mockResolvedValue({
+    data: { user: null },
+    error: null,
+  });
 }
 
 const OWNER = "user-owner";
@@ -115,9 +123,30 @@ describe("Organization Members Security (CR-6)", () => {
     it("rejects anonymous requests with 401 on all organization routes", async () => {
       const cases = [
         [orgHandler, createReq({ method: "GET", query: {}, token: null })],
-        [membersHandler, createReq({ method: "GET", query: { organizationId: "org-1" }, token: null })],
-        [invitationsHandler, createReq({ method: "GET", query: { organizationId: "org-1" }, token: null })],
-        [settingsHandler, createReq({ method: "GET", query: { organizationId: "org-1" }, token: null })],
+        [
+          membersHandler,
+          createReq({
+            method: "GET",
+            query: { organizationId: "org-1" },
+            token: null,
+          }),
+        ],
+        [
+          invitationsHandler,
+          createReq({
+            method: "GET",
+            query: { organizationId: "org-1" },
+            token: null,
+          }),
+        ],
+        [
+          settingsHandler,
+          createReq({
+            method: "GET",
+            query: { organizationId: "org-1" },
+            token: null,
+          }),
+        ],
       ];
 
       for (const [handler, req] of cases) {
@@ -131,7 +160,11 @@ describe("Organization Members Security (CR-6)", () => {
   describe("addMember", () => {
     it("denies a non-manager (plain member) from adding members", async () => {
       supabaseAdmin.from.mockImplementation(() =>
-        genericChain({ single: vi.fn(() => Promise.resolve({ data: { role: "member" }, error: null })) })
+        genericChain({
+          single: vi.fn(() =>
+            Promise.resolve({ data: { role: "member" }, error: null }),
+          ),
+        }),
       );
 
       const result = await addMember({
@@ -150,7 +183,9 @@ describe("Organization Members Security (CR-6)", () => {
     it("denies a non-member from adding members to an organization they don't own", async () => {
       // Membership lookup for OTHER resolves nothing → not a manager.
       supabaseAdmin.from.mockImplementation(() =>
-        genericChain({ single: vi.fn(() => Promise.resolve({ data: null, error: null })) })
+        genericChain({
+          single: vi.fn(() => Promise.resolve({ data: null, error: null })),
+        }),
       );
 
       const result = await addMember({
@@ -167,7 +202,11 @@ describe("Organization Members Security (CR-6)", () => {
 
     it("rejects a client-supplied elevated role from an admin (admin cannot grant owner)", async () => {
       supabaseAdmin.from.mockImplementation(() =>
-        genericChain({ single: vi.fn(() => Promise.resolve({ data: { role: "admin" }, error: null })) })
+        genericChain({
+          single: vi.fn(() =>
+            Promise.resolve({ data: { role: "admin" }, error: null }),
+          ),
+        }),
       );
 
       const result = await addMember({
@@ -186,8 +225,12 @@ describe("Organization Members Security (CR-6)", () => {
       supabaseAdmin.from.mockImplementation((table) => {
         const chain = genericChain();
         if (table === "organization_members") {
-          chain.single = vi.fn(() => Promise.resolve({ data: { role: "owner" }, error: null }));
-          chain.maybeSingle = vi.fn(() => Promise.resolve({ data: null, error: null }));
+          chain.single = vi.fn(() =>
+            Promise.resolve({ data: { role: "owner" }, error: null }),
+          );
+          chain.maybeSingle = vi.fn(() =>
+            Promise.resolve({ data: null, error: null }),
+          );
         }
         return chain;
       });
@@ -206,7 +249,11 @@ describe("Organization Members Security (CR-6)", () => {
   describe("createInvitation", () => {
     it("denies a non-owner (plain member) from inviting", async () => {
       supabaseAdmin.from.mockImplementation(() =>
-        genericChain({ single: vi.fn(() => Promise.resolve({ data: { role: "member" }, error: null })) })
+        genericChain({
+          single: vi.fn(() =>
+            Promise.resolve({ data: { role: "member" }, error: null }),
+          ),
+        }),
       );
 
       const result = await createInvitation({
@@ -222,7 +269,11 @@ describe("Organization Members Security (CR-6)", () => {
 
     it("denies an admin from inviting with an elevated owner role", async () => {
       supabaseAdmin.from.mockImplementation(() =>
-        genericChain({ single: vi.fn(() => Promise.resolve({ data: { role: "admin" }, error: null })) })
+        genericChain({
+          single: vi.fn(() =>
+            Promise.resolve({ data: { role: "admin" }, error: null }),
+          ),
+        }),
       );
 
       const result = await createInvitation({
@@ -241,13 +292,20 @@ describe("Organization Members Security (CR-6)", () => {
       supabaseAdmin.from.mockImplementation((table) => {
         const chain = genericChain();
         if (table === "organization_members") {
-          chain.single = vi.fn(() => Promise.resolve({ data: { role: "owner" }, error: null }));
+          chain.single = vi.fn(() =>
+            Promise.resolve({ data: { role: "owner" }, error: null }),
+          );
         } else if (table === "invitations") {
-          chain.maybeSingle = vi.fn(() => Promise.resolve({ data: null, error: null }));
+          chain.maybeSingle = vi.fn(() =>
+            Promise.resolve({ data: null, error: null }),
+          );
           chain.insert = vi.fn(() => chain);
           chain.select = vi.fn(() => chain);
           chain.single = vi.fn(() =>
-            Promise.resolve({ data: { id: "inv-1", role: "member", token: "abc" }, error: null })
+            Promise.resolve({
+              data: { id: "inv-1", role: "member", token: "abc" },
+              error: null,
+            }),
           );
         }
         return chain;
@@ -265,7 +323,12 @@ describe("Organization Members Security (CR-6)", () => {
 
   describe("updateMemberRole", () => {
     it("denies a user changing their OWN role (self role escalation)", async () => {
-      const result = await updateMemberRole("org-1", "user-self", "admin", "user-self");
+      const result = await updateMemberRole(
+        "org-1",
+        "user-self",
+        "admin",
+        "user-self",
+      );
       expect(result.success).toBe(false);
       expect(result.error).toMatch(/own role/i);
       // No service-role query is issued at all.
@@ -274,10 +337,19 @@ describe("Organization Members Security (CR-6)", () => {
 
     it("denies an admin promoting a member to owner", async () => {
       supabaseAdmin.from.mockImplementation(() =>
-        genericChain({ single: vi.fn(() => Promise.resolve({ data: { role: "admin" }, error: null })) })
+        genericChain({
+          single: vi.fn(() =>
+            Promise.resolve({ data: { role: "admin" }, error: null }),
+          ),
+        }),
       );
 
-      const result = await updateMemberRole("org-1", "user-target", "owner", ADMIN);
+      const result = await updateMemberRole(
+        "org-1",
+        "user-target",
+        "owner",
+        ADMIN,
+      );
       expect(result.success).toBe(false);
       expect(result.error).toMatch(/owner/i);
       expect(supabaseAdmin.from().update).not.toHaveBeenCalled();
@@ -289,10 +361,10 @@ describe("Organization Members Security (CR-6)", () => {
         if (table === "organization_members") {
           // actor lookup (single) → owner; target lookup (maybeSingle) → member
           chain.single = vi.fn(() =>
-            Promise.resolve({ data: { role: "owner" }, error: null })
+            Promise.resolve({ data: { role: "owner" }, error: null }),
           );
           chain.maybeSingle = vi.fn(() =>
-            Promise.resolve({ data: { role: "member" }, error: null })
+            Promise.resolve({ data: { role: "member" }, error: null }),
           );
           chain.update = vi.fn(() => chain);
           chain.eq = vi.fn(() => chain);
@@ -301,7 +373,12 @@ describe("Organization Members Security (CR-6)", () => {
         return chain;
       });
 
-      const result = await updateMemberRole("org-1", "user-target", "finance_manager", OWNER);
+      const result = await updateMemberRole(
+        "org-1",
+        "user-target",
+        "finance_manager",
+        OWNER,
+      );
       expect(result.success).toBe(true);
     });
   });
@@ -327,7 +404,9 @@ describe("Organization Members Security (CR-6)", () => {
 
     it("rejects operations on an organization the caller does not belong to (invalid organization)", async () => {
       supabaseAdmin.from.mockImplementation(() =>
-        genericChain({ single: vi.fn(() => Promise.resolve({ data: null, error: null })) })
+        genericChain({
+          single: vi.fn(() => Promise.resolve({ data: null, error: null })),
+        }),
       );
 
       const result = await createInvitation({
@@ -347,9 +426,16 @@ describe("Organization Members Security (CR-6)", () => {
       supabaseAdmin.from.mockImplementation((table) => {
         const chain = genericChain();
         if (table === "organization_members") {
-          chain.maybeSingle = vi.fn(() => Promise.resolve({ data: { id: "mem-1" }, error: null }));
+          chain.maybeSingle = vi.fn(() =>
+            Promise.resolve({ data: { id: "mem-1" }, error: null }),
+          );
         }
-        chain.then = (resolve) => resolve({ data: [{ id: "m1", user_id: MEMBER, role: "member" }], error: null, count: 1 });
+        chain.then = (resolve) =>
+          resolve({
+            data: [{ id: "m1", user_id: MEMBER, role: "member" }],
+            error: null,
+            count: 1,
+          });
         return chain;
       });
 
@@ -359,7 +445,11 @@ describe("Organization Members Security (CR-6)", () => {
 
     it("denies a non-member from listing another organization's members", async () => {
       supabaseAdmin.from.mockImplementation(() =>
-        genericChain({ maybeSingle: vi.fn(() => Promise.resolve({ data: null, error: null })) })
+        genericChain({
+          maybeSingle: vi.fn(() =>
+            Promise.resolve({ data: null, error: null }),
+          ),
+        }),
       );
 
       const result = await getMembers("org-1", {}, OTHER);
@@ -372,14 +462,20 @@ describe("Organization Members Security (CR-6)", () => {
       supabaseAdmin.from.mockImplementation((table) => {
         const chain = genericChain();
         if (table === "organization_members") {
-          chain.single = vi.fn(() => Promise.resolve({ data: { role: "owner" }, error: null }));
+          chain.single = vi.fn(() =>
+            Promise.resolve({ data: { role: "owner" }, error: null }),
+          );
         } else if (table === "invitations") {
           chain.select = vi.fn((cols) => {
             invitationsSelect = cols;
             return chain;
           });
           chain.then = (resolve) =>
-            resolve({ data: [{ id: "i1", email: "a@b.com", token: "SECRET" }], error: null, count: 1 });
+            resolve({
+              data: [{ id: "i1", email: "a@b.com", token: "SECRET" }],
+              error: null,
+              count: 1,
+            });
         }
         return chain;
       });
@@ -394,10 +490,19 @@ describe("Organization Members Security (CR-6)", () => {
   describe("setOrganizationSetting", () => {
     it("denies a non-manager from changing organization settings", async () => {
       supabaseAdmin.from.mockImplementation(() =>
-        genericChain({ single: vi.fn(() => Promise.resolve({ data: { role: "member" }, error: null })) })
+        genericChain({
+          single: vi.fn(() =>
+            Promise.resolve({ data: { role: "member" }, error: null }),
+          ),
+        }),
       );
 
-      const result = await setOrganizationSetting("org-1", "theme", { color: "blue" }, MEMBER);
+      const result = await setOrganizationSetting(
+        "org-1",
+        "theme",
+        { color: "blue" },
+        MEMBER,
+      );
       expect(result.success).toBe(false);
       expect(result.error).toMatch(/permissions/i);
       expect(supabaseAdmin.from().upsert).not.toHaveBeenCalled();
@@ -407,18 +512,28 @@ describe("Organization Members Security (CR-6)", () => {
       supabaseAdmin.from.mockImplementation((table) => {
         const chain = genericChain();
         if (table === "organization_members") {
-          chain.single = vi.fn(() => Promise.resolve({ data: { role: "owner" }, error: null }));
+          chain.single = vi.fn(() =>
+            Promise.resolve({ data: { role: "owner" }, error: null }),
+          );
         } else if (table === "organization_settings") {
           chain.upsert = vi.fn(() => chain);
           chain.select = vi.fn(() => chain);
           chain.single = vi.fn(() =>
-            Promise.resolve({ data: { id: "set-1", setting_key: "theme" }, error: null })
+            Promise.resolve({
+              data: { id: "set-1", setting_key: "theme" },
+              error: null,
+            }),
           );
         }
         return chain;
       });
 
-      const result = await setOrganizationSetting("org-1", "theme", { color: "blue" }, OWNER);
+      const result = await setOrganizationSetting(
+        "org-1",
+        "theme",
+        { color: "blue" },
+        OWNER,
+      );
       expect(result.success).toBe(true);
     });
   });

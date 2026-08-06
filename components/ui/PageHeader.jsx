@@ -6,9 +6,7 @@ export default function PageHeader({
   className = "",
 }) {
   return (
-    <div
-      className={`fade-in-up space-y-2 ${className}`}
-    >
+    <div className={`fade-in-up space-y-2 ${className}`}>
       <div className="flex items-center justify-between">
         <h1 className="font-geist text-2xl md:text-3xl font-bold text-on-surface flex items-center gap-3">
           {icon && (

@@ -48,10 +48,13 @@ export default withAuth(async function handler(req, res, user) {
     // if (!user.isAdmin) return res.status(403).json({ error: "Forbidden" });
 
     try {
-      const { overrideType, newValue, reason, isPermanent, expiresAt } = req.body;
+      const { overrideType, newValue, reason, isPermanent, expiresAt } =
+        req.body;
 
       if (!overrideType || !newValue || !reason) {
-        return res.status(400).json({ error: "Missing required fields: overrideType, newValue, reason" });
+        return res.status(400).json({
+          error: "Missing required fields: overrideType, newValue, reason",
+        });
       }
 
       const result = await applyManualOverride({
@@ -68,7 +71,9 @@ export default withAuth(async function handler(req, res, user) {
         return res.status(400).json({ error: result.error });
       }
 
-      return res.status(200).json({ success: true, message: "Override applied" });
+      return res
+        .status(200)
+        .json({ success: true, message: "Override applied" });
     } catch (err) {
       logError("FraudProfileAPI", "POST error", { error: err.message });
       return res.status(500).json({ error: "Failed to apply override" });

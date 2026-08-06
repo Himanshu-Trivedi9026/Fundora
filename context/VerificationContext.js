@@ -1,4 +1,12 @@
-import { createContext, useContext, useEffect, useState, useMemo, useCallback, useRef } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useMemo,
+  useCallback,
+  useRef,
+} from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useRole } from "./RoleContext";
 
@@ -57,12 +65,42 @@ const VerificationContext = createContext(null);
  *   5 — Fully Verified Creator
  */
 export const VERIFICATION_LEVELS = [
-  { level: 0, label: "Email Only", icon: "mail", description: "Account created with email" },
-  { level: 1, label: "Phone Verified", icon: "phone", description: "Phone number confirmed" },
-  { level: 2, label: "Identity Verified", icon: "badge", description: "Government ID verified" },
-  { level: 3, label: "Bank Verified", icon: "account_balance", description: "Bank account confirmed" },
-  { level: 4, label: "Business Verified", icon: "business", description: "Business registration verified" },
-  { level: 5, label: "Fully Verified", icon: "verified", description: "All verification checks passed" },
+  {
+    level: 0,
+    label: "Email Only",
+    icon: "mail",
+    description: "Account created with email",
+  },
+  {
+    level: 1,
+    label: "Phone Verified",
+    icon: "phone",
+    description: "Phone number confirmed",
+  },
+  {
+    level: 2,
+    label: "Identity Verified",
+    icon: "badge",
+    description: "Government ID verified",
+  },
+  {
+    level: 3,
+    label: "Bank Verified",
+    icon: "account_balance",
+    description: "Bank account confirmed",
+  },
+  {
+    level: 4,
+    label: "Business Verified",
+    icon: "business",
+    description: "Business registration verified",
+  },
+  {
+    level: 5,
+    label: "Fully Verified",
+    icon: "verified",
+    description: "All verification checks passed",
+  },
 ];
 
 /**
@@ -75,10 +113,22 @@ export const VERIFICATION_LEVELS = [
  */
 export const VERIFICATION_STATUSES = {
   pending: { label: "Pending", color: "warning", icon: "hourglass_empty" },
-  documents_uploaded: { label: "Documents Uploaded", color: "primary", icon: "upload_file" },
-  automatic_validation: { label: "Auto Validation", color: "primary", icon: "auto_awesome" },
+  documents_uploaded: {
+    label: "Documents Uploaded",
+    color: "primary",
+    icon: "upload_file",
+  },
+  automatic_validation: {
+    label: "Auto Validation",
+    color: "primary",
+    icon: "auto_awesome",
+  },
   under_review: { label: "Under Review", color: "primary", icon: "pending" },
-  manual_review: { label: "Manual Review", color: "warning", icon: "rate_review" },
+  manual_review: {
+    label: "Manual Review",
+    color: "warning",
+    icon: "rate_review",
+  },
   approved: { label: "Approved", color: "success", icon: "check_circle" },
   rejected: { label: "Rejected", color: "danger", icon: "cancel" },
   expired: { label: "Expired", color: "danger", icon: "schedule" },
@@ -93,7 +143,11 @@ export const VERIFICATION_STATUSES = {
  *   expired      — verification has expired
  */
 export const EXPIRY_STATUSES = {
-  not_verified: { label: "Not Verified", color: "on-surface-variant", icon: "help_outline" },
+  not_verified: {
+    label: "Not Verified",
+    color: "on-surface-variant",
+    icon: "help_outline",
+  },
   valid: { label: "Valid", color: "success", icon: "verified" },
   expiring_soon: { label: "Expiring Soon", color: "warning", icon: "warning" },
   expired: { label: "Expired", color: "danger", icon: "error" },
@@ -133,11 +187,11 @@ export function VerificationProvider({ children }) {
       setUserId(data?.user?.id || null);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUserId(session?.user?.id || null);
-      }
-    );
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserId(session?.user?.id || null);
+    });
 
     return () => subscription?.unsubscribe();
   }, []);
@@ -155,7 +209,9 @@ export function VerificationProvider({ children }) {
     try {
       const { data, error } = await supabase
         .from("creator_verifications")
-        .select("id, user_id, verification_level, email_verified, phone_verified, identity_verified, bank_verified, business_verified, selfie_verified, verification_status, trust_score, risk_score, verification_provider, verified_at, expires_at, expiry_status, created_at, updated_at")
+        .select(
+          "id, user_id, verification_level, email_verified, phone_verified, identity_verified, bank_verified, business_verified, selfie_verified, verification_status, trust_score, risk_score, verification_provider, verified_at, expires_at, expiry_status, created_at, updated_at",
+        )
         .eq("user_id", userId)
         .maybeSingle();
 
@@ -179,37 +235,46 @@ export function VerificationProvider({ children }) {
   }, [userId, isEligible]);
 
   /* ─── Fetch verification history ─── */
-  const refreshHistory = useCallback(async (verificationId) => {
-    if (!isEligible || !verificationId || isKnownMissing("verification_history")) {
-      setHistory([]);
-      return;
-    }
-
-    setHistoryLoading(true);
-
-    try {
-      const { data, error } = await supabase
-        .from("verification_history")
-        .select("id, action, old_status, new_status, old_level, new_level, performed_by_type, reason, created_at")
-        .eq("verification_id", verificationId)
-        .order("created_at", { ascending: true });
-
-      if (error) {
-        markMissing("verification_history", error);
-        if (!isTableMissing(error)) {
-          console.error("Failed to fetch history:", error);
-        }
+  const refreshHistory = useCallback(
+    async (verificationId) => {
+      if (
+        !isEligible ||
+        !verificationId ||
+        isKnownMissing("verification_history")
+      ) {
         setHistory([]);
-      } else {
-        setHistory(data || []);
+        return;
       }
-    } catch (err) {
-      console.error("History fetch error:", err);
-      setHistory([]);
-    }
 
-    setHistoryLoading(false);
-  }, [isEligible]);
+      setHistoryLoading(true);
+
+      try {
+        const { data, error } = await supabase
+          .from("verification_history")
+          .select(
+            "id, action, old_status, new_status, old_level, new_level, performed_by_type, reason, created_at",
+          )
+          .eq("verification_id", verificationId)
+          .order("created_at", { ascending: true });
+
+        if (error) {
+          markMissing("verification_history", error);
+          if (!isTableMissing(error)) {
+            console.error("Failed to fetch history:", error);
+          }
+          setHistory([]);
+        } else {
+          setHistory(data || []);
+        }
+      } catch (err) {
+        console.error("History fetch error:", err);
+        setHistory([]);
+      }
+
+      setHistoryLoading(false);
+    },
+    [isEligible],
+  );
 
   // Auto-fetch history when verification is loaded
   useEffect(() => {
@@ -263,7 +328,9 @@ export function VerificationProvider({ children }) {
     try {
       const { data, error } = await supabase
         .from("verification_requests")
-        .select("id, verification_type, status, review_priority, submitted_at, completed_at, created_at")
+        .select(
+          "id, verification_type, status, review_priority, submitted_at, completed_at, created_at",
+        )
         .eq("user_id", userId)
         .order("created_at", { ascending: false });
       markMissing("verification_requests", error);
@@ -289,7 +356,9 @@ export function VerificationProvider({ children }) {
     try {
       const { data, error } = await supabase
         .from("business_verifications")
-        .select("id, user_id, business_name, business_type, gst_status, pan_status, status, verified_at, rejection_reason, created_at, updated_at")
+        .select(
+          "id, user_id, business_name, business_type, gst_status, pan_status, status, verified_at, rejection_reason, created_at, updated_at",
+        )
         .eq("user_id", userId)
         .maybeSingle();
       markMissing("business_verifications", error);
@@ -303,7 +372,9 @@ export function VerificationProvider({ children }) {
       if (data?.id && !isKnownMissing("business_documents")) {
         const { data: docs, error: docsError } = await supabase
           .from("business_documents")
-          .select("id, document_type, document_name, status, uploaded_at, verified_at")
+          .select(
+            "id, document_type, document_name, status, uploaded_at, verified_at",
+          )
           .eq("business_verification_id", data.id)
           .order("created_at", { ascending: true });
         markMissing("business_documents", docsError);
@@ -330,7 +401,9 @@ export function VerificationProvider({ children }) {
     try {
       const { data, error } = await supabase
         .from("bank_accounts")
-        .select("id, user_id, account_holder_name, bank_name, account_type, is_primary, status, penny_drop_status, penny_drop_verified_at, created_at, updated_at")
+        .select(
+          "id, user_id, account_holder_name, bank_name, account_type, is_primary, status, penny_drop_status, penny_drop_verified_at, created_at, updated_at",
+        )
         .eq("user_id", userId)
         .neq("status", "archived")
         .order("is_primary", { ascending: false })
@@ -350,7 +423,9 @@ export function VerificationProvider({ children }) {
     try {
       const { data, error } = await supabase
         .from("bank_verifications")
-        .select("id, user_id, status, total_accounts, verified_accounts, verified_at, rejection_reason, created_at, updated_at")
+        .select(
+          "id, user_id, status, total_accounts, verified_accounts, verified_at, rejection_reason, created_at, updated_at",
+        )
         .eq("user_id", userId)
         .maybeSingle();
       markMissing("bank_verifications", error);
@@ -388,13 +463,17 @@ export function VerificationProvider({ children }) {
       }
 
       // Add business verification event
-      if (businessVerification?.status && businessVerification.status !== "draft") {
+      if (
+        businessVerification?.status &&
+        businessVerification.status !== "draft"
+      ) {
         events.push({
           id: `biz-${businessVerification.id}`,
           type: "business",
           action: `business_${businessVerification.status}`,
           status: businessVerification.status,
-          timestamp: businessVerification.updated_at || businessVerification.created_at,
+          timestamp:
+            businessVerification.updated_at || businessVerification.created_at,
         });
       }
 
@@ -445,7 +524,7 @@ export function VerificationProvider({ children }) {
           } else {
             setVerification(payload.new);
           }
-        }
+        },
       )
       .on(
         "postgres_changes",
@@ -460,10 +539,10 @@ export function VerificationProvider({ children }) {
             setBusinessVerification(null);
           } else if (payload.new) {
             setBusinessVerification((prev) =>
-              prev?.id === payload.new.id ? payload.new : prev || payload.new
+              prev?.id === payload.new.id ? payload.new : prev || payload.new,
             );
           }
-        }
+        },
       )
       .on(
         "postgres_changes",
@@ -487,14 +566,18 @@ export function VerificationProvider({ children }) {
               return [...prev, payload.new];
             });
           }
-        }
+        },
       )
       // If the Realtime server rejects the channel (e.g. the subscribed table
       // doesn't exist), supabase-js would otherwise keep retrying the subscribe
       // forever. Unsubscribe on any terminal/failed status so we never retry a
       // failed endpoint. The channel can be resubscribed later on a full reload.
       .subscribe((status) => {
-        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+        if (
+          status === "CHANNEL_ERROR" ||
+          status === "TIMED_OUT" ||
+          status === "CLOSED"
+        ) {
           supabase.removeChannel(channel);
         }
       });
@@ -506,7 +589,9 @@ export function VerificationProvider({ children }) {
 
   /* ─── Derived helpers ─── */
   const isVerified = verification?.verification_status === "approved";
-  const isFullyVerified = verification?.verification_level === 5 && verification?.verification_status === "approved";
+  const isFullyVerified =
+    verification?.verification_level === 5 &&
+    verification?.verification_status === "approved";
 
   /* ─── Expiry helpers ─── */
   const expiryStatus = verification?.expiry_status || "not_verified";
@@ -523,7 +608,9 @@ export function VerificationProvider({ children }) {
 
   const levelLabel = useMemo(() => {
     if (!verification) return "Unverified";
-    const level = VERIFICATION_LEVELS.find(l => l.level === verification.verification_level);
+    const level = VERIFICATION_LEVELS.find(
+      (l) => l.level === verification.verification_level,
+    );
     return level?.label || "Unverified";
   }, [verification]);
 
@@ -543,27 +630,57 @@ export function VerificationProvider({ children }) {
   const pendingActions = useMemo(() => {
     const actions = [];
     if (verification && !verification.phone_verified) {
-      actions.push({ type: "phone", label: "Verify phone number", icon: "phone" });
+      actions.push({
+        type: "phone",
+        label: "Verify phone number",
+        icon: "phone",
+      });
     }
     if (verification && !verification.identity_verified) {
-      actions.push({ type: "identity", label: "Upload government ID", icon: "badge" });
+      actions.push({
+        type: "identity",
+        label: "Upload government ID",
+        icon: "badge",
+      });
     }
     if (verification?.identity_verified && !verification.bank_verified) {
-      actions.push({ type: "bank", label: "Add bank account", icon: "account_balance" });
+      actions.push({
+        type: "bank",
+        label: "Add bank account",
+        icon: "account_balance",
+      });
     }
     if (verification?.bank_verified && !verification.business_verified) {
-      actions.push({ type: "business", label: "Verify business", icon: "business" });
+      actions.push({
+        type: "business",
+        label: "Verify business",
+        icon: "business",
+      });
     }
     if (businessVerification?.status === "resubmission_requested") {
-      actions.push({ type: "business_resubmit", label: "Resubmit business documents", icon: "upload_file" });
+      actions.push({
+        type: "business_resubmit",
+        label: "Resubmit business documents",
+        icon: "upload_file",
+      });
     }
     if (bankVerification?.status === "resubmission_requested") {
-      actions.push({ type: "bank_resubmit", label: "Resubmit bank documents", icon: "upload_file" });
+      actions.push({
+        type: "bank_resubmit",
+        label: "Resubmit bank documents",
+        icon: "upload_file",
+      });
     }
     // Check for rejected documents
-    const rejectedDocs = businessDocuments.filter((d) => d.status === "rejected");
+    const rejectedDocs = businessDocuments.filter(
+      (d) => d.status === "rejected",
+    );
     rejectedDocs.forEach((doc) => {
-      actions.push({ type: "resubmit_doc", label: `Resubmit ${doc.document_type}`, icon: "replay" });
+      actions.push({
+        type: "resubmit_doc",
+        label: `Resubmit ${doc.document_type}`,
+        icon: "replay",
+      });
     });
     return actions;
   }, [verification, businessVerification, bankVerification, businessDocuments]);
@@ -572,38 +689,70 @@ export function VerificationProvider({ children }) {
     return businessDocuments.filter((d) => d.status === "rejected");
   }, [businessDocuments]);
 
-  const value = useMemo(() => ({
-    verification,
-    history,
-    loading,
-    historyLoading,
-    refreshVerification,
-    refreshHistory,
-    isVerified,
-    isFullyVerified,
-    expiryStatus,
-    isExpiringSoon,
-    daysUntilExpiry,
-    levelLabel,
-    // Phase 3 additions
-    currentSession,
-    refreshSession,
-    requests,
-    refreshRequests,
-    auditLog,
-    // Phase 4 additions
-    businessVerification,
-    businessDocuments,
-    refreshBusinessVerification,
-    bankAccounts,
-    refreshBankAccounts,
-    bankVerification,
-    refreshBankVerification,
-    completionPercentage,
-    pendingActions,
-    rejectedDocuments,
-    verificationTimeline,
-  }), [verification, history, loading, historyLoading, refreshVerification, refreshHistory, isVerified, isFullyVerified, expiryStatus, isExpiringSoon, daysUntilExpiry, levelLabel, currentSession, refreshSession, requests, refreshRequests, auditLog, businessVerification, businessDocuments, refreshBusinessVerification, bankAccounts, refreshBankAccounts, bankVerification, refreshBankVerification, completionPercentage, pendingActions, rejectedDocuments, verificationTimeline]);
+  const value = useMemo(
+    () => ({
+      verification,
+      history,
+      loading,
+      historyLoading,
+      refreshVerification,
+      refreshHistory,
+      isVerified,
+      isFullyVerified,
+      expiryStatus,
+      isExpiringSoon,
+      daysUntilExpiry,
+      levelLabel,
+      // Phase 3 additions
+      currentSession,
+      refreshSession,
+      requests,
+      refreshRequests,
+      auditLog,
+      // Phase 4 additions
+      businessVerification,
+      businessDocuments,
+      refreshBusinessVerification,
+      bankAccounts,
+      refreshBankAccounts,
+      bankVerification,
+      refreshBankVerification,
+      completionPercentage,
+      pendingActions,
+      rejectedDocuments,
+      verificationTimeline,
+    }),
+    [
+      verification,
+      history,
+      loading,
+      historyLoading,
+      refreshVerification,
+      refreshHistory,
+      isVerified,
+      isFullyVerified,
+      expiryStatus,
+      isExpiringSoon,
+      daysUntilExpiry,
+      levelLabel,
+      currentSession,
+      refreshSession,
+      requests,
+      refreshRequests,
+      auditLog,
+      businessVerification,
+      businessDocuments,
+      refreshBusinessVerification,
+      bankAccounts,
+      refreshBankAccounts,
+      bankVerification,
+      refreshBankVerification,
+      completionPercentage,
+      pendingActions,
+      rejectedDocuments,
+      verificationTimeline,
+    ],
+  );
 
   return (
     <VerificationContext.Provider value={value}>
@@ -648,7 +797,9 @@ export function VerificationProvider({ children }) {
 export function useVerification() {
   const context = useContext(VerificationContext);
   if (!context) {
-    throw new Error("useVerification must be used within a VerificationProvider");
+    throw new Error(
+      "useVerification must be used within a VerificationProvider",
+    );
   }
   return context;
 }

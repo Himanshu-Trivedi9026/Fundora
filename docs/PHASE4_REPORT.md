@@ -67,24 +67,26 @@ Phase 4 extends the existing KYC/verification system (built in Phases 1-3) with 
 
 **New tables:**
 
-| Table | Purpose | Rows |
-|-------|---------|------|
-| `business_verifications` | 1:1 with creator_verifications | Per user |
-| `business_documents` | 1:many per business verification | Per document |
-| `bank_accounts` | 1:many per user | Per account |
-| `bank_verifications` | 1:1 with creator_verifications | Per user |
-| `verification_providers` | Provider registry | Fixed |
-| `verification_events` | Unified event log | Per event |
+| Table                    | Purpose                          | Rows         |
+| ------------------------ | -------------------------------- | ------------ |
+| `business_verifications` | 1:1 with creator_verifications   | Per user     |
+| `business_documents`     | 1:many per business verification | Per document |
+| `bank_accounts`          | 1:many per user                  | Per account  |
+| `bank_verifications`     | 1:1 with creator_verifications   | Per user     |
+| `verification_providers` | Provider registry                | Fixed        |
+| `verification_events`    | Unified event log                | Per event    |
 
 ### 2.2 Key Columns
 
 **bank_accounts:**
+
 - `account_number_encrypted` — BYTEA, AES-256-GCM encrypted
 - `status` — Lifecycle: draft → pending → verified → rejected → disabled → archived
 - `penny_drop_status` — null | pending | success | failed
 - `is_primary` — Boolean, one primary per user
 
 **business_verifications:**
+
 - `business_type` — 11 types (individual, partnership, private_limited, etc.)
 - `gst_status`, `pan_status`, `cin_status` — Verification sub-statuses
 - `address` — JSONB for flexible address storage
@@ -92,6 +94,7 @@ Phase 4 extends the existing KYC/verification system (built in Phases 1-3) with 
 ### 2.3 RLS Policies
 
 All tables have:
+
 - User-level access (users can only access their own data)
 - Service role full access (for admin operations)
 - Indexes on user_id, status, and entity lookups
@@ -102,21 +105,21 @@ All tables have:
 
 ### 3.1 Provider Registry
 
-| Provider | Type | Status | File |
-|----------|------|--------|------|
-| `fundora_internal` | kyc | Existing | `providers/fundoraInternalOCR.js` |
-| `stripe_identity` | kyc | Existing | `providers/stripeIdentityProvider.js` |
-| `hyperverge` | kyc | Existing | `providers/hypervergeProvider.js` |
-| `signzy` | kyc | Existing | `providers/signzyProvider.js` |
-| `onfido` | kyc | Existing | `providers/onfidoProvider.js` |
-| `persona` | kyc | Existing | `providers/personaProvider.js` |
-| `fundora_internal_ocr` | ocr | Existing | `providers/fundoraInternalOCR.js` |
-| `penny_drop_internal` | penny_drop | **New** | `providers/pennyDropProvider.js` |
-| `fundora_internal_business` | business_verification | **New** | `providers/businessVerificationProvider.js` |
-| `fundora_internal_bank` | bank_verification | **New** | `providers/bankVerificationProvider.js` |
-| `fundora_internal_gst` | gst_verification | **New** | `providers/gstVerificationProvider.js` |
-| `fundora_internal_pan` | pan_verification | **New** | `providers/panVerificationProvider.js` |
-| `face_verification` | face | Future | Placeholder |
+| Provider                    | Type                  | Status   | File                                        |
+| --------------------------- | --------------------- | -------- | ------------------------------------------- |
+| `fundora_internal`          | kyc                   | Existing | `providers/fundoraInternalOCR.js`           |
+| `stripe_identity`           | kyc                   | Existing | `providers/stripeIdentityProvider.js`       |
+| `hyperverge`                | kyc                   | Existing | `providers/hypervergeProvider.js`           |
+| `signzy`                    | kyc                   | Existing | `providers/signzyProvider.js`               |
+| `onfido`                    | kyc                   | Existing | `providers/onfidoProvider.js`               |
+| `persona`                   | kyc                   | Existing | `providers/personaProvider.js`              |
+| `fundora_internal_ocr`      | ocr                   | Existing | `providers/fundoraInternalOCR.js`           |
+| `penny_drop_internal`       | penny_drop            | **New**  | `providers/pennyDropProvider.js`            |
+| `fundora_internal_business` | business_verification | **New**  | `providers/businessVerificationProvider.js` |
+| `fundora_internal_bank`     | bank_verification     | **New**  | `providers/bankVerificationProvider.js`     |
+| `fundora_internal_gst`      | gst_verification      | **New**  | `providers/gstVerificationProvider.js`      |
+| `fundora_internal_pan`      | pan_verification      | **New**  | `providers/panVerificationProvider.js`      |
+| `face_verification`         | face                  | Future   | Placeholder                                 |
 
 ### 3.2 Provider Interface
 
@@ -140,6 +143,7 @@ class BaseVerificationProvider {
 ### 3.3 Mock Provider Behavior
 
 All Phase 4 providers are mock implementations:
+
 - Auto-approve after 2 seconds (simulated delay)
 - Generate random reference IDs
 - Support health checks (always return healthy)
@@ -151,32 +155,33 @@ All Phase 4 providers are mock implementations:
 
 ### 4.1 Business Verification
 
-| Route | Methods | Purpose |
-|-------|---------|---------|
-| `/api/verification/business` | GET, POST, PUT | Business verification CRUD |
-| `/api/verification/business-documents` | GET, POST | Document upload/list |
-| `/api/verification/gst` | POST | GST verification + status |
-| `/api/verification/pan` | POST | PAN verification + status |
+| Route                                  | Methods        | Purpose                    |
+| -------------------------------------- | -------------- | -------------------------- |
+| `/api/verification/business`           | GET, POST, PUT | Business verification CRUD |
+| `/api/verification/business-documents` | GET, POST      | Document upload/list       |
+| `/api/verification/gst`                | POST           | GST verification + status  |
+| `/api/verification/pan`                | POST           | PAN verification + status  |
 
 ### 4.2 Bank Verification
 
-| Route | Methods | Purpose |
-|-------|---------|---------|
-| `/api/verification/bank` | GET, POST, PUT, DELETE | Bank account CRUD |
-| `/api/verification/bank-documents` | GET, POST | Bank document upload |
-| `/api/verification/penny-drop` | POST | Penny drop verify/status/history |
+| Route                              | Methods                | Purpose                          |
+| ---------------------------------- | ---------------------- | -------------------------------- |
+| `/api/verification/bank`           | GET, POST, PUT, DELETE | Bank account CRUD                |
+| `/api/verification/bank-documents` | GET, POST              | Bank document upload             |
+| `/api/verification/penny-drop`     | POST                   | Penny drop verify/status/history |
 
 ### 4.3 Admin Review
 
-| Route | Methods | Purpose |
-|-------|---------|---------|
-| `/api/admin/business-review` | POST | Approve/reject/resubmit business |
-| `/api/admin/bank-review` | POST | Approve/reject/resubmit bank |
-| `/api/admin/review-queue` | GET | Extended review queue with filters |
+| Route                        | Methods | Purpose                            |
+| ---------------------------- | ------- | ---------------------------------- |
+| `/api/admin/business-review` | POST    | Approve/reject/resubmit business   |
+| `/api/admin/bank-review`     | POST    | Approve/reject/resubmit bank       |
+| `/api/admin/review-queue`    | GET     | Extended review queue with filters |
 
 ### 4.4 API Pattern
 
 All routes follow:
+
 ```js
 import { withAuth } from "../../../lib/withAuth";
 import { rateLimit } from "../../../lib/rateLimit";
@@ -185,7 +190,9 @@ const rl = rateLimit({ windowMs: 60_000, max: 10 });
 
 export default withAuth(async function handler(req, res, user) {
   if (!rl(req, res)) return;
-  try { /* ... */ } catch (err) {
+  try {
+    /* ... */
+  } catch (err) {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -197,18 +204,18 @@ export default withAuth(async function handler(req, res, user) {
 
 ### 5.1 Data Protection
 
-| Data | Storage | Exposure |
-|------|---------|----------|
-| Account numbers | AES-256-GCM encrypted (BYTEA) | Masked: last 4 digits only |
-| IFSC codes | Plain in DB (low risk) | Masked: first 4 chars + stars |
-| GST numbers | Plain in DB | Masked: first 2 + last 4 |
-| PAN numbers | Plain in DB | Masked: first 4 + last 1 |
-| CIN numbers | Plain in DB | Not exposed in responses |
-| UPI IDs | Plain in DB | Not exposed in public responses |
-| Provider references | Plain in DB | Never exposed to frontend |
-| Storage paths | Plain in DB | Masked in responses |
-| Device metadata | Plain in DB | Stripped from API responses |
-| IP addresses | Hashed in DB | Never exposed |
+| Data                | Storage                       | Exposure                        |
+| ------------------- | ----------------------------- | ------------------------------- |
+| Account numbers     | AES-256-GCM encrypted (BYTEA) | Masked: last 4 digits only      |
+| IFSC codes          | Plain in DB (low risk)        | Masked: first 4 chars + stars   |
+| GST numbers         | Plain in DB                   | Masked: first 2 + last 4        |
+| PAN numbers         | Plain in DB                   | Masked: first 4 + last 1        |
+| CIN numbers         | Plain in DB                   | Not exposed in responses        |
+| UPI IDs             | Plain in DB                   | Not exposed in public responses |
+| Provider references | Plain in DB                   | Never exposed to frontend       |
+| Storage paths       | Plain in DB                   | Masked in responses             |
+| Device metadata     | Plain in DB                   | Stripped from API responses     |
+| IP addresses        | Hashed in DB                  | Never exposed                   |
 
 ### 5.2 Encryption
 
@@ -222,6 +229,7 @@ const encrypted = encryptMetadata(sensitiveData);
 ### 5.3 Sanitization
 
 Three-tier sanitization:
+
 1. **Document responses** — Strips provider_reference, storage_path, metadata_encrypted
 2. **Business verification** — Strips GST/PAN/CIN, adds masked versions
 3. **Bank accounts** — Strips encrypted account number, IFSC, UPI, adds masked versions
@@ -229,13 +237,14 @@ Three-tier sanitization:
 ### 5.4 Audit Logging
 
 Every state change logged:
+
 ```js
 logAuditEvent({
   action: "business_verification.created",
   entity_type: "business_verification",
   entity_id: verificationId,
   user_id: userId,
-  details: { business_type, status }
+  details: { business_type, status },
 });
 ```
 
@@ -268,7 +277,7 @@ export const VERIFICATION_WEIGHTS = {
 
 ```js
 export const BUSINESS_TYPE_MULTIPLIERS = {
-  private_limited: 1.2,    // +20% bonus
+  private_limited: 1.2, // +20% bonus
   public_limited: 1.2,
   llp: 1.1,
   startup: 1.1,
@@ -295,12 +304,12 @@ Total possible from verification:
 
 ```js
 const MODULE_WEIGHTS = {
-  identity: 0.30,   // Verification completeness
-  campaigns: 0.25,  // Project quality
-  community: 0.15,  // Follower engagement
-  payments: 0.20,   // Funding history
-  reports: 0.05,    // Community reports (future)
-  ai: 0.05,         // ML signals (future)
+  identity: 0.3, // Verification completeness
+  campaigns: 0.25, // Project quality
+  community: 0.15, // Follower engagement
+  payments: 0.2, // Funding history
+  reports: 0.05, // Community reports (future)
+  ai: 0.05, // ML signals (future)
 };
 ```
 
@@ -312,30 +321,30 @@ const MODULE_WEIGHTS = {
 
 11 business types, each with specific document requirements:
 
-| Business Type | Documents Required |
-|--------------|-------------------|
-| individual | 3 documents |
-| sole_proprietorship | 4 documents |
-| partnership | 5 documents |
-| llp | 4 documents |
-| private_limited | 5 documents |
-| public_limited | 5 documents |
-| ngo | 4 documents |
-| trust | 4 documents |
-| society | 4 documents |
-| startup | 5 documents |
-| government | 3 documents |
+| Business Type       | Documents Required |
+| ------------------- | ------------------ |
+| individual          | 3 documents        |
+| sole_proprietorship | 4 documents        |
+| partnership         | 5 documents        |
+| llp                 | 4 documents        |
+| private_limited     | 5 documents        |
+| public_limited      | 5 documents        |
+| ngo                 | 4 documents        |
+| trust               | 4 documents        |
+| society             | 4 documents        |
+| startup             | 5 documents        |
+| government          | 3 documents        |
 
 ### 7.2 API
 
 ```js
-getRequiredDocuments("private_limited")
+getRequiredDocuments("private_limited");
 // → ["certificate_of_incorporation", "gst_certificate", "moa", "aoa", "director_identity_proof"]
 
-getMissingDocuments(["gst_certificate", "moa"], "private_limited")
+getMissingDocuments(["gst_certificate", "moa"], "private_limited");
 // → ["certificate_of_incorporation", "aoa", "director_identity_proof"]
 
-checkDocumentCompletion(["gst_certificate", "moa"], "private_limited")
+checkDocumentCompletion(["gst_certificate", "moa"], "private_limited");
 // → { total: 5, completed: 2, percentage: 40 }
 ```
 
@@ -345,34 +354,34 @@ checkDocumentCompletion(["gst_certificate", "moa"], "private_limited")
 
 ### 8.1 Trust Center Dashboard (`pages/creator/verification.js`)
 
-| Section | Component |
-|---------|-----------|
-| Completion % | `CompletionIndicator.jsx` — SVG circular indicator |
-| Pending Actions | `PendingActions.jsx` — Action cards with CTAs |
-| Rejected Documents | `RejectedDocuments.jsx` — Resubmit workflow |
+| Section               | Component                                                  |
+| --------------------- | ---------------------------------------------------------- |
+| Completion %          | `CompletionIndicator.jsx` — SVG circular indicator         |
+| Pending Actions       | `PendingActions.jsx` — Action cards with CTAs              |
+| Rejected Documents    | `RejectedDocuments.jsx` — Resubmit workflow                |
 | Business Verification | `BusinessVerificationCard.jsx` — Status + type + documents |
-| Bank Verification | `BankAccountCard.jsx` — Account details + penny drop |
-| Verification Timeline | Unified chronological events |
+| Bank Verification     | `BankAccountCard.jsx` — Account details + penny drop       |
+| Verification Timeline | Unified chronological events                               |
 
 ### 8.2 Admin Review (`pages/admin/verification-review.js`)
 
-| Component | Purpose |
-|-----------|---------|
+| Component             | Purpose                              |
+| --------------------- | ------------------------------------ |
 | `ReviewQueueItem.jsx` | Queue item with type/priority badges |
-| `DocumentPreview.jsx` | Document viewer with status badge |
-| `DecisionPanel.jsx` | Approve/reject/resubmit with notes |
-| `ReviewTimeline.jsx` | Chronological review events |
-| `AuditHistory.jsx` | Full audit trail display |
-| `ReviewNotes.jsx` | Notes input/display (500 char limit) |
+| `DocumentPreview.jsx` | Document viewer with status badge    |
+| `DecisionPanel.jsx`   | Approve/reject/resubmit with notes   |
+| `ReviewTimeline.jsx`  | Chronological review events          |
+| `AuditHistory.jsx`    | Full audit trail display             |
+| `ReviewNotes.jsx`     | Notes input/display (500 char limit) |
 
 ### 8.3 New UI Components
 
-| Component | Purpose |
-|-----------|---------|
-| `BankAccountCard.jsx` | Single bank account display |
-| `BankAccountForm.jsx` | Add/edit bank account form |
-| `BusinessTypeSelector.jsx` | Grid selector for 11 types |
-| `GSTValidator.jsx` | GST input with live validation |
+| Component                  | Purpose                        |
+| -------------------------- | ------------------------------ |
+| `BankAccountCard.jsx`      | Single bank account display    |
+| `BankAccountForm.jsx`      | Add/edit bank account form     |
+| `BusinessTypeSelector.jsx` | Grid selector for 11 types     |
+| `GSTValidator.jsx`         | GST input with live validation |
 
 ---
 
@@ -380,36 +389,36 @@ checkDocumentCompletion(["gst_certificate", "moa"], "private_limited")
 
 ### 9.1 Test Summary
 
-| Metric | Value |
-|--------|-------|
-| Total test files | 53 |
-| Total tests | 1393 |
-| New test files (Phase 4) | 7 |
-| New tests (Phase 4) | 447 |
-| All passing | ✅ Yes |
+| Metric                   | Value  |
+| ------------------------ | ------ |
+| Total test files         | 53     |
+| Total tests              | 1393   |
+| New test files (Phase 4) | 7      |
+| New tests (Phase 4)      | 447    |
+| All passing              | ✅ Yes |
 
 ### 9.2 New Test Files
 
-| File | Tests | Coverage |
-|------|-------|----------|
-| `tests/lib/businessVerification.test.js` | 68 | GST/PAN/CIN validation, masking |
-| `tests/lib/bankVerification.test.js` | 39 | IFSC validation, account masking |
-| `tests/lib/pennyDrop.test.js` | 29 | Provider, webhook, history |
-| `tests/lib/documentRequirements.test.js` | 52 | Requirements engine, completion |
-| `tests/lib/providerRegistry.test.js` | 48 | Registration, health check, capabilities |
-| `tests/lib/trustEngine.test.js` | 83 | Trust scoring, weights, multipliers |
-| `tests/lib/metadataEncryption.test.js` | 128 | Masking, sanitization, encryption |
+| File                                     | Tests | Coverage                                 |
+| ---------------------------------------- | ----- | ---------------------------------------- |
+| `tests/lib/businessVerification.test.js` | 68    | GST/PAN/CIN validation, masking          |
+| `tests/lib/bankVerification.test.js`     | 39    | IFSC validation, account masking         |
+| `tests/lib/pennyDrop.test.js`            | 29    | Provider, webhook, history               |
+| `tests/lib/documentRequirements.test.js` | 52    | Requirements engine, completion          |
+| `tests/lib/providerRegistry.test.js`     | 48    | Registration, health check, capabilities |
+| `tests/lib/trustEngine.test.js`          | 83    | Trust scoring, weights, multipliers      |
+| `tests/lib/metadataEncryption.test.js`   | 128   | Masking, sanitization, encryption        |
 
 ### 9.3 Security Tests
 
-| File | Tests | Coverage |
-|------|-------|----------|
-| `tests/security/businessBankSecurity.test.js` | 44 | Sensitive data exposure, authorization |
-| `tests/api/business-verification.test.js` | 28 | API validation, auth, rate limiting |
-| `tests/api/bank-verification.test.js` | 28 | API validation, auth, rate limiting |
-| `tests/components/BusinessVerificationCard.test.jsx` | 16 | Component rendering |
-| `tests/components/BankAccountCard.test.jsx` | 14 | Component rendering |
-| `tests/components/CompletionIndicator.test.jsx` | 12 | Completion % display |
+| File                                                 | Tests | Coverage                               |
+| ---------------------------------------------------- | ----- | -------------------------------------- |
+| `tests/security/businessBankSecurity.test.js`        | 44    | Sensitive data exposure, authorization |
+| `tests/api/business-verification.test.js`            | 28    | API validation, auth, rate limiting    |
+| `tests/api/bank-verification.test.js`                | 28    | API validation, auth, rate limiting    |
+| `tests/components/BusinessVerificationCard.test.jsx` | 16    | Component rendering                    |
+| `tests/components/BankAccountCard.test.jsx`          | 14    | Component rendering                    |
+| `tests/components/CompletionIndicator.test.jsx`      | 12    | Completion % display                   |
 
 ### 9.4 Modified Tests
 
@@ -421,13 +430,13 @@ checkDocumentCompletion(["gst_certificate", "moa"], "private_limited")
 
 ### 10.1 Test Performance
 
-| Metric | Value |
-|--------|-------|
-| Full suite duration | ~12s |
-| Setup time | ~7s |
-| Transform time | ~4s |
-| Test execution | ~19s |
-| Environment setup | ~77s (jsdom) |
+| Metric              | Value        |
+| ------------------- | ------------ |
+| Full suite duration | ~12s         |
+| Setup time          | ~7s          |
+| Transform time      | ~4s          |
+| Test execution      | ~19s         |
+| Environment setup   | ~77s (jsdom) |
 
 ### 10.2 API Performance
 
@@ -451,18 +460,19 @@ checkDocumentCompletion(["gst_certificate", "moa"], "private_limited")
 
 Replace mock providers with real integrations:
 
-| Provider | Type | Integration |
-|----------|------|------------|
-| Razorpay | Penny drop | Bank account verification |
-| Cashfree | Penny drop | Alternative provider |
-| Digio | GST/PAN | Government API integration |
-| NSDL | PAN | PAN verification API |
-| TRACES | GST | GST verification API |
-| Signzy | Business | Document OCR + verification |
+| Provider | Type       | Integration                 |
+| -------- | ---------- | --------------------------- |
+| Razorpay | Penny drop | Bank account verification   |
+| Cashfree | Penny drop | Alternative provider        |
+| Digio    | GST/PAN    | Government API integration  |
+| NSDL     | PAN        | PAN verification API        |
+| TRACES   | GST        | GST verification API        |
+| Signzy   | Business   | Document OCR + verification |
 
 ### 11.2 Payment Escrow (Phase 5+)
 
 Bank account verification enables:
+
 - Creator payouts
 - Fund disbursement
 - Escrow account management
@@ -471,6 +481,7 @@ Bank account verification enables:
 ### 11.3 Fraud Detection (Phase 5+)
 
 Business verification enables:
+
 - Business legitimacy scoring
 - Document forgery detection
 - GST/PAN cross-validation
@@ -490,21 +501,21 @@ Business verification enables:
 
 ### 12.1 Checklist
 
-| Item | Status |
-|------|--------|
-| Database migration | ✅ Created (004_business_bank_verification.sql) |
-| RLS policies | ✅ User-level + service role |
-| Encryption | ✅ AES-256-GCM for sensitive data |
-| Audit logging | ✅ All state changes logged |
-| Rate limiting | ✅ 10 req/min per endpoint |
-| Input validation | ✅ GST, PAN, CIN, IFSC format validation |
-| Error handling | ✅ try/catch with generic error messages |
-| Sanitization | ✅ Sensitive data never exposed |
-| Provider abstraction | ✅ Pluggable, mock-ready |
-| Storage abstraction | ✅ storageAdapter layer |
-| Test coverage | ✅ 1393 tests passing |
-| Documentation | ✅ Business + Bank verification docs |
-| Build verification | ⏳ Pending (`npm run build`) |
+| Item                 | Status                                          |
+| -------------------- | ----------------------------------------------- |
+| Database migration   | ✅ Created (004_business_bank_verification.sql) |
+| RLS policies         | ✅ User-level + service role                    |
+| Encryption           | ✅ AES-256-GCM for sensitive data               |
+| Audit logging        | ✅ All state changes logged                     |
+| Rate limiting        | ✅ 10 req/min per endpoint                      |
+| Input validation     | ✅ GST, PAN, CIN, IFSC format validation        |
+| Error handling       | ✅ try/catch with generic error messages        |
+| Sanitization         | ✅ Sensitive data never exposed                 |
+| Provider abstraction | ✅ Pluggable, mock-ready                        |
+| Storage abstraction  | ✅ storageAdapter layer                         |
+| Test coverage        | ✅ 1393 tests passing                           |
+| Documentation        | ✅ Business + Bank verification docs            |
+| Build verification   | ⏳ Pending (`npm run build`)                    |
 
 ### 12.2 Environment Variables Required
 
@@ -538,6 +549,7 @@ DIGIO_API_KEY=<key>
 ### New Files (30)
 
 **Libraries:**
+
 - `lib/verification/businessVerification.js`
 - `lib/verification/bankVerification.js`
 - `lib/verification/documentRequirements.js`
@@ -547,6 +559,7 @@ DIGIO_API_KEY=<key>
 - `lib/verification/storageAdapter.js`
 
 **Providers:**
+
 - `lib/verification/providers/pennyDropProvider.js`
 - `lib/verification/providers/businessVerificationProvider.js`
 - `lib/verification/providers/bankVerificationProvider.js`
@@ -554,6 +567,7 @@ DIGIO_API_KEY=<key>
 - `lib/verification/providers/panVerificationProvider.js`
 
 **API Routes:**
+
 - `pages/api/verification/business.js`
 - `pages/api/verification/business-documents.js`
 - `pages/api/verification/bank.js`
@@ -566,6 +580,7 @@ DIGIO_API_KEY=<key>
 - `pages/api/admin/review-queue.js`
 
 **UI Components:**
+
 - `components/verification/BusinessVerificationCard.jsx`
 - `components/verification/BankAccountCard.jsx`
 - `components/verification/BankAccountForm.jsx`
@@ -576,6 +591,7 @@ DIGIO_API_KEY=<key>
 - `components/verification/RejectedDocuments.jsx`
 
 **Admin Components:**
+
 - `components/admin/ReviewTimeline.jsx`
 - `components/admin/DocumentPreview.jsx`
 - `components/admin/DecisionPanel.jsx`
@@ -584,14 +600,17 @@ DIGIO_API_KEY=<key>
 - `components/admin/ReviewQueueItem.jsx`
 
 **Documentation:**
+
 - `docs/BUSINESS_VERIFICATION.md`
 - `docs/BANK_VERIFICATION.md`
 - `docs/PHASE4_REPORT.md`
 
 **Database:**
+
 - `supabase/migrations/004_business_bank_verification.sql`
 
 **Tests:**
+
 - `tests/lib/businessVerification.test.js`
 - `tests/lib/bankVerification.test.js`
 - `tests/lib/pennyDrop.test.js`
@@ -625,4 +644,4 @@ Phase 4 successfully extends the Fundora verification system with business and b
 
 ---
 
-*Generated by Claude Code — Fundora Phase 4 Implementation*
+_Generated by Claude Code — Fundora Phase 4 Implementation_

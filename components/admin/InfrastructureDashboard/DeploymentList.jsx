@@ -57,14 +57,19 @@ export default function DeploymentList() {
       cancelled: "bg-gray-800 text-gray-400",
     };
     return (
-      <span className={`px-2 py-0.5 rounded text-xs ${colors[status] || "bg-gray-800 text-gray-400"}`}>
+      <span
+        className={`px-2 py-0.5 rounded text-xs ${colors[status] || "bg-gray-800 text-gray-400"}`}
+      >
         {status}
       </span>
     );
   };
 
   const filters = ["", "deployed", "deploying", "failed", "rolled_back"];
-  const getStatusCount = (status) => (status ? deployments.filter((d) => d.status === status).length : deployments.length);
+  const getStatusCount = (status) =>
+    status
+      ? deployments.filter((d) => d.status === status).length
+      : deployments.length;
 
   return (
     <div className="bg-gray-900 rounded-xl border border-gray-800">
@@ -87,7 +92,10 @@ export default function DeploymentList() {
           {filters.map((f) => (
             <button
               key={f || "all"}
-              onClick={() => { setFilter(f); fetchDeployments(f); }}
+              onClick={() => {
+                setFilter(f);
+                fetchDeployments(f);
+              }}
               className={`px-3 py-1 rounded-lg text-sm ${filter === f ? "bg-indigo-600 text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700"}`}
             >
               {f || "All"} ({getStatusCount(f)})
@@ -100,7 +108,10 @@ export default function DeploymentList() {
       {loading && (
         <div className="p-6 space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="animate-pulse h-16 bg-gray-800 rounded-lg" />
+            <div
+              key={i}
+              className="animate-pulse h-16 bg-gray-800 rounded-lg"
+            />
           ))}
         </div>
       )}
@@ -123,34 +134,48 @@ export default function DeploymentList() {
       {!loading && deployments.length > 0 && (
         <div className="divide-y divide-gray-800">
           {deployments.map((dep) => (
-            <div key={dep.id} className="p-4 hover:bg-gray-800/30 transition-colors">
+            <div
+              key={dep.id}
+              className="p-4 hover:bg-gray-800/30 transition-colors"
+            >
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-gray-200">{dep.version}</span>
+                    <span className="text-sm font-medium text-gray-200">
+                      {dep.version}
+                    </span>
                     <StatusBadge status={dep.status} />
                     {dep.health_check_passed && (
-                      <span className="text-xs text-green-500">✓ Health Check</span>
+                      <span className="text-xs text-green-500">
+                        ✓ Health Check
+                      </span>
                     )}
                   </div>
                   <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
                     <span>{dep.environment}</span>
                     <span>{dep.branch}</span>
-                    {dep.commit_hash && <span title={dep.commit_hash}>{dep.commit_hash.substring(0, 7)}</span>}
+                    {dep.commit_hash && (
+                      <span title={dep.commit_hash}>
+                        {dep.commit_hash.substring(0, 7)}
+                      </span>
+                    )}
                     <span>{new Date(dep.created_at).toLocaleString()}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  {dep.status !== "rolled_back" && dep.status !== "cancelled" && (
-                    <button
-                      onClick={() => handleRollback(dep.id)}
-                      className="px-3 py-1 text-xs bg-yellow-900/30 text-yellow-400 rounded hover:bg-yellow-900/50"
-                    >
-                      Rollback
-                    </button>
-                  )}
+                  {dep.status !== "rolled_back" &&
+                    dep.status !== "cancelled" && (
+                      <button
+                        onClick={() => handleRollback(dep.id)}
+                        className="px-3 py-1 text-xs bg-yellow-900/30 text-yellow-400 rounded hover:bg-yellow-900/50"
+                      >
+                        Rollback
+                      </button>
+                    )}
                   {dep.deployed_by && (
-                    <span className="text-xs text-gray-600">{dep.deployed_by.substring(0, 8)}</span>
+                    <span className="text-xs text-gray-600">
+                      {dep.deployed_by.substring(0, 8)}
+                    </span>
                   )}
                 </div>
               </div>

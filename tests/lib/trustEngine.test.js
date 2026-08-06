@@ -35,7 +35,9 @@ describe("Trust Engine", () => {
     it("returns lastCalculated as ISO string", async () => {
       const result = await calculateTrustScore({});
       expect(result.lastCalculated).toBeTruthy();
-      expect(new Date(result.lastCalculated).toISOString()).toBe(result.lastCalculated);
+      expect(new Date(result.lastCalculated).toISOString()).toBe(
+        result.lastCalculated,
+      );
     });
 
     it("returns all 6 module breakdowns", async () => {
@@ -61,15 +63,24 @@ describe("Trust Engine", () => {
     it("scores higher with verified identity at level 4", async () => {
       const unverified = await calculateTrustScore({});
       const verified = await calculateTrustScore({
-        verification: { verification_level: 4, verified_at: new Date().toISOString() },
+        verification: {
+          verification_level: 4,
+          verified_at: new Date().toISOString(),
+        },
       });
       expect(verified.score).toBeGreaterThan(unverified.score);
     });
 
     it("scores higher with identity level 5 vs level 0", async () => {
-      const level0 = await calculateTrustScore({ verification: { verification_level: 0 } });
-      const level5 = await calculateTrustScore({ verification: { verification_level: 5 } });
-      expect(level5.modules.identity.score).toBeGreaterThan(level0.modules.identity.score);
+      const level0 = await calculateTrustScore({
+        verification: { verification_level: 0 },
+      });
+      const level5 = await calculateTrustScore({
+        verification: { verification_level: 5 },
+      });
+      expect(level5.modules.identity.score).toBeGreaterThan(
+        level0.modules.identity.score,
+      );
     });
 
     it("identity module scores 0 when no verification data", async () => {
@@ -79,12 +90,20 @@ describe("Trust Engine", () => {
 
     it("identity module gets recency bonus for recent verification", async () => {
       const recent = await calculateTrustScore({
-        verification: { verification_level: 3, verified_at: new Date().toISOString() },
+        verification: {
+          verification_level: 3,
+          verified_at: new Date().toISOString(),
+        },
       });
       const old = await calculateTrustScore({
-        verification: { verification_level: 3, verified_at: "2020-01-01T00:00:00Z" },
+        verification: {
+          verification_level: 3,
+          verified_at: "2020-01-01T00:00:00Z",
+        },
       });
-      expect(recent.modules.identity.score).toBeGreaterThanOrEqual(old.modules.identity.score);
+      expect(recent.modules.identity.score).toBeGreaterThanOrEqual(
+        old.modules.identity.score,
+      );
     });
 
     it("campaigns module returns base stub score with projects", async () => {
@@ -116,8 +135,12 @@ describe("Trust Engine", () => {
 
     it("reports module scores higher with no reports", async () => {
       const noReports = await calculateTrustScore({});
-      const withReports = await calculateTrustScore({ reports: [{ id: "r1" }] });
-      expect(noReports.modules.reports.score).toBeGreaterThan(withReports.modules.reports.score);
+      const withReports = await calculateTrustScore({
+        reports: [{ id: "r1" }],
+      });
+      expect(noReports.modules.reports.score).toBeGreaterThan(
+        withReports.modules.reports.score,
+      );
     });
 
     it("reports module scores 80 with no reports (good)", async () => {
@@ -133,7 +156,10 @@ describe("Trust Engine", () => {
 
     it("handles all data provided", async () => {
       const result = await calculateTrustScore({
-        verification: { verification_level: 5, verified_at: new Date().toISOString() },
+        verification: {
+          verification_level: 5,
+          verified_at: new Date().toISOString(),
+        },
         projects: [{ id: "1" }, { id: "2" }],
         profile: { followers: 500 },
         donations: [{ id: "d1" }, { id: "d2" }],
@@ -370,17 +396,23 @@ describe("Trust Engine", () => {
   // ─── calculateBusinessTrustBonus ───
   describe("calculateBusinessTrustBonus", () => {
     it("returns base bonus for partnership (multiplier 1.0)", () => {
-      const result = calculateBusinessTrustBonus({ business_type: "partnership" });
+      const result = calculateBusinessTrustBonus({
+        business_type: "partnership",
+      });
       expect(result).toBe(25);
     });
 
     it("returns higher bonus for private_limited (multiplier 1.2)", () => {
-      const result = calculateBusinessTrustBonus({ business_type: "private_limited" });
+      const result = calculateBusinessTrustBonus({
+        business_type: "private_limited",
+      });
       expect(result).toBe(30); // round(25 * 1.2)
     });
 
     it("returns higher bonus for public_limited (multiplier 1.2)", () => {
-      const result = calculateBusinessTrustBonus({ business_type: "public_limited" });
+      const result = calculateBusinessTrustBonus({
+        business_type: "public_limited",
+      });
       expect(result).toBe(30);
     });
 
@@ -410,17 +442,23 @@ describe("Trust Engine", () => {
     });
 
     it("returns lower bonus for sole_proprietorship (multiplier 0.9)", () => {
-      const result = calculateBusinessTrustBonus({ business_type: "sole_proprietorship" });
+      const result = calculateBusinessTrustBonus({
+        business_type: "sole_proprietorship",
+      });
       expect(result).toBe(23);
     });
 
     it("returns lowest bonus for individual (multiplier 0.8)", () => {
-      const result = calculateBusinessTrustBonus({ business_type: "individual" });
+      const result = calculateBusinessTrustBonus({
+        business_type: "individual",
+      });
       expect(result).toBe(20); // round(25 * 0.8)
     });
 
     it("returns base bonus for government (multiplier 1.0)", () => {
-      const result = calculateBusinessTrustBonus({ business_type: "government" });
+      const result = calculateBusinessTrustBonus({
+        business_type: "government",
+      });
       expect(result).toBe(25);
     });
 
@@ -441,7 +479,9 @@ describe("Trust Engine", () => {
   // ─── calculateBankTrustBonus ───
   describe("calculateBankTrustBonus", () => {
     it("returns base bonus when penny drop is not success", () => {
-      const result = calculateBankTrustBonus({ penny_drop_status: "initiated" });
+      const result = calculateBankTrustBonus({
+        penny_drop_status: "initiated",
+      });
       expect(result).toBe(20);
     });
 
@@ -581,7 +621,7 @@ describe("Trust Engine", () => {
     });
 
     it("identity has highest weight at 0.30", () => {
-      expect(MODULE_WEIGHTS.identity).toBe(0.30);
+      expect(MODULE_WEIGHTS.identity).toBe(0.3);
     });
 
     it("reports and ai have lowest weights at 0.05", () => {

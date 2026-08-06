@@ -27,8 +27,12 @@ export default function SEO({
   structuredData,
 }) {
   const siteName = "Fundora";
-  const fullTitle = title ? `${title} | ${siteName}` : `${siteName} — Crowdfunding Reimagined`;
-  const canonicalUrl = url ? `https://fundora.vercel.app${url}` : "https://fundora.vercel.app";
+  const fullTitle = title
+    ? `${title} | ${siteName}`
+    : `${siteName} — Crowdfunding Reimagined`;
+  const canonicalUrl = url
+    ? `https://fundora.vercel.app${url}`
+    : "https://fundora.vercel.app";
 
   return (
     <Head>
@@ -51,13 +55,19 @@ export default function SEO({
       <meta property="og:description" content={description} />
       <meta property="og:url" content={canonicalUrl} />
       <meta property="og:site_name" content={siteName} />
-      <meta property="og:image" content={`https://fundora.vercel.app${image}`} />
+      <meta
+        property="og:image"
+        content={`https://fundora.vercel.app${image}`}
+      />
 
       {/* ─── Twitter Card ─── */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={`https://fundora.vercel.app${image}`} />
+      <meta
+        name="twitter:image"
+        content={`https://fundora.vercel.app${image}`}
+      />
 
       {/* ─── App Info ─── */}
       <meta name="application-name" content={siteName} />

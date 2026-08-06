@@ -58,7 +58,7 @@ describe("Auth callback", () => {
 
     await waitFor(() => {
       expect(supabase.insert).toHaveBeenCalledWith(
-        expect.objectContaining({ role: "creator" })
+        expect.objectContaining({ role: "creator" }),
       );
     });
     expect(router.replace).toHaveBeenCalledWith("/");
@@ -71,20 +71,24 @@ describe("Auth callback", () => {
 
     await waitFor(() => {
       expect(supabase.insert).toHaveBeenCalledWith(
-        expect.objectContaining({ role: "donor" })
+        expect.objectContaining({ role: "donor" }),
       );
     });
     expect(router.replace).toHaveBeenCalledWith("/");
   });
 
   it("blocks self-elevation: platform_admin falls back to donor", async () => {
-    const router = mockRouter({ code: "abc", next: "/", role: "platform_admin" });
+    const router = mockRouter({
+      code: "abc",
+      next: "/",
+      role: "platform_admin",
+    });
     mockSession();
     render(<Callback />);
 
     await waitFor(() => {
       expect(supabase.insert).toHaveBeenCalledWith(
-        expect.objectContaining({ role: "donor" })
+        expect.objectContaining({ role: "donor" }),
       );
     });
     const inserted = supabase.insert.mock.calls[0][0];

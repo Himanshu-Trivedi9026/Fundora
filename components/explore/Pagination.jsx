@@ -43,7 +43,12 @@ export default function Pagination({ page, totalPages, onChange, totalCount }) {
           aria-label="Previous page"
           className="flex items-center gap-1 border border-outline-variant px-3 py-2 rounded-lg hover:border-primary hover:text-primary transition-all text-on-surface-variant font-inter text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-outline-variant disabled:hover:text-on-surface-variant"
         >
-          <span className="material-symbols-outlined text-[16px]" aria-hidden="true">chevron_left</span>
+          <span
+            className="material-symbols-outlined text-[16px]"
+            aria-hidden="true"
+          >
+            chevron_left
+          </span>
           Previous
         </button>
 
@@ -71,7 +76,7 @@ export default function Pagination({ page, totalPages, onChange, totalCount }) {
             >
               {p}
             </button>
-          )
+          ),
         )}
 
         {/* Next */}
@@ -82,7 +87,12 @@ export default function Pagination({ page, totalPages, onChange, totalCount }) {
           className="flex items-center gap-1 border border-outline-variant px-3 py-2 rounded-lg hover:border-primary hover:text-primary transition-all text-on-surface-variant font-inter text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-outline-variant disabled:hover:text-on-surface-variant"
         >
           Next
-          <span className="material-symbols-outlined text-[16px]" aria-hidden="true">chevron_right</span>
+          <span
+            className="material-symbols-outlined text-[16px]"
+            aria-hidden="true"
+          >
+            chevron_right
+          </span>
         </button>
       </div>
 

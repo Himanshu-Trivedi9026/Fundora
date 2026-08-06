@@ -48,7 +48,9 @@ vi.mock("../../../lib/ai/providerRegistry.js", () => ({
   getModelProvider: vi.fn().mockReturnValue({
     success: true,
     data: {
-      healthCheck: vi.fn().mockResolvedValue({ healthy: true, provider: "openai" }),
+      healthCheck: vi
+        .fn()
+        .mockResolvedValue({ healthy: true, provider: "openai" }),
     },
     error: null,
   }),
@@ -65,7 +67,11 @@ import {
 } from "../../../lib/ai/modelRouter.js";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin.js";
 import { logInfo, logError } from "../../../lib/verification/secureLogger.js";
-import { getActiveModelProvider, listModelProviders, getModelProvider } from "../../../lib/ai/providerRegistry.js";
+import {
+  getActiveModelProvider,
+  listModelProviders,
+  getModelProvider,
+} from "../../../lib/ai/providerRegistry.js";
 
 // ─── Tests ───
 
@@ -173,7 +179,11 @@ describe("Model Router", () => {
       expect(result.success).toBe(true);
 
       const config = await getRouterConfig();
-      expect(config.data.fallbackChain).toEqual(["anthropic", "openai", "mock"]);
+      expect(config.data.fallbackChain).toEqual([
+        "anthropic",
+        "openai",
+        "mock",
+      ]);
     });
 
     it("returns error when config is not an object", async () => {
@@ -201,7 +211,11 @@ describe("Model Router", () => {
     });
 
     it("returns empty array when no providers registered", async () => {
-      listModelProviders.mockReturnValueOnce({ success: true, data: [], error: null });
+      listModelProviders.mockReturnValueOnce({
+        success: true,
+        data: [],
+        error: null,
+      });
 
       const result = await getProviderHealth();
 
