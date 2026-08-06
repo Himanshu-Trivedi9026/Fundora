@@ -25,13 +25,13 @@ export function FollowProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    if (!currentUser) {
-      setFollowingIds(new Set());
-      setLoading(false);
-      return;
-    }
-
     async function loadFollowing() {
+      if (!currentUser) {
+        setFollowingIds(new Set());
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
 
       const { data, error } = await supabase
@@ -47,7 +47,7 @@ export function FollowProvider({ children }) {
     }
 
     loadFollowing();
-  }, [currentUser?.id]);
+  }, [currentUser]);
 
   const follow = useCallback(async (userId) => {
     if (!currentUser) return;

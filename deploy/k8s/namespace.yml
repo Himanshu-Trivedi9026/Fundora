@@ -1,0 +1,10 @@
+# Fundora — Kubernetes Namespace
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fundora
+  labels:
+    app: fundora
+    environment: production
+    managed-by: helm

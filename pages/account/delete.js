@@ -1,9 +1,11 @@
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { supabase } from "../../lib/supabaseClient";
 
 export default function DeleteAccount() {
+  const router = useRouter();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -51,7 +53,7 @@ export default function DeleteAccount() {
       }
 
       await supabase.auth.signOut();
-      window.location.href = "/";
+      router.push("/");
     } catch (err) {
       console.error("Delete error:", err);
       setError("An error occurred. Please try again.");
@@ -61,7 +63,7 @@ export default function DeleteAccount() {
 
   if (!user)
     return (
-      <div className="min-h-screen flex items-center justify-center text-white">
+      <div className="min-h-screen flex items-center justify-center text-white" role="status">
         Loading...
       </div>
     );
@@ -79,7 +81,7 @@ export default function DeleteAccount() {
         </p>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/30 text-red-300 px-4 py-3 rounded-lg mb-4">
+          <div className="bg-red-500/10 border border-red-500/30 text-red-300 px-4 py-3 rounded-lg mb-4" role="alert">
             {error}
           </div>
         )}

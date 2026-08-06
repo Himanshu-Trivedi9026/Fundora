@@ -1,4 +1,5 @@
 // pages/home.js
+import Image from "next/image";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 
@@ -26,10 +27,13 @@ export default function HomeHero() {
         >
           <div className="w-44 h-44 md:w-52 md:h-52 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-1 shadow-[0_0_70px_rgba(99,102,241,0.7)]">
             <div className="w-full h-full rounded-full bg-slate-900 flex items-center justify-center">
-              <img
+              <Image
                 src="/logo.png"
                 alt="Fundora"
+                width={112}
+                height={112}
                 className="w-28 h-28 object-contain"
+                priority
               />
             </div>
           </div>
@@ -65,14 +69,14 @@ export default function HomeHero() {
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => router.push("/explore")}
+          onClick={() => { router.push("/explore"); }}
           className="px-12 py-4 rounded-full text-lg font-semibold
                      bg-gradient-to-r from-blue-600 to-purple-600
                      shadow-[0_0_35px_rgba(99,102,241,0.7)]
                      hover:shadow-[0_0_70px_rgba(99,102,241,1)]
                      transition-all duration-300"
         >
-          Let's Contribute Together for Future
+          Let&rsquo;s Contribute Together for Future
         </motion.button>
 
       </div>

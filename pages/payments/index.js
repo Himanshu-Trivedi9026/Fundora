@@ -1,5 +1,6 @@
 // pages/payments/index.js
-import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/router";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
@@ -60,6 +61,7 @@ function formatTime(iso) {
 }
 
 export default function MyPayments() {
+  const router = useRouter();
   const [payments, setPayments] = useState([]);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -73,12 +75,7 @@ export default function MyPayments() {
   }, []);
 
   /* ================= LOAD PAYMENTS ================= */
-  useEffect(() => {
-    if (!user) return;
-    loadPayments();
-  }, [user]);
-
-  async function loadPayments() {
+  const loadPayments = useCallback(async () => {
     setLoading(true);
 
     const { data, error } = await supabase
@@ -106,7 +103,7 @@ export default function MyPayments() {
 
     setPayments(data || []);
     setLoading(false);
-  }
+  }, [user]);
 
   /* ================= DOWNLOAD RECEIPT ================= */
   async function downloadReceipt(payment) {
@@ -194,7 +191,7 @@ export default function MyPayments() {
       <div className="min-h-screen flex flex-col bg-surface-dim">
         <Navbar />
         <main className="flex-1 pt-32 pb-24">
-          <div className="max-w-7xl mx-auto px-6 lg:px-16">
+          <div className="max-w-7xl mx-auto px-6 lg:px-16" role="status" aria-label="Loading payments">
             {/* Header skeleton */}
             <div className="mb-12 flex justify-between items-end">
               <div className="space-y-3">
@@ -276,7 +273,7 @@ export default function MyPayments() {
               transition={{ duration: 0.4, delay: 0.2 }}
               className="flex items-center gap-3 bg-surface-container-high px-6 py-3 rounded-full border border-outline-variant/20"
             >
-              <span className="material-symbols-outlined text-primary text-xl">
+              <span className="material-symbols-outlined text-primary text-xl" aria-hidden="true">
                 receipt_long
               </span>
               <span className="font-inter text-sm text-on-surface">
@@ -295,7 +292,7 @@ export default function MyPayments() {
               animate={{ opacity: 1, y: 0 }}
               className="glass-card p-16 rounded-xl text-center"
             >
-              <span className="material-symbols-outlined text-6xl text-on-surface-variant/30 block mb-4">
+              <span className="material-symbols-outlined text-6xl text-on-surface-variant/30 block mb-4" aria-hidden="true">
                 receipts
               </span>
               <h3 className="font-geist text-xl font-semibold text-on-surface mb-2">
@@ -360,7 +357,7 @@ export default function MyPayments() {
 
                         {/* Date + Time */}
                         <div className="flex items-center gap-2 text-on-surface-variant">
-                          <span className="material-symbols-outlined text-[18px]">
+                          <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
                             calendar_today
                           </span>
                           <span className="font-inter text-[13px]">
@@ -385,14 +382,14 @@ export default function MyPayments() {
                           color: "#340080",
                         }}
                       >
-                        <span className="material-symbols-outlined text-[20px]">
+                        <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
                           download
                         </span>
                         Download Receipt
                       </motion.button>
                     ) : (
                       <div className="mt-8 w-full py-4 px-6 rounded-lg bg-surface-container-high border border-outline-variant/30 text-on-surface-variant font-inter text-sm flex items-center justify-center gap-3 opacity-50 cursor-not-allowed">
-                        <span className="material-symbols-outlined text-[20px]">
+                        <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
                           lock
                         </span>
                         Download Receipt
@@ -406,14 +403,14 @@ export default function MyPayments() {
               <motion.div
                 variants={cardScale}
                 whileHover={{ borderColor: "rgba(196, 168, 255, 0.4)" }}
-                onClick={() => window.location.href = "/explore"}
+                onClick={() => router.push("/explore")}
                 className="border-2 border-dashed border-outline-variant/20 rounded-xl p-8 flex flex-col items-center justify-center text-center group hover:border-primary/40 transition-colors cursor-pointer min-h-[280px]"
               >
                 <motion.div
                   whileHover={{ scale: 1.1 }}
                   className="w-16 h-16 bg-surface-container-high rounded-full flex items-center justify-center mb-4"
                 >
-                  <span className="material-symbols-outlined text-primary text-[32px]">
+                  <span className="material-symbols-outlined text-primary text-[32px]" aria-hidden="true">
                     add
                   </span>
                 </motion.div>
@@ -459,7 +456,7 @@ export default function MyPayments() {
                 aria-label="Close payment details"
                 className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors"
               >
-                <span className="material-symbols-outlined text-lg">close</span>
+                <span className="material-symbols-outlined text-lg" aria-hidden="true">close</span>
               </motion.button>
 
               <h2 className="font-geist text-xl font-semibold text-on-surface mb-6">

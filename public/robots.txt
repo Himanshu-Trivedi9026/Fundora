@@ -1,0 +1,19 @@
+# Fundora - AI-Powered Crowdfunding Platform
+# https://fundora.vercel.app
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /account/
+Disallow: /creator/analytics
+Disallow: /creator/edit
+Disallow: /creator/funds-got
+Disallow: /creator/payments
+Disallow: /dm/
+Disallow: /saved
+Disallow: /payments
+Disallow: /edit-profile
+Disallow: /edit/
+
+# Sitemap
+Sitemap: https://fundora.vercel.app/sitemap.xml

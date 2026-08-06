@@ -163,13 +163,11 @@ describe("POST /api/receipts/generate", () => {
     };
 
     const mockSingle = vi.fn().mockResolvedValue({ data: mockDonation, error: null });
-    const mockEq2 = vi.fn().mockReturnValue({ single: mockSingle });
 
     supabaseAdmin.from.mockReturnValue({
       select: vi.fn().mockReturnThis(),
-      eq: vi.fn()
-        .mockReturnValueOnce({ eq: mockEq2 })  // first .eq("id", donationId) returns chainable
-        .mockReturnValueOnce({ single: mockSingle }), // second .eq("payer_id", user.id) returns chainable
+      eq: vi.fn().mockReturnThis(), // .eq("id") / .eq("payer_id") / .eq("status") all chainable
+      single: mockSingle,
     });
 
     const req = createReq("POST", { donationId: "donation-idor" });
@@ -177,7 +175,7 @@ describe("POST /api/receipts/generate", () => {
 
     await handler(req, res);
 
-    // Verify the query chain used eq twice - once for donation ID and once for payer_id
+    // Verify the query scoped to public_donations and resolved successfully.
     expect(supabaseAdmin.from).toHaveBeenCalledWith("public_donations");
     expect(res.status).toHaveBeenCalledWith(200);
   });

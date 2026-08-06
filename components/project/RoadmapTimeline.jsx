@@ -1,18 +1,5 @@
 import { motion } from "framer-motion";
 
-const stagger = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.15, delayChildren: 0.1 },
-  },
-};
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } },
-};
-
 /**
  * RoadmapTimeline — Vertical timeline with phase indicators.
  * Props: { project }
@@ -20,74 +7,64 @@ const fadeUp = {
 export default function RoadmapTimeline({ project }) {
   const createdDate = project?.created_at ? new Date(project.created_at) : new Date();
   const deadline = project?.deadline ? new Date(project.deadline) : null;
+  const daysRemaining = deadline
+    ? Math.max(0, Math.ceil((deadline - new Date()) / (1000 * 60 * 60 * 24)))
+    : null;
 
   const phases = [
     {
-      title: "Phase 1: Project Creation",
-      description: `Project was created and published on ${createdDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })}. Initial concept and team formation completed.`,
-      status: "COMPLETED",
-      statusColor: "text-success",
-      dotColor: "bg-success",
-      ringColor: "ring-success/20",
+      title: "Phase 01: Concept & Neural Model",
+      description: `Project created on ${createdDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })}. Architectural blueprints finalized and initial concept completed.`,
+      status: "Completed",
+      dotClass: "bg-primary ring-6 ring-primary/20 shadow-[0_0_12px_rgba(208,188,255,0.4)]",
+      badgeClass: "text-primary border-primary/30",
+      opacity: "",
     },
     {
-      title: "Phase 2: Crowdfunding",
-      description: `Active funding round${deadline ? ` — ${Math.max(0, Math.ceil((deadline - new Date()) / (1000 * 60 * 60 * 24)))} days remaining` : ""}. Community building and investor outreach in progress.`,
-      status: "ACTIVE",
-      statusColor: "text-primary",
-      dotColor: "bg-primary",
-      ringColor: "ring-primary/20",
+      title: "Phase 02: Crowdfunding & Governance",
+      description: `Active funding round${daysRemaining !== null ? ` — ${daysRemaining} days remaining` : ""}. Establishing governance and securing initial capital.`,
+      status: "Active",
+      dotClass: "bg-primary ring-6 ring-primary/20 animate-pulse",
+      badgeClass: "text-primary border-primary",
+      opacity: "",
     },
     {
-      title: "Phase 3: Development & Delivery",
+      title: "Phase 03: Physical Construction",
       description: "Post-funding development, prototype refinement, and delivery to backers. Scaling operations and market expansion.",
-      status: "UPCOMING",
-      statusColor: "text-on-surface-variant",
-      dotColor: "border-2 border-outline-variant bg-background",
-      ringColor: "",
+      status: "Upcoming",
+      dotClass: "bg-outline-variant",
+      badgeClass: "text-on-surface-variant border-outline-variant",
+      opacity: "opacity-50",
     },
   ];
 
   return (
     <motion.section
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+      aria-label="Project roadmap"
     >
-      <h2 className="font-geist text-2xl font-bold text-on-surface mb-8">Project Roadmap</h2>
+      <h2 className="font-geist text-[24px] font-bold border-b border-outline-variant/30 pb-3">
+        Project Roadmap
+      </h2>
 
-      <motion.div
-        variants={stagger}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-40px" }}
-        className="space-y-0 border-l border-outline-variant ml-4"
-      >
+      <div className="relative ml-3 pl-10 space-y-8 before:absolute before:left-0 before:top-2 before:bottom-2 before:w-px before:bg-outline-variant/30">
         {phases.map((phase, i) => (
-          <motion.div
-            key={i}
-            variants={fadeUp}
-            className="relative pl-10 pb-12 last:pb-0"
-          >
-            {/* Dot */}
-            <div className={`absolute left-[-9px] top-0 w-4 h-4 rounded-full ${phase.dotColor} ${
-              phase.ringColor ? `ring-4 ${phase.ringColor}` : ""
-            }`} />
-
-            {/* Content */}
-            <h4 className="font-geist text-lg font-semibold text-on-surface">
-              {phase.title}
-            </h4>
-            <p className="text-on-surface-variant font-inter mt-2 leading-relaxed">
-              {phase.description}
-            </p>
-            <span className={`text-xs font-inter uppercase tracking-wider mt-2 block ${phase.statusColor}`}>
-              {phase.status}
-            </span>
-          </motion.div>
+          <div key={i} className={`relative ${phase.opacity}`}>
+            <div className={`absolute -left-[46px] top-1 w-2.5 h-2.5 rounded-full ${phase.dotClass}`} />
+            <div className="flex items-center gap-3 mb-1.5">
+              <span className={`font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 border rounded ${phase.badgeClass}`}>
+                {phase.status}
+              </span>
+              <h4 className="font-geist text-base font-semibold text-on-surface">{phase.title}</h4>
+            </div>
+            <p className="text-on-surface-variant text-sm max-w-xl font-inter">{phase.description}</p>
+          </div>
         ))}
-      </motion.div>
+      </div>
     </motion.section>
   );
 }

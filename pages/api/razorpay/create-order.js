@@ -2,6 +2,7 @@ import Razorpay from "razorpay";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 import { withAuth } from "../../../lib/withAuth";
 import { rateLimit } from "../../../lib/rateLimit";
+import { isCreatorVerified } from "../../../lib/verification/status";
 
 const rl = rateLimit({ windowMs: 60_000, max: 10 });
 
@@ -34,6 +35,11 @@ export default withAuth(async function handler(req, res, user) {
       return res.status(404).json({ error: "Project not found" });
     }
 
+    /* A campaign may only receive donations when its owner is verified. */
+    if (!(await isCreatorVerified(project.owner_id))) {
+      return res.status(403).json({ error: "VerificationRequired" });
+    }
+
     const { data: creatorConfig } = await supabaseAdmin
       .from("creator_payment_configs")
       .select("razorpay_key_id, razorpay_key_secret")
@@ -61,6 +67,10 @@ export default withAuth(async function handler(req, res, user) {
       amount: parsedAmount * 100, // rupees → paise
       currency: "INR",
       receipt: `p_${Date.now()}`,
+      // Bind this order to the project + payer server-side. This is NOT
+      // attacker-controlled: it is set at order creation, and verify/webhook
+      // re-read it from the order to prevent cross-project mis-crediting.
+      notes: { project_id: projectId, payer_id: user.id },
     });
 
     return res.status(200).json({

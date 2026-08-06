@@ -1,0 +1,667 @@
+# 🧭 Fundora — End-to-End User Journey Guide
+
+**Document:** `docs/E2E_USER_JOURNEY.md`
+**Author:** QA Automation Architect
+**Date:** 2026-07-30
+**Version:** 1.0
+**Platform:** Fundora Crowdfunding (Next.js 16 + Supabase + PostgreSQL)
+**Total Journeys:** 5 | **Total Steps:** 100+
+
+---
+
+## Table of Contents
+
+1. [Journey 1: Anonymous Visitor → Donor](#journey-1-anonymous-visitor--donor)
+2. [Journey 2: Creator (Full Lifecycle)](#journey-2-creator-full-lifecycle)
+3. [Journey 3: Admin Platform Operations](#journey-3-admin-platform-operations)
+4. [Journey 4: Organization Management](#journey-4-organization-management)
+5. [Journey 5: Enterprise Ecosystem](#journey-5-enterprise-ecosystem)
+6. [Cross-Cutting Concerns](#cross-cutting-concerns)
+7. [Journey Matrix: Coverage Map](#journey-matrix-coverage-map)
+
+---
+
+## Journey 1: Anonymous Visitor → Donor
+
+**Persona:** First-time visitor who browses campaigns and converts to a donor
+**Precondition:** No account, no session, fresh browser
+**Postcondition:** Authenticated user, donation recorded, logged out
+
+---
+
+### Step 1.1: Landing Page Entry
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Hero section with "Fund dreams, create futures" messaging. Two CTAs: "Explore Campaigns" and "Start a Campaign". Stats bar with animated counters (total funded, active creators, campaigns launched). Trending Projects grid (4-6 cards with image, title, progress bar, amount raised). "How It Works" section (3-4 step cards). Final CTA banner. Navbar: Logo, Explore link, Login button, Signup button. Footer with links and copyright. |
+| **🗄️ Expected DB Changes** | None (read-only) |
+| **📡 Expected API Calls** | `GET /api/projects?trending=true` — fetch trending projects for the landing section |
+| **🔔 Expected Notifications** | None |
+| **📋 Expected Audit Logs** | None |
+| **📊 Expected Analytics** | Page view event recorded: `{ event: 'page_view', page: '/', referrer, timestamp }` |
+| **🛡️ Expected Security Checks** | Rate limit: 30 req/min on API. No auth check (public page). CSRF token present on forms. Helmet security headers rendered. |
+| **🤖 Expected AI Actions** | None at this stage |
+| **⚙️ Expected Background Jobs** | None |
+
+---
+
+### Step 1.2: Browse Explore Page
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Grid of project cards (12-24 per page). Sidebar with filters: Category dropdown (Education, Health, Technology, Arts, Community, Emergency), Sort options (Newest, Most Funded, Ending Soon, Trending). Search bar at top. Pagination at bottom (Page 1/2/3…). Empty state "No projects found" for no results. Loading: skeleton card grid. Mobile: filters collapse to bottom sheet / hamburger. |
+| **🗄️ Expected DB Changes** | None (read-only) |
+| **📡 Expected API Calls** | `GET /api/projects?page=1&limit=12&category=all&sort=newest` — paginated project list with filters |
+| **🔔 Expected Notifications** | None |
+| **📋 Expected Audit Logs** | None |
+| **📊 Expected Analytics** | `{ event: 'page_view', page: '/explore', filters: { category, sort } }` — search_analytics row if search used: `{ query, result_count, locale, session_id }` |
+| **🛡️ Expected Security Checks** | Rate limit on search: 30 req/min. Input sanitization on search query. URL params validated (page number bounds, sort enum). XSS protection on rendered card content. |
+| **🤖 Expected AI Actions** | None directly. Recommendation engine may influence trending sort via `ai_recommendations` scoring. |
+| **⚙️ Expected Background Jobs** | None |
+
+---
+
+### Step 1.3: View Project Detail
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Hero banner with campaign image. Campaign title, creator avatar+name. Funding progress bar (raised / goal). Days remaining countdown. Amount raised display. Donate button (prominent CTA). Story/section with rich text content. Gallery grid (images/videos). Roadmap timeline if milestones configured. Funding sidebar (sticky on desktop): progress, donors count, share buttons. Similar projects section at bottom. Loading: skeleton for hero, gallery, story. Error: "Campaign not found" with back link. |
+| **🗄️ Expected DB Changes** | Increment `projects.view_count` (if tracking page views) |
+| **📡 Expected API Calls** | `GET /api/projects/[id]` — full project details including creator info, gallery, milestones. `GET /api/projects/[id]/similar` — similar project recommendations. |
+| **🔔 Expected Notifications** | None (viewer is anonymous) |
+| **📋 Expected Audit Logs** | None for anonymous users |
+| **📊 Expected Analytics** | `{ event: 'project_view', project_id, anonymous: true, timestamp }` |
+| **🛡️ Expected Security Checks** | Rate limit: 30 req/min. Project ID validated as UUID. Anonymous access allowed (public route). RLS: project SELECT policy for public users (`published` status). |
+| **🤖 Expected AI Actions** | Recommendation engine pre-fetches similar projects using `ai_recommendations` (entity_id = campaign). Prediction engine may load `prediction_results` for success probability (displayed optionally). |
+| **⚙️ Expected Background Jobs** | None immediate. View count may be batch-updated by scheduled job. |
+
+---
+
+### Step 1.4: Signup (Account Creation)
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Signup form: Full Name, Email, Password, Confirm Password fields. Submit button with loading spinner. OAuth buttons: "Continue with Google", "Continue with GitHub". Link to Login page. Validation states: inline errors for empty fields, password mismatch, weak password (<6 chars), invalid email format. Success: redirect to email verification prompt or `/home`. Error: toast "User already registered" for duplicate email. Mobile responsive: stacked layout. |
+| **🗄️ Expected DB Changes** | **`auth.users`** — new user row created by Supabase Auth. **`profiles`** — new row inserted by `handle_new_user()` trigger (name, email, avatar). **`creator_verifications`** — new row inserted by `on_auth_user_created` trigger (user_id, status='pending'). |
+| **📡 Expected API Calls** | `POST /api/auth/signup` (or Supabase native) — email + password + name payload. `POST /api/auth/callback` — OAuth callback handler (if OAuth used). |
+| **🔔 Expected Notifications** | **Email:** Verification email sent via Supabase Auth (magic link or OTP). **In-App:** None yet (user not logged in). |
+| **📋 Expected Audit Logs** | **`verification_history`** — row inserted: `{ action: 'created', new_status: 'pending', performed_by_type: 'system' }` (triggered by `handle_new_user_verification()`). |
+| **📊 Expected Analytics** | `{ event: 'user_signup', method: 'email'|'google'|'github', timestamp }` |
+| **🛡️ Expected Security Checks** | Password hashed by Supabase Auth (bcrypt). Rate limit: 5 signup attempts/min per IP. Email format validation (regex). Password strength: minimum 6 characters. CSRF token validated. OAuth state parameter validated (prevents CSRF on OAuth callback). Email verification required before login (configurable). |
+| **🤖 Expected AI Actions** | None at signup. Future: AI may generate initial recommendations once user has profile. |
+| **⚙️ Expected Background Jobs** | **Trigger function:** `handle_new_user_verification()` runs as DB trigger. **Optional:** Welcome email queued via notification engine. |
+
+---
+
+### Step 1.5: Login
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Login form: Email, Password fields. "Forgot Password?" link. Login button with loading spinner. OAuth buttons. Signup link. Validation: empty field errors, invalid email format. Error states: "Invalid login credentials" (wrong password), "Invalid login credentials" (unregistered email). Loading: button spinner, fields disabled during submit. Success: redirect to `/home` or previous guarded page. Session persistence: stays logged in across tabs. |
+| **🗄️ Expected DB Changes** | **`auth.sessions`** — new session row created by Supabase Auth |
+| **📡 Expected API Calls** | `POST /api/auth/login` (or Supabase native) — email + password. `GET /api/user/profile` — fetch user profile for navbar. |
+| **🔔 Expected Notifications** | None on login |
+| **📋 Expected Audit Logs** | **`fraud_events`** — optional: `{ event_category: 'auth', event_type: 'login', severity: 'info' }` if fraud tracking enabled |
+| **📊 Expected Analytics** | `{ event: 'user_login', method: 'email'|'oauth', timestamp }` |
+| **🛡️ Expected Security Checks** | Rate limit: 5 login attempts/min per IP (configurable via `fraud_rules.rapid_login_attempts`). Account lockout after N failed attempts (if configured). Session cookie: HTTP-only, Secure, SameSite=Lax. Fraud check: device fingerprint evaluated via `risk_signals`. MFA: optional 2FA if enabled. Password: hashed comparison via Supabase. |
+| **🤖 Expected AI Actions** | **Fraud analysis:** AI risk analyzer may evaluate login pattern (new device, unusual location) via `ai_fraud/analyze.js`. Risk score recalculated in `fraud_profiles` if anomalous login detected. |
+| **⚙️ Expected Background Jobs** | None immediate. Fraud event processing is synchronous. |
+
+---
+
+### Step 1.6: Make a Donation
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Fund page (`/projects/[id]/fund`): Preset amount buttons (₹100, ₹200, ₹500, ₹1000, custom). Custom amount input with ₹ prefix. Donor name (optional, defaults to "Anonymous"). Message/note textarea (optional). Payment summary: amount, platform fee, total. Payment method selection (UPI, Card, NetBanking, Wallet). "Proceed to Pay" button → opens Razorpay Checkout modal. Loading: order creation spinner. Success: green checkmark animation, "Thank you for your donation!" with receipt link. Error: payment failed toast with retry option. Validation: amount > 0, valid number. |
+| **🗄️ Expected DB Changes** | **`public_donations`** — new row: `{ user_id, project_id, amount, payment_id, status: 'completed' }` (inserted after Razorpay webhook verification). **`projects.raised_amount`** — incremented by donation amount (via webhook). **`escrow_accounts`** — balance incremented if escrow active for campaign. `escrow_ledger` — entry created for incoming escrow funds. |
+| **📡 Expected API Calls** | `POST /api/razorpay/create-order` — `{ amount, projectId }` → returns `orderId`. **Razorpay Checkout** — frontend SDK opens payment modal. `POST /api/razorpay/verify` — `{ razorpay_payment_id, razorpay_order_id, razorpay_signature, projectId, amount }` → returns `{ success, donationId }`. **Webhook (async):** `POST /api/razorpay/webhook` — Razorpay sends `payment.captured` event (bodyParser: false for raw body). |
+| **🔔 Expected Notifications** | **In-App:** Donor receives "Payment successful" toast. **Creator:** "New donation received!" notification (in-app). **Email:** Receipt sent to donor email (via `generateReceipt.js`). **Creator Email:** "Someone just supported your campaign!" notification. |
+| **📋 Expected Audit Logs** | **`escrow_events`** — `{ entity_type: 'escrow_account', event_type: 'funded', old_status: 'pending', new_status: 'funded' }`. **`verification_events`** — if donor has verification changes. **`audit_archives`** — eventually archived for compliance. |
+| **📊 Expected Analytics** | `{ event: 'donation_completed', project_id, amount, currency: 'INR', payment_method }`. **Platform Metrics:** `platform_metrics` updated: `metric_type='total_donations'`. **Analytics Snapshot:** Daily/weekly donation aggregations queued. |
+| **🛡️ Expected Security Checks** | HMAC-SHA256 signature verification on Razorpay callback (prevents tampering). Webhook: raw body verified with webhook secret. Rate limit: 10 req/min on create-order and verify endpoints. Amount validation: positive finite number, bounds check. Project existence verified. Fraud check: `fraud_rules` evaluated for rapid donations, new-account-high-activity. Payout eligibility: creator verification level checked if escrow. |
+| **🤖 Expected AI Actions** | **Fraud Analysis:** `POST /api/ai/fraud/analyze` — analyzes donation pattern for fraud signals. **Prediction Update:** `prediction_results` for campaign may be marked stale (triggers recalculation of funding timeline). **Recommendation Refresh:** Campaign score in `ai_recommendations` gets updated. |
+| **⚙️ Expected Background Jobs** | **Receipt Generation:** PDF receipt generated via `generateReceipt.js`. **Escrow Balance Recalculation:** `recalculate_escrow_balance()` function updates escrow totals. **Milestone Check:** If campaign reaches milestone threshold, auto-approval evaluated. **Analytics Update:** Platform metrics background aggregation. **Webhook Delivery:** If enterprise webhooks subscribed to `donation.completed` event, delivery queued. |
+
+---
+
+### Step 1.7: Logout
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Navbar dropdown or settings page: "Logout" button. Confirmation: optional "Are you sure?" dialog. Loading: spinner on button. Success: redirect to landing page (`/`). Navbar reverts to guest state (Login/Signup buttons). Session cookie cleared. |
+| **🗄️ Expected DB Changes** | **`auth.sessions`** — session row invalidated or deleted |
+| **📡 Expected API Calls** | `POST /api/auth/logout` (or Supabase native) — invalidates session |
+| **🔔 Expected Notifications** | None |
+| **📋 Expected Audit Logs** | None |
+| **📊 Expected Analytics** | `{ event: 'user_logout', session_duration_ms }` |
+| **🛡️ Expected Security Checks** | Session token revoked server-side. HTTP-only cookie cleared. CSRF token invalidated. No redirect to external URLs (open redirect prevention). |
+| **🤖 Expected AI Actions** | None |
+| **⚙️ Expected Background Jobs** | None |
+
+---
+
+## Journey 2: Creator (Full Lifecycle)
+
+**Persona:** Content creator who signs up, gets verified, creates a campaign, receives funding, completes milestones, and withdraws funds
+**Precondition:** Authenticated user, unverified, no campaigns
+**Postcondition:** Verified creator with funded campaign, milestones completed, payout processed
+
+---
+
+### Step 2.1: Creator Signup & Profile Setup
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Signup form → verification email → email link click → redirected to `/creator/profile`. Profile page: avatar upload (drag & drop or file picker, JPG/PNG <2MB), bio/description textarea, social links (Twitter, GitHub, website), display name, save button. Progress: "Complete your profile to get started" banner. Loading: avatar upload progress bar. Success: toast "Profile saved!" Error: file too large, invalid URL format. Empty state: placeholder avatar, empty bio. |
+| **🗄️ Expected DB Changes** | **`profiles`** — updated: avatar_url, bio, social_links, display_name. **`storage.objects`** — new row for uploaded avatar image (if file uploaded). **`creator_verifications`** — already created by `on_auth_user_created` trigger. |
+| **📡 Expected API Calls** | `POST /api/storage/upload` — avatar file upload (returns signed URL). `PUT /api/user/profile` — save profile fields. `GET /api/creator/verification-status` — fetch current verification progress. |
+| **🔔 Expected Notifications** | **In-App:** "Welcome to Fundora! Complete your verification to start creating campaigns." |
+| **📋 Expected Audit Logs** | **`verification_history`** — new row: `{ action: 'profile_updated', performed_by: user_id }` |
+| **📊 Expected Analytics** | `{ event: 'creator_profile_created', user_id }` |
+| **🛡️ Expected Security Checks** | Auth check: `withAuth` HOC on profile page. File upload: MIME type validation (image/jpeg, image/png), file size < 2MB, virus scan (if configured). Storage: file stored in user-specific path, RLS ensures user owns file. XSS: bio text sanitized before render. Rate limit: 10 profile updates/hr. |
+| **🤖 Expected AI Actions** | None at profile setup |
+| **⚙️ Expected Background Jobs** | **Image optimization:** Avatar resized/optimized via `imageOptimizer.js` |
+
+---
+
+### Step 2.2: Complete Verification (Identity)
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Verification page (`/creator/verification`): Progress indicator (Email → Phone → Identity → Selfie → Bank → Business). Current step highlighted. Email verification: "Resend verification email" button, status badge. Identity verification: Upload ID document (Passport, Driver's License, Aadhaar, PAN Card, Voter ID). File upload with drag-drop, preview thumbnail. Submit button. Loading: file upload progress, "Verifying…" spinner. Success: green checkmark, auto-advance to next step. Error: "Document unclear, please re-upload" with help tips. |
+| **🗄️ Expected DB Changes** | **`email_verified`** — TRUE (after email confirmation). **`verification_documents`** — new row: { document_type, storage_path, status: 'pending', file_size, mime_type }. **`verification_requests`** — new row: { verification_type, current_step, status: 'submitted' }. **`creator_verifications`** — `email_verified=TRUE`, verification_level recalculated (1→2→3→4→5). |
+| **📡 Expected API Calls** | `POST /api/verification/identity` — submit identity document. `POST /api/storage/upload` — document file upload. `GET /api/verification/status` — fetch current verification status. `POST /api/verification/verify-email` — trigger email verification |
+| **🔔 Expected Notifications** | **In-App:** "Identity document submitted for review." **Email:** "Your identity verification is under review." **Admin:** New verification request in queue. |
+| **📋 Expected Audit Logs** | **`verification_history`** — `{ action: 'submitted', new_status: 'under_review', metadata: { document_type } }`. **`verification_audit_log`** — `{ action: 'document_uploaded', actor: user_id }`. |
+| **📊 Expected Analytics** | `{ event: 'verification_step_completed', step: 'identity', user_id }` |
+| **🛡️ Expected Security Checks** | Auth required. Document file validation: MIME type (image/*, application/pdf), max size 10MB, content-type verification. Storage path: user-isolated bucket (`/verification/{user_id}/...`). RLS: user can only access own documents. Rate limit: 5 document uploads/hr. Metadata encryption: sensitive fields encrypted with AES-256-GCM. OCR data encrypted as BYTEA. |
+| **🤖 Expected AI Actions** | **Document OCR:** AI-powered OCR extraction via `ocrProvider.js` / `ai/moderation/classify.js` — extracts text from ID documents. **Fraud Detection:** Document checked for forgery signals via `ai/fraud/analyze.js`. **Content Moderation:** `POST /api/ai/moderation/classify` — check document for inappropriate content. |
+| **⚙️ Expected Background Jobs** | **OCR Processing:** Async document text extraction (if provider async). **Provider Verification:** Third-party verification provider called (mock). **Trust Score Recalculation:** `recalculate_verification_level()` function triggered. |
+
+---
+
+### Step 2.3: Business & Bank Verification (Trust Center)
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Trust Center dashboard (`/creator/trust-center`): Completion indicator (pie/ring chart showing % complete). Business section: Business type selector (11 types: Individual, Sole Proprietorship, Partnership, Pvt Ltd, Public Ltd, LLC, LLP, Non-Profit, Trust, Society, Govt Body). Business documents upload (GST certificate, PAN card, Registration certificate, etc.). Bank section: Add bank account form (Account holder name, Bank name, IFSC code, Account number — encrypted field). Penny drop verification CTA. Status badges: draft, pending, verified, rejected. |
+| **🗄️ Expected DB Changes** | **`business_verifications`** — new row: { user_id, business_type, status: 'pending' }. **`business_documents`** — new rows for each uploaded document. **`bank_accounts`** — new row: { encrypted_account_number, ifsc, status: 'pending' }. **`bank_verifications`** — new row linked to primary account. **`verification_providers`** — referenced for penny drop provider. |
+| **📡 Expected API Calls** | `POST /api/verification/business` — submit business details. `POST /api/verification/business-documents` — upload business docs. `POST /api/verification/bank` — add bank account. `POST /api/verification/penny-drop` — initiate penny drop verification. `POST /api/verification/gst` — verify GST (if applicable). `POST /api/verification/pan` — verify PAN. `GET /api/verification/trust-score` — fetch current trust score. |
+| **🔔 Expected Notifications** | **In-App:** "Bank account added successfully." "Penny drop verification initiated — check your bank for a small deposit." **Email:** "Business verification documents received." **Admin:** New business verification pending review. |
+| **📋 Expected Audit Logs** | **`verification_history`** — `{ action: 'business_submitted', new_status: 'under_review' }`. **`bank_verifications`** — status lifecycle tracked. **`verification_events`** — `{ entity_type: 'bank_account', event: 'created' }`. |
+| **📊 Expected Analytics** | `{ event: 'business_verification_submitted', business_type }`, `{ event: 'bank_account_added' }` |
+| **🛡️ Expected Security Checks** | **Bank encryption:** Account number encrypted at rest with AES-256-GCM (`account_number_encrypted` BYTEA). No plaintext storage. **Penny drop:** Amount verification ensures account ownership. **Rate limit:** 3 bank account additions/day. **IFSC validation:** Format check (4-alpha + 7-alphanumeric). **Document validation:** Business docs verified against business type requirements. **GST/PAN:** Format validation + provider verification. |
+| **🤖 Expected AI Actions** | **Business Document Analysis:** AI analyzes business documents for authenticity. **Risk Assessment:** `ai/fraud/analyze.js` evaluates business creation pattern for fraud signals. **Trust Score Calculation:** `recalculate_bank_verification()` function updates composite trust score. |
+| **⚙️ Expected Background Jobs** | **Penny Drop Processing:** Mock provider processes penny drop (deposit small amount to account, verify amount). **GST Verification:** Async verification via GST provider API. **PAN Verification:** Async PAN check via provider. **Document Expiry Check:** Scheduled job monitors `expires_at` on documents. |
+
+---
+
+### Step 2.4: Create Campaign (Wizard)
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Create campaign page (`/create`): 4-step wizard with progress stepper. **Step 1 — Project Details:** Title input (char limit), Category dropdown (Education, Health, Technology, Arts, Community, Emergency), Short description (textarea, 200 char max), Story/Full description (rich text editor — bold, italic, lists, links, images). **Step 2 — AI Description:** "Generate with AI" button, AI-generated preview text area, "Accept" / "Regenerate" / "Edit Manually" options. **Step 3 — Media:** Cover image upload (drag-drop, preview, crop), Gallery images (multiple, 10 max), Video URL (YouTube embed). **Step 4 — Funding:** Goal amount input (₹), End date (date picker, min 7 days, max 90 days). Milestones section (optional): add milestone rows (title, amount %, deliverable description). Review summary before publish. **Publish button:** prominent CTA. Loading: per-step save spinners. Validation: all required fields per step. Error: "Failed to save draft" toast. |
+| **🗄️ Expected DB Changes** | **`projects`** — new row: { title, description, category, goal_amount, end_date, status: 'draft', creator_id }. **`project_gallery`** — rows for each uploaded image. **`campaign_milestones`** — rows for each milestone (if configured). **`storage.objects`** — rows for uploaded media files. |
+| **📡 Expected API Calls** | `POST /api/projects` — create project draft. `PUT /api/projects/[id]` — update draft per step. `POST /api/storage/upload` — upload images. `POST /api/ai/generate-campaign` — AI generate campaign description (step 2). `GET /api/categories` — fetch category list. |
+| **🔔 Expected Notifications** | **In-App:** "Campaign draft saved!" per step. None to others until published. |
+| **📋 Expected Audit Logs** | None at draft stage |
+| **📊 Expected Analytics** | `{ event: 'campaign_draft_created' }` — with funnel tracking through wizard steps |
+| **🛡️ Expected Security Checks** | Auth required (withAuth). Category validation (must be valid enum). Goal amount: > 0, < max limit. End date: > 7 days from now, < 90 days. File upload: image MIME types only, max 5MB each. XSS: title/description sanitized. Rate limit: 5 campaign creates/day. Profanity filter on title (via moderation engine). RLS: creator owns draft, service_role can read all. |
+| **🤖 Expected AI Actions** | **Campaign Generation:** `POST /api/ai/generate-campaign` — AI generates campaign description, title suggestions, taglines. **Title Suggestion:** `suggestCampaignTitle()` via `promptEngine.js`. **Content Moderation:** `POST /api/ai/moderation/classify` — checks campaign content for policy violations. **Fraud Analysis:** `POST /api/ai/fraud/analyze` — evaluates campaign for fraudulent patterns. |
+| **⚙️ Expected Background Jobs** | **Image Optimization:** Cover/gallery images resized and optimized via `imageOptimizer.js`. **Content Moderation:** Async deep content analysis queued if initial check detects borderline content. |
+
+---
+
+### Step 2.5: Publish Campaign
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | After wizard completion: "Ready to Publish" summary page. Publish button (confirmation dialog: "Are you sure? Published campaigns cannot be edited for 24 hours."). Success: confetti animation, "Your campaign is live!" with share links (Twitter, WhatsApp, copy link). "View Campaign" CTA → redirects to `/projects/[id]`. Error: "Campaign requires minimum verification level 2 to publish" if verification incomplete. Error: "You must have a verified bank account to receive funds" if bank not verified. |
+| **🗄️ Expected DB Changes** | **`projects`** — status changed from 'draft' to 'active', published_at = NOW(). **`campaign_milestones`** — if milestones exist, status changed to 'active'. **`search_indexes`** — new row: { entity_type: 'campaign', entity_id: project_id, title, description, tags, is_published: true }. **`ai_embeddings`** — new embedding row: { entity_type: 'campaign', entity_id: project_id, model, content_hash }. |
+| **📡 Expected API Calls** | `POST /api/projects/[id]/publish` — publish campaign. `POST /api/search/index` — index campaign in search. `POST /api/ai/embeddings` — generate vector embedding for semantic search. |
+| **🔔 Expected Notifications** | **In-App:** "Your campaign is now live!" **Email:** "Your campaign [title] is live on Fundora!" **Followers:** If creator has followers, "New campaign from [creator]!" (if following system active). **Admin:** Notification for new campaign published (moderation queued). |
+| **📋 Expected Audit Logs** | **`verification_history`** — if campaign publish triggers verification level check |
+| **📊 Expected Analytics** | `{ event: 'campaign_published', campaign_id, category, goal_amount, has_milestones }`. **Platform Metrics:** `platform_metrics` updated: `metric_type='active_campaigns'`. |
+| **🛡️ Expected Security Checks** | **Verification gate:** Creator must have `verification_level >= 2` (identity verified). **Bank account check:** At least one verified bank account must exist. **Fraud check:** Risk score must be below block threshold. **Rate limit:** 3 publishes/day. **Content moderation:** Auto-flag if moderation score below threshold. **RLS:** publish endpoint checks `auth.uid() = projects.creator_id`. |
+| **🤖 Expected AI Actions** | **Embedding Generation:** Vector embedding generated for campaign → stored in `ai_embeddings` → enables semantic search. **Recommendation Refresh:** Campaign added to `ai_recommendations` for trending/new recommendations. **Prediction Update:** `prediction_results` recalculated: success_prob, funding_timeline, donation_velocity predictions generated. **Campaign Score:** `POST /api/ai/campaign/score` — quality score assigned for search ranking boost. |
+| **⚙️ Expected Background Jobs** | **Search Indexing:** Campaign added to full-text search index via `searchIndexManager.js`. **Notification Dispatch:** Batch notification to followers. **Analytics Snapshot:** Daily campaign count aggregation triggered. **Backup:** Next scheduled backup will include new campaign. |
+
+---
+
+### Step 2.6: Receive Donation (as Creator)
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Creator dashboard (`/creator/[id]`) or funds page (`/creator/funds-got`): Real-time donation counter (animated). Recent donations list: donor name/avatar (or "Anonymous"), amount, date, message. Total raised display. Funding progress bar updating. Notification bell badge with count. |
+| **🗄️ Expected DB Changes** | **`public_donations`** — new row inserted (per donor). **`projects.raised_amount`** — incremented. **`escrow_accounts`** — if escrow active: balance incremented, ledger entry created. **`creator_reputation`** — campaign stats updated (total donations, donors count). |
+| **📡 Expected API Calls** | `GET /api/creator/[id]/donations` — fetch donation list. `GET /api/projects/[id]` — refreshed project data with new amount. |
+| **🔔 Expected Notifications** | **In-App:** "🎉 New donation: ₹500 from Anonymous!" (real-time via notification engine). **Email:** "Your campaign received a new donation!" (digest or instant based on preference). |
+| **📋 Expected Audit Logs** | **`escrow_events`** — `{ event: 'funds_received', amount, campaign_id }` (if escrow). **`escrow_ledger`** — immutable entry: `{ entry_type: 'donation', amount, balance_after, idempotency_key }`. |
+| **📊 Expected Analytics** | Real-time donation counter updated. Daily earnings aggregation recalculates. Platform metrics: total_donations incremented. |
+| **🛡️ Expected Security Checks** | Fraud check on donor (rapid donations, new account). Escrow account existence verified. Webhook signature verified for async payment confirmation. Amount verification: payment captured amount must match order amount. |
+| **🤖 Expected AI Actions** | **Funding Timeline Prediction:** `prediction_results` for campaign updated with new donation velocity. **Recommendation Score:** Campaign AI score recalculated for trending rank. **Fraud Analysis:** Donation pattern analyzed if rapid or unusual. |
+| **⚙️ Expected Background Jobs** | **Receipt Generation:** PDF receipt emailed to donor. **Escrow Balance:** `recalculate_escrow_balance()` runs if escrow active. **Milestone Evaluation:** Check if cumulative donations trigger milestone thresholds. **Analytics:** Platform metrics aggregation job updated. |
+
+---
+
+### Step 2.7: Milestone Submission & Approval
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Creator dashboard → Milestones tab: List of milestones with status badges (Pending, Active, Submitted, Under Review, Approved, Rejected, Paid). Each milestone card: title, target amount, release amount, progress, deliverable checklist. Submit button (when milestone target reached): opens submission form (upload deliverable files, add links, write completion notes). Upload spinner. Donor review section (for donors who funded): rating stars, comment textarea, approve/reject buttons. Voting progress bar (% approved). |
+| **🗄️ Expected DB Changes** | **`campaign_milestones`** — status updated: 'active' → 'submitted' (when creator submits). **`milestone_submissions`** — new row: { milestone_id, submission_type, files JSONB, links TEXT[] }. **`milestone_reviews`** — rows inserted by each reviewing donor: { milestone_id, donor_id, decision, comment, vote_weight }. **`campaign_milestones`** — status updated: 'submitted' → 'approved' (when threshold met) or 'changes_requested'. |
+| **📡 Expected API Calls** | `POST /api/milestone/submit` — submit milestone deliverables. `GET /api/milestone/[id]/reviews` — fetch review status. `POST /api/milestone/review` — submit donor review. `GET /api/escrow/account` — fetch current escrow balance (to confirm funds available for release). |
+| **🔔 Expected Notifications** | **To Donors:** "[Creator] submitted milestone [title] for review — review it now!" **To Creator:** "Your milestone [title] was approved! Funds will be released." **To Creator:** "Changes requested on milestone [title]: [reviewer comments]". |
+| **📋 Expected Audit Logs** | **`escrow_events`** — `{ entity_type: 'milestone', event: 'submitted'|'approved'|'rejected' }`. **`milestone_reviews`** — each reviewer decision logged. |
+| **📊 Expected Analytics** | `{ event: 'milestone_submitted', milestone_id }`. `{ event: 'milestone_approved', milestone_id }`. |
+| **🛡️ Expected Security Checks** | **Ownership:** Only creator can submit milestone for own campaign. **Threshold:** Creator must have milestone target met (donations >= milestone target). **Review weight:** Donor vote weight based on donation amount. **Double-vote:** UNIQUE(milestone_id, reviewer_id) prevents duplicate reviews. **Rate limit:** 1 milestone submission/day. |
+| **🤖 Expected AI Actions** | **Deliverable Analysis:** AI analyzes submitted files/links for completeness. **Fraud Check:** Submission reviewed for fraudulent deliverables via fraud analysis. |
+| **⚙️ Expected Background Jobs** | **Escrow Release:** When milestone approved, `recalculate_milestone_approval()` runs. If approval threshold met, funds moved from escrow to available balance. **Notification:** Batch notification to all milestone-eligible donors. |
+
+---
+
+### Step 2.8: Escrow & Payout
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Payout page (`/creator/payments` or escrow dashboard): Escrow balance display (total held, pending, available). Payout history table: date, amount, status (pending, processing, completed, failed), transaction ID. "Request Payout" button: opens form with amount input (max = available balance), bank account selector (if multiple), confirmation checkbox. Success: "Payout request submitted! Funds will arrive in 2-3 business days." Error: "Insufficient available balance", "No verified bank account found". Status tracking: pending → processing → completed. |
+| **🗄️ Expected DB Changes** | **`escrow_accounts`** — `available_balance` decreased by payout amount, `pending_balance` or `total_disbursed` adjusted. **`payout_requests`** — new row: { creator_id, amount, bank_account_id, status: 'pending', escrow_account_id }. **`payout_transactions`** — new row: { payout_request_id, status: 'pending', idempotency_key, provider }. **`escrow_ledger`** — immutable entry: { entry_type: 'payout_requested', amount, balance_after, idempotency_key }. |
+| **📡 Expected API Calls** | `POST /api/payout/index` — create payout request. `GET /api/escrow/account` — fetch escrow summary. `GET /api/payout/status` — check payout status. `POST /api/escrow/release` — trigger escrow release (if milestone-based). |
+| **🔔 Expected Notifications** | **In-App:** "Payout request for ₹X submitted successfully." **Email:** "Your payout is being processed." **SMS/WhatsApp:** "Funds on the way — ₹X credited to your bank account (via connector if configured)." |
+| **📋 Expected Audit Logs** | **`escrow_events`** — `{ entity_type: 'payout', event: 'requested'|'processed'|'completed'|'failed' }`. **`escrow_ledger`** — immutable record of the payout transaction. **`payout_transactions`** — full provider tracking. |
+| **📊 Expected Analytics** | `{ event: 'payout_requested', amount, creator_id }`. `{ event: 'payout_completed', amount, processing_time_ms }`. **Platform Metrics:** `metric_type='total_disbursed'` updated. |
+| **🛡️ Expected Security Checks** | **Balance verification:** Sufficient available balance in escrow. **Bank verification:** Payout bank account must be verified. **Compliance check:** `compliance_cases` checked for active blocks on creator. **Fraud check:** `fraud_profiles.decision` must not be 'block' or 'escalate'. **KYC requirement:** Verification level >= 3 typically required for payout. **Rate limit:** 1 payout request/day, max amount limits. **Duplicate prevention:** Idempotency key ensures no double-payout. **Manual review:** Payouts above threshold enter admin review queue. |
+| **🤖 Expected AI Actions** | **Fraud Analysis:** AI evaluates payout pattern against fraud signals. **Risk Scoring:** `risk_scores` recalculated based on payout behavior. **Compliance Check:** Automated compliance verification via `complianceEngine`. |
+| **⚙️ Expected Background Jobs** | **Payout Processing:** `payoutEngine.js` processes via configured provider (Razorpay). **Settlement Batch:** `settlementEngine.js` batches multiple payouts if batch processing configured. **Notification:** Payout completion/ failure notification dispatched. **Escrow Balance:** `recalculate_escrow_balance()` runs after payout. **Audit Archive:** Transaction archived to `audit_archives` for compliance. |
+
+---
+
+## Journey 3: Admin Platform Operations
+
+**Persona:** Platform administrator who reviews verifications, investigates fraud, approves businesses, monitors escrow, and oversees platform health
+**Precondition:** Logged in as admin (super_admin or admin role), admin dashboard accessible
+**Postcondition:** All queues processed, platform health verified
+
+---
+
+### Step 3.1: Review Verification Queue
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Admin dashboard → Verification Queue (`/admin/verifications`): List view with pending items. Each item: user name, email, verification type badge, submitted date, priority indicator. Click to expand detail panel: user info card, submitted documents (preview thumbnails, click to zoom), verification history timeline (chronological), trust score breakdown (radar chart of dimension scores). Decision panel: Approve (with level selector 1-5), Request Changes (with reason textarea), Reject (with reason + permanent/temporary toggle). Audit sidebar: all events for this user. Queue filter: All, Pending, Under Review, Escalated. Pagination or infinite scroll. Loading: skeleton queue items. Empty: "🎉 All caught up! No pending verifications." |
+| **🗄️ Expected DB Changes** | **`creator_verifications`** — status updated: 'under_review' → 'approved'|'rejected', verification_level set, verified_at = NOW(). **`verification_history`** — new row: { action: 'approved'|'rejected', performed_by: admin_id, performed_by_type: 'admin', reason }. **`verification_documents`** — status updated to 'verified' or 'rejected'. |
+| **📡 Expected API Calls** | `GET /api/admin/review-queue` — fetch pending items. `POST /api/admin/business-review` — approve/reject business verification. `GET /api/verification/status?userId=X` — fetch full verification status. |
+| **🔔 Expected Notifications** | **To Creator (on approve):** "🎉 Your identity verification has been approved! You can now create campaigns." **To Creator (on reject):** "Your verification was rejected. Reason: [reason]. Please re-submit with correct documents." |
+| **📋 Expected Audit Logs** | **`verification_audit_log`** — `{ action: 'admin_review_completed', decision, admin_id, reason }`. **`verification_history`** — immutable record of status change. |
+| **📊 Expected Analytics** | `{ event: 'verification_approved', processing_time_ms }`. `{ event: 'verification_rejected', reason_category }`. **Admin metric:** average review time tracked. |
+| **🛡️ Expected Security Checks** | **Admin authorization:** `isOrgAdmin()` or role check: only admin/super_admin roles can access. **Audit trail:** All decisions logged immutably. **Rate limit:** 60 admin actions/hr. **Session:** Admin session must have elevated privileges. **RLS:** admin-only policies on verification tables (`auth.role() = 'service_role'`). |
+| **🤖 Expected AI Actions** | **Automated Verification:** AI may have pre-scored document authenticity — admin sees AI confidence score as guidance. **Decision Assist:** AI suggests decision based on document analysis (shown as "AI suggests: Approve with 92% confidence"). |
+| **⚙️ Expected Background Jobs** | **Notification Dispatch:** Approval/rejection email queued. **Trust Score Recalculation:** `recalculate_verification_level()` triggered for affected user. |
+
+---
+
+### Step 3.2: Review Fraud Cases
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Admin Fraud Dashboard (`/admin/fraud-dashboard`): Summary cards: Total cases, High Risk, Medium Risk, Low Risk. Case list with severity color coding (red=critical, orange=high, yellow=medium, green=low). Each case: user, risk score (0-100 gauge), risk level badge, trigger event, timestamp. Click to expand: user profile card, fraud profile (risk signals list with weights), event timeline (chronological fraud events), device fingerprints, IP geolocation map, behavior anomaly chart. Decision panel: Allow, Monitor, Manual Review, Limit Actions, Block User, Escalate. Notes textarea for admin comments. Flag to create compliance case. Export case as PDF. |
+| **🗄️ Expected DB Changes** | **`fraud_profiles`** — decision updated: 'monitor'|'block'|'escalate'|'allow', risk_level recalculated. **`manual_overrides`** — new row: { user_id, override_type, created_by, expires_at, reason }. **`fraud_events`** — new event: { event_category: 'admin_action', severity: 'info' }. **`compliance_cases`** — new case if admin created compliance case from fraud review. |
+| **📡 Expected API Calls** | `GET /api/admin/fraud-dashboard` — fraud cases list with stats. `POST /api/fraud/evaluate` — re-evaluate user risk score. `POST /api/admin/fraud/override` — create manual override. `POST /api/admin/compliance-dashboard` — create compliance case from fraud. `GET /api/fraud/history?userId=X` — fraud event history. |
+| **🔔 Expected Notifications** | **To Creator (on block):** "Your account has been temporarily restricted. Please contact support." **To Admin Team:** Escalation notification if high-risk case. **Internal Alert:** Slack/Teams notification via connector (if configured). |
+| **📋 Expected Audit Logs** | **`fraud_rule_hits`** — updated with admin action taken. **`manual_overrides`** — immutable override record. **`compliance_events`** — if compliance case created. **`verification_audit_log`** — if verification impacted by fraud decision. |
+| **📊 Expected Analytics** | `{ event: 'fraud_case_resolved', risk_level, decision, processing_time }`. **Platform Metrics:** flagged_activities incremented. **Admin KPI:** cases resolved/avg time tracked. |
+| **🛡️ Expected Security Checks** | **Admin-only access:** Super admin or compliance admin role required. **Dual-control:** Block/escalate decisions may require second admin approval (configurable). **Audit trail:** Every override logged irreversibly. **Notification to user:** Required for certain actions (GDPR/consumer protection compliance). **Escalation path:** Critical overrides notify senior admins. |
+| **🤖 Expected AI Actions** | **Risk Re-evaluation:** `POST /api/ai/fraud/analyze` — AI re-analyzes user after decision. **Pattern Detection:** AI identifies similar fraud patterns across users. **Decision Assist:** "AI Risk Score: 87/100 — Top signals: device mismatch, rapid donations, new account." |
+| **⚙️ Expected Background Jobs** | **Compliance Case Creation:** If admin creates case from fraud review, compliance pipeline initiated. **Alert Escalation:** If critical, escalation notifications sent via connector. **Risk Recalculation:** Batch recalc of related risk signals. |
+
+---
+
+### Step 3.3: Approve Business Verification
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Admin → Business Review Queue (`/admin/business-review`): Business verification list with status filters (Pending, Under Review, Approved, Rejected). Each item: business name, type badge, user, submitted date, document completeness indicator (X/5 docs uploaded). Click to expand: Business details card (type, registration number, address), Document grid (preview cards with zoom), Document verification status per doc, Penny drop result badge (if bank verification also pending), GST/PAN verification status. Decision panel: Approve (with trust score multiplier selector), Reject (with reason + reject specific document), Request resubmission (with document-level feedback). |
+| **🗄️ Expected DB Changes** | **`business_verifications`** — status updated to 'verified' or 'rejected', verified_at = NOW(), reviewer_id = admin_id. **`business_documents`** — status updated per document. **`creator_verifications`** — business_verified = TRUE (if approved), verification_level recalculated. **`creator_reputation`** — verification_score updated with business multiplier. |
+| **📡 Expected API Calls** | `GET /api/admin/business-review` — fetch pending business verifications. `POST /api/admin/business-review` — approve/reject with decision payload. `GET /api/verification/business?userId=X` — fetch business verification details. |
+| **🔔 Expected Notifications** | **To Creator:** "Your business verification has been approved! Your trust score has increased." **To Creator:** "Your [document_name] was rejected. Reason: [reason]. Please upload a clearer copy." |
+| **📋 Expected Audit Logs** | **`verification_history`** — `{ action: 'business_verified'|'business_rejected', performed_by: admin_id }`. **`verification_events`** — `{ entity_type: 'business_verification', event: 'approved' }`. |
+| **📊 Expected Analytics** | `{ event: 'business_verification_approved', business_type, processing_days }`. **Admin KPI:** business verification throughput tracked. |
+| **🛡️ Expected Security Checks** | Admin authorization: verification admin or above. Document integrity: checksum verified against stored checksum. Dual approval: High-value business types may require 2 admin approvals. Rate limit: 60 reviews/hr. Audit: Full decision trail with admin identity. |
+| **🤖 Expected AI Actions** | **Document Authenticity Score:** AI provides confidence score for each document. **Business Validation:** Cross-reference business details against databases (if provider available). **Trust Score Suggestion:** "Recommended trust multiplier: 1.2x based on business type and document quality." |
+| **⚙️ Expected Background Jobs** | **Trust Score Recalculation:** `recalculate_verification_level()` + `get_business_verification_summary()` run. **Notification:** Approval/rejection dispatched. **Provider Sync:** If external provider used, sync verification status. |
+
+---
+
+### Step 3.4: Review Escrow & Payout Queue
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Admin → Escrow Dashboard (`/admin/escrow-dashboard`): Summary: Total in escrow (₹), pending releases, flagged accounts, completed payouts today. Escrow accounts list: campaign title, creator, current balance, status badge, days since last activity. Click to expand: ledger view (full immutable transaction history), balance breakdown chart, milestones with release status, payout history. Payout Review Queue: Pending payout requests (above threshold or auto-flagged). Each: amount, creator, bank account (masked), request date, fraud risk score. Decision: Approve Release, Hold (with reason), Flag for Review, Cancel. Payout history table with filter by status. |
+| **🗄️ Expected DB Changes** | **`escrow_accounts`** — status updated if frozen/hold applied. **`payout_requests`** — status updated: 'pending' → 'approved'|'on_hold'|'cancelled'. **`escrow_ledger`** — entry for admin hold/release action. **`milestone_reviews`** — if admin overrides milestone vote. |
+| **📡 Expected API Calls** | `GET /api/admin/escrow-dashboard` — escrow overview. `GET /api/escrow/account?campaignId=X` — detailed account. `POST /api/escrow/release` — trigger escrow release. `POST /api/admin/payout-review` — approve/hold payout. `GET /api/payout/status` — check transaction status. |
+| **🔔 Expected Notifications** | **To Creator:** "Your payout has been approved and is being processed." **To Creator:** "Your payout has been temporarily held. Reason: [reason]. Please contact support." |
+| **📋 Expected Audit Logs** | **`escrow_events`** — `{ entity_type: 'escrow_account', event: 'admin_hold'|'admin_release'|'frozen' }`. **`escrow_ledger`** — immutable record of admin action. **`compliance_events`** — if payout hold tied to compliance case. |
+| **📊 Expected Analytics** | `{ event: 'payout_approved', amount, processing_time }`. `{ event: 'escrow_action', action: 'hold'|'release', reason }`. |
+| **🛡️ Expected Security Checks** | **Admin authorization:** Finance admin role required for payout approval. **Dual control:** Payouts above ₹1,00,000 require 2 admin approvals. **Fraud re-check:** Risk score re-evaluated before approval. **Balance verification:** Escrow balance confirmed sufficient. **Bank verification:** Destination bank account reverified. **Compliance check:** Creator compliance status checked. **Rate limit:** 50 payout approvals/hr/admin. |
+| **🤖 Expected AI Actions** | **Payout Risk Score:** AI recalculates fraud risk for payout. **Anomaly Detection:** AI flags unusual payout patterns (amount, frequency, destination changes). **Compliance Check:** Automated regulatory compliance verification. |
+| **⚙️ Expected Background Jobs** | **Payout Processing:** Approved payout sent to Razorpay for processing. **Settlement Batch:** If batch payout configured, added to next batch. **Notification:** Approval/denial dispatched. **Escrow Balance:** `recalculate_escrow_balance()` runs post-release. |
+
+---
+
+### Step 3.5: Monitor Platform Health
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Admin → Platform Monitoring (`/admin/monitor` or aggregated dashboard): **System Health Cards:** Database (connection pool utilization, query latency, cache hit ratio), API (request rate, error rate, p95 latency), AI Services (provider status, avg latency, error rate), Background Jobs (queue depth, processing time, failure rate), Webhook Deliveries (success rate, backlog). **Alert Panel:** Active alerts with severity color: Critical (red), Warning (orange), Info (blue). Each alert: name, value, threshold, triggered_at, acknowledge button. **Traces:** Recent distributed traces (operation name, duration, status). Click to expand full trace timeline. **Health Check Log:** Component list with last check time and status. **Metrics Charts:** Time-series graphs for key metrics (requests/sec, error rate, queue depth). **Quick Actions:** "Run Health Check", "Clear Cache", "Restart Queue", "View Deployments". |
+| **🗄️ Expected DB Changes** | **`system_health`** — new rows inserted by health check (component, status, metric_value, threshold). **`health_checks`** — new row per component check. **`alerts`** — status updated when acknowledged/resolved. **`alert_events`** — new events for each alert state change. **`metrics`** — real-time metric points inserted. |
+| **📡 Expected API Calls** | `GET /api/health/database` — database health (connection pool, query perf). `GET /api/observability/health` — all component health status. `GET /api/observability/metrics` — aggregated platform metrics. `GET /api/observability/alerts` — active and historical alerts. `GET /api/infrastructure/queues` — job queue status. `POST /api/observability/health/run` — trigger health check run. |
+| **🔔 Expected Notifications** | **Admin Alert (Critical):** "🚨 Database pool at 95% capacity — action required!" **Admin Alert (Warning):** "⚠️ AI provider latency > 2000ms — degraded performance." **Slack/Teams:** (via connector) alert forwarded to operations channel. **Email/SMS:** Critical alerts escalated if not acknowledged within 5 min. |
+| **📋 Expected Audit Logs** | **`alert_events`** — `{ event_type: 'fired'|'acknowledged'|'resolved', metadata: {admin_id} }`. **`system_health`** — all health check records. |
+| **📊 Expected Analytics** | **Metrics:** Metrics engine aggregates: request rate, error rate, p95 latency, queue depth. **Alert analytics:** Mean time to acknowledge (MTTA), mean time to resolve (MTTR). **Capacity planning:** Resource utilization trends. |
+| **🛡️ Expected Security Checks** | **Admin authorization:** Infrastructure admin or super_admin role. **Rate limit:** Health checks: 1/30s (avoid self-DoS). **Sensitive data:** Alert messages must not contain secrets/keys. **RLS:** `service_role` only access to system_health, metrics, alerts tables. |
+| **🤖 Expected AI Actions** | **Anomaly Detection:** AI analyzes metric patterns and fires alerts for anomalies. **Predictive Alerting:** AI predicts resource exhaustion before threshold reached (e.g., "Database will reach capacity in 2 hours at current growth rate"). **Root Cause Analysis:** AI correlates alerts across components to suggest root cause. |
+| **⚙️ Expected Background Jobs** | **Health Check Runner:** Periodic health checks executed by `healthMonitor.js`. **Metric Aggregation:** Metrics rolled up to minute/hour/day buckets. **Alert Evaluation:** Threshold/anomaly conditions evaluated against incoming metrics. **Dead Letter Processing:** Failed events retried or moved to dead letter. **Cache Cleanup:** Expired cache entries purged. **Backup Verification:** Scheduled backup integrity check. |
+
+---
+
+## Journey 4: Organization Management
+
+**Persona:** Enterprise user who creates an organization, invites team members, assigns roles, generates API keys, and makes API calls
+**Precondition:** Authenticated user, no existing organization
+**Postcondition:** Organization with members, roles, and active API keys
+
+---
+
+### Step 4.1: Create Organization
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Organization creation page (`/org/create`): Form fields — Organization Name, Slug (auto-generated from name, editable), Organization Type dropdown (Individual, Business, Non-Profit, Educational, Government, Community, Media), Size dropdown (1-10, 11-50, 51-200, 201-1000, 1000+), Website URL, Description textarea, Logo upload, Country/Region select. Submit button. Loading spinner. Success: redirect to organization dashboard (`/org/[slug]`). Error: "Slug already taken", "Name is required". |
+| **🗄️ Expected DB Changes** | **`organizations`** — new row: { name, slug, org_type, size, description, owner_id, status: 'active' }. **`organization_members`** — new row: { organization_id, user_id, role: 'owner', status: 'active' } (creator becomes owner). **`organization_settings`** — new row: { organization_id, setting_key: 'default_locale', value: 'en' }. **`tenant_settings`** — new row: { organization_id, locale, currency, timezone, is_active: true }. |
+| **📡 Expected API Calls** | `POST /api/organization/index` — create organization with payload. `POST /api/storage/upload` — upload logo (optional). `GET /api/organization/[slug]` — fetch new org details. |
+| **🔔 Expected Notifications** | **In-App:** "Organization created successfully!" **Team:** None yet (no members). |
+| **📋 Expected Audit Logs** | None immediate (first org action). |
+| **📊 Expected Analytics** | `{ event: 'organization_created', org_type, size }`. **Platform Metrics:** `metric_type='organizations'` incremented. |
+| **🛡️ Expected Security Checks** | **Slug uniqueness:** UNIQUE constraint on `organizations.slug`. **Auth check:** User must be authenticated. **Rate limit:** 3 organizations created/day/user. **Slug validation:** alphanumeric + hyphens only, length 3-50. **XSS:** Name/description sanitized. **RLS:** creator automatically added as owner member. |
+| **🤖 Expected AI Actions** | None |
+| **⚙️ Expected Background Jobs** | **Tenant Provisioning:** `tenantManager.js` provisions default settings. **Usage Quotas:** Default quotas initialized in `usage_quotas` table. |
+
+---
+
+### Step 4.2: Invite Members & Assign Roles
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Organization dashboard → Members tab (`/org/[slug]/members`): Members list with avatars, names, roles, status badges (Active, Pending, Invited). Invite button → modal/form: Email input (multi-add: comma-separated or bulk paste), Role selector dropdown (Admin, Moderator, Finance, Support, Viewer, Custom). Optional welcome message textarea. Send button. Pending invitations table: email, role, invited date, expires date, resend/revoke actions. Member management per row: role change dropdown, remove member button (with confirmation). |
+| **🗄️ Expected DB Changes** | **`invitations`** — new rows per invite: { organization_id, email, role, token, status: 'pending', expires_at }. **`organization_members`** — new row when invite accepted: { organization_id, user_id, role, status: 'active', invited_by }. **`organization_members`** — role updated when admin changes role. |
+| **📡 Expected API Calls** | `POST /api/organization/invitations` — send invitations. `POST /api/organization/members` — add member directly. `PUT /api/organization/members/[id]/role` — change member role. `DELETE /api/organization/members/[id]` — remove member. `GET /api/organization/[slug]/members` — fetch member list. |
+| **🔔 Expected Notifications** | **Email to Invitee:** "[Org Name] has invited you to join on Fundora — Accept Invitation". **In-App (to invitee):** "You've been invited to join [org name]!" **To Admin (on accept):** "[User] has accepted your invitation to [org name]". |
+| **📋 Expected Audit Logs** | **`compliance_events`** — if invitation volume triggers compliance threshold |
+| **📊 Expected Analytics** | `{ event: 'member_invited', role }`. `{ event: 'member_joined', role }`. `{ event: 'member_role_changed', from_role, to_role }`. |
+| **🛡️ Expected Security Checks** | **Authorization:** Only org admin/owner can invite and manage roles. **Rate limit:** 50 invitations/day/org. **Email validation:** Valid email format required. **Token security:** Invitation token is unique UUID, expires after 7 days. **Role hierarchy:** Owner cannot demote self. **RLS:** `is_org_member()` and `is_org_admin()` functions enforce access. `get_user_org_role()` controls member management permissions. |
+| **🤖 Expected AI Actions** | None |
+| **⚙️ Expected Background Jobs** | **Invitation Expiry:** Scheduled job checks `expires_at` on pending invitations and marks expired. **Notification:** Invitation emails dispatched via notification engine. |
+
+---
+
+### Step 4.3: Generate API Keys
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Organization → Developer API section (`/org/[slug]/developers` or `/api-platform/keys`): API Keys table: Name (label), Key preview (prefix + masked: `fund_org_abc...xyz`), Scopes list, Status badge (Active, Disabled, Expired), Created date, Last used date. "Generate New Key" button → form: Key name (label for identification), Scope selector (checkboxes: projects.read, projects.write, donations.read, users.read, analytics.read, admin.*, etc.), Expiry optional (date picker). Generate → key shown once with copy button + warning "Copy this key now. You won't see it again." Revoke button (confirmation dialog). Rate limit info: current tier limits displayed. |
+| **🗄️ Expected DB Changes** | **`api_keys`** — new row: { key_hash, name, organization_id, status: 'active', scopes, rate_limit, rate_window_ms, created_by }. **`api_logs`** — future API calls will be logged referencing this key. |
+| **📡 Expected API Calls** | `POST /api/api-platform/keys` — generate new key. `GET /api/api-platform/keys` — list all keys (returning masked keys + last 4 chars). `DELETE /api/api-platform/keys/[id]` — revoke key. `PUT /api/api-platform/keys/[id]` — update key (scopes, status). |
+| **🔔 Expected Notifications** | **In-App:** "New API key generated: [name]" |
+| **📋 Expected Audit Logs** | **`api_logs`** — key generation event logged: `{ api_key_id, action: 'created', created_by }`. |
+| **📊 Expected Analytics** | `{ event: 'api_key_created', scopes }`. `{ event: 'api_key_revoked' }`. |
+| **🛡️ Expected Security Checks** | **Authorization:** Only org admin/owner can generate API keys. **Key hashing:** Key stored as hash only (`UNIQUE(key_hash)`) — plaintext never persisted. **One-time display:** Full key shown once, then masked. **Rate limit enforcement:** `api_rate_limits` tier applied. **Scope validation:** Scopes validated against available permissions. **Minimum scope:** Principle of least privilege encouraged. **Revocation:** Immediate invalidation on revoke. **Key rotation:** Warning displayed for keys > 90 days old. |
+| **🤖 Expected AI Actions** | None |
+| **⚙️ Expected Background Jobs** | **Key Expiry:** Scheduled job checks expires_at and deactivates expired keys. **Usage Aggregation:** API usage metrics aggregated for billing/analytics. |
+
+---
+
+### Step 4.4: Call APIs (External Integration)
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | (External — this step is about the developer's integration). Developer Portal (`/developer/apps`): Quick start guide with code examples (curl, Node.js, Python). API reference documentation. Test console: endpoint URL input, method selector, headers (pre-filled with API key), request body editor, Send button, Response viewer (status, headers, body, timing). Recent API calls log: timestamp, endpoint, status code, response time. Rate limit usage gauge. |
+| **🗄️ Expected DB Changes** | **`api_logs`** — row for each API call: { api_key_id, endpoint, method, status_code, ip_address, request_body_hash, response_time_ms, created_at }. |
+| **📡 Expected API Calls** | External calls via API key: `GET /api/v1/projects` — list projects. `GET /api/v1/projects/[id]` — get project details. `POST /api/v1/organization/members` — add member via API. `GET /api/v1/analytics/reports` — fetch org analytics. All requests authenticated via `withApiKey` middleware using `Authorization: Bearer fund_org_...` header. |
+| **🔔 Expected Notifications** | **To Org Admin:** "API call volume alert: 80% of daily limit reached." (if configured) |
+| **📋 Expected Audit Logs** | **`api_logs`** — each API call logged with full request/response metadata. **`developer_apps`** — if call made on behalf of registered app, app_id logged. |
+| **📊 Expected Analytics** | **Metrics:** `metrics` table receives API request rate, error rate, p50/p95/p99 latency. **Usage Quotas:** `usage_quotas` updated with API call counts. |
+| **🛡️ Expected Security Checks** | **API Key Authentication:** `withApiKey` middleware validates key hash against DB. **Rate Limiting:** Per-key rate limit enforced (configurable per tier). **Scope Enforcement:** Key scopes checked against endpoint requirements. **Request Validation:** Input validation, sanitization, content-type verification. **Logging:** Every request logged with IP, timestamp, endpoint (not sensitive body content). **IP Whitelist:** Optional IP restriction per key. **CORS:** Allowed origins enforced for browser-based calls. **Response Sanitization:** Sensitive data masked in responses (bank accounts, secrets). |
+| **🤖 Expected AI Actions** | None for standard API calls |
+| **⚙️ Expected Background Jobs** | **Usage Aggregation:** Hourly/daily rollup of API usage metrics. **Quota Enforcement:** Scheduled check for quota threshold alerts. **Log Archival:** Old api_logs archived to `audit_archives`. |
+
+---
+
+## Journey 5: Enterprise Ecosystem
+
+**Persona:** Enterprise developer/admin who manages plugins, marketplace, feature flags, automation, AI agents, enterprise connectors, MCP, and data exports
+**Precondition:** Organization admin with enterprise plan
+**Postcondition:** Plugin installed, automation configured, agent running, export generated
+
+---
+
+### Step 5.1: Plugin Management
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Plugin Management (`/org/[slug]/plugins`): Installed plugins list: icon, name, version, status badge (Active, Disabled, Error), enabled/disable toggle. Plugin details: manifest viewer, permissions granted, configuration form (rendered from `config_schema` JSON). "Install Plugin" button → plugin browser: search bar, category filter, sort options. Plugin cards: icon, name, description, rating (stars), download count, author. Plugin details modal: manifest details, reviews, version history, install button. Install confirmation: "This plugin requests permissions: [list]. Allow?" |
+| **🗄️ Expected DB Changes** | **`plugins`** — new row if installing from marketplace. **`plugin_versions`** — version tracking row. **`plugin_installations`** (org-install mapping, if exists). |
+| **📡 Expected API Calls** | `GET /api/marketplace/list` — browse available plugins. `GET /api/plugins/[id]` — fetch plugin details. `POST /api/plugins/[id]/install` — install plugin. `PUT /api/plugins/[id]` — update plugin config. `POST /api/plugins/[id]/disable` — disable plugin. |
+| **🔔 Expected Notifications** | **In-App:** "Plugin [name] installed successfully." **To Developer:** "Your plugin [name] was installed by [org]." |
+| **📋 Expected Audit Logs** | Plugin lifecycle events tracked in `plugin_versions` and plugin audit trail |
+| **📊 Expected Analytics** | `{ event: 'plugin_installed', plugin_id, org_id }`. Plugin download count incremented. |
+| **🛡️ Expected Security Checks** | **Permission review:** Plugin permissions reviewed before install. **Sandbox:** Plugin executed in `pluginSandbox.js` with permission restrictions. **Manifest validation:** `pluginManifest.js` validates manifest structure. **Signature check:** Verified plugin signature checked (`is_signed`, `signature`). **Scope limitation:** Plugins cannot access resources outside granted permissions. **Rate limit:** 10 plugin operations/hr. **Approval flow:** Admin approval may be required for enterprise orgs. |
+| **🤖 Expected AI Actions** | **Plugin Code Analysis:** AI may analyze plugin code for security vulnerabilities (in review pipeline). |
+| **⚙️ Expected Background Jobs** | **Plugin Download Tracking:** `download_count` incremented asynchronously. **Marketplace Stats:** Plugin rating averages recomputed. |
+
+---
+
+### Step 5.2: Marketplace Operations
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Marketplace (`/marketplace`): Category navigation (Analytics, Payments, Communication, Social, Automation, Security, AI & ML, Developer Tools, Design, Marketing). Featured plugins carousel. Grid of plugin cards with search and filter. Plugin detail page: screenshots, description, version history, reviews, ratings. Review form: rating (1-5 stars), title, content textarea, submit. Developer submission: "Submit Your Plugin" page — upload plugin package (.zip), fill manifest fields, select category, agree to terms. Submission progress: Draft → Pending Review → Approved → Published. |
+| **🗄️ Expected DB Changes** | **`marketplace_categories`** — referenced (seeded: 10 categories). **`plugins`** — new row for submitted plugin (status: 'draft'→'pending_review'). **`plugin_reviews`** — new row: { plugin_id, user_id, rating, content }. |
+| **📡 Expected API Calls** | `GET /api/marketplace/featured` — featured plugins. `GET /api/marketplace/list?category=X&sort=Y` — filtered plugin list. `POST /api/marketplace/review` — submit review. `POST /api/plugins/submit` — submit new plugin (developer). |
+| **🔔 Expected Notifications** | **To Developer (on approve):** "Your plugin [name] has been approved and published!" **To Developer (on reject):** "Your plugin [name] was rejected. Reason: [reason]." |
+| **📋 Expected Audit Logs** | Plugin submission, review, and publish events tracked. |
+| **📊 Expected Analytics** | `{ event: 'marketplace_visit' }`. `{ event: 'plugin_reviewed', rating }`. Download tracking per plugin. |
+| **🛡️ Expected Security Checks** | **Plugin submission:** Code scan for malware/security issues. **Review process:** Admin must approve before publish. **Rating validation:** Unique(plugin_id, user_id) prevents duplicate review. **Content moderation:** Reviews moderated for inappropriate content. |
+| **🤖 Expected AI Actions** | **Plugin Review Moderation:** `POST /api/ai/moderation/classify` scans plugin content. **Smart Recommendations:** "Users who installed this also installed..." |
+| **⚙️ Expected Background Jobs** | **Plugin Verification:** Async security scan of submitted plugin. **Rating Recalculation:** `rating_avg` and `rating_count` updated on `plugins`. |
+
+---
+
+### Step 5.3: Feature Flag Management
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Feature Flags dashboard (`/org/[slug]/features`): Flags list: toggle switches, flag key, name, description, type badge (Boolean, Percentage, Organization, Environment), enabled/disabled status. Create flag button → form: flag key (unique, lowercase-with-hyphens), name, description, type selector, rollout percentage (if percentage type), environment selector (dev, staging, production), organization assign. Flag detail pane: rules list (add/edit/delete rules), event history log (enabled, disabled, rule changed), percentage rollout slider. A/B test config panel (experiment name, variants, metrics target). |
+| **🗄️ Expected DB Changes** | **`feature_flags`** — new row on create, updates on toggle/rule change. **`feature_flag_events`** — row for each change: { flag_key, event_type, previous_value, new_value, changed_by }. |
+| **📡 Expected API Calls** | `GET /api/flags/index` — list all feature flags. `POST /api/flags/index` — create new flag. `PUT /api/flags/[id]` — update flag config. `POST /api/flags/abtest` — create A/B test. |
+| **🔔 Expected Notifications** | None by default. Optional: "Feature flag [name] enabled in production" (for critical flags). |
+| **📋 Expected Audit Logs** | **`feature_flag_events`** — complete history of flag changes. |
+| **📊 Expected Analytics** | `{ event: 'feature_flag_toggled', flag_key, enabled }`. A/B test results tracked via analytics engine. |
+| **🛡️ Expected Security Checks** | **Authorization:** Only org admin can create/modify flags. **Validation:** Flag key uniqueness enforced. **Percentage bounds:** 0-100 range enforced. **Environment validation:** Must be valid environment name. **RLS:** Org-isolation via JWT. |
+| **🤖 Expected AI Actions** | **A/B Test Recommendations:** AI may suggest optimal rollout percentage based on usage patterns. |
+| **⚙️ Expected Background Jobs** | None immediate |
+
+---
+
+### Step 5.4: Automation (Workflow Engine)
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Automation dashboard (`/org/[slug]/automation`): Workflow list: name, trigger type badge (Event, Schedule, Manual, Webhook), status toggle, last run, next run. Create workflow button → visual builder: Trigger configuration (select event type + conditions), Action configuration (select action type: send notification, update status, call webhook, run agent, export data), Retry configuration (max retries, backoff), Conditional branching (if/else based on conditions). Workflow run history: run ID, status (Pending, Running, Completed, Failed, Retrying), duration, input/output JSON viewer, error logs. Manual trigger button for manual workflows. |
+| **🗄️ Expected DB Changes** | **`workflow_templates`** — row per workflow: { name, trigger_type, conditions JSONB, actions JSONB, retry_config, enabled }. **`workflow_runs`** — new rows per execution. **`workflow_logs`** — step-level log rows per run. **`scheduled_jobs`** — if schedule trigger, job created in job queue. |
+| **📡 Expected API Calls** | `POST /api/automation/workflows` — create workflow. `PUT /api/automation/workflows/[id]` — update workflow. `POST /api/automation/workflows/[id]/trigger` — manual trigger. `GET /api/automation/workflows/[id]/runs` — run history. |
+| **🔔 Expected Notifications** | **To Configurator:** "Workflow [name] completed successfully." **To Configurator:** "Workflow [name] failed after 3 retries — review logs." |
+| **📋 Expected Audit Logs** | **`workflow_logs`** — every step logged with input, output, status. **`event_bus`** — workflow events published (if event trigger configured). |
+| **📊 Expected Analytics** | `{ event: 'workflow_run', status, duration_ms }`. **Metrics:** workflow execution count, success rate, avg duration. |
+| **🛡️ Expected Security Checks** | **Authorization:** Org admin or automation manager role. **Action validation:** Actions must be within permitted scope. **Infinite loop protection:** Max run count or circuit breaker. **Input validation:** JSON payload validated against schema. **Rate limit:** 100 workflow triggers/hour. **Template isolation:** Workflows in one org cannot affect another. |
+| **🤖 Expected AI Actions** | **Smart Workflow Suggestions:** AI suggests workflow templates based on org usage patterns. |
+| **⚙️ Expected Background Jobs** | **Workflow Execution:** `workflowEngine.js` processes queued runs. **Schedule Evaluation:** `scheduled_jobs` checks for due workflows. **Retry Handler:** Failed workflows retried per retry_config. |
+
+---
+
+### Step 5.5: AI Agents
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Agent Management (`/org/[slug]/agents`): Agent list: name, type badge (Creator, Donor, Moderator, Compliance, Finance, Organization, Plugin, Custom), status (Inactive, Active, Paused, Error), last run timestamp. Create agent button → form: name, slug, description, agent type, model selector (GPT-4, Claude, etc.), system prompt editor (monaco/textarea with variable hints), config JSON editor, permissions (resource + action checkboxes). Agent detail view: memory browser (key-value pairs with types), schedule configuration (cron, interval, or event-triggered), run history table (status, input summary, output, duration, cost). Manual run button. |
+| **🗄️ Expected DB Changes** | **`agents`** — row per agent: { name, slug, agent_type, status, model, system_prompt, config, permissions, owner_id, organization_id }. **`agent_runs`** — rows per execution: { agent_id, run_type, status, input, output, context, error, duration_ms, token_usage, cost }. **`agent_memory`** — rows: { agent_id, memory_type, key, value, ttl_seconds }. **`agent_permissions`** — granted permissions per agent. **`agent_schedules`** — schedule configuration rows. |
+| **📡 Expected API Calls** | `POST /api/agents/index` — create agent. `PUT /api/agents/[id]` — update agent config. `POST /api/agents/run` — trigger agent run. `GET /api/agents/[id]/memory` — read agent memory. `POST /api/agents/memory` — write agent memory. `POST /api/agents/schedule` — create schedule. `POST /api/agents/approve` — approve pending agent action. |
+| **🔔 Expected Notifications** | **To Admin:** "Agent [name] requires approval for: [action]." **To Admin:** "Agent [name] completed run with output: [summary]." **Error Alert:** "Agent [name] failed — [error]. Action needed." |
+| **📋 Expected Audit Logs** | **`agent_runs`** — every run recorded with full input/output. **`agent_memory`** — memory changes versioned. **`event_bus`** — agent lifecycle events published. |
+| **📊 Expected Analytics** | `{ event: 'agent_run', agent_type, status, duration_ms, cost_cents }`. **Metrics:** AI usage tracking (token counts, cost per agent). **Cost Tracking:** `ai_usage` table updated per run. |
+| **🛡️ Expected Security Checks** | **Authorization:** Agent permissions scoped to org resources. **Human Approval:** `requires_human_approval` flag blocks actions like payouts, account changes. **Memory Isolation:** Agent memory scoped per agent (`agent_id, memory_type, key`). **Execution Limits:** `max_execution_time_ms`, `max_concurrent_runs` enforced by `agentExecution.js`. **Rate limit:** 50 agent runs/hour/org. **Sanction Check:** Agent actions checked against compliance rules. **Token Budget:** Daily cost limit enforced via `costTracker.js`. |
+| **🤖 Expected AI Actions** | **(This step IS the AI action)** Agent runs include: content moderation, compliance checks, data analysis, notification dispatch, report generation. **Autonomous Decision:** Agent may call MCP tools, query knowledge base, execute workflows. |
+| **⚙️ Expected Background Jobs** | **Agent Execution:** Scheduled agents run per cron/interval. **Memory Cleanup:** Expired agent memory (`expires_at`) cleaned by scheduled job. **Cost Accounting:** Agent usage costs aggregated to `ai_usage` and `usage_quotas`. |
+
+---
+
+### Step 5.6: Enterprise Connectors
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Connectors dashboard (`/org/[slug]/connectors`): Available connectors grid: Slack, Microsoft Teams, Discord, Google Workspace, GitHub, Jira, Notion, Custom Webhook. Each connector card: icon, name, status badge (Connected, Disconnected, Error, Expired), "Connect" button. OAuth flow: for Slack/Teams/Google → redirect to provider → authorize → redirect back. Webhook setup: for Custom → enter webhook URL, secret, test connection. Connected connector detail: configuration form (channel selection, event filters), activity log (recent events sent), "Disconnect" button. Notification routing config: which platform events → which connector channel. |
+| **🗄️ Expected DB Changes** | **`connector_configs`** — new row: { provider, label, config JSONB, credentials JSONB (encrypted), status, webhook_url, organization_id, created_by }. **`event_subscriptions`** — new subscription routing events to connector. |
+| **📡 Expected API Calls** | `GET /api/connectors/index` — list available/connected connectors. `POST /api/connectors/index` — connect new connector. `PUT /api/connectors/[id]` — update connector config. `DELETE /api/connectors/[id]` — disconnect. `POST /api/events/subscriptions` — subscribe to events. |
+| **🔔 Expected Notifications** | **In-App:** "🔗 Slack connected successfully!" **Via Connector (test):** "Fundora connected to [channel] — test message". |
+| **📋 Expected Audit Logs** | **`connector_configs`** — status changes tracked. **`event_subscriptions`** — subscription creation logged. |
+| **📊 Expected Analytics** | `{ event: 'connector_connected', provider }`. **Metrics:** connector message delivery rates. |
+| **🛡️ Expected Security Checks** | **OAuth security:** State parameter validation, PKCE flow. **Credentials encryption:** Provider tokens/credentials encrypted at rest. **Webhook secret:** HMAC signature verification. **Scope limitation:** OAuth scopes minimized. **Rate limit:** 10 connector operations/hr. **Disconnect:** Immediate revocation of access tokens. **Data isolation:** Connectors scoped to single org. |
+| **🤖 Expected AI Actions** | **Event Routing Suggestions:** AI suggests optimal event-to-channel routing based on org activity patterns. |
+| **⚙️ Expected Background Jobs** | **Webhook Delivery:** Events forwarded to connected webhooks. **Health Check:** Periodic connectivity check for each connector. **Token Refresh:** OAuth tokens refreshed before expiry. |
+
+---
+
+### Step 5.7: MCP Server (Model Context Protocol)
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | MCP Configuration (`/org/[slug]/mcp`): Status indicator (Running/Stopped/Error). Server configuration: port, allowed models, rate limits. **Tool Registry:** List of available MCP tools exposed: `search_campaigns`, `get_project_details`, `get_analytics`, `manage_agents`, `trigger_workflow`, `list_plugins`, etc. Each tool: name, description, parameter schema (JSON), permission required. **Connection Log:** Recent MCP client connections: client_id, tool invoked, timestamp, status. **Test Console:** dropdown select tool → fill params → "Invoke" → response viewer. |
+| **🗄️ Expected DB Changes** | **`mcp_sessions`** — connection sessions logged (if tracking enabled). **`agent_runs`** — if MCP triggers agent execution. |
+| **📡 Expected API Calls** | `POST /api/mcp/index` — MCP endpoint (receives tool invocation requests). `GET /api/mcp/tools` — list available tools. |
+| **🔔 Expected Notifications** | **To Admin:** "MCP server received connection from [client]." |
+| **📋 Expected Audit Logs** | **`agent_runs`** — MCP-triggered agent runs logged. **`mcp_request_log`** — all tool invocations logged (if enabled). |
+| **📊 Expected Analytics** | `{ event: 'mcp_tool_invoked', tool_name, duration_ms }`. **Metrics:** MCP request rate, error rate, tool popularity. |
+| **🛡️ Expected Security Checks** | **Authentication:** MCP clients must authenticate (API key or JWT). **Authorization:** Tool access controlled by API key scopes. **Rate limit:** Per-client rate limits enforced. **Input validation:** Tool parameters validated against schema. **Request logging:** All invocations logged for audit. **DoS protection:** Max payload size, request timeout. **Isolation:** MCP server scoped to single org's resources. |
+| **🤖 Expected AI Actions** | **(MCP IS the AI interface)** MCP tools enable AI agents to: search campaigns, analyze data, trigger workflows, manage agents. AI agents discover and invoke tools autonomously. |
+| **⚙️ Expected Background Jobs** | None immediate. Async tool executions handled by job queue. |
+
+---
+
+### Step 5.8: Data Exports
+
+| Aspect | Details |
+|--------|---------|
+| **🎨 Expected UI** | Exports dashboard (`/org/[slug]/exports`): **Export Templates:** list of saved templates (name, export type badge (CSV/XLSX/JSON/PDF), entity type, last used). Create template → form: name, export type selector, entity type selector, field picker (checkboxes of available fields), filter builder (condition rows: field + operator + value), schedule switch. **Export Jobs:** table with job ID, template name, status badge (Pending, Processing, Completed, Failed), file size, created date, download button. **Scheduled Exports:** list of schedules: template, frequency, recipients, last run, next run, enable/disable toggle. **Download:** file download with progress indicator. |
+| **🗄️ Expected DB Changes** | **`export_templates`** — rows for saved templates. **`export_jobs`** — rows for each export execution: { template_id, export_type, entity_type, fields, filters, status, file_url, file_size, organization_id }. **`scheduled_exports`** — rows for scheduled exports. |
+| **📡 Expected API Calls** | `POST /api/exports/templates` — create export template. `POST /api/exports/index` — trigger export job. `GET /api/exports/index?status=completed` — fetch completed exports. `POST /api/exports/schedule` — schedule recurring export. `GET /api/exports/[id]/download` — download export file. |
+| **🔔 Notifications** | **In-App:** "Your export [name] is ready for download!" **Email:** Export file attached or download link sent. **Webhook:** If configured, export completion webhook delivered. |
+| **📋 Expected Audit Logs** | **`export_jobs`** — status changes tracked. **`audit_archives`** — exported data may be archived. |
+| **📊 Expected Analytics** | `{ event: 'export_completed', export_type, entity_type, file_size, duration_ms }`. **Metrics:** export volume, frequency, user adoption. |
+| **🛡️ Security Checks** | **Authorization:** Export scope limited to user's org permissions. **Data isolation:** Exports only include org's own data. **File access:** Generated files have signed URLs with expiry. **Sensitive fields:** Bank details, personal data excluded from exports unless explicitly permitted. **Rate limit:** 10 export jobs/day/org. **File size limit:** Max export file size enforced. **Scheduled export security:** Recipients validated, external delivery restricted. |
+| **🤖 Expected AI Actions** | **Smart Field Selection:** AI suggests relevant fields based on export purpose. **Template Recommendations:** "Based on your recent activity, you may want to export: [suggested template]." |
+| **⚙️ Background Jobs** | **Export Generation:** Async export processing via `exportEngine.js`. **File Compression:** Large exports compressed. **Cleanup:** Expired export files deleted per retention policy. **Scheduled Export:** Cron-based scheduled export execution. |
+
+---
+
+## Cross-Cutting Concerns
+
+### Notification Matrix
+
+| Trigger | In-App | Email | SMS | Push | Slack/Teams |
+|---------|--------|-------|-----|------|-------------|
+| User Signup | ✅ Welcome toast | ✅ Verification email | ❌ | ❌ | ❌ |
+| Verification Approved | ✅ Toast | ✅ Confirmation | ❌ | ❌ | ❌ |
+| Donation Received | ✅ Toast | ✅ Receipt | ❌ | ❌ | ❌ |
+| Milestone Approved | ✅ Toast | ✅ Update | ❌ | ❌ | ❌ |
+| Payout Processed | ✅ Toast | ✅ Confirmation | ✅ (if configured) | ❌ | ✅ (if connector) |
+| Fraud Alert (Critical) | ✅ Admin alert | ✅ Escalation | ✅ SMS to admin | ✅ Push | ✅ Slack alert |
+| Escrow Hold | ✅ Toast | ✅ Email | ✅ SMS | ❌ | ✅ Slack |
+| Workflow Failure | ✅ Toast | ❌ | ❌ | ❌ | ✅ (if connector) |
+| Agent Needs Approval | ✅ Toast | ✅ Email | ❌ | ❌ | ✅ Slack |
+| Export Complete | ✅ Toast | ✅ Download link | ❌ | ❌ | ❌ |
+| Invitation Received | ✅ Toast | ✅ Invite email | ❌ | ❌ | ❌ |
+| API Quota Warning | ✅ Toast | ✅ Email (admin) | ❌ | ❌ | ✅ Slack |
+
+### Background Jobs Matrix
+
+| Job | Trigger | Service | Max Retries | Priority |
+|-----|---------|---------|-------------|----------|
+| Receipt Generation | Donation completed | `generateReceipt.js` | 3 | Medium |
+| Image Optimization | File upload | `imageOptimizer.js` | 2 | Low |
+| Escrow Balance Recalc | Milestone/Payout event | `recalculate_escrow_balance()` | 3 | High |
+| Fraud Rule Evaluation | Any financial event | `ruleEngine.js` | 2 | High |
+| Notification Dispatch | Any event | `notificationEngine.js` | 3 | Medium |
+| Webhook Delivery | Event → subscribed | `webhookEngine.js` | 5 (backoff) | Medium |
+| Email Dispatch | Notification event | Notification engine | 3 | Low |
+| Metric Aggregation | Scheduled (5 min) | `metricsEngine.js` | 2 | Low |
+| Cache Cleanup | Scheduled (1 hour) | `cacheEngine.js` | 1 | Low |
+| Backup Execution | Scheduled (daily) | `backupEngine.js` | 2 | Low |
+| Invitation Expiry | Scheduled (hourly) | DB cleanup | 1 | Low |
+| Agent Execution | Schedule/Event | `agentExecution.js` | 3 | Configurable |
+| Export Generation | User trigger / Schedule | `exportEngine.js` | 3 | Low |
+| Connector Health Check | Scheduled (5 min) | `connectorManager.js` | 2 | Low |
+
+### Analytics Events Matrix
+
+| Event Category | Events Collected | Aggregation |
+|----------------|------------------|-------------|
+| Page Views | `/`, `/explore`, `/projects/*`, `/home`, `/creator/*` | Real-time → hourly |
+| User Events | signup, login, logout, profile_update | Real-time → daily |
+| Verification | step_completed, approved, rejected, document_uploaded | Real-time → daily |
+| Campaign | draft_created, published, milestone_submitted | Real-time → hourly |
+| Payments | donation_completed, payout_requested, payout_completed | Real-time → hourly |
+| Fraud | case_created, resolved, override, rule_hit | Real-time → daily |
+| Admin | reviews_completed, actions_taken | Real-time → daily |
+| Organization | created, member_invited, api_key_generated | Real-time → daily |
+| AI | agent_run, prediction_made, recommendation_served | Real-time → daily |
+| Plugins | installed, uninstalled, reviewed | Real-time → daily |
+| Infrastructure | api_call, webhook_delivery, job_completed | Real-time → hourly |
+| Performance | page_load_time, api_latency, query_duration | Real-time → minute |
+
+### Security Controls Per Journey Step
+
+| Control | Journey 1 (Visitor) | Journey 2 (Creator) | Journey 3 (Admin) | Journey 4 (Org) | Journey 5 (Enterprise) |
+|---------|---------------------|--------------------|--------------------|-----------------|------------------------|
+| Auth Required | ❌ (until signup) | ✅ | ✅ | ✅ | ✅ |
+| Role Check | ❌ | ❌ | ✅ (admin) | ✅ (org_admin) | ✅ (org_admin) |
+| Rate Limiting | 30 req/min | 10-60 req/min | 60 req/hr | 50 req/hr | 100 req/hr |
+| Input Sanitization | ✅ | ✅ | ✅ | ✅ | ✅ |
+| CSRF Protection | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Encryption at Rest | N/A | ✅ (bank data) | ✅ (all data) | ✅ (API keys) | ✅ (credentials) |
+| Audit Logging | ❌ | ✅ | ✅ | ✅ | ✅ |
+| RLS Enforcement | ✅ (read public) | ✅ (own data) | ✅ (service_role) | ✅ (org isolation) | ✅ (org isolation) |
+| Fraud Detection | ❌ | ✅ | ✅ | ✅ | ✅ |
+| Human Approval | ❌ | ❌ | ✅ (dual control) | ❌ | ✅ (agent actions) |
+
+---
+
+## Journey Matrix: Coverage Map
+
+| # | Phase | Journey 1 | Journey 2 | Journey 3 | Journey 4 | Journey 5 |
+|---|-------|-----------|-----------|-----------|-----------|-----------|
+| 1 | Foundation & Auth | ✅ Signup, Login, Logout | ✅ Signup, Profile | ✅ Dashboard access | — | — |
+| 2 | Projects & Campaigns | ✅ Explore, View | ✅ Create, Publish | — | — | — |
+| 3 | Payments | ✅ Donate | ✅ Receive Donation | — | — | — |
+| 4 | Verification | — | ✅ Full KYC flow | ✅ Review Verification | — | — |
+| 5 | Fraud Detection | — | ✅ Fraud checks | ✅ Review Fraud | — | — |
+| 6 | Escrow & Milestones | — | ✅ Milestones, Payout | ✅ Review Escrow | — | — |
+| 7 | Compliance | — | ✅ Compliance checks | ✅ (implicit in review) | — | — |
+| 8 | Organizations | — | — | — | ✅ Create, Invite, API Keys | ✅ Org-based |
+| 9 | AI Platform | ✅ Recommendations | ✅ AI Suggestions | ✅ Decision Assist | — | ✅ Agents, MCP |
+| 10 | Plugins/Marketplace | — | — | — | — | ✅ Plugins, Marketplace |
+| 11 | Automation/Events | — | — | ✅ Monitoring | — | ✅ Automation, State |
+| 12 | Infrastructure | — | — | ✅ Platform Health | — | ✅ Exports, Cache |
+
+---
+
+*End of E2E User Journey Guide. Covers 5 distinct personas, 100+ steps, and all 12 platform phases.*

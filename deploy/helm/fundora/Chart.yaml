@@ -1,0 +1,20 @@
+apiVersion: v2
+name: fundora
+description: Fundora — Crowdfunding Platform Helm Chart
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+keywords:
+  - fundora
+  - crowdfunding
+  - nextjs
+  - supabase
+
+home: https://fundora.app
+sources:
+  - https://github.com/fundora/fundora
+
+maintainers:
+  - name: Fundora Team
+    email: dev@fundora.app

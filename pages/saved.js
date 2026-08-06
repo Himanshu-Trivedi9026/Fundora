@@ -54,7 +54,7 @@ export default function Saved() {
         </h1>
 
         {projects.length === 0 ? (
-          <p className="text-slate-400">No saved projects yet.</p>
+          <p className="text-slate-400" role="status">No saved projects yet.</p>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {projects.map((p) => (

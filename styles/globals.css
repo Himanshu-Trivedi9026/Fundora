@@ -84,9 +84,7 @@
    FUNDORA DESIGN SYSTEM — Global Foundation
    ───────────────────────────────────────────── */
 
-html {
-  scroll-behavior: smooth;
-}
+/* scroll-behavior is now handled by Next.js 16 via data-scroll-behavior on <html> */
 
 body {
   background-color: #0a0a0f;
@@ -337,6 +335,11 @@ input[type="range"]::-moz-range-thumb {
   box-shadow: 0 0 15px rgba(208, 188, 255, 0.2);
 }
 
+/* ─── TEXT GLOW (Pledged Amount) ─── */
+.text-glow {
+  text-shadow: 0 0 15px rgba(208, 188, 255, 0.3);
+}
+
 /* ─── CHAT GRADIENT ─── */
 .chat-gradient {
   background: linear-gradient(180deg, rgba(208, 188, 255, 0.05) 0%, rgba(19, 19, 22, 0) 100%);
@@ -357,4 +360,49 @@ input[type="range"]::-moz-range-thumb {
   33% { transform: translate(3%, -2%) scale(1.02); }
   66% { transform: translate(-2%, 3%) scale(0.98); }
   100% { transform: translate(0%, 0%) scale(1); }
+}
+
+/* ─── REDUCED MOTION (Accessibility) ─── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .shimmer {
+    animation: none;
+  }
+
+  .aurora-dark,
+  .aurora-dark-delayed,
+  .aurora-light,
+  .aurora-light-delayed,
+  .glass-sweep,
+  .animate-float-slow,
+  .animate-float-slow-delayed,
+  .ai-pulse {
+    animation: none;
+  }
+}
+
+/* ─── SKIP TO CONTENT (Accessibility) ─── */
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+  z-index: 999;
+  padding: 1rem;
+  background: #8b5cf6;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.skip-to-content:focus {
+  left: 50%;
+  top: 1rem;
+  transform: translateX(-50%);
 }

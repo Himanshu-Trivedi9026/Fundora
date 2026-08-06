@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
@@ -30,43 +30,43 @@ export default function CreatorPayments() {
   const [keySecret, setKeySecret] = useState("");
   const [configured, setConfigured] = useState(false);
 
-  /* ================= LOAD CONFIG ================= */
-  useEffect(() => {
-    loadConfig();
+  const loadConfig = useCallback(async () => {
+    queueMicrotask(() => setLoading(true));
+    queueMicrotask(() => setMessage(""));
+
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        queueMicrotask(() => setMessage("Please login first."));
+        return;
+      }
+
+      const res = await fetch("/api/creator/razorpay-config", {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        queueMicrotask(() => setMessage(data?.error || "Failed to load config"));
+        return;
+      }
+
+      queueMicrotask(() => setConfigured(Boolean(data?.configured)));
+      queueMicrotask(() => setKeyId(data?.keyId || ""));
+    } finally {
+      queueMicrotask(() => setLoading(false));
+    }
   }, []);
 
-  async function loadConfig() {
-    setLoading(true);
-    setMessage("");
-
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (!session?.access_token) {
-      setLoading(false);
-      setMessage("Please login first.");
-      return;
-    }
-
-    const res = await fetch("/api/creator/razorpay-config", {
-      headers: {
-        Authorization: `Bearer ${session.access_token}`,
-      },
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      setMessage(data?.error || "Failed to load config");
-      setLoading(false);
-      return;
-    }
-
-    setConfigured(Boolean(data?.configured));
-    setKeyId(data?.keyId || "");
-    setLoading(false);
-  }
+  useEffect(() => {
+    queueMicrotask(() => loadConfig());
+  }, [loadConfig]);
 
   /* ================= SAVE CONFIG ================= */
   async function handleSave(e) {
@@ -127,6 +127,8 @@ export default function CreatorPayments() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
+            role="status"
+            aria-label="Loading payment configuration"
             className="text-on-surface-variant font-inter text-lg"
           >
             Loading payment configuration...
@@ -185,14 +187,14 @@ export default function CreatorPayments() {
                 {/* Header */}
                 <div className="flex items-center gap-4 mb-8">
                   <div className="w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center">
-                    <span className="material-symbols-outlined text-primary text-[28px]">payments</span>
+                    <span className="material-symbols-outlined text-primary text-[28px]" aria-hidden="true">payments</span>
                   </div>
                   <div>
                     <h3 className="font-geist text-lg font-semibold text-on-surface">
                       Razorpay Integration
                     </h3>
                     <p className="text-on-surface-variant font-inter text-sm flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-success" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-success" aria-hidden="true" />
                       Active Connection: Live Mode
                     </p>
                   </div>
@@ -206,7 +208,7 @@ export default function CreatorPayments() {
                       Razorpay Key ID
                     </label>
                     <div className="relative group">
-                      <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors">
+                      <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors" aria-hidden="true">
                         vpn_key
                       </span>
                       <input
@@ -226,7 +228,7 @@ export default function CreatorPayments() {
                       Razorpay Key Secret
                     </label>
                     <div className="relative group">
-                      <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors">
+                      <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors" aria-hidden="true">
                         lock
                       </span>
                       <input
@@ -245,14 +247,14 @@ export default function CreatorPayments() {
                     <div className="flex items-center gap-2 text-on-surface-variant text-[13px] font-inter">
                       {configured ? (
                         <>
-                          <span className="material-symbols-outlined text-success text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                          <span className="material-symbols-outlined text-success text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">
                             verified
                           </span>
                           Last verified: {new Date().toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })}
                         </>
                       ) : (
                         <>
-                          <span className="material-symbols-outlined text-on-surface-variant/40 text-[20px]">
+                          <span className="material-symbols-outlined text-on-surface-variant/40 text-[20px]" aria-hidden="true">
                             info
                           </span>
                           Not yet configured
@@ -280,6 +282,7 @@ export default function CreatorPayments() {
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
+                      role="alert"
                       className={`p-4 rounded-xl text-sm font-inter ${
                         message.includes("Failed") || message.includes("Enter") || message.includes("login")
                           ? "bg-danger-muted text-danger border border-danger/20"
@@ -303,7 +306,7 @@ export default function CreatorPayments() {
               {/* Encryption Status */}
               <div className="bg-surface-container-low border border-outline-variant rounded-xl p-6 flex items-start gap-4">
                 <div className="p-3 bg-primary-container/10 rounded-full shrink-0">
-                  <span className="material-symbols-outlined text-primary text-[24px]">shield_lock</span>
+                  <span className="material-symbols-outlined text-primary text-[24px]" aria-hidden="true">shield_lock</span>
                 </div>
                 <div>
                   <h4 className="font-geist text-sm font-semibold text-on-surface mb-1">
@@ -319,7 +322,7 @@ export default function CreatorPayments() {
               {/* Quick Tip */}
               <div className="bg-surface-container-lowest border border-dashed border-outline-variant rounded-xl p-6">
                 <h4 className="font-inter text-sm font-semibold text-primary mb-2 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[16px]">info</span>
+                  <span className="material-symbols-outlined text-[16px]" aria-hidden="true">info</span>
                   Setup Tip
                 </h4>
                 <p className="text-[13px] text-on-surface-variant font-inter leading-relaxed">
@@ -345,7 +348,7 @@ export default function CreatorPayments() {
               className="bg-surface-container border border-outline-variant/30 rounded-xl p-6 hover:border-primary/40 transition-all group"
             >
               <div className="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center mb-4 group-hover:bg-primary-container/20 transition-all">
-                <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">
+                <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors" aria-hidden="true">
                   auto_mode
                 </span>
               </div>
@@ -364,7 +367,7 @@ export default function CreatorPayments() {
               className="bg-surface-container border border-outline-variant/30 rounded-xl p-6 hover:border-primary/40 transition-all group"
             >
               <div className="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center mb-4 group-hover:bg-primary-container/20 transition-all">
-                <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">
+                <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors" aria-hidden="true">
                   monitoring
                 </span>
               </div>
@@ -382,7 +385,7 @@ export default function CreatorPayments() {
               whileHover={{ y: -4 }}
               className="bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 rounded-xl p-6 flex flex-col justify-center items-center text-center"
             >
-              <span className="material-symbols-outlined text-primary text-[32px] mb-3">
+              <span className="material-symbols-outlined text-primary text-[32px] mb-3" aria-hidden="true">
                 help_center
               </span>
               <h4 className="font-geist text-sm font-semibold text-on-surface mb-1">

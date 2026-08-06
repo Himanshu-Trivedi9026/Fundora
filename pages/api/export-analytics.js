@@ -6,10 +6,15 @@ import {
   generateBarChart,
 } from "../../lib/pdfCharts";
 import { withAuth } from "../../lib/withAuth";
+import { rateLimit } from "../../lib/rateLimit";
+
+const rl = rateLimit({ windowMs: 60_000, max: 5 });
 
 export default withAuth(async function handler(req, res, user) {
   if (req.method !== "POST")
     return res.status(405).json({ error: "Method not allowed" });
+
+  if (!rl(req, res)) return;
 
   try {
     const {
@@ -141,7 +146,7 @@ export default withAuth(async function handler(req, res, user) {
 
     doc.end();
   } catch (err) {
-    console.error(err);
+    console.error("Export analytics PDF error:", err);
     res.status(500).json({ error: "PDF failed" });
   }
 });

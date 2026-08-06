@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { supabase } from "../../lib/supabaseClient";
@@ -52,48 +52,121 @@ export default function CreatorAnalytics() {
     });
   }, []);
 
-  /* ================= REALTIME ================= */
-  useEffect(() => {
-    if (!user) return;
+  /* ================= DONOR ANALYTICS ================= */
 
-    loadAnalytics();
+  const donorMap = useMemo(() => {
+    const map = {};
 
-    const channel = supabase
-      .channel("creator-analytics-live")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "public_donations" },
-        loadAnalytics
+    donations.forEach((d) => {
+      if (!d.payer_id) return;
+
+      if (!map[d.payer_id]) {
+        map[d.payer_id] = {
+          totalDonated: 0,
+          donationCount: 0,
+          lastDonation: new Date(d.created_at),
+        };
+      }
+
+      map[d.payer_id].totalDonated += d.amount;
+      map[d.payer_id].donationCount += 1;
+      map[d.payer_id].lastDonation = new Date(d.created_at);
+    });
+
+    return map;
+  }, [donations]);
+
+  const totalUniqueDonors = Object.keys(donorMap).length;
+
+  const retentionRate = useMemo(() => {
+    const returning = Object.values(donorMap).filter(
+      (d) => d.donationCount > 1
+    ).length;
+
+    return totalUniqueDonors === 0
+      ? 0
+      : Math.round((returning / totalUniqueDonors) * 100);
+  }, [donorMap, totalUniqueDonors]);
+
+  /* ================= ADVANCED CREATOR GROWTH ENGINE ================= */
+
+  const growthEngine = useMemo(() => {
+    if (!projects.length) return null;
+
+    const successfulProjects = projects.filter(
+      (p) => (p.pledged || 0) >= (p.goal || 1)
+    ).length;
+
+    const successRate = Math.round(
+      (successfulProjects / projects.length) * 100
+    );
+
+    const donorProjectSpread = {};
+
+    donations.forEach((d) => {
+      if (!d.payer_id) return;
+
+      donorProjectSpread[d.payer_id] =
+        donorProjectSpread[d.payer_id] || new Set();
+
+      donorProjectSpread[d.payer_id].add(d.project_id);
+    });
+
+    const multiProjectDonors = Object.values(donorProjectSpread)
+      .filter((set) => set.size > 1).length;
+
+    const donorExpansion =
+      totalUniqueDonors === 0
+        ? 0
+        : Math.round((multiProjectDonors / totalUniqueDonors) * 100);
+
+    const growthScore = Math.round(
+      0.35 * successRate +
+        0.3 * retentionRate +
+        0.2 * donorExpansion +
+        0.15 * Math.min(totalUniqueDonors * 5, 100)
+    );
+
+    const monthMap = {};
+
+    donations.forEach((d) => {
+      const m = new Date(d.created_at).toLocaleString("default", {
+        month: "long",
+      });
+
+      monthMap[m] = (monthMap[m] || 0) + d.amount;
+    });
+
+    const bestMonth =
+      Object.entries(monthMap).sort((a, b) => b[1] - a[1])[0]?.[0] ||
+      "Unknown";
+
+    const fundingProbability = Math.min(
+      95,
+      Math.round(
+        0.5 * successRate +
+          0.3 * retentionRate +
+          0.2 * growthScore
       )
-      .subscribe();
+    );
 
-    return () => supabase.removeChannel(channel);
-  }, [user]);
+    return {
+      growthScore,
+      successRate,
+      donorExpansion,
+      bestMonth,
+      fundingProbability,
+    };
+  }, [projects, donations, retentionRate, totalUniqueDonors]);
 
-  async function loadAnalytics() {
-    if (!user) return;
+  /* ================= EXISTING METRICS ================= */
 
-    setLoading(true);
+  const totalEarnings = useMemo(
+    () => donations.reduce((s, d) => s + d.amount, 0),
+    [donations]
+  );
 
-    const { data: projectData } = await supabase
-      .from("projects")
-      .select("*")
-      .eq("owner_id", user.id);
-
-    const { data: donationData } = await supabase
-      .from("public_donations")
-      .select("*, projects!inner(owner_id, title)")
-      .eq("projects.owner_id", user.id);
-
-    setProjects(projectData || []);
-    setDonations(donationData || []);
-    setLoading(false);
-    if (projectData && donationData) {
-      generateAIInsights();
-    }
-  }
-
-  async function generateAIInsights() {
+  const generateAIInsights = useCallback(async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const headers = { "Content-Type": "application/json" };
@@ -134,7 +207,50 @@ No paragraphs.`,
     } catch (err) {
       console.error("AI Insight Error:", err);
     }
-  }
+  }, [projects, totalEarnings, retentionRate, growthEngine]);
+
+  const loadAnalytics = useCallback(async () => {
+    queueMicrotask(() => setLoading(true));
+    try {
+      if (!user) return;
+
+      const { data: projectData } = await supabase
+        .from("projects")
+        .select("*")
+        .eq("owner_id", user.id);
+
+      const { data: donationData } = await supabase
+        .from("public_donations")
+        .select("*, projects!inner(owner_id, title)")
+        .eq("projects.owner_id", user.id);
+
+      setProjects(projectData || []);
+      setDonations(donationData || []);
+      if (projectData && donationData) {
+        generateAIInsights();
+      }
+    } finally {
+      queueMicrotask(() => setLoading(false));
+    }
+  }, [user, generateAIInsights]);
+
+  /* ================= REALTIME ================= */
+  useEffect(() => {
+    if (!user) return;
+
+    loadAnalytics();
+
+    const channel = supabase
+      .channel("creator-analytics-live")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "public_donations" },
+        loadAnalytics
+      )
+      .subscribe();
+
+    return () => supabase.removeChannel(channel);
+  }, [user, loadAnalytics]);
 
   async function handleAIAction(type) {
     try {
@@ -233,42 +349,6 @@ Rules:
     }
   }
 
-  /* ================= DONOR ANALYTICS ================= */
-
-  const donorMap = useMemo(() => {
-    const map = {};
-
-    donations.forEach((d) => {
-      if (!d.payer_id) return;
-
-      if (!map[d.payer_id]) {
-        map[d.payer_id] = {
-          totalDonated: 0,
-          donationCount: 0,
-          lastDonation: new Date(d.created_at),
-        };
-      }
-
-      map[d.payer_id].totalDonated += d.amount;
-      map[d.payer_id].donationCount += 1;
-      map[d.payer_id].lastDonation = new Date(d.created_at);
-    });
-
-    return map;
-  }, [donations]);
-
-  const totalUniqueDonors = Object.keys(donorMap).length;
-
-  const retentionRate = useMemo(() => {
-    const returning = Object.values(donorMap).filter(
-      (d) => d.donationCount > 1
-    ).length;
-
-    return totalUniqueDonors === 0
-      ? 0
-      : Math.round((returning / totalUniqueDonors) * 100);
-  }, [donorMap]);
-
   /* ================= DONOR CHURN PREDICTION ================= */
 
   const churnPredictions = useMemo(() => {
@@ -298,10 +378,10 @@ Rules:
         0.25 * trendScore
       );
 
-      let status = "🟢 Loyal";
+      let status = "\u{1F7E2} Loyal";
 
-      if (churnScore > 70) status = "🔴 High Risk";
-      else if (churnScore > 40) status = "🟡 At Risk";
+      if (churnScore > 70) status = "\u{1F534} High Risk";
+      else if (churnScore > 40) status = "\u{1F7E1} At Risk";
 
       return {
         payer,
@@ -314,7 +394,7 @@ Rules:
 
   /* ================= AI PROJECT RECOMMENDATION ================= */
 
-  const aiRecommendation = useMemo(() => {
+  function getAiRecommendation() {
     if (!projects.length) return null;
 
     const categoryScore = {};
@@ -346,7 +426,9 @@ Rules:
       suggestedGoal: Math.round(avgGoal * 1.1),
       donorStrength: Math.round(avgDonation),
     };
-  }, [projects, donations]);
+  }
+
+  const aiRecommendation = getAiRecommendation();
 
   /* ================= AI REVENUE FORECAST ================= */
 
@@ -390,84 +472,6 @@ Rules:
 
     return forecast;
   }, [monthlyRevenue]);
-
-  /* ================= ADVANCED CREATOR GROWTH ENGINE ================= */
-
-  const growthEngine = useMemo(() => {
-    if (!projects.length) return null;
-
-    const successfulProjects = projects.filter(
-      (p) => (p.pledged || 0) >= (p.goal || 1)
-    ).length;
-
-    const successRate = Math.round(
-      (successfulProjects / projects.length) * 100
-    );
-
-    const donorProjectSpread = {};
-
-    donations.forEach((d) => {
-      if (!d.payer_id) return;
-
-      donorProjectSpread[d.payer_id] =
-        donorProjectSpread[d.payer_id] || new Set();
-
-      donorProjectSpread[d.payer_id].add(d.project_id);
-    });
-
-    const multiProjectDonors = Object.values(donorProjectSpread)
-      .filter((set) => set.size > 1).length;
-
-    const donorExpansion =
-      totalUniqueDonors === 0
-        ? 0
-        : Math.round((multiProjectDonors / totalUniqueDonors) * 100);
-
-    const growthScore = Math.round(
-      0.35 * successRate +
-        0.3 * retentionRate +
-        0.2 * donorExpansion +
-        0.15 * Math.min(totalUniqueDonors * 5, 100)
-    );
-
-    const monthMap = {};
-
-    donations.forEach((d) => {
-      const m = new Date(d.created_at).toLocaleString("default", {
-        month: "long",
-      });
-
-      monthMap[m] = (monthMap[m] || 0) + d.amount;
-    });
-
-    const bestMonth =
-      Object.entries(monthMap).sort((a, b) => b[1] - a[1])[0]?.[0] ||
-      "Unknown";
-
-    const fundingProbability = Math.min(
-      95,
-      Math.round(
-        0.5 * successRate +
-          0.3 * retentionRate +
-          0.2 * growthScore
-      )
-    );
-
-    return {
-      growthScore,
-      successRate,
-      donorExpansion,
-      bestMonth,
-      fundingProbability,
-    };
-  }, [projects, donations, retentionRate, totalUniqueDonors]);
-
-  /* ================= EXISTING METRICS ================= */
-
-  const totalEarnings = useMemo(
-    () => donations.reduce((s, d) => s + d.amount, 0),
-    [donations]
-  );
 
   const earningsByDate = useMemo(() => {
     return Object.values(
@@ -557,6 +561,8 @@ Rules:
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
+            role="status"
+            aria-label="Loading analytics"
             className="text-on-surface-variant font-inter text-lg"
           >
             Loading analytics...
@@ -605,7 +611,7 @@ Rules:
             className="glass-card border-l-4 border-primary p-6 rounded-xl mb-8 relative overflow-hidden"
           >
             <div className="absolute top-4 right-4">
-              <span className="material-symbols-outlined text-primary text-3xl animate-pulse">
+              <span className="material-symbols-outlined text-primary text-3xl animate-pulse" aria-hidden="true">
                 auto_awesome
               </span>
             </div>
@@ -633,7 +639,7 @@ Rules:
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className={`w-10 h-10 rounded-lg ${kpi.bg} flex items-center justify-center`}>
-                    <span className={`material-symbols-outlined text-xl ${kpi.color}`}>
+                    <span className={`material-symbols-outlined text-xl ${kpi.color}`} aria-hidden="true">
                       {kpi.icon}
                     </span>
                   </div>
@@ -656,7 +662,7 @@ Rules:
             >
               <div className="glass-card p-6 rounded-xl h-full">
                 <div className="flex items-center gap-2 mb-6">
-                  <span className="material-symbols-outlined text-primary">lightbulb</span>
+                  <span className="material-symbols-outlined text-primary" aria-hidden="true">lightbulb</span>
                   <h3 className="font-geist text-lg font-semibold text-on-surface">
                     Project Recommendations
                   </h3>
@@ -707,7 +713,7 @@ Rules:
             >
               <div className="glass-card p-6 rounded-xl h-full">
                 <div className="flex items-center gap-2 mb-6">
-                  <span className="material-symbols-outlined text-primary">speed</span>
+                  <span className="material-symbols-outlined text-primary" aria-hidden="true">speed</span>
                   <h3 className="font-geist text-lg font-semibold text-on-surface">
                     Advanced Creator Growth Engine
                   </h3>
@@ -767,7 +773,7 @@ Rules:
                               {metric.value}{metric.suffix || ""}
                             </span>
                           </div>
-                          <div className="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+                          <div className="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden" role="progressbar" aria-valuenow={Math.min(100, typeof metric.value === "number" ? metric.value : 0)} aria-valuemin={0} aria-valuemax={100} aria-label={metric.label}>
                             <motion.div
                               initial={{ width: 0 }}
                               whileInView={{
@@ -776,6 +782,7 @@ Rules:
                               viewport={{ once: true }}
                               transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
                               className={`h-full rounded-full ${metric.color}`}
+                              aria-hidden="true"
                             />
                           </div>
                         </div>
@@ -838,7 +845,7 @@ Rules:
               className="glass-card p-6 rounded-xl mb-8"
             >
               <div className="flex items-center gap-2 mb-4">
-                <span className="material-symbols-outlined text-primary animate-pulse">psychology</span>
+                <span className="material-symbols-outlined text-primary animate-pulse" aria-hidden="true">psychology</span>
                 <h3 className="font-geist text-lg font-semibold text-on-surface">
                   AI {aiActionData.type.toUpperCase()} Analysis
                 </h3>
@@ -860,7 +867,7 @@ Rules:
               className="glass-card p-6 rounded-xl"
             >
               <div className="flex items-center gap-2 mb-6">
-                <span className="material-symbols-outlined text-primary">bar_chart</span>
+                <span className="material-symbols-outlined text-primary" aria-hidden="true">bar_chart</span>
                 <h3 className="font-geist text-lg font-semibold text-on-surface">
                   Earnings Over Time
                 </h3>
@@ -877,7 +884,7 @@ Rules:
               className="glass-card p-6 rounded-xl"
             >
               <div className="flex items-center gap-2 mb-6">
-                <span className="material-symbols-outlined text-primary">pie_chart</span>
+                <span className="material-symbols-outlined text-primary" aria-hidden="true">pie_chart</span>
                 <h3 className="font-geist text-lg font-semibold text-on-surface">
                   Funding by Project
                 </h3>
@@ -898,13 +905,14 @@ Rules:
                             ₹{item.amount.toLocaleString()}
                           </span>
                         </div>
-                        <div className="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+                        <div className="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label={item.name}>
                           <motion.div
                             initial={{ width: 0 }}
                             whileInView={{ width: `${progress}%` }}
                             viewport={{ once: true }}
                             transition={{ duration: 1, ease: "easeOut", delay: i * 0.1 }}
                             className="h-full bg-gradient-to-r from-primary-container to-primary rounded-full"
+                            aria-hidden="true"
                           />
                         </div>
                       </div>
@@ -928,7 +936,7 @@ Rules:
               className="glass-card p-6 rounded-xl border-l-4 border-danger"
             >
               <div className="flex items-center gap-2 mb-6">
-                <span className="material-symbols-outlined text-danger">warning</span>
+                <span className="material-symbols-outlined text-danger" aria-hidden="true">warning</span>
                 <h3 className="font-geist text-lg font-semibold text-on-surface">
                   Donor Churn Risk
                 </h3>
@@ -971,7 +979,7 @@ Rules:
               className="glass-card p-6 rounded-xl border-l-4 border-success"
             >
               <div className="flex items-center gap-2 mb-6">
-                <span className="material-symbols-outlined text-success">show_chart</span>
+                <span className="material-symbols-outlined text-success" aria-hidden="true">show_chart</span>
                 <h3 className="font-geist text-lg font-semibold text-on-surface">
                   Revenue Prediction
                 </h3>

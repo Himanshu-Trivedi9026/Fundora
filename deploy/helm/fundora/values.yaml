@@ -1,0 +1,107 @@
+# Fundora Helm Chart — Default Values
+
+# === Global Settings ===
+global:
+  environment: production
+  imagePullPolicy: Always
+
+# === Application ===
+app:
+  name: fundora-app
+  replicaCount: 3
+  image:
+    repository: fundora/app
+    tag: latest
+  port: 3000
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: "2"
+      memory: 4Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilization: 70
+    targetMemoryUtilization: 80
+  probes:
+    liveness:
+      path: /api/health
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      timeoutSeconds: 10
+      failureThreshold: 3
+    readiness:
+      path: /api/health
+      initialDelaySeconds: 10
+      periodSeconds: 15
+      timeoutSeconds: 5
+      failureThreshold: 2
+    startup:
+      path: /api/health
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      failureThreshold: 30
+
+# === Redis ===
+redis:
+  enabled: true
+  image: redis:7-alpine
+  port: 6379
+  persistence:
+    size: 10Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# === Ingress ===
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: fundora.app
+      paths:
+        - path: /
+          pathType: Prefix
+    - host: api.fundora.app
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: fundora-tls
+
+# === Environment Variables ===
+env:
+  NODE_ENV: production
+  NEXT_PUBLIC_BUILD_ENV: production
+  NEXT_TELEMETRY_DISABLED: "1"
+  LOG_LEVEL: info
+  CACHE_BACKEND: memory
+  ENABLE_TRACING: "false"
+  ENABLE_METRICS: "true"
+  JOB_CONCURRENCY: "5"
+
+# === Secrets (set via external-secrets or sealed-secrets) ===
+secrets:
+  supabaseUrl: ""
+  supabaseServiceRoleKey: ""
+  nextauthSecret: ""
+  encryptionKey: ""
+
+# === Monitoring ===
+monitoring:
+  prometheus:
+    enabled: true
+    scrapeInterval: 15s
+  grafana:
+    enabled: true
+    adminPassword: admin

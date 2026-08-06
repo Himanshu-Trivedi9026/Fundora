@@ -41,6 +41,7 @@ function createMockRes() {
       res.body = data;
       return res;
     }),
+    setHeader: vi.fn(),
   };
   return res;
 }
@@ -74,26 +75,25 @@ describe("POST /api/ai/funding-recommendation", () => {
 
   it("returns recommended category with highest score", async () => {
     const projects = [
-      { id: "p1", category: "Tech", pledged: 8000, goal: 10000, likes: 50, dislikes: 5, owner_id: "creator-1" },
-      { id: "p2", category: "Art", pledged: 2000, goal: 5000, likes: 20, dislikes: 10, owner_id: "other" },
+      { id: "p1", categories: ["Tech"], pledged: 8000, goal: 10000, owner_id: "creator-1" },
+      { id: "p2", categories: ["Art"], pledged: 2000, goal: 5000, owner_id: "other" },
     ];
     const donations = [
       { project_id: "p1", amount: 500 },
       { project_id: "p2", amount: 100 },
     ];
 
-    // Chain: from("projects") -> select -> returns projects
-    // Then: from("public_donations") -> select -> returns donations
-    let callCount = 0;
+    // Chain used by the route:
+    //   projects:        from("projects").select(...).eq("deleted", false).limit(1000)
+    //   public_donations: from("public_donations").select(...).limit(1000)
+    const resolveFor = (table) => (resolve) => {
+      if (table === "projects") resolve({ data: projects, error: null });
+      else resolve({ data: donations, error: null });
+    };
     supabaseAdmin.from.mockImplementation((table) => ({
       select: () => ({
-        then: (resolve) => {
-          if (table === "projects") resolve({ data: projects, error: null });
-          else resolve({ data: donations, error: null });
-        },
-        eq: () => ({
-          then: (resolve) => resolve({ data: null, error: null }),
-        }),
+        eq: () => ({ limit: () => ({ then: resolveFor(table) }) }),
+        limit: () => ({ then: resolveFor(table) }),
       }),
     }));
 
@@ -112,10 +112,8 @@ describe("POST /api/ai/funding-recommendation", () => {
   it("returns null category when no projects exist", async () => {
     supabaseAdmin.from.mockImplementation(() => ({
       select: () => ({
-        then: (resolve) => resolve({ data: [], error: null }),
-        eq: () => ({
-          then: (resolve) => resolve({ data: [], error: null }),
-        }),
+        eq: () => ({ limit: () => ({ then: (resolve) => resolve({ data: [], error: null }) }) }),
+        limit: () => ({ then: (resolve) => resolve({ data: [], error: null }) }),
       }),
     }));
 

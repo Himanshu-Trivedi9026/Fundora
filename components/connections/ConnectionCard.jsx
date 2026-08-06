@@ -1,3 +1,5 @@
+import Image from "next/image";
+import { useState } from "react";
 import { motion } from "framer-motion";
 
 export const cardVariants = {
@@ -14,6 +16,9 @@ export const cardVariants = {
  * Props: { profile, isFollowing, isSelf, onToggleFollow }
  */
 export default function ConnectionCard({ profile, isFollowing, isSelf, onToggleFollow }) {
+  // Simulated mutual connections count
+  const mutualCount = useState(() => Math.floor(Math.random() * 50) + 1)[0];
+
   if (!profile) return null;
 
   const avatarUrl =
@@ -22,9 +27,6 @@ export default function ConnectionCard({ profile, isFollowing, isSelf, onToggleF
 
   // Simulated badge — in production this would come from profile data
   const badge = isFollowing ? "Premium Founder" : null;
-
-  // Simulated mutual connections count
-  const mutualCount = Math.floor(Math.random() * 50) + 1;
 
   return (
     <motion.article
@@ -41,9 +43,11 @@ export default function ConnectionCard({ profile, isFollowing, isSelf, onToggleF
               : "bg-outline-variant/30"
           }`}
         >
-          <img
+          <Image
             src={avatarUrl}
             alt={profile.full_name || "User"}
+            width={64}
+            height={64}
             className="w-full h-full rounded-full object-cover"
           />
         </div>

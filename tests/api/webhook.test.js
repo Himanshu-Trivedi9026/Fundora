@@ -4,18 +4,42 @@ import { vi } from "vitest";
 const mockSelect = vi.hoisted(() => vi.fn().mockReturnThis());
 const mockEq = vi.hoisted(() => vi.fn().mockReturnThis());
 const mockMaybeSingle = vi.hoisted(() => vi.fn().mockResolvedValue({ data: null, error: null }));
+// creator_verifications lookup performed by isCreatorVerified — approved by
+// default so the normal captured-payment path proceeds.
+const mockVerificationMaybeSingle = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({ data: { verification_status: "approved" }, error: null })
+);
+// projects owner lookup added by the verification gate (webhook.js).
+const mockSingle = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({ data: { owner_id: "owner-verified" }, error: null })
+);
 const mockInsert = vi.hoisted(() => vi.fn().mockResolvedValue({ data: null, error: null }));
+const mockUpdate = vi.hoisted(() => vi.fn().mockReturnThis());
 const mockRpc = vi.hoisted(() => vi.fn().mockResolvedValue({ data: null, error: null }));
 const mockTimingSafeEqual = vi.hoisted(() => vi.fn().mockReturnValue(true));
+// Server-side order resolution (project binding comes from the ORDER, never
+// from client-controllable payment notes).
+const mockOrderFetch = vi.hoisted(() => vi.fn());
 
 vi.mock("@/lib/supabaseAdmin", () => ({
   supabaseAdmin: {
-    from: vi.fn(() => ({
-      select: mockSelect,
-      eq: mockEq,
-      maybeSingle: mockMaybeSingle,
-      insert: mockInsert,
-    })),
+    // Fluent chain, per-table. The route calls, in order:
+    //   public_donations idempotency       -> maybeSingle
+    //   projects owner lookup              -> single   (verification gate)
+    //   creator_verifications status       -> maybeSingle (isCreatorVerified)
+    //   public_donations insert / update
+    from: vi.fn((table) => {
+      const chain = {
+        select: mockSelect,
+        eq: mockEq,
+        maybeSingle:
+          table === "creator_verifications" ? mockVerificationMaybeSingle : mockMaybeSingle,
+        single: mockSingle,
+        insert: mockInsert,
+        update: mockUpdate,
+      };
+      return chain;
+    }),
     rpc: mockRpc,
   },
 }));
@@ -32,6 +56,14 @@ vi.mock("crypto", async () => {
     },
   };
 });
+
+vi.mock("razorpay", () => ({
+  default: class MockRazorpay {
+    constructor() {
+      this.orders = { fetch: mockOrderFetch };
+    }
+  },
+}));
 
 import handler from "@/pages/api/razorpay/webhook";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
@@ -75,9 +107,17 @@ describe("POST /api/razorpay/webhook", () => {
     mockSelect.mockReturnThis();
     mockEq.mockReturnThis();
     mockMaybeSingle.mockResolvedValue({ data: null, error: null });
+    mockVerificationMaybeSingle.mockResolvedValue({
+      data: { verification_status: "approved" },
+      error: null,
+    });
+    mockSingle.mockResolvedValue({ data: { owner_id: "owner-verified" }, error: null });
     mockInsert.mockResolvedValue({ data: null, error: null });
     mockRpc.mockResolvedValue({ data: null, error: null });
     mockTimingSafeEqual.mockReturnValue(true);
+    mockOrderFetch.mockResolvedValue({ notes: { project_id: "proj-abc" } });
+    vi.stubEnv("RAZORPAY_KEY_ID", "rzp_test_key");
+    vi.stubEnv("RAZORPAY_KEY_SECRET", "rzp_test_secret");
   });
 
   it("returns 405 for non-POST methods", async () => {
@@ -107,14 +147,14 @@ describe("POST /api/razorpay/webhook", () => {
     expect(res.json).toHaveBeenCalledWith({ error: "Invalid JSON payload" });
   });
 
-  it("processes payment.captured — inserts donation and increments funding", async () => {
+  it("processes payment.captured — inserts donation (funding is incremented by DB trigger)", async () => {
     const event = {
       event: "payment.captured",
       payload: {
         payment: {
           entity: {
             id: "pay_test123",
-            notes: { projectId: "proj-abc" },
+            order_id: "order_test123",
             amount: 50000,
             email: "donor@test.com",
           },
@@ -129,15 +169,68 @@ describe("POST /api/razorpay/webhook", () => {
     expect(mockInsert).toHaveBeenCalledWith({
       project_id: "proj-abc",
       amount: 500,
-      payer_email: "donor@test.com",
-      payment_id: "pay_test123",
+      razorpay_payment_id: "pay_test123",
+      name: "donor@test.com",
       status: "success",
     });
-    expect(mockRpc).toHaveBeenCalledWith("increment_project_funding", {
-      project_id: "proj-abc",
-      amount: 500,
-    });
+    // Funding is incremented by the DB trigger on public_donations INSERT.
+    // The webhook must NOT call the RPC too, or the donation would double-count.
+    expect(mockRpc).not.toHaveBeenCalled();
     expect(res.json).toHaveBeenCalledWith({ success: true });
+  });
+
+  it("skips donation credit when the project owner is not verified", async () => {
+    mockVerificationMaybeSingle.mockResolvedValue({
+      data: { verification_status: "pending" },
+      error: null,
+    });
+
+    const event = {
+      event: "payment.captured",
+      payload: {
+        payment: {
+          entity: {
+            id: "pay_unverified",
+            order_id: "order_unverified",
+            amount: 50000,
+            email: "donor@test.com",
+          },
+        },
+      },
+    };
+    const req = createMockReq("POST", event);
+    const res = createMockRes();
+    await handler(req, res);
+
+    // Money is never credited to an unverified owner; return success so
+    // Razorpay does not retry. verify.js (authoritative) 403s the frontend.
+    expect(mockInsert).not.toHaveBeenCalled();
+    expect(mockRpc).not.toHaveBeenCalled();
+    expect(res.json).toHaveBeenCalledWith({ success: true, skipped: "creator_not_verified" });
+  });
+
+  it("skips donation credit when the owner lookup errors or owner is missing (fail-closed)", async () => {
+    mockSingle.mockResolvedValue({ data: null, error: { message: "db down" } });
+
+    const event = {
+      event: "payment.captured",
+      payload: {
+        payment: {
+          entity: {
+            id: "pay_missingowner",
+            order_id: "order_missingowner",
+            amount: 50000,
+            email: "donor@test.com",
+          },
+        },
+      },
+    };
+    const req = createMockReq("POST", event);
+    const res = createMockRes();
+    await handler(req, res);
+
+    expect(mockInsert).not.toHaveBeenCalled();
+    expect(res.json).toHaveBeenCalledWith({ success: true, skipped: "creator_not_verified" });
   });
 
   it("skips insert for duplicate donation (idempotency)", async () => {
@@ -165,14 +258,20 @@ describe("POST /api/razorpay/webhook", () => {
     expect(res.json).toHaveBeenCalledWith({ success: true, duplicate: true });
   });
 
-  it("skips processing when projectId is missing from notes", async () => {
+  it("defers to verify.js when the project cannot be resolved from the order", async () => {
+    // Order lookup returns no project binding (creator-owned order, or the
+    // order can't be fetched with the platform key) → the webhook defers to
+    // verify.js rather than guessing the project from client-controllable
+    // payment notes.
+    mockOrderFetch.mockResolvedValue({ notes: {} });
+
     const event = {
       event: "payment.captured",
       payload: {
         payment: {
           entity: {
             id: "pay_noid",
-            notes: {},
+            order_id: "order_noid",
             amount: 10000,
             email: "a@b.com",
           },
@@ -184,7 +283,7 @@ describe("POST /api/razorpay/webhook", () => {
     await handler(req, res);
 
     expect(mockInsert).not.toHaveBeenCalled();
-    expect(res.json).toHaveBeenCalledWith({ success: true });
+    expect(res.json).toHaveBeenCalledWith({ success: true, deferred: true });
   });
 
   it("returns 500 on insert error", async () => {
@@ -196,7 +295,7 @@ describe("POST /api/razorpay/webhook", () => {
         payment: {
           entity: {
             id: "pay_err",
-            notes: { projectId: "proj-1" },
+            order_id: "order_err",
             amount: 10000,
             email: "a@b.com",
           },
@@ -209,30 +308,6 @@ describe("POST /api/razorpay/webhook", () => {
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({ error: "Donation insert failed" });
-  });
-
-  it("returns 500 on RPC error", async () => {
-    mockRpc.mockResolvedValue({ data: null, error: { message: "rpc failed" } });
-
-    const event = {
-      event: "payment.captured",
-      payload: {
-        payment: {
-          entity: {
-            id: "pay_rpcerr",
-            notes: { projectId: "proj-1" },
-            amount: 10000,
-            email: "a@b.com",
-          },
-        },
-      },
-    };
-    const req = createMockReq("POST", event);
-    const res = createMockRes();
-    await handler(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ error: "Funding update failed" });
   });
 
   it("handles payment.failed event", async () => {

@@ -58,12 +58,18 @@ vi.mock("../lib/supabaseClient", () => ({
       signInWithPassword: vi.fn().mockResolvedValue({ data: {}, error: null }),
       signUp: vi.fn().mockResolvedValue({ data: {}, error: null }),
       signOut: vi.fn().mockResolvedValue({ error: null }),
+      exchangeCodeForSession: vi
+        .fn()
+        .mockResolvedValue({ data: { session: null }, error: null }),
     },
     from: vi.fn().mockReturnThis(),
     select: vi.fn().mockReturnThis(),
     insert: vi.fn().mockResolvedValue({ data: null, error: null }),
     update: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
+    order: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockReturnThis(),
+    maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
     single: vi.fn().mockResolvedValue({ data: null, error: null }),
     channel: vi.fn().mockReturnThis(),
     on: vi.fn().mockReturnThis(),

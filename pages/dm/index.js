@@ -1,6 +1,6 @@
 // pages/dm/index.js
-import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
@@ -36,7 +36,31 @@ export default function DMInbox() {
       if (!data?.user) router.push("/login");
       else setUserId(data.user.id);
     });
-  }, []);
+  }, [router]);
+
+  const loadInbox = useCallback(async () => {
+    queueMicrotask(() => setLoading(true));
+    try {
+      const { data } = await supabase
+        .from("dm_conversations")
+        .select(`
+          id,
+          user1,
+          user2,
+          created_at,
+          dm_messages (
+            content,
+            created_at
+          )
+        `)
+        .or(`user1.eq.${userId},user2.eq.${userId}`)
+        .order("created_at", { ascending: false });
+
+      setThreads(data || []);
+    } finally {
+      queueMicrotask(() => setLoading(false));
+    }
+  }, [userId]);
 
   useEffect(() => {
     if (!userId) return;
@@ -52,29 +76,7 @@ export default function DMInbox() {
       .subscribe();
 
     return () => supabase.removeChannel(channel);
-  }, [userId]);
-
-  async function loadInbox() {
-    setLoading(true);
-
-    const { data } = await supabase
-      .from("dm_conversations")
-      .select(`
-        id,
-        user1,
-        user2,
-        created_at,
-        dm_messages (
-          content,
-          created_at
-        )
-      `)
-      .or(`user1.eq.${userId},user2.eq.${userId}`)
-      .order("created_at", { ascending: false });
-
-    setThreads(data || []);
-    setLoading(false);
-  }
+  }, [userId, loadInbox]);
 
   function openThread(thread) {
     const otherUser =
@@ -178,7 +180,7 @@ export default function DMInbox() {
               whileTap={{ scale: 0.95 }}
               className="w-10 h-10 rounded-xl bg-primary-container/20 flex items-center justify-center text-primary hover:bg-primary-container/30 transition-colors"
             >
-              <span className="material-symbols-outlined text-xl">edit_square</span>
+              <span className="material-symbols-outlined text-xl" aria-hidden="true">edit_square</span>
             </motion.button>
           </motion.div>
 
@@ -190,7 +192,7 @@ export default function DMInbox() {
             className="mb-6"
           >
             <div className="relative">
-              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl">
+              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl" aria-hidden="true">
                 search
               </span>
               <input
@@ -199,6 +201,7 @@ export default function DMInbox() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                aria-label="Search conversations"
               />
             </div>
           </motion.div>
@@ -210,7 +213,7 @@ export default function DMInbox() {
               animate={{ opacity: 1, y: 0 }}
               className="glass-card p-12 rounded-xl text-center"
             >
-              <span className="material-symbols-outlined text-5xl text-on-surface-variant/30 block mb-4">
+              <span className="material-symbols-outlined text-5xl text-on-surface-variant/30 block mb-4" aria-hidden="true">
                 {search ? "search_off" : "forum"}
               </span>
               <h3 className="font-geist text-lg font-semibold text-on-surface mb-2">
@@ -253,11 +256,11 @@ export default function DMInbox() {
                       {/* Avatar */}
                       <div className="relative shrink-0">
                         <div className="w-12 h-12 rounded-full overflow-hidden border border-outline-variant bg-surface-container-high flex items-center justify-center">
-                          <span className="material-symbols-outlined text-on-surface-variant/50 text-xl">
+                          <span className="material-symbols-outlined text-on-surface-variant/50 text-xl" aria-hidden="true">
                             person
                           </span>
                         </div>
-                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-surface-container rounded-full" />
+                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-surface-container rounded-full" aria-hidden="true" />
                       </div>
 
                       {/* Content */}

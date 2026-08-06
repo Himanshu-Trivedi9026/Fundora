@@ -1,0 +1,167 @@
+# Fundora — Deploy Pipeline
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - production
+      skip_tests:
+        description: "Skip test suite"
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: deploy-${{ github.ref_name }}-${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'production' }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: "20"
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  NEXT_TELEMETRY_DISABLED: "1"
+
+jobs:
+  # ============================================================
+  # Determine environment
+  # ============================================================
+  env:
+    name: Determine Environment
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.set-env.outputs.environment }}
+      deploy_url: ${{ steps.set-env.outputs.deploy_url }}
+    steps:
+      - id: set-env
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+          else
+            echo "environment=production" >> $GITHUB_OUTPUT
+          fi
+
+  # ============================================================
+  # Test (unless skipped)
+  # ============================================================
+  test:
+    name: Test Suite
+    needs: [env]
+    if: ${{ !github.event.inputs.skip_tests }}
+    uses: ./.github/workflows/ci.yml
+
+  # ============================================================
+  # Build & Push Container
+  # ============================================================
+  build-container:
+    name: Build & Push Container
+    needs: [env, test]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=,suffix=,format=short
+            type=raw,value=latest,enable=${{ endsWith(github.ref, 'main') }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: deploy/docker/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ============================================================
+  # Deploy to Environment
+  # ============================================================
+  deploy:
+    name: Deploy to ${{ needs.env.outputs.environment }}
+    needs: [env, build-container]
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ needs.env.outputs.environment }}
+      url: ${{ needs.env.outputs.deploy_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure kubectl
+        uses: azure/setup-kubectl@v4
+      - name: Set up Kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+      - name: Update image tag in manifests
+        run: |
+          IMAGE_TAG="${{ needs.build-container.outputs.image_tag }}"
+          # Update Kubernetes deployment image
+          sed -i "s|image: .*|image: ${IMAGE_TAG}|g" deploy/k8s/deployment.yml
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f deploy/k8s/ -n fundora
+          kubectl rollout status deployment/fundora-app -n fundora --timeout=5m
+      - name: Verify deployment
+        run: |
+          kubectl get pods -n fundora -l app=fundora
+          kubectl get svc -n fundora
+
+  # ============================================================
+  # Smoke Tests
+  # ============================================================
+  smoke-test:
+    name: Smoke Tests
+    needs: [env, deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Health check
+        run: |
+          curl -sSf --retry 5 --retry-delay 10 \
+            "${{ needs.env.outputs.deploy_url }}/api/health" || exit 1
+      - name: Metrics endpoint
+        run: |
+          curl -sSf --retry 3 --retry-delay 5 \
+            "${{ needs.env.outputs.deploy_url }}/api/health/database" || exit 1
+
+  # ============================================================
+  # Rollback (if smoke tests fail)
+  # ============================================================
+  rollback:
+    name: Rollback on Failure
+    needs: [env, deploy, smoke-test]
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Rollback deployment
+        run: |
+          kubectl rollout undo deployment/fundora-app -n fundora
+          kubectl rollout status deployment/fundora-app -n fundora --timeout=5m
+      - name: Verify rollback
+        run: |
+          kubectl get pods -n fundora

@@ -1,0 +1,31 @@
+{
+  "page": "landing",
+  "route": "/",
+  "timestamp": "2026-08-02T15:24:13.665Z",
+  "metrics": {
+    "loadTimeMs": 3652,
+    "ttfb": 6,
+    "domContentLoaded": 437,
+    "loadComplete": 2607,
+    "domInteractive": 359,
+    "transferSize": 7091,
+    "fcp": 400,
+    "lcp": 1040,
+    "cls": 0.0569,
+    "network": {
+      "totalRequests": 29,
+      "totalTransferSize": 288487,
+      "jsRequests": 20,
+      "cssRequests": 3,
+      "imageRequests": 4
+    },
+    "pageSize": {
+      "documentElements": 269,
+      "domDepth": 13,
+      "totalImages": 0,
+      "totalScripts": 26,
+      "totalStylesheets": 3
+    }
+  },
+  "consoleErrors": []
+}

@@ -1,0 +1,63 @@
+# Fundora — Security Scanning (Scheduled)
+name: Security Scan
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Every Monday at 06:00
+  workflow_dispatch:
+
+jobs:
+  # ============================================================
+  # Dependency Vulnerability Scan
+  # ============================================================
+  dependency-scan:
+    name: Dependency Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - name: npm audit
+        run: |
+          npm audit --json > audit-report.json || true
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit-report
+          path: audit-report.json
+
+  # ============================================================
+  # SAST Analysis
+  # ============================================================
+  sast:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+          queries: security-and-quality
+      - uses: github/codeql-action/analyze@v3
+
+  # ============================================================
+  # Secret Scanning
+  # ============================================================
+  secret-scan:
+    name: Secret Detection
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: TruffleHog Scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD

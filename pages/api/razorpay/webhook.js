@@ -1,11 +1,41 @@
 import crypto from "crypto";
+import Razorpay from "razorpay";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
+import { isCreatorVerified } from "../../../lib/verification/status";
 
 export const config = {
   api: {
     bodyParser: false, // REQUIRED
   },
 };
+
+/**
+ * Resolve the project a payment belongs to from its ORDER (bound server-side at
+ * order creation via notes.project_id). Payment-level notes are client-
+ * controllable and are deliberately NOT trusted here.
+ *
+ * Returns null when the project cannot be resolved (creator-owned account, or
+ * order without a binding). In that case the webhook defers to verify.js, which
+ * is the authoritative path (it re-fetches payment + order server-side and is
+ * always invoked by the frontend on return from Razorpay checkout).
+ */
+async function resolveProjectFromOrder(paymentOrderId) {
+  if (!paymentOrderId) return null;
+
+  const keyId = process.env.RAZORPAY_KEY_ID || "";
+  const keySecret = process.env.RAZORPAY_KEY_SECRET || "";
+  if (!keyId || !keySecret) return null;
+
+  try {
+    const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret });
+    const order = await razorpay.orders.fetch(paymentOrderId);
+    return order?.notes?.project_id || null;
+  } catch {
+    // Creator-owned orders can't be fetched with the platform key. Defer to
+    // verify.js rather than guessing the project.
+    return null;
+  }
+}
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -46,31 +76,57 @@ export default async function handler(req, res) {
     if (event.event === "payment.captured") {
       const payment = event.payload.payment.entity;
 
-      const projectId = payment.notes?.projectId;
-      const amount = payment.amount / 100; // paise → rupees
-      const payerEmail = payment.email || null;
-
-      if (!projectId) return res.json({ success: true });
-
-      /* Idempotency: skip if donation already recorded (e.g. by verify.js) */
+      /* Idempotency: skip if donation already recorded (e.g. by verify.js). */
       const { data: existing } = await supabaseAdmin
         .from("public_donations")
         .select("id")
-        .eq("payment_id", payment.id)
+        .eq("razorpay_payment_id", payment.id)
         .maybeSingle();
 
       if (existing) {
         return res.json({ success: true, duplicate: true });
       }
 
-      // Insert donation
+      /* Resolve the project from the server-bound order. Never from payment
+         notes (client-controllable). If unresolved, defer to verify.js. */
+      const projectId = await resolveProjectFromOrder(payment.order_id);
+      if (!projectId) return res.json({ success: true, deferred: true });
+
+      /* Money must never be credited to an unverified owner. The create-order
+         route already blocks unverified projects, so this is a hard guarantee
+         for orders that predate the gate or owners de-verified mid-payment.
+         Return success so Razorpay doesn't retry; verify.js (authoritative
+         path) will 403 the frontend. */
+      const { data: ownerProject } = await supabaseAdmin
+        .from("projects")
+        .select("owner_id")
+        .eq("id", projectId)
+        .single();
+
+      if (
+        !ownerProject?.owner_id ||
+        !(await isCreatorVerified(ownerProject.owner_id))
+      ) {
+        console.warn("Webhook: donation skipped — owner not verified", {
+          projectId,
+          paymentId: payment.id,
+        });
+        return res.json({ success: true, skipped: "creator_not_verified" });
+      }
+
+      const amount = payment.amount / 100; // paise → rupees
+
+      // Insert donation.
+      // NOTE: inserting fires the DB trigger that increments projects.pledged
+      // by the donation amount. Do NOT call increment_project_funding here too
+      // — that would double-count (2X).
       const { error: insertError } = await supabaseAdmin
         .from("public_donations")
         .insert({
           project_id: projectId,
           amount,
-          payer_email: payerEmail,
-          payment_id: payment.id,
+          razorpay_payment_id: payment.id,
+          name: payment.email || null,
           status: "success",
         });
 
@@ -78,30 +134,46 @@ export default async function handler(req, res) {
         console.error("Webhook insert error:", insertError);
         return res.status(500).json({ error: "Donation insert failed" });
       }
-
-      // Update pledged amount
-      const { error: rpcError } = await supabaseAdmin.rpc(
-        "increment_project_funding",
-        {
-          project_id: projectId,
-          amount,
-        },
-      );
-
-      if (rpcError) {
-        console.error("Webhook RPC error:", rpcError);
-        return res.status(500).json({ error: "Funding update failed" });
-      }
     }
 
     /* ---------------- PAYMENT FAILED ---------------- */
     if (event.event === "payment.failed") {
-      console.error("Payment failed:", event.payload.payment.entity.id);
+      const payment = event.payload.payment.entity;
+      // Mark any recorded donation for this payment as failed so refunds/stats
+      // don't treat an uncaptured payment as valid.
+      await supabaseAdmin
+        .from("public_donations")
+        .update({ status: "failed" })
+        .eq("razorpay_payment_id", payment.id)
+        .eq("status", "paid");
+      console.error("Payment failed:", payment.id);
     }
 
     /* ---------------- REFUND ---------------- */
     if (event.event === "refund.processed") {
-      console.error("Refund processed:", event.payload.refund.entity.id);
+      const refund = event.payload.refund.entity;
+      // Mark the original donation refunded (never silently keep it "paid").
+      const { data: donations } = await supabaseAdmin
+        .from("public_donations")
+        .select("id, project_id, amount")
+        .eq("razorpay_payment_id", refund.payment_id);
+
+      if (donations && donations.length > 0) {
+        await supabaseAdmin
+          .from("public_donations")
+          .update({ status: "refunded" })
+          .eq("razorpay_payment_id", refund.payment_id);
+
+        // Decrement the project's pledged total by the refunded amount so the
+        // campaign stats reflect money actually held.
+        for (const d of donations) {
+          await supabaseAdmin.rpc("decrement_project_funding", {
+            project_id: d.project_id,
+            amount: d.amount,
+          });
+        }
+      }
+      console.log("Refund processed:", refund.id);
     }
 
     return res.json({ success: true });

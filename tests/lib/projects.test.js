@@ -21,7 +21,11 @@ vi.mock("@/lib/supabaseClient", () => ({
   },
 }));
 
-import { createProject, updateProject, deleteProject } from "@/lib/projects";
+import { updateProject, deleteProject } from "@/lib/projects";
+
+// NOTE: createProject was removed — publishing now goes through the single
+// verified-only path POST /api/projects (withVerified). Coverage for the
+// publish route lives in tests/api/projects.test.js.
 
 describe("lib/projects.js — project CRUD", () => {
   beforeEach(() => {
@@ -32,29 +36,6 @@ describe("lib/projects.js — project CRUD", () => {
     mockSelect.mockReturnThis();
     mockEq.mockReturnThis();
     mockSingle.mockResolvedValue({ data: { id: "proj-1" }, error: null });
-  });
-
-  // ---- createProject ----
-  it("creates a project with correct fields", async () => {
-    const data = {
-      title: "My Project",
-      short: "Short desc",
-      description: "Full description",
-      goal: 10000,
-      deadline: "2026-12-31",
-      prototypeUrl: "https://example.com",
-      owner_id: "user-1",
-    };
-
-    const result = await createProject(data);
-    expect(result.id).toBe("proj-1");
-  });
-
-  it("throws on database error during create", async () => {
-    mockSingle.mockResolvedValueOnce({ data: null, error: { message: "insert failed" } });
-    await expect(
-      createProject({ title: "Test", short: "s", description: "d", goal: 1000, deadline: "2026-01-01", prototypeUrl: "", owner_id: "u1" })
-    ).rejects.toThrow();
   });
 
   // ---- updateProject ----

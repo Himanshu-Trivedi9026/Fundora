@@ -5,9 +5,11 @@ import { supabase } from "../../lib/supabaseClient";
 import { uploadCreatorFile } from "../../lib/uploadCreatorFile";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import { useToast } from "../../components/ui/Toast";
 
 export default function CreatorProfile() {
   const router = useRouter();
+  const { toast } = useToast();
 
   const [creator, setCreator] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -44,7 +46,8 @@ export default function CreatorProfile() {
       .from("creators")
       .select("*")
       .eq("user_id", auth.user.id)
-      .single();
+      .single()
+      .then((r) => (r.error ? { data: null } : r));
 
     if (data) {
       setCreator(data);
@@ -93,7 +96,7 @@ export default function CreatorProfile() {
       await supabase.from("creators").insert(payload);
     }
 
-    alert("Profile saved successfully");
+    toast.success("Profile saved successfully");
     await loadProfile();
     setLoading(false);
   }
@@ -118,6 +121,7 @@ export default function CreatorProfile() {
               aria-label="Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              autoComplete="name"
             />
 
             <input
@@ -127,12 +131,15 @@ export default function CreatorProfile() {
               aria-label="Age"
               value={age}
               onChange={(e) => setAge(e.target.value)}
+              autoComplete="off"
             />
 
             <input
               className="input"
               placeholder="Email"
               aria-label="Email"
+              type="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -141,6 +148,8 @@ export default function CreatorProfile() {
               className="input"
               placeholder="Mobile"
               aria-label="Mobile"
+              type="tel"
+              autoComplete="tel"
               value={mobile}
               onChange={(e) => setMobile(e.target.value)}
             />
@@ -152,6 +161,8 @@ export default function CreatorProfile() {
               </label>
 
               {photoPreview && (
+                // Blob URL preview — next/image can't optimize local object URLs.
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={photoPreview}
                   className="w-24 h-24 rounded-full object-cover mb-2 border"
@@ -168,7 +179,7 @@ export default function CreatorProfile() {
                   if (!file) return;
 
                   if (file.size > 2 * 1024 * 1024) {
-                    alert("Profile photo must be under 2MB");
+                    toast.error("Profile photo must be under 2MB");
                     return;
                   }
 
@@ -192,6 +203,8 @@ export default function CreatorProfile() {
               </label>
 
               {qrPreview && (
+                // Blob URL preview — next/image can't optimize local object URLs.
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={qrPreview}
                   className="w-40 rounded border mb-2"

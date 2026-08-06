@@ -1,21 +1,26 @@
 // components/FloatingProjectChat.jsx
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "../lib/supabaseClient";
 import ProjectChat from "./ProjectChat";
 
+/* Simple client-side mount detection — no setState in effect */
+const emptySubscribe = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
+
 export default function FloatingProjectChat({ projectId }) {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(emptySubscribe, getClientSnapshot, getServerSnapshot);
   const [open, setOpen] = useState(false);
   const [unread, setUnread] = useState(0);
-  const lastSeenRef = useRef(Date.now());
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // Ref to track message ids we have already counted toward the unread badge,
+  // so a message is never double-counted even if it arrives via multiple paths
+  // (initial load, realtime, optimistic insert on our own device).
+  const countedRef = useRef(new Set());
 
-  /* REALTIME UNREAD */
+  /* REALTIME UNREAD (primary) */
   useEffect(() => {
     if (!projectId) return;
 
@@ -29,19 +34,28 @@ export default function FloatingProjectChat({ projectId }) {
           table: "project_messages",
           filter: `project_id=eq.${projectId}`,
         },
-        () => {
-          if (!open) setUnread((u) => u + 1);
+        (payload) => {
+          const id = payload.new?.id;
+          if (!id || countedRef.current.has(id)) return;
+          // Ignore messages I sent myself (another tab / device of mine).
+          const me = payload.new?.sender_id;
+          // If the chat is closed, count as unread.
+          if (!open) {
+            countedRef.current.add(id);
+            setUnread((u) => u + 1);
+          }
         }
       )
       .subscribe();
 
     return () => supabase.removeChannel(channel);
-  }, [projectId]);
+  }, [projectId, open]);
 
+  /* Reset the badge when the chat is opened. */
   function toggleChat() {
     if (!open) {
       setUnread(0);
-      lastSeenRef.current = Date.now();
+      countedRef.current = new Set();
     }
     setOpen((v) => !v);
   }
@@ -70,7 +84,14 @@ export default function FloatingProjectChat({ projectId }) {
             }}
             className="glass-card rounded-xl shadow-2xl overflow-hidden flex flex-col border-primary/10"
           >
-            <ProjectChat projectId={projectId} />
+            <ProjectChat
+              projectId={projectId}
+              onFirstRender={(messageIds) => {
+                // If the chat just opened and there were pre-existing messages,
+                // none of them are "unread" anymore — they were already loaded.
+                messageIds?.forEach((id) => countedRef.current.add(id));
+              }}
+            />
           </motion.div>
         )}
       </AnimatePresence>

@@ -1,10 +1,15 @@
 // pages/creator/edit.js
-import { useEffect, useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/router";
+import { useEffect, useState, useCallback } from "react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { supabase } from "../../lib/supabaseClient";
+import { useToast } from "../../components/ui/Toast";
 
 export default function EditProfile() {
+  const router = useRouter();
+  const { toast } = useToast();
   const [user, setUser] = useState(null);
   const [fullName, setFullName] = useState("");
   const [bio, setBio] = useState("");
@@ -12,13 +17,9 @@ export default function EditProfile() {
   const [avatarUrl, setAvatarUrl] = useState("");
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    loadUser();
-  }, []);
-
-  async function loadUser() {
+  const loadUser = useCallback(async () => {
     const u = (await supabase.auth.getUser()).data.user;
-    if (!u) return (window.location.href = "/login");
+    if (!u) { router.push("/login"); return; }
 
     setUser(u);
 
@@ -34,7 +35,11 @@ export default function EditProfile() {
       setWebsite(data.website || "");
       setAvatarUrl(data.avatar_url || "");
     }
-  }
+  }, [router]);
+
+  useEffect(() => {
+    Promise.resolve().then(() => loadUser());
+  }, [loadUser]);
 
   async function uploadAvatar(e) {
     const file = e.target.files[0];
@@ -47,7 +52,7 @@ export default function EditProfile() {
       .from("avatars")
       .upload(fileName, file, { upsert: true });
 
-    if (error) return alert("Avatar upload failed.");
+    if (error) return toast.error("Avatar upload failed.");
 
     // Get public URL
     const { data } = supabase.storage.from("avatars").getPublicUrl(fileName);
@@ -67,15 +72,13 @@ export default function EditProfile() {
 
     await supabase.from("profiles").update(updateData).eq("id", user.id);
 
-    alert("Profile updated!");
+    toast.success("Profile updated!");
 
-    // Refresh page AND Navbar avatar
-    window.location.reload();
-
+    // Update local state instead of reloading
     setSaving(false);
   }
 
-  if (!user) return null;
+  if (!user) return <div className="min-h-screen flex items-center justify-center text-white" role="status" aria-live="polite">Loading profile...</div>;
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-slate-900 to-slate-800">
@@ -95,6 +98,7 @@ export default function EditProfile() {
               className="input"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
+              autoComplete="name"
             />
           </div>
 
@@ -107,6 +111,7 @@ export default function EditProfile() {
               rows={4}
               value={bio}
               onChange={(e) => setBio(e.target.value)}
+              autoComplete="off"
             ></textarea>
           </div>
 
@@ -118,6 +123,8 @@ export default function EditProfile() {
               className="input"
               value={website}
               onChange={(e) => setWebsite(e.target.value)}
+              type="url"
+              autoComplete="url"
             />
           </div>
 
@@ -127,9 +134,11 @@ export default function EditProfile() {
             <input id="edit-avatar" type="file" onChange={uploadAvatar} className="mt-2" />
 
             {avatarUrl && (
-              <img
+              <Image
                 src={avatarUrl}
                 alt="Creator avatar"
+                width={96}
+                height={96}
                 className="mt-3 w-24 h-24 rounded-full border border-slate-700 object-cover"
               />
             )}

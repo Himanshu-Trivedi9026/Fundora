@@ -1,7 +1,8 @@
+import Image from "next/image";
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
-export default function ParallaxBanner({ banner, avatar, fullName, bio, children }) {
+export default function ParallaxBanner({ banner, avatar, fullName, bio, verificationLevel, children }) {
   const containerRef = useRef(null);
 
   const { scrollYProgress } = useScroll({
@@ -36,10 +37,12 @@ export default function ParallaxBanner({ banner, avatar, fullName, bio, children
             transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
             whileHover={{ scale: 1.05 }}
           >
-            <img
+            <Image
               className="w-20 h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 rounded-full object-cover"
               src={avatar}
               alt={fullName || "Creator avatar"}
+              width={128}
+              height={128}
             />
           </motion.div>
 
@@ -50,8 +53,12 @@ export default function ParallaxBanner({ banner, avatar, fullName, bio, children
                 {fullName}
               </h1>
               <span
-                className="material-symbols-outlined text-primary text-xl hidden"
+                className={`material-symbols-outlined text-primary text-xl ${
+                  verificationLevel >= 2 ? "" : "hidden"
+                }`}
                 style={{ fontVariationSettings: "'FILL' 1" }}
+                role="img"
+                aria-label={verificationLevel >= 2 ? "Verified Creator" : undefined}
               >
                 verified
               </span>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { supabase } from "../../lib/supabaseClient";
@@ -8,51 +8,49 @@ export default function FundsGot() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadFunds();
+  const loadFunds = useCallback(async () => {
+    queueMicrotask(() => setLoading(true));
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("public_donations")
+        .select(
+          `
+          id,
+          amount,
+          status,
+          created_at,
+          projects!inner (
+            title,
+            owner_id
+          )
+        `
+        )
+        .eq("projects.owner_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error(error);
+        setPayments([]);
+        setTotal(0);
+        return;
+      }
+
+      setPayments(data || []);
+      setTotal((data || []).reduce((s, p) => s + p.amount, 0));
+    } finally {
+      queueMicrotask(() => setLoading(false));
+    }
   }, []);
 
-  async function loadFunds() {
-    setLoading(true);
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from("public_donations")
-      .select(
-        `
-        id,
-        amount,
-        status,
-        created_at,
-        projects!inner (
-          title,
-          owner_id
-        )
-      `
-      )
-      .eq("projects.owner_id", user.id)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error(error);
-      setPayments([]);
-      setTotal(0);
-      setLoading(false);
-      return;
-    }
-
-    setPayments(data || []);
-    setTotal((data || []).reduce((s, p) => s + p.amount, 0));
-    setLoading(false);
-  }
+  useEffect(() => {
+    loadFunds();
+  }, [loadFunds]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -68,11 +66,11 @@ export default function FundsGot() {
         </p>
 
         {loading && (
-          <p className="text-slate-400">Loading funds...</p>
+          <p className="text-slate-400" role="status">Loading funds...</p>
         )}
 
         {!loading && payments.length === 0 && (
-          <p className="text-slate-400">No funds received yet.</p>
+          <p className="text-slate-400" role="status">No funds received yet.</p>
         )}
 
         <div className="space-y-4">

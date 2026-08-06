@@ -1,21 +1,38 @@
-import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import { isSaved, toggleSave, getSaveCounts } from "../lib/saved";
 
 export default function ProjectCard({ project, currentUserId, creatorName }) {
   const router = useRouter();
-  if (!project) return null;
+  /* Reset imgError when project changes — adjust state during render so the
+     reset is not a setState-in-effect (React 19 rule) */
+  const [imgError, setImgError] = useState(false);
+  const [prevProjectId, setPrevProjectId] = useState(project?.id);
+  if (prevProjectId !== project?.id) {
+    setPrevProjectId(project?.id);
+    setImgError(false);
+  }
+  /* Lazy-init save state from localStorage — avoids setState in effect */
+  const [saved, setSaved] = useState(() => {
+    if (typeof window === "undefined" || !project?.id) return false;
+    return isSaved(project.id);
+  });
+  const [saveCount, setSaveCount] = useState(() => {
+    if (typeof window === "undefined" || !project?.id) return 0;
+    return getSaveCounts()[project.id] || 0;
+  });
 
-  const [saved, setSaved] = useState(false);
-  const [saveCount, setSaveCount] = useState(0);
-
-  /* ---------------- SAVE STATE ---------------- */
+  /* Sync save state when project.id changes — safe update via effect */
   useEffect(() => {
-    if (!project?.id) return;
-    const counts = getSaveCounts();
-    setSaveCount(counts[project.id] || 0);
-    setSaved(isSaved(project.id));
+    if (project?.id) {
+      const counts = getSaveCounts();
+      queueMicrotask(() => setSaveCount(counts[project.id] || 0));
+      queueMicrotask(() => setSaved(isSaved(project.id)));
+    }
   }, [project?.id]);
+
+  if (!project) return null;
 
   function handleSave(e) {
     e.stopPropagation();
@@ -40,74 +57,85 @@ export default function ProjectCard({ project, currentUserId, creatorName }) {
       tabIndex={0}
       role="link"
       aria-label={`View project: ${project.title}`}
-      className="cursor-pointer bg-slate-900/80 border border-slate-800 rounded-xl
+      className="cursor-pointer bg-surface-dim/80 border border-outline-variant/50 rounded-xl
                  shadow hover:shadow-xl hover:-translate-y-1 transition p-4 relative
-                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+                 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface-dim"
     >
       {/* SAVE */}
       <button
         onClick={handleSave}
         aria-label={saved ? "Unsave project" : "Save project"}
+        aria-pressed={saved}
         className="absolute top-3 right-3 text-white/80 hover:text-white text-xl z-10"
       >
-        {saved ? "🔖" : "📑"}
+        <span aria-hidden="true">{saved ? "🔖" : "📑"}</span>
       </button>
 
       {/* THUMBNAIL */}
-      <div className="h-40 rounded-lg mb-3 overflow-hidden border border-slate-800 bg-slate-800">
-        {thumbnail ? (
-          <img
+      <div className="h-40 rounded-lg mb-3 overflow-hidden border border-outline-variant/50 bg-surface-container relative">
+        {thumbnail && !imgError ? (
+          <Image
             src={thumbnail}
             alt={project.title}
-            className="w-full h-full object-cover"
+            fill
+            sizes="(max-width: 640px) 100vw, 300px"
+            className="object-cover"
+            onError={() => setImgError(true)}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-slate-500 text-xs">
+          <div className="w-full h-full flex items-center justify-center text-muted text-xs">
             No thumbnail
           </div>
         )}
       </div>
 
-      <h3 className="text-lg font-semibold text-slate-100 hover:text-blue-400 transition">
+      <h3 className="text-lg font-semibold text-on-surface hover:text-primary transition">
         {project.title}
       </h3>
 
-      <p className="text-sm text-slate-400 mt-1 line-clamp-2">
+      <p className="text-sm text-on-surface-variant mt-1 line-clamp-2">
         {project.short}
       </p>
 
       {/* 🔥 PROGRESS BAR */}
       <div className="mt-3">
-        <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
+        <div
+          className="w-full bg-surface-container-high rounded-full h-2 overflow-hidden"
+          role="progressbar"
+          aria-valuenow={fundedPercent}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`${fundedPercent}% funded`}
+        >
           <div
             className="bg-green-500 h-2 rounded-full transition-all duration-500"
             style={{ width: `${fundedPercent}%` }}
           />
         </div>
 
-        <p className="text-xs text-slate-300 mt-1">
+        <p className="text-xs text-on-surface-variant mt-1">
           ₹{project.pledged || 0} raised of ₹{project.goal} ({fundedPercent}%)
         </p>
       </div>
 
-      <p className="text-[11px] text-slate-500 mt-2">
+      <p className="text-[11px] text-muted mt-2">
         ❤️ {saveCount} people saved this
       </p>
 
       {/* CREATOR — batch-fetched from parent */}
       {creatorName && (
         <div
-          className="mt-4 pt-3 border-t border-slate-700"
+          className="mt-4 pt-3 border-t border-outline-variant"
           onClick={(e) => {
             e.stopPropagation();
             router.push(`/creator/${project.owner_id}`);
           }}
         >
-          <p className="text-sm text-slate-300 mb-2">
+          <p className="text-sm text-on-surface-variant mb-2">
             By: {creatorName}
           </p>
 
-          <button className="w-full text-center px-3 py-1.5 bg-slate-700 text-white rounded-lg text-xs hover:bg-slate-600 transition">
+          <button className="w-full text-center px-3 py-1.5 bg-surface-container-high text-on-surface rounded-lg text-xs hover:bg-surface-container-highest transition">
             View Profile
           </button>
         </div>
@@ -120,7 +148,7 @@ export default function ProjectCard({ project, currentUserId, creatorName }) {
             e.stopPropagation();
             router.push(`/projects/${project.id}`);
           }}
-          className="flex-1 text-xs bg-slate-700 text-white py-1.5 rounded"
+          className="flex-1 text-xs bg-surface-container-high text-on-surface py-1.5 rounded"
         >
           View
         </button>

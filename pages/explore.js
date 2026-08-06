@@ -1,12 +1,22 @@
-import { useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ExploreCard from "../components/explore/ExploreCard";
 import SidebarFilters from "../components/explore/SidebarFilters";
 import SkeletonCard from "../components/explore/SkeletonCard";
+import Pagination from "../components/explore/Pagination";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { supabase } from "../lib/supabaseClient";
+import SEO from "../components/SEO";
+import { CATEGORY_LABELS } from "../lib/categories";
+import {
+  buildExploreQuery,
+  EXPLORE_PAGE_SIZE,
+  EXPLORE_SORT_OPTIONS,
+  DEFAULT_EXPLORE_FILTERS,
+} from "../lib/explore/exploreQuery";
 
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -16,39 +26,29 @@ const staggerContainer = {
   },
 };
 
-const SORT_OPTIONS = [
-  { value: "recent", label: "Recently Added" },
-  { value: "trending", label: "Trending" },
-  { value: "funded", label: "Most Funded" },
-  { value: "ending", label: "Ending Soon" },
-];
-
-const AI_RECOMMENDED = [
-  "Quantum Computing",
-  "Sustainable Fashion",
-  "Urban Mobility",
-  "Biotech startups",
-];
+const AI_RECOMMENDED = CATEGORY_LABELS.slice(0, 4);
 
 export default function Explore() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [creatorMap, setCreatorMap] = useState({});
+  const [verificationMap, setVerificationMap] = useState({});
+  const [page, setPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [error, setError] = useState(null);
 
-  const [filters, setFilters] = useState({
-    categories: [],
-    minGoal: "",
-    maxGoal: "",
-    sort: "recent",
-  });
+  const [filters, setFilters] = useState(DEFAULT_EXPLORE_FILTERS);
 
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [showSort, setShowSort] = useState(false);
   const sortRef = useRef(null);
+  const requestSeq = useRef(0);
 
   const router = useRouter();
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / EXPLORE_PAGE_SIZE));
 
   /* ================= CLOSE SORT DROPDOWN ON OUTSIDE CLICK ================= */
   useEffect(() => {
@@ -68,60 +68,96 @@ export default function Explore() {
     });
   }, []);
 
-  /* ================= LOAD PROJECTS ================= */
-  async function loadProjects() {
-    setLoading(true);
+  /* ================= LOAD ONE PAGE =================
+     Loads the requested page with the CURRENT filters. A request-sequence
+     ref guards against out-of-order responses when the user clicks pages
+     faster than the DB answers. */
+  const loadPage = useCallback(
+    async (targetPage) => {
+      const seq = ++requestSeq.current;
+      queueMicrotask(() => setLoading(true));
+      if (error) queueMicrotask(() => setError(null));
 
-    let q = supabase.from("projects").select("*");
+      try {
+        const q = buildExploreQuery(supabase, {
+          categories: filters.categories,
+          minGoal: filters.minGoal,
+          maxGoal: filters.maxGoal,
+          sort: filters.sort,
+          page: targetPage,
+          pageSize: EXPLORE_PAGE_SIZE,
+        });
 
-    switch (filters.sort) {
-      case "trending":
-        q = q.order("pledged", { ascending: false });
-        break;
-      case "funded":
-        q = q.order("goal", { ascending: false });
-        break;
-      case "ending":
-        q = q.order("deadline", { ascending: true });
-        break;
-      default:
-        q = q.order("created_at", { ascending: false });
-    }
+        const { data, count, error: queryError } = await q;
+        if (seq !== requestSeq.current) return; // stale response — ignore
 
-    if (filters.categories.length > 0) {
-      q = q.contains("categories", filters.categories);
-    }
+        if (queryError) {
+          setError("Failed to load projects. Please try again.");
+          setProjects([]);
+          return;
+        }
 
-    if (filters.minGoal) q = q.gte("goal", filters.minGoal);
-    if (filters.maxGoal) q = q.lte("goal", filters.maxGoal);
+        const projectList = data || [];
+        setProjects(projectList);
+        setTotalCount(count ?? 0);
 
-    const { data } = await q;
-    const projectList = data || [];
-    setProjects(projectList);
+        // Batch-fetch creator names + verification levels in two queries
+        // (eliminates the N+1 pattern).
+        const ownerIds = [
+          ...new Set(projectList.map((p) => p.owner_id).filter(Boolean)),
+        ];
+        if (ownerIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from("profiles")
+            .select("id, full_name")
+            .in("id", ownerIds);
 
-    // Batch-fetch all creator names in a single query (eliminates N+1)
-    const ownerIds = [
-      ...new Set(projectList.map((p) => p.owner_id).filter(Boolean)),
-    ];
-    if (ownerIds.length > 0) {
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, full_name")
-        .in("id", ownerIds);
+          const map = {};
+          (profiles || []).forEach((p) => {
+            map[p.id] = p.full_name;
+          });
+          setCreatorMap(map);
 
-      const map = {};
-      (profiles || []).forEach((p) => {
-        map[p.id] = p.full_name;
-      });
-      setCreatorMap(map);
-    }
+          const { data: verifications } = await supabase
+            .from("creator_verifications")
+            .select("user_id, verification_level")
+            .in("user_id", ownerIds);
 
-    setLoading(false);
-  }
+          const vMap = {};
+          (verifications || []).forEach((v) => {
+            vMap[v.user_id] = v.verification_level;
+          });
+          setVerificationMap(vMap);
+        } else {
+          setCreatorMap({});
+          setVerificationMap({});
+        }
+      } catch (err) {
+        if (seq !== requestSeq.current) return;
+        setError("Failed to load projects. Please try again.");
+        setProjects([]);
+      } finally {
+        if (seq === requestSeq.current) {
+          queueMicrotask(() => setLoading(false));
+        }
+      }
+    },
+    [filters, error]
+  );
 
+  /* ================= FILTER CHANGE → RESET TO PAGE 1 =================
+     Filters are also passed to SidebarFilters as `setFilters` so a category
+     toggle, sort pick, or "clear all" atomically bumps the page back to 1.
+     No separate effect is needed — loadPage re-runs on [page, filters]. */
+  const applyFilters = useCallback((updater) => {
+    setFilters(updater);
+    setPage(1);
+  }, []);
+
+  /* ================= LOAD WHEN PAGE OR FILTERS CHANGE ================= */
   useEffect(() => {
-    loadProjects();
-  }, [filters]);
+    queueMicrotask(() => loadPage(page));
+  }, [page, loadPage]);
 
   /* ================= REALTIME ================= */
   useEffect(() => {
@@ -152,7 +188,7 @@ export default function Explore() {
   /* ================= SEARCH ================= */
   useEffect(() => {
     if (!query.trim()) {
-      setSuggestions([]);
+      queueMicrotask(() => setSuggestions([]));
       return;
     }
 
@@ -170,10 +206,17 @@ export default function Explore() {
   }, [query]);
 
   const currentSortLabel =
-    SORT_OPTIONS.find((o) => o.value === filters.sort)?.label || "Trending";
+    EXPLORE_SORT_OPTIONS.find((o) => o.value === filters.sort)?.label ||
+    "Newest";
 
   return (
-    <div className="min-h-screen flex flex-col bg-surface-dim">
+    <>
+      <SEO
+        title="Explore Projects"
+        description="Discover innovative crowdfunding projects on Fundora. Browse by category, funding stage, and trending campaigns."
+        url="/explore"
+      />
+      <div className="min-h-screen flex flex-col bg-surface-dim">
       <Navbar />
 
       <main className="pt-24 pb-12 px-6 lg:px-16 max-w-7xl mx-auto min-h-screen flex-1">
@@ -188,7 +231,7 @@ export default function Explore() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             {/* Search Input */}
             <div className="relative flex-1 max-w-2xl">
-              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">
+              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline" aria-hidden="true">
                 search
               </span>
               <input
@@ -213,10 +256,11 @@ export default function Explore() {
                     className="absolute left-0 right-0 mt-2 bg-surface-container border border-outline-variant rounded-xl z-30 shadow-xl overflow-hidden"
                   >
                     {suggestions.map((s) => (
-                      <a
+                      <Link
                         key={s.id}
                         href={`/projects/${s.id}`}
                         role="option"
+                        aria-selected={false}
                         className="block px-4 py-3 hover:bg-surface-container-high text-on-surface border-b border-outline-variant/30 last:border-b-0 transition-colors"
                       >
                         <div className="font-semibold text-primary text-sm">
@@ -225,7 +269,7 @@ export default function Explore() {
                         <div className="text-xs text-on-surface-variant mt-0.5">
                           {s.short}
                         </div>
-                      </a>
+                      </Link>
                     ))}
                   </motion.div>
                 )}
@@ -243,7 +287,7 @@ export default function Explore() {
                   className="flex items-center gap-2 bg-surface-container-high px-4 py-3 rounded-lg border border-outline-variant/30 text-sm font-inter min-w-[160px] justify-between text-on-surface hover:border-primary/50 transition-colors"
                 >
                   {currentSortLabel}
-                  <span className="material-symbols-outlined text-sm">
+                  <span className="material-symbols-outlined text-sm" aria-hidden="true">
                     expand_more
                   </span>
                 </button>
@@ -257,11 +301,11 @@ export default function Explore() {
                       transition={{ duration: 0.15 }}
                       className="absolute right-0 mt-2 w-full bg-surface-container border border-outline-variant rounded-lg z-30 shadow-xl overflow-hidden"
                     >
-                      {SORT_OPTIONS.map((opt) => (
+                      {EXPLORE_SORT_OPTIONS.map((opt) => (
                         <button
                           key={opt.value}
                           onClick={() => {
-                            setFilters((f) => ({ ...f, sort: opt.value }));
+                            applyFilters((f) => ({ ...f, sort: opt.value }));
                             setShowSort(false);
                           }}
                           className={`w-full text-left px-4 py-2.5 text-sm font-inter transition-colors ${
@@ -286,6 +330,7 @@ export default function Explore() {
               <span
                 className="material-symbols-outlined text-[18px]"
                 style={{ fontVariationSettings: "'FILL' 1" }}
+                aria-hidden="true"
               >
                 auto_awesome
               </span>
@@ -294,7 +339,18 @@ export default function Explore() {
             {AI_RECOMMENDED.map((pill) => (
               <button
                 key={pill}
-                className="px-4 py-1.5 rounded-full bg-surface-container border border-outline-variant text-sm font-inter whitespace-nowrap hover:border-primary hover:text-primary transition-colors"
+                onClick={() => {
+                  applyFilters((f) =>
+                    f.categories.includes(pill)
+                      ? f
+                      : { ...f, categories: [...f.categories, pill] }
+                  );
+                }}
+                className={`px-4 py-1.5 rounded-full border text-sm font-inter whitespace-nowrap transition-colors ${
+                  filters.categories.includes(pill)
+                    ? "bg-primary/20 border-primary text-primary"
+                    : "bg-surface-container border-outline-variant hover:border-primary hover:text-primary"
+                }`}
               >
                 {pill}
               </button>
@@ -306,7 +362,7 @@ export default function Explore() {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* ─── LEFT: Sticky Sidebar (hidden on mobile) ─── */}
           <div className="hidden lg:block">
-            <SidebarFilters filters={filters} setFilters={setFilters} />
+            <SidebarFilters filters={filters} setFilters={applyFilters} />
           </div>
 
           {/* ─── RIGHT: Project Grid ─── */}
@@ -317,6 +373,20 @@ export default function Explore() {
                 {Array.from({ length: 6 }).map((_, i) => (
                   <SkeletonCard key={i} />
                 ))}
+              </div>
+            ) : error ? (
+              /* ─── ERROR STATE ─── */
+              <div className="text-center py-20">
+                <span className="material-symbols-outlined text-6xl text-on-surface-variant/30 block mb-4" aria-hidden="true">
+                  error_outline
+                </span>
+                <p className="text-on-surface-variant font-inter text-lg">{error}</p>
+                <button
+                  onClick={() => loadPage(page)}
+                  className="mt-4 text-primary font-inter hover:underline"
+                >
+                  Try again
+                </button>
               </div>
             ) : (
               <>
@@ -333,6 +403,7 @@ export default function Explore() {
                       project={p}
                       currentUserId={currentUserId}
                       creatorName={creatorMap[p.owner_id]}
+                      creatorVerificationLevel={verificationMap[p.owner_id] || 0}
                     />
                   ))}
                 </motion.div>
@@ -344,21 +415,14 @@ export default function Explore() {
                     animate={{ opacity: 1 }}
                     className="text-center py-20"
                   >
-                    <span className="material-symbols-outlined text-6xl text-on-surface-variant/30 block mb-4">
+                    <span className="material-symbols-outlined text-6xl text-on-surface-variant/30 block mb-4" aria-hidden="true">
                       search_off
                     </span>
                     <p className="text-on-surface-variant font-inter text-lg">
                       No projects found matching your filters.
                     </p>
                     <button
-                      onClick={() =>
-                        setFilters({
-                          categories: [],
-                          minGoal: "",
-                          maxGoal: "",
-                          sort: "recent",
-                        })
-                      }
+                      onClick={() => applyFilters(DEFAULT_EXPLORE_FILTERS)}
                       className="mt-4 text-primary font-inter hover:underline"
                     >
                       Clear all filters
@@ -366,23 +430,14 @@ export default function Explore() {
                   </motion.div>
                 )}
 
-                {/* ─── LOAD MORE ─── */}
-                {projects.length > 0 && (
-                  <div className="mt-16 flex flex-col items-center gap-4">
-                    <p className="text-on-surface-variant font-inter text-sm">
-                      Showing {projects.length} project{projects.length !== 1 ? "s" : ""}
-                    </p>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="flex items-center gap-2 border border-outline-variant px-8 py-3 rounded-lg hover:border-primary hover:text-primary transition-all text-on-surface-variant font-inter group"
-                    >
-                      Load more projects
-                      <span className="material-symbols-outlined group-hover:translate-y-0.5 transition-transform">
-                        expand_more
-                      </span>
-                    </motion.button>
-                  </div>
+                {/* ─── PAGINATION ─── */}
+                {totalCount > 0 && (
+                  <Pagination
+                    page={page}
+                    totalPages={totalPages}
+                    totalCount={totalCount}
+                    onChange={setPage}
+                  />
                 )}
               </>
             )}
@@ -392,5 +447,6 @@ export default function Explore() {
 
       <Footer />
     </div>
+    </>
   );
 }

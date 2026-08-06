@@ -1,47 +1,68 @@
+import Link from "next/link";
+import { useRole } from "../context/RoleContext";
+import { canStartProject, startProjectHref } from "../lib/roles";
+
 /**
- * Footer — 4-column footer with brand, platform, company, legal links.
+ * Footer — 6-column footer matching mockup.
  */
 export default function Footer() {
+  const { role } = useRole();
   return (
-    <footer className="bg-surface-dim border-t border-white/[0.06]">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 px-4 md:px-16 py-12 max-w-6xl mx-auto">
+    <footer className="bg-surface-container-lowest border-t border-outline-variant/20">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 px-10 lg:px-16 py-12 max-w-[1280px] mx-auto">
         {/* Brand */}
-        <div className="col-span-1">
-          <span className="font-geist text-lg font-bold text-on-surface block mb-4">Fundora</span>
-          <p className="text-on-surface-variant font-inter text-sm opacity-80 leading-relaxed">
-            Empowering the next generation of founders through architectural intelligence and capital democratization.
+        <div className="col-span-2 lg:col-span-2 space-y-4">
+          <h2 className="text-xl font-bold text-primary tracking-tighter font-geist">Fundora</h2>
+          <p className="text-on-surface-variant text-xs max-w-xs leading-relaxed">
+            The world&apos;s first architectural intelligence crowdfunding platform. Engineering the future, block by block.
           </p>
         </div>
 
         {/* Platform */}
-        <div className="flex flex-col gap-2">
-          <p className="font-geist text-sm font-semibold text-on-surface mb-2">Platform</p>
-          <a href="/explore" className="text-on-surface-variant hover:text-primary transition-colors font-inter text-sm">Discover</a>
-          <a href="/explore" className="text-on-surface-variant hover:text-primary transition-colors font-inter text-sm">Markets</a>
-          <span className="text-on-surface-variant hover:text-primary transition-colors font-inter text-sm cursor-pointer">API Documentation</span>
+        <div className="space-y-3">
+          <h3 className="text-on-surface font-bold text-xs uppercase tracking-wider">Platform</h3>
+          <nav aria-label="Platform" className="flex flex-col gap-2 text-xs">
+            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors">Explore</Link>
+            <Link href="/explore?sort=trending" className="text-on-surface-variant hover:text-on-surface transition-colors">Invest</Link>
+            {/* Raise (create-flow) is a creator-only entry point. */}
+            {canStartProject({ role }) && (
+              <Link href={startProjectHref({ role })} className="text-on-surface-variant hover:text-on-surface transition-colors">Raise</Link>
+            )}
+          </nav>
         </div>
 
         {/* Company */}
-        <div className="flex flex-col gap-2">
-          <p className="font-geist text-sm font-semibold text-on-surface mb-2">Company</p>
-          <span className="text-on-surface-variant hover:text-primary transition-colors font-inter text-sm cursor-pointer">Investor Relations</span>
-          <span className="text-on-surface-variant hover:text-primary transition-colors font-inter text-sm cursor-pointer">Help Center</span>
-          <span className="text-on-surface-variant hover:text-primary transition-colors font-inter text-sm cursor-pointer">Success Stories</span>
+        <div className="space-y-3">
+          <h3 className="text-on-surface font-bold text-xs uppercase tracking-wider">Company</h3>
+          <nav aria-label="Company" className="flex flex-col gap-2 text-xs">
+            <Link href="/" className="text-on-surface-variant hover:text-on-surface transition-colors">About</Link>
+            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors">Explore Projects</Link>
+            <Link href="/login" className="text-on-surface-variant hover:text-on-surface transition-colors">Contact</Link>
+          </nav>
+        </div>
+
+        {/* Resources */}
+        <div className="space-y-3">
+          <h3 className="text-on-surface font-bold text-xs uppercase tracking-wider">Resources</h3>
+          <nav aria-label="Resources" className="flex flex-col gap-2 text-xs">
+            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors">Intelligence</Link>
+            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors">Community</Link>
+          </nav>
         </div>
 
         {/* Legal */}
-        <div className="flex flex-col gap-2">
-          <p className="font-geist text-sm font-semibold text-on-surface mb-2">Legal</p>
-          <span className="text-on-surface-variant hover:text-primary transition-colors font-inter text-sm cursor-pointer">Privacy Policy</span>
-          <span className="text-on-surface-variant hover:text-primary transition-colors font-inter text-sm cursor-pointer">Terms of Service</span>
+        <div className="space-y-3">
+          <h3 className="text-on-surface font-bold text-xs uppercase tracking-wider">Legal</h3>
+          <nav aria-label="Legal" className="flex flex-col gap-2 text-xs">
+            <Link href="/" className="text-on-surface-variant hover:text-on-surface transition-colors">Privacy</Link>
+            <Link href="/" className="text-on-surface-variant hover:text-on-surface transition-colors">Terms</Link>
+          </nav>
         </div>
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-white/[0.04] py-6 text-center">
-        <p className="font-inter text-xs text-on-surface-variant opacity-60">
-          © {new Date().getFullYear()} Fundora Intelligence. All rights reserved.
-        </p>
+      <div className="px-10 lg:px-16 py-6 border-t border-outline-variant/10 text-center text-on-surface-variant text-[10px] font-bold uppercase tracking-widest">
+        &copy; {new Date().getFullYear()} Fundora Architectural Intelligence. All rights reserved.
       </div>
     </footer>
   );

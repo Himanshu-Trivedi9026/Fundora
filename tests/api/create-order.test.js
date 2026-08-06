@@ -58,6 +58,7 @@ function createRes() {
 
 describe("POST /api/razorpay/create-order", () => {
   const mockProjectSingle = vi.fn();
+  const mockVerificationMaybeSingle = vi.fn();
   const mockConfigMaybeSingle = vi.fn();
 
   beforeEach(() => {
@@ -66,11 +67,19 @@ describe("POST /api/razorpay/create-order", () => {
     vi.stubEnv("RAZORPAY_KEY_ID", "rzp_test_key");
     vi.stubEnv("RAZORPAY_KEY_SECRET", "rzp_test_secret");
 
-    // Default: project found, no creator config
+    // Default: project found, owner verified, no creator config.
+    // Chain order: projects → creator_verifications → creator_payment_configs.
+    // mockReset() clears leftover queued chains from tests that short-circuit
+    // (403 gate tests consume only 2 chains) so ordering stays aligned.
     supabaseAdmin.from
+      .mockReset()
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnValue({ single: mockProjectSingle }),
+      })
+      .mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
@@ -79,6 +88,10 @@ describe("POST /api/razorpay/create-order", () => {
 
     mockProjectSingle.mockResolvedValue({
       data: { id: "proj-1", owner_id: "owner-1" },
+      error: null,
+    });
+    mockVerificationMaybeSingle.mockResolvedValue({
+      data: { verification_status: "approved" },
       error: null,
     });
     mockConfigMaybeSingle.mockResolvedValue({ data: null, error: null });
@@ -185,10 +198,18 @@ describe("POST /api/razorpay/create-order", () => {
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
+      })
+      .mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnValue({ maybeSingle: mockConfigMaybeSingle }),
       });
     mockProjectSingle.mockResolvedValue({
       data: { id: "proj-1", owner_id: "owner-1" },
+      error: null,
+    });
+    mockVerificationMaybeSingle.mockResolvedValue({
+      data: { verification_status: "approved" },
       error: null,
     });
     mockConfigMaybeSingle.mockResolvedValue({ data: null, error: null });
@@ -213,11 +234,19 @@ describe("POST /api/razorpay/create-order", () => {
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnValue({ maybeSingle: mockVerificationMaybeSingle }),
+      })
+      .mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnValue({ maybeSingle: mockConfigMaybeSingle }),
       });
 
     mockProjectSingle.mockResolvedValue({
       data: { id: "proj-2", owner_id: "owner-2" },
+      error: null,
+    });
+    mockVerificationMaybeSingle.mockResolvedValue({
+      data: { verification_status: "approved" },
       error: null,
     });
     mockConfigMaybeSingle.mockResolvedValue({
@@ -249,5 +278,51 @@ describe("POST /api/razorpay/create-order", () => {
     expect(mockCreateOrder).toHaveBeenCalledWith(
       expect.objectContaining({ amount: 1050, currency: "INR" })
     );
+  });
+
+  it("returns 403 when the project owner is not verified", async () => {
+    mockVerificationMaybeSingle.mockResolvedValueOnce({
+      data: { verification_status: "pending" },
+      error: null,
+    });
+
+    const req = createReq("POST", { amount: 500, projectId: "proj-1" });
+    const res = createRes();
+
+    await handler(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith({ error: "VerificationRequired" });
+    expect(mockCreateOrder).not.toHaveBeenCalled();
+  });
+
+  it("returns 403 when the owner verification row is missing", async () => {
+    mockVerificationMaybeSingle.mockResolvedValueOnce({
+      data: null,
+      error: null,
+    });
+
+    const req = createReq("POST", { amount: 500, projectId: "proj-1" });
+    const res = createRes();
+
+    await handler(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith({ error: "VerificationRequired" });
+  });
+
+  it("returns 403 when the owner verification lookup errors (fail-closed)", async () => {
+    mockVerificationMaybeSingle.mockResolvedValueOnce({
+      data: null,
+      error: { message: "db down" },
+    });
+
+    const req = createReq("POST", { amount: 500, projectId: "proj-1" });
+    const res = createRes();
+
+    await handler(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith({ error: "VerificationRequired" });
   });
 });

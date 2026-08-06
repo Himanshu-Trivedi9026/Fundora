@@ -1,6 +1,6 @@
 //pages/projects/[id]/fund.js
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
@@ -36,10 +36,46 @@ export default function FundProject() {
   const [selectedTier, setSelectedTier] = useState(null); // null | tier index | "custom"
 
   /* ---------------- LOAD DATA ---------------- */
+  const loadData = useCallback(async () => {
+    queueMicrotask(() => setLoading(true));
+    try {
+      const { data: projectData } = await supabase
+        .from("projects")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (!projectData) return;
+      setProject(projectData);
+
+      const { data: creatorData } = await supabase
+        .from("creators")
+        .select("*")
+        .eq("user_id", projectData.owner_id)
+        .single()
+        .then((r) => (r.error ? { data: null } : r));
+
+      setCreator(creatorData || null);
+
+      // Public donor list: select only display-safe columns. Never request
+      // payer_id or razorpay_payment_id here — this query runs with the
+      // anon/authenticated client against a public table.
+      const { data: donorList } = await supabase
+        .from("public_donations")
+        .select("id, amount, status, created_at")
+        .eq("project_id", id)
+        .order("created_at", { ascending: false });
+
+      setDonors(donorList || []);
+    } finally {
+      queueMicrotask(() => setLoading(false));
+    }
+  }, [id]);
+
   useEffect(() => {
     if (!id) return;
     loadData();
-  }, [id]);
+  }, [id, loadData]);
 
   /* -------- REALTIME FUNDING UPDATE ---------- */
   useEffect(() => {
@@ -63,33 +99,6 @@ export default function FundProject() {
 
     return () => supabase.removeChannel(channel);
   }, [id]);
-
-  async function loadData() {
-    const { data: projectData } = await supabase
-      .from("projects")
-      .select("*")
-      .eq("id", id)
-      .single();
-
-    if (!projectData) return;
-    setProject(projectData);
-
-    const { data: creatorData } = await supabase
-      .from("creators")
-      .select("*")
-      .eq("user_id", projectData.owner_id)
-      .single();
-
-    setCreator(creatorData || null);
-
-    const { data: donorList } = await supabase
-      .from("public_donations")
-      .select("*")
-      .eq("project_id", id)
-      .order("created_at", { ascending: false });
-
-    setDonors(donorList || []);
-  }
 
   /* ---------------- TIER SELECTION ---------------- */
   function selectTier(index) {
@@ -231,7 +240,7 @@ export default function FundProject() {
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (err) {
-      console.error(err);
+      console.error("Payment flow error:", err);
       alert("Payment failed. Try again.");
     } finally {
       setLoading(false);
@@ -258,7 +267,7 @@ export default function FundProject() {
             <ProjectSummary
               project={project}
               creator={creator}
-              onBack={() => router.push(`/projects/${id}`)}
+              onBack={() => { router.push(`/projects/${id}`); }}
             />
 
             {/* Funding Progress */}

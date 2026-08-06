@@ -33,7 +33,7 @@ export default function MediaUploader({ mediaFiles, setMediaFiles }) {
         <input id="media-upload" {...getInputProps()} aria-label="Upload media files" />
 
         <div className="flex flex-col items-center gap-2 text-center">
-          <span className="material-symbols-outlined text-[32px] text-on-surface-variant group-hover:text-primary transition-colors">
+          <span className="material-symbols-outlined text-[32px] text-on-surface-variant group-hover:text-primary transition-colors" aria-hidden="true">
             cloud_upload
           </span>
           {isDragActive ? (
@@ -62,7 +62,7 @@ export default function MediaUploader({ mediaFiles, setMediaFiles }) {
               className="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low border border-outline-variant/50 group"
             >
               <div className="flex items-center gap-2 overflow-hidden">
-                <span className="material-symbols-outlined text-[16px] text-on-surface-variant flex-shrink-0">
+                <span className="material-symbols-outlined text-[16px] text-on-surface-variant flex-shrink-0" aria-hidden="true">
                   {file.type?.startsWith("image")
                     ? "image"
                     : file.type?.startsWith("video")
@@ -78,7 +78,7 @@ export default function MediaUploader({ mediaFiles, setMediaFiles }) {
                 className="text-on-surface-variant/50 hover:text-red-400 transition-colors flex-shrink-0 ml-1"
                 aria-label={`Remove ${file.name}`}
               >
-                <span className="material-symbols-outlined text-[14px]">
+                <span className="material-symbols-outlined text-[14px]" aria-hidden="true">
                   close
                 </span>
               </button>

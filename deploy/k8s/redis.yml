@@ -1,0 +1,94 @@
+# Fundora — Redis (Cache & Queue Backend)
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fundora-redis
+  namespace: fundora
+  labels:
+    app: fundora
+    component: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fundora
+      component: redis
+  template:
+    metadata:
+      labels:
+        app: fundora
+        component: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379
+              name: redis
+              protocol: TCP
+          args:
+            - "--appendonly"
+            - "yes"
+            - "--appendfsync"
+            - "everysec"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+      volumes:
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: fundora-redis-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fundora-redis
+  namespace: fundora
+  labels:
+    app: fundora
+    component: redis
+spec:
+  ports:
+    - port: 6379
+      targetPort: 6379
+      name: redis
+  selector:
+    app: fundora
+    component: redis
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fundora-redis-pvc
+  namespace: fundora
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi

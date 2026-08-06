@@ -101,7 +101,7 @@ export default function PaymentSummary({ tierName, amount, loading, onPay, disab
         <p className="text-[10px] text-center text-on-surface-variant/60 mt-4 font-inter">
           By confirming, you agree to the{" "}
           <a className="underline hover:text-primary transition-colors" href="#">Terms of Service</a>{" "}
-          and the project's{" "}
+          and the project&rsquo;s{" "}
           <a className="underline hover:text-primary transition-colors" href="#">Fulfillment Policy</a>.
         </p>
       </div>

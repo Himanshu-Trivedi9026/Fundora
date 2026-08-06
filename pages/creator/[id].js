@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { supabase } from "../../lib/supabaseClient";
@@ -11,6 +11,8 @@ import SidebarConnect from "../../components/creator/SidebarConnect";
 import StatsGrid from "../../components/creator/StatsGrid";
 import ProjectTabs from "../../components/creator/ProjectTabs";
 import AchievementsBento from "../../components/creator/AchievementsBento";
+import VerificationCard from "../../components/security/VerificationCard";
+import VerificationBadge from "../../components/security/VerificationBadge";
 
 function cleanUrl(url) {
   if (!url) return null;
@@ -24,6 +26,7 @@ export default function CreatorProfile() {
   const [profile, setProfile] = useState(null);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [verification, setVerification] = useState(null);
 
   const [currentUserId, setCurrentUserId] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
@@ -37,65 +40,75 @@ export default function CreatorProfile() {
     });
   }, []);
 
+  const loadProfile = useCallback(async (userId) => {
+    queueMicrotask(() => setLoading(true));
+    try {
+      const { data: profileRow } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .maybeSingle();
+
+      const { data: projectRows } = await supabase
+        .from("projects")
+        .select("*")
+        .eq("owner_id", userId)
+        .order("created_at", { ascending: false });
+
+      const { count: followersCount } = await supabase
+        .from("followers")
+        .select("id", { count: "exact", head: true })
+        .eq("following_id", userId);
+
+      const { count: followingCount } = await supabase
+        .from("followers")
+        .select("id", { count: "exact", head: true })
+        .eq("follower_id", userId);
+
+      if (currentUserId && !followTouchedRef.current) {
+        const { data } = await supabase
+          .from("followers")
+          .select("id")
+          .eq("follower_id", currentUserId)
+          .eq("following_id", userId)
+          .maybeSingle();
+
+        setIsFollowing(!!data);
+      }
+
+      // Fetch verification data (non-sensitive fields only)
+      const { data: verificationRow } = await supabase
+        .from("creator_verifications")
+        .select("verification_level, verification_status, trust_score, risk_score, email_verified, phone_verified, identity_verified, bank_verified, business_verified, selfie_verified")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      setVerification(verificationRow);
+
+      setProfile({
+        ...profileRow,
+        followers_count: followersCount || 0,
+        following_count: followingCount || 0,
+      });
+
+      setProjects(projectRows || []);
+    } finally {
+      queueMicrotask(() => setLoading(false));
+    }
+  }, [currentUserId]);
+
   useEffect(() => {
     if (id && currentUserId !== undefined) {
       loadProfile(id);
     }
-  }, [id, currentUserId]);
-
-  /* ---------------- LOAD PROFILE ---------------- */
-  async function loadProfile(userId) {
-    setLoading(true);
-
-    const { data: profileRow } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .maybeSingle();
-
-    const { data: projectRows } = await supabase
-      .from("projects")
-      .select("*")
-      .eq("owner_id", userId)
-      .order("created_at", { ascending: false });
-
-    const { count: followersCount } = await supabase
-      .from("followers")
-      .select("id", { count: "exact", head: true })
-      .eq("following_id", userId);
-
-    const { count: followingCount } = await supabase
-      .from("followers")
-      .select("id", { count: "exact", head: true })
-      .eq("follower_id", userId);
-
-    if (currentUserId && !followTouchedRef.current) {
-      const { data } = await supabase
-        .from("followers")
-        .select("id")
-        .eq("follower_id", currentUserId)
-        .eq("following_id", userId)
-        .maybeSingle();
-
-      setIsFollowing(!!data);
-    }
-
-    setProfile({
-      ...profileRow,
-      followers_count: followersCount || 0,
-      following_count: followingCount || 0,
-    });
-
-    setProjects(projectRows || []);
-    setLoading(false);
-  }
+  }, [id, currentUserId, loadProfile]);
 
   /* ---------------- FOLLOW ---------------- */
   async function followUser(e) {
     e.preventDefault();
     e.stopPropagation();
 
-    if (!currentUserId) return router.push("/login");
+    if (!currentUserId) { router.push("/login"); return; }
     if (currentUserId === id) return;
 
     followTouchedRef.current = true;
@@ -188,10 +201,11 @@ export default function CreatorProfile() {
     return (
       <div className="min-h-screen flex flex-col bg-surface-dim">
         <Navbar />
-        <div className="flex-1 flex items-center justify-center">
+        <div className="flex-1 flex items-center justify-center" role="status" aria-label="Loading creator profile">
           <span
             className="material-symbols-outlined animate-spin text-primary text-4xl"
             style={{ fontVariationSettings: "'FILL' 1" }}
+            aria-hidden="true"
           >
             progress_activity
           </span>
@@ -228,12 +242,18 @@ export default function CreatorProfile() {
       <Navbar />
 
       {/* ── HERO ── */}
-      <ProfileHeader banner={banner} avatar={avatar} fullName={profile.full_name} bio={profile.bio}>
+      <ProfileHeader
+        banner={banner}
+        avatar={avatar}
+        fullName={profile.full_name}
+        bio={profile.bio}
+        verificationLevel={verification?.verification_level || 0}
+      >
         <ProfileActions
           isOwner={currentUserId === profile.id}
           isFollowing={isFollowing}
-          onEdit={() => router.push("/edit-profile")}
-          onMessage={() => router.push(`/dm/${profile.id}`)}
+          onEdit={() => { router.push("/edit-profile"); }}
+          onMessage={() => { router.push(`/dm/${profile.id}`); }}
           onFollow={followUser}
           onUnfollow={unfollowUser}
         />
@@ -246,6 +266,12 @@ export default function CreatorProfile() {
             <>
               <SidebarAbout bio={profile.bio} achievements={achievements} />
               <SidebarConnect profile={profile} />
+              {currentUserId === profile.id && verification && (
+                <VerificationCard
+                  verification={verification}
+                  onNavigate={() => { router.push("/creator/verification"); }}
+                />
+              )}
             </>
           }
         >

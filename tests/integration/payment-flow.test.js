@@ -44,6 +44,19 @@ vi.mock("razorpay", () => ({
           amount: 50000,
           currency: "INR",
         }),
+        // Server-side re-verification: order bound to project + payer.
+        fetch: vi.fn().mockResolvedValue({
+          id: "order_test_abc123",
+          notes: { project_id: "project-456", payer_id: "test-user-123" },
+        }),
+      };
+      this.payments = {
+        // Payment bound to the same order, amount ₹500 (paise).
+        fetch: vi.fn().mockResolvedValue({
+          id: "pay_test_xyz789",
+          order_id: "order_test_abc123",
+          amount: 50000,
+        }),
       };
     }
   },
@@ -140,10 +153,23 @@ describe("Payment Flow Integration", () => {
       }
     });
 
-    // Creator config lookup (used by create-order & verify)
-    supabaseAdmin.maybeSingle.mockResolvedValue({
-      data: mockCreatorConfig,
-      error: null,
+    // maybeSingle is used by create-order/verify for (1) the idempotency check
+    // on public_donations (must be null — no existing donation), (2) the
+    // creator_verifications lookup (owner must be approved for the Phase 1
+    // gate), and (3) the creator_payment_configs lookup. Route by table so the
+    // idempotency check doesn't see the creator config as an already-processed
+    // payment, and the verification gate sees an approved owner.
+    supabaseAdmin.maybeSingle.mockImplementation(function () {
+      if (this._currentTable === "creator_payment_configs") {
+        return Promise.resolve({ data: mockCreatorConfig, error: null });
+      }
+      if (this._currentTable === "creator_verifications") {
+        return Promise.resolve({
+          data: { verification_status: "approved" },
+          error: null,
+        });
+      }
+      return Promise.resolve({ data: null, error: null });
     });
 
     // Insert donation → chainable .select().single() returning donation id
@@ -339,7 +365,17 @@ describe("Payment Flow Integration", () => {
 
   /* ================================================================ */
   it("returns 500 when creator payment config is missing", async () => {
-    supabaseAdmin.maybeSingle.mockResolvedValue({ data: null, error: null });
+    // Owner stays approved (verification gate passes); only the creator
+    // payment config lookup is empty.
+    supabaseAdmin.maybeSingle.mockImplementation(function () {
+      if (this._currentTable === "creator_verifications") {
+        return Promise.resolve({
+          data: { verification_status: "approved" },
+          error: null,
+        });
+      }
+      return Promise.resolve({ data: null, error: null });
+    });
 
     const req = createMockReq("POST", {
       amount: 500,

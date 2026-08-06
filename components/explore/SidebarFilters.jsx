@@ -1,17 +1,11 @@
 import { motion } from "framer-motion";
-
-const CATEGORIES = [
-  { id: "tech-web3", label: "Tech & Web3" },
-  { id: "ai", label: "Artificial Intelligence" },
-  { id: "creative", label: "Creative Media" },
-  { id: "social", label: "Social Impact" },
-];
+import { PROJECT_CATEGORIES } from "../../lib/categories";
 
 const STAGES = ["Pre-seed", "Seed", "Series A", "Scale-up"];
 
 /**
  * SidebarFilters — Sticky sidebar with categories, funding range, market stage.
- * Uses same filter state shape as the old FiltersSidebar.
+ * Categories come from shared lib/categories.js to match what's stored in Supabase.
  */
 export default function SidebarFilters({ filters, setFilters }) {
   function toggleCategory(label) {
@@ -27,6 +21,13 @@ export default function SidebarFilters({ filters, setFilters }) {
     setFilters((f) => ({ ...f, maxGoal: value }));
   }
 
+  function toggleStage(stage) {
+    setFilters((f) => ({
+      ...f,
+      stage: f.stage === stage ? "" : stage,
+    }));
+  }
+
   return (
     <motion.aside
       initial={{ opacity: 0, x: -20 }}
@@ -40,8 +41,8 @@ export default function SidebarFilters({ filters, setFilters }) {
           <h3 className="text-on-surface font-geist text-sm font-semibold uppercase tracking-widest mb-6 border-l-2 border-primary pl-4">
             Categories
           </h3>
-          <div className="space-y-2">
-            {CATEGORIES.map((cat) => {
+          <div className="space-y-2 max-h-80 overflow-y-auto custom-scrollbar pr-1">
+            {PROJECT_CATEGORIES.map((cat) => {
               const checked = filters.categories.includes(cat.label);
               return (
                 <label
@@ -77,11 +78,15 @@ export default function SidebarFilters({ filters, setFilters }) {
               value={filters.maxGoal || 1000000}
               onChange={(e) => setFundingMax(Number(e.target.value))}
               className="w-full h-1.5 bg-surface-container-highest rounded-lg appearance-none cursor-pointer"
+              aria-label={`Maximum funding goal: ₹${(filters.maxGoal || 1000000).toLocaleString("en-IN")}`}
             />
-            <div className="flex justify-between mt-3 text-xs font-inter text-on-surface-variant">
-              <span>$0</span>
-              <span>$1M+</span>
+            <div className="flex justify-between mt-3 text-xs font-inter text-on-surface-variant" aria-hidden="true">
+              <span>₹0</span>
+              <span>₹10L+</span>
             </div>
+            <p className="text-xs text-on-surface-variant mt-1" aria-live="polite">
+              Max: ₹{(filters.maxGoal || 1000000).toLocaleString("en-IN")}
+            </p>
           </div>
         </div>
 
@@ -94,10 +99,12 @@ export default function SidebarFilters({ filters, setFilters }) {
             {STAGES.map((stage) => (
               <button
                 key={stage}
-                onClick={() => {
-                  /* Stage filtering — can be extended later */
-                }}
-                className="px-3 py-1.5 rounded bg-surface-container-low border border-outline-variant text-sm font-inter text-on-surface-variant hover:bg-primary/20 hover:border-primary transition-all"
+                onClick={() => toggleStage(stage)}
+                className={`px-3 py-1.5 rounded border text-sm font-inter transition-all ${
+                  filters.stage === stage
+                    ? "bg-primary/20 border-primary text-primary"
+                    : "bg-surface-container-low border-outline-variant text-on-surface-variant hover:bg-primary/10 hover:border-primary/50"
+                }`}
               >
                 {stage}
               </button>

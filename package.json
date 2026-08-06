@@ -4,14 +4,20 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:clean": "cd /home/himanshu/Fundora && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:e2e": "npx playwright test",
+    "test:e2e:ui": "npx playwright test --ui",
+    "test:all": "vitest run && npx playwright test"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.3",
     "@supabase/supabase-js": "^2.87.1",
+    "busboy": "^1.6.0",
     "chartjs-node-canvas": "^5.0.0",
     "dayjs": "^1.11.19",
     "framer-motion": "^12.26.1",
@@ -28,6 +34,7 @@
     "resend": "^6.6.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

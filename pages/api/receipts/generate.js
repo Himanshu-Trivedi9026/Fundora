@@ -33,6 +33,7 @@ export default withAuth(async function handler(req, res, user) {
       `)
       .eq("id", donationId)
       .eq("payer_id", user.id)
+      .eq("status", "paid")
       .single();
 
     if (error) {

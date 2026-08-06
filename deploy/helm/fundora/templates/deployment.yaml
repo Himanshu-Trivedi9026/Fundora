@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "fundora.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "fundora.labels" . | nindent 4 }}
+    app.kubernetes.io/component: app
+spec:
+  replicas: {{ .Values.app.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "fundora.name" . }}
+      app.kubernetes.io/component: app
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "fundora.name" . }}
+        app.kubernetes.io/component: app
+        app.kubernetes.io/instance: {{ .Release.Name }}
+      annotations:
+        prometheus.io/scrape: "{{ .Values.monitoring.prometheus.enabled }}"
+        prometheus.io/port: "{{ .Values.app.port }}"
+        prometheus.io/path: "/api/metrics"
+    spec:
+      serviceAccountName: {{ include "fundora.fullname" . }}
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: app
+          image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          ports:
+            - containerPort: {{ .Values.app.port }}
+              name: http
+              protocol: TCP
+          env:
+            - name: NODE_ENV
+              value: {{ .Values.env.NODE_ENV }}
+            - name: PORT
+              value: {{ .Values.app.port | quote }}
+            - name: NEXT_TELEMETRY_DISABLED
+              value: {{ .Values.env.NEXT_TELEMETRY_DISABLED }}
+            - name: LOG_LEVEL
+              value: {{ .Values.env.LOG_LEVEL }}
+            - name: CACHE_BACKEND
+              value: {{ .Values.env.CACHE_BACKEND }}
+            - name: ENABLE_TRACING
+              value: {{ .Values.env.ENABLE_TRACING }}
+            - name: ENABLE_METRICS
+              value: {{ .Values.env.ENABLE_METRICS }}
+            - name: JOB_CONCURRENCY
+              value: {{ .Values.env.JOB_CONCURRENCY }}
+            - name: SUPABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "fundora.fullname" . }}-secrets
+                  key: supabase-url
+            - name: SUPABASE_SERVICE_ROLE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "fundora.fullname" . }}-secrets
+                  key: supabase-service-role-key
+            - name: NEXTAUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "fundora.fullname" . }}-secrets
+                  key: nextauth-secret
+            - name: NEXTAUTH_URL
+              value: https://{{ (first .Values.ingress.hosts).host }}
+            - name: REDIS_URL
+              value: "redis://{{ include "fundora.fullname" . }}-redis:6379"
+          resources:
+            {{- toYaml .Values.app.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.app.probes.liveness.path }}
+              port: {{ .Values.app.port }}
+            initialDelaySeconds: {{ .Values.app.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.app.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.app.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.app.probes.liveness.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.app.probes.readiness.path }}
+              port: {{ .Values.app.port }}
+            initialDelaySeconds: {{ .Values.app.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.app.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.app.probes.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.app.probes.readiness.failureThreshold }}
+          startupProbe:
+            httpGet:
+              path: {{ .Values.app.probes.startup.path }}
+              port: {{ .Values.app.port }}
+            initialDelaySeconds: {{ .Values.app.probes.startup.initialDelaySeconds }}
+            periodSeconds: {{ .Values.app.probes.startup.periodSeconds }}
+            failureThreshold: {{ .Values.app.probes.startup.failureThreshold }}

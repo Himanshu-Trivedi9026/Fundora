@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "fundora.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "fundora.labels" . | nindent 4 }}
+data:
+  NODE_ENV: {{ .Values.env.NODE_ENV }}
+  NEXT_PUBLIC_BUILD_ENV: {{ .Values.env.NEXT_PUBLIC_BUILD_ENV }}
+  NEXT_TELEMETRY_DISABLED: {{ .Values.env.NEXT_TELEMETRY_DISABLED }}
+  LOG_LEVEL: {{ .Values.env.LOG_LEVEL }}
+  CACHE_BACKEND: {{ .Values.env.CACHE_BACKEND }}
+  ENABLE_TRACING: {{ .Values.env.ENABLE_TRACING }}
+  ENABLE_METRICS: {{ .Values.env.ENABLE_METRICS }}
+  JOB_CONCURRENCY: {{ .Values.env.JOB_CONCURRENCY }}

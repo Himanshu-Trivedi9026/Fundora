@@ -21,6 +21,7 @@ export default function AnimatedCounter({
     if (!inView) return;
     let start = 0;
     const startTime = performance.now();
+    let animationId;
 
     function tick(now) {
       const elapsed = now - startTime;
@@ -29,10 +30,18 @@ export default function AnimatedCounter({
       const eased = 1 - Math.pow(1 - progress, 3);
       start = eased * end;
       setValue(start);
-      if (progress < 1) requestAnimationFrame(tick);
+      if (progress < 1) {
+        animationId = requestAnimationFrame(tick);
+      }
     }
 
-    requestAnimationFrame(tick);
+    animationId = requestAnimationFrame(tick);
+
+    return () => {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+    };
   }, [inView, end, duration]);
 
   return (

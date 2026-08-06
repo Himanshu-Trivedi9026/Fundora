@@ -6,11 +6,19 @@ const nextConfig = {
   poweredByHeader: false,
 
   images: {
-    // Allow Supabase storage URLs for next/image optimization
+    // Allow Supabase storage URLs + ui-avatars.com for next/image optimization
     remotePatterns: [
       {
         protocol: "https",
         hostname: "**.supabase.co",
+      },
+      {
+        protocol: "https",
+        hostname: "ui-avatars.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
       },
     ],
   },
@@ -79,7 +87,7 @@ const nextConfig = {
                     // Fonts
                     "font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com",
                     // Images: self + Supabase storage + Razorpay logos + tracking pixels + avatar service
-                    "img-src 'self' data: blob: https://*.supabase.co https://checkout.razorpay.com https://lumberjack.razorpay.com https://ui-avatars.com",
+                    "img-src 'self' data: blob: https://*.supabase.co https://checkout.razorpay.com https://lumberjack.razorpay.com https://ui-avatars.com https://images.unsplash.com",
                     // API connections: Supabase (HTTPS + WSS realtime) + Razorpay + OpenRouter + OpenAI
                     "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openrouter.ai https://api.openai.com https://checkout.razorpay.com https://lumberjack.razorpay.com https://api.razorpay.com https://rzp.razorpay.com",
                     // Frames: Razorpay checkout + payment verification iframe

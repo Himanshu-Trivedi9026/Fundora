@@ -1,4 +1,4 @@
-import { useRef, useMemo, useEffect } from "react";
+import { useRef, useMemo, useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { PageHeader, GlassCard } from "../ui";
@@ -13,6 +13,7 @@ export default function MediaStep({
   errors,
 }) {
   const fileInputRef = useRef(null);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   // Memoize thumbnail preview URL to prevent blob URL leak on re-render
   const thumbnailPreview = useMemo(
@@ -27,19 +28,53 @@ export default function MediaStep({
     };
   }, [thumbnailPreview]);
 
+  const handleThumbnailFile = useCallback(
+    (file) => {
+      if (!file) return;
+      if (!file.type.startsWith("image/")) {
+        alert("Please upload an image file (JPG, PNG, WebP, etc.)");
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        alert("Thumbnail should be less than 10MB");
+        return;
+      }
+      setThumbnailFile(file);
+    },
+    [setThumbnailFile]
+  );
+
   const handleThumbnailChange = (e) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 10 * 1024 * 1024) {
-      alert("Thumbnail should be less than 10MB");
-      return;
-    }
-    setThumbnailFile(file);
+    if (file) handleThumbnailFile(file);
+    // Reset input so re-selecting the same file triggers onChange
+    e.target.value = "";
   };
 
   const removeThumbnail = () => {
     setThumbnailFile(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  // Native drag-and-drop handlers
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleThumbnailFile(file);
   };
 
   return (
@@ -60,12 +95,13 @@ export default function MediaStep({
         {/* Hero Image / Thumbnail */}
         <div className="space-y-3">
           <label className="block font-inter text-sm text-on-surface-variant">
-            Hero Image <span className="text-red-400 ml-0.5">*</span>
+            Hero Image <span className="text-red-400 ml-0.5" aria-hidden="true">*</span>
           </label>
 
           {thumbnailFile && thumbnailPreview ? (
-            /* Thumbnail Preview */
+            /* ── Thumbnail Preview ── */
             <div className="glass-card rounded-xl overflow-hidden group relative">
+              {/* eslint-disable-next-line @next/next/no-img-element -- FileReader blob URL, cannot use next/image */}
               <img
                 src={thumbnailPreview}
                 alt="Thumbnail preview"
@@ -89,28 +125,39 @@ export default function MediaStep({
               </div>
             </div>
           ) : (
-            /* Upload Area */
+            /* ── Upload Area ── */
             <button
+              type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="glass-card p-8 rounded-xl flex flex-col items-center justify-center border-dashed border-2 border-outline-variant hover:border-primary transition-colors cursor-pointer group min-h-[250px] w-full"
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              className={`glass-card p-8 rounded-xl flex flex-col items-center justify-center border-dashed border-2 transition-all cursor-pointer group min-h-[250px] w-full ${
+                isDragOver
+                  ? "border-primary bg-primary/5 scale-[1.02]"
+                  : "border-outline-variant hover:border-primary"
+              }`}
               aria-label="Upload hero image"
             >
-              <span className="material-symbols-outlined text-[48px] text-on-surface-variant group-hover:text-primary transition-colors mb-4">
-                image_search
+              <span className="material-symbols-outlined text-[48px] text-on-surface-variant group-hover:text-primary transition-colors mb-4" aria-hidden="true">
+                {isDragOver ? "add_photo_alternate" : "image_search"}
               </span>
               <span className="font-geist text-base font-semibold text-on-surface mb-2">
-                Hero Image
+                {isDragOver ? "Drop your image here" : "Hero Image"}
               </span>
               <p className="text-on-surface-variant font-inter text-xs text-center max-w-[200px]">
-                Drag and drop or click to upload. Recommended 1920x1080.
+                {isDragOver
+                  ? "Release to upload"
+                  : "Drag and drop or click to upload. Recommended 1920×1080."}
               </p>
             </button>
           )}
 
+          {/* Single hidden file input — the ONLY input */}
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp,image/gif"
             onChange={handleThumbnailChange}
             className="hidden"
             aria-label="Select thumbnail image"

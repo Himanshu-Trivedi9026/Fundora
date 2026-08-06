@@ -1,0 +1,31 @@
+{
+  "page": "login",
+  "route": "/login",
+  "timestamp": "2026-08-02T15:24:42.045Z",
+  "metrics": {
+    "loadTimeMs": 15392,
+    "ttfb": 6,
+    "domContentLoaded": 540,
+    "loadComplete": 6673,
+    "domInteractive": 28,
+    "transferSize": 4074,
+    "fcp": 504,
+    "lcp": 836,
+    "cls": 0.0175,
+    "network": {
+      "totalRequests": 33,
+      "totalTransferSize": 311694,
+      "jsRequests": 26,
+      "cssRequests": 5,
+      "imageRequests": 0
+    },
+    "pageSize": {
+      "documentElements": 156,
+      "domDepth": 14,
+      "totalImages": 0,
+      "totalScripts": 25,
+      "totalStylesheets": 3
+    }
+  },
+  "consoleErrors": []
+}

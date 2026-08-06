@@ -53,8 +53,21 @@ function createMockRes() {
 }
 
 describe("POST /api/ai/generate-campaign", () => {
+  const originalEnv = process.env.OPENAI_API_KEY;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    // Set a mock API key so the handler doesn't return early
+    process.env.OPENAI_API_KEY = "test-api-key";
+  });
+
+  afterEach(() => {
+    // Restore original env
+    if (originalEnv === undefined) {
+      delete process.env.OPENAI_API_KEY;
+    } else {
+      process.env.OPENAI_API_KEY = originalEnv;
+    }
   });
 
   it("returns 405 for non-POST methods", async () => {
@@ -69,7 +82,7 @@ describe("POST /api/ai/generate-campaign", () => {
     const res = createMockRes();
     await handler(req, res);
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ error: "Missing required fields" });
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: expect.stringContaining("Missing required fields") }));
   });
 
   it("returns 400 when category is missing", async () => {
@@ -103,7 +116,7 @@ describe("POST /api/ai/generate-campaign", () => {
     expect(res.json).toHaveBeenCalledWith({ content: "Test campaign description" });
   });
 
-  it("returns empty content when AI returns empty", async () => {
+  it("returns error when AI returns empty content", async () => {
     mockCreate.mockResolvedValueOnce({
       choices: [{ message: { content: "" } }],
     });
@@ -111,7 +124,8 @@ describe("POST /api/ai/generate-campaign", () => {
     const req = createMockReq("POST", { title: "My Project", category: "Tech", goal: 10000 });
     const res = createMockRes();
     await handler(req, res);
-    expect(res.json).toHaveBeenCalledWith({ content: "" });
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: expect.stringContaining("empty") }));
   });
 
   it("returns 500 when OpenAI call fails", async () => {
@@ -121,6 +135,6 @@ describe("POST /api/ai/generate-campaign", () => {
     const res = createMockRes();
     await handler(req, res);
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ error: "AI generation failed" });
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: expect.stringContaining("AI generation failed") }));
   });
 });

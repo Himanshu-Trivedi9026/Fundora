@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { supabase } from "../lib/supabaseClient";
 import Navbar from "../components/Navbar";
@@ -45,45 +45,46 @@ export default function FollowersPage() {
   }, [user]);
 
   /* ================= LOAD CONNECTIONS ================= */
+  const loadConnections = useCallback(async () => {
+    queueMicrotask(() => setLoading(true));
+    try {
+      const { data: followRows, error } = await supabase
+        .from("followers")
+        .select(tab === "followers" ? "follower_id" : "following_id")
+        .eq(
+          tab === "followers" ? "following_id" : "follower_id",
+          user.id
+        );
+
+      if (error || !followRows || followRows.length === 0) {
+        setList([]);
+        return;
+      }
+
+      const ids = followRows.map((r) =>
+        tab === "followers" ? r.follower_id : r.following_id
+      );
+
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, full_name, avatar_url, bio")
+        .in("id", ids);
+
+      setList(profiles || []);
+    } finally {
+      queueMicrotask(() => setLoading(false));
+    }
+  }, [user, tab]);
+
   useEffect(() => {
     if (!user || search) return;
     loadConnections();
-  }, [user, tab, search]);
-
-  async function loadConnections() {
-    setLoading(true);
-
-    const { data: followRows, error } = await supabase
-      .from("followers")
-      .select(tab === "followers" ? "follower_id" : "following_id")
-      .eq(
-        tab === "followers" ? "following_id" : "follower_id",
-        user.id
-      );
-
-    if (error || !followRows || followRows.length === 0) {
-      setList([]);
-      setLoading(false);
-      return;
-    }
-
-    const ids = followRows.map((r) =>
-      tab === "followers" ? r.follower_id : r.following_id
-    );
-
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("id, full_name, avatar_url, bio")
-      .in("id", ids);
-
-    setList(profiles || []);
-    setLoading(false);
-  }
+  }, [user, tab, search, loadConnections]);
 
   /* ================= SEARCH ================= */
   useEffect(() => {
     if (!search.trim()) {
-      setSearchResults([]);
+      queueMicrotask(() => setSearchResults([]));
       return;
     }
 
@@ -207,7 +208,7 @@ export default function FollowersPage() {
             className="max-w-2xl mx-auto mb-16 relative"
           >
             <div className="glass-card flex items-center px-6 py-4 rounded-full group focus-within:ring-2 focus-within:ring-primary/40">
-              <span className="material-symbols-outlined text-primary group-focus-within:scale-110 transition-transform">
+              <span className="material-symbols-outlined text-primary group-focus-within:scale-110 transition-transform" aria-hidden="true">
                 search
               </span>
               <input
@@ -216,6 +217,7 @@ export default function FollowersPage() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                aria-label="Search connections"
               />
               <div className="flex items-center gap-2 shrink-0">
                 <span className="text-[10px] text-outline px-2 py-1 border border-outline-variant/30 rounded uppercase tracking-widest font-bold">
@@ -270,7 +272,7 @@ export default function FollowersPage() {
                   className="border-2 border-dashed border-outline-variant/30 p-6 rounded-xl flex flex-col items-center justify-center text-center bg-surface-container-low/30 hover:border-primary/50 transition-colors cursor-pointer col-span-full"
                 >
                   <div className="w-12 h-12 rounded-full bg-surface-variant flex items-center justify-center mb-4">
-                    <span className="material-symbols-outlined text-primary">
+                    <span className="material-symbols-outlined text-primary" aria-hidden="true">
                       person_add
                     </span>
                   </div>
@@ -292,7 +294,7 @@ export default function FollowersPage() {
                 exit={{ opacity: 0 }}
                 className="text-center py-16"
               >
-                <span className="material-symbols-outlined text-5xl text-on-surface-variant/30 block mb-4">
+                <span className="material-symbols-outlined text-5xl text-on-surface-variant/30 block mb-4" aria-hidden="true">
                   search_off
                 </span>
                 <p className="text-on-surface-variant font-inter text-lg">
@@ -330,7 +332,7 @@ export default function FollowersPage() {
                     className="border-2 border-dashed border-outline-variant/30 p-6 rounded-xl flex flex-col items-center justify-center text-center bg-surface-container-low/30 hover:border-primary/50 transition-colors cursor-pointer group"
                   >
                     <div className="w-12 h-12 rounded-full bg-surface-variant flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                      <span className="material-symbols-outlined text-primary">
+                      <span className="material-symbols-outlined text-primary" aria-hidden="true">
                         person_add
                       </span>
                     </div>
@@ -360,7 +362,7 @@ export default function FollowersPage() {
                 className="px-12 py-4 bg-surface-container-highest text-on-surface font-inter text-sm rounded-xl hover:bg-surface-bright transition-colors border border-outline-variant/30 flex items-center gap-2 group"
               >
                 Load More Connections
-                <span className="material-symbols-outlined group-hover:translate-y-1 transition-transform">
+                <span className="material-symbols-outlined group-hover:translate-y-1 transition-transform" aria-hidden="true">
                   expand_more
                 </span>
               </motion.button>

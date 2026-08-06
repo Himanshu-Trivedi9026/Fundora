@@ -1,0 +1,50 @@
+# Fundora — Prometheus Configuration
+# Scrapes metrics from the application and monitors system health
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+# Alerting configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+      scheme: http
+      timeout: 10s
+
+# Rule files
+rule_files:
+  - "alerts/*.yml"
+
+# Scrape targets
+scrape_configs:
+  # Application metrics
+  - job_name: "fundora-app"
+    metrics_path: "/api/metrics"
+    scheme: http
+    static_configs:
+      - targets: ["app:3000"]
+        labels:
+          service: "fundora"
+          environment: "production"
+
+  # Redis metrics (via redis_exporter, if deployed)
+  - job_name: "redis"
+    static_configs:
+      - targets: ["redis:6379"]
+        labels:
+          service: "redis"
+
+  # Node/system metrics (via node_exporter, if deployed)
+  - job_name: "node"
+    static_configs:
+      - targets: ["node-exporter:9100"]
+        labels:
+          service: "node"
+
+  # Self-monitoring
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]

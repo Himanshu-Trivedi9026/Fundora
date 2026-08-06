@@ -1,0 +1,31 @@
+{
+  "page": "explore",
+  "route": "/explore",
+  "timestamp": "2026-08-02T15:24:22.545Z",
+  "metrics": {
+    "loadTimeMs": 4734,
+    "ttfb": 5,
+    "domContentLoaded": 368,
+    "loadComplete": 3772,
+    "domInteractive": 20,
+    "transferSize": 4480,
+    "fcp": 332,
+    "lcp": 2752,
+    "cls": 0.0991,
+    "network": {
+      "totalRequests": 50,
+      "totalTransferSize": 367657,
+      "jsRequests": 34,
+      "cssRequests": 8,
+      "imageRequests": 3
+    },
+    "pageSize": {
+      "documentElements": 293,
+      "domDepth": 14,
+      "totalImages": 1,
+      "totalScripts": 31,
+      "totalStylesheets": 3
+    }
+  },
+  "consoleErrors": []
+}

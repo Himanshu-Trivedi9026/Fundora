@@ -1,20 +1,7 @@
 import { Badge } from "./ui";
+import { PROJECT_CATEGORIES } from "../lib/categories";
 
 export default function CategorySelector({ selected, setSelected }) {
-  const categories = [
-    "Artificial Intelligence",
-    "Technology",
-    "Education",
-    "Health",
-    "Environment",
-    "Food",
-    "Art",
-    "Fashion",
-    "Gaming",
-    "Community",
-    "Business",
-  ];
-
   function toggleCategory(cat) {
     if (selected.includes(cat)) {
       setSelected(selected.filter((c) => c !== cat));
@@ -30,14 +17,14 @@ export default function CategorySelector({ selected, setSelected }) {
         role="group"
         aria-label="Project categories"
       >
-        {categories.map((cat) => (
+        {PROJECT_CATEGORIES.map((cat) => (
           <Badge
-            key={cat}
-            active={selected.includes(cat)}
-            onClick={() => toggleCategory(cat)}
-            aria-pressed={selected.includes(cat)}
+            key={cat.id}
+            active={selected.includes(cat.label)}
+            onClick={() => toggleCategory(cat.label)}
+            aria-pressed={selected.includes(cat.label)}
           >
-            {cat}
+            {cat.label}
           </Badge>
         ))}
       </div>

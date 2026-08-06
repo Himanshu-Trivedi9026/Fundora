@@ -1,0 +1,71 @@
+# Fundora — ConfigMap & Secrets
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fundora-config
+  namespace: fundora
+  labels:
+    app: fundora
+data:
+  NODE_ENV: "production"
+  NEXT_PUBLIC_BUILD_ENV: "production"
+  NEXT_TELEMETRY_DISABLED: "1"
+  LOG_LEVEL: "info"
+  PORT: "3000"
+  CACHE_BACKEND: "memory"
+  ENABLE_TRACING: "false"
+  ENABLE_METRICS: "true"
+  JOB_CONCURRENCY: "5"
+  REDIS_URL: "redis://fundora-redis:6379"
+  NEXTAUTH_URL: "https://fundora.app"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: fundora-secrets
+  namespace: fundora
+  labels:
+    app: fundora
+type: Opaque
+stringData:
+  supabase-url: ""      # Set via: kubectl apply -f - < sealed-secret or external-secrets
+  supabase-service-role-key: ""
+  nextauth-secret: ""
+  encryption-key: ""
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fundora-app
+  namespace: fundora
+  labels:
+    app: fundora
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: fundora-app-role
+  namespace: fundora
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services", "endpoints"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: fundora-app-rolebinding
+  namespace: fundora
+subjects:
+  - kind: ServiceAccount
+    name: fundora-app
+    namespace: fundora
+roleRef:
+  kind: Role
+  name: fundora-app-role
+  apiGroup: rbac.authorization.k8s.io

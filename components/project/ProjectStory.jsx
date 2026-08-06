@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
 /**
- * ProjectStory — Project story section with prose styling and prototype link.
+ * ProjectStory — Project story section.
  * Props: { project }
  */
 export default function ProjectStory({ project }) {
@@ -10,33 +10,35 @@ export default function ProjectStory({ project }) {
 
   return (
     <motion.section
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+      aria-label="Project story"
     >
-      <h2 className="font-geist text-2xl font-bold text-on-surface mb-8 flex items-center gap-3">
-        <span className="w-8 h-[2px] bg-primary" />
+      <h2 className="font-geist text-[24px] font-bold border-b border-outline-variant/30 pb-3">
         Project Story
       </h2>
 
-      <div className="space-y-6 text-on-surface-variant font-inter text-lg leading-relaxed">
+      <div className="space-y-4">
         {description.split("\n").map((paragraph, i) => (
-          <p key={i}>{paragraph}</p>
+          <p key={i} className="text-on-surface-variant font-inter text-sm md:text-base leading-relaxed">
+            {paragraph}
+          </p>
         ))}
       </div>
 
-      {/* Prototype Link */}
       {prototypeUrl && (
         <motion.a
           whileHover={{ scale: 1.02 }}
           href={prototypeUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 mt-6 px-4 py-2 rounded-lg bg-primary/10 border border-primary/20 text-primary font-inter text-sm hover:bg-primary/20 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 border border-primary/20 text-primary font-inter text-sm hover:bg-primary/20 transition-colors"
         >
-          <span className="material-symbols-outlined text-lg">open_in_new</span>
-          View Prototype
+          <span className="material-symbols-outlined text-lg" aria-hidden="true">open_in_new</span>
+          View Prototype (opens in new tab)
         </motion.a>
       )}
     </motion.section>

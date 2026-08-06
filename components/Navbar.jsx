@@ -1,8 +1,14 @@
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient";
 import { signOutUser } from "../lib/auth";
 import { useRouter } from "next/router";
+import { useRole } from "../context/RoleContext";
+import {
+  canStartProject,
+  startProjectHref,
+  canAccessArea,
+} from "../lib/roles";
 
 /* Inline SVG icons — eliminates 2.2MB react-icons/fa + react-icons/fi from Navbar */
 function EnvelopeIcon({ size = 18 }) {
@@ -71,94 +77,81 @@ function MenuItem({ href, onClick, label, danger }) {
   );
 }
 
-export default function Navbar({ onToggleFilters }) {
-  const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState(null);
+/* ─── Role Badge & Menu Definitions ─── */
+const ROLE_BADGE = {
+  platform_admin: { label: "Admin", class: "bg-amber-500/20 text-amber-400 border border-amber-500/20" },
+  creator: { label: "Creator", class: "bg-purple-500/20 text-purple-400 border border-purple-500/20" },
+  donor: { label: "Investor", class: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/20" },
+};
+
+const ROLE_MENUS = {
+  donor: [
+    { href: "/investor/dashboard", label: "Dashboard" },
+    { href: "/investor/portfolio", label: "Portfolio" },
+    { href: "/investor/analytics", label: "Analytics" },
+    { href: "/investor/investments", label: "Investments" },
+    { href: "/saved", label: "Saved Projects" },
+    { href: "/investor/payment-history", label: "Payment History" },
+  ],
+  creator: [
+    { href: "/creator/dashboard", label: "Dashboard" },
+    { href: "/creator/projects", label: "My Campaigns" },
+    { href: "/creator/analytics", label: "Analytics" },
+    /* AI Insights — required path /creator/insights has no page; the real
+       AI page lives at /creator/ai-assistant (would otherwise fall through
+       to the dynamic /creator/[id] profile route). */
+    { href: "/creator/ai-assistant", label: "AI Insights" },
+    { href: "/creator/verification", label: "Verification" },
+    { href: "/creator/payouts", label: "Payouts" },
+    /* Razorpay — required path /creator/razorpay has no page; the real
+       Razorpay portal lives at /creator/payments. */
+    { href: "/creator/payments", label: "Razorpay" },
+    /* Followers — required path /creator/followers has no page; the real
+       page lives at /followers. */
+    { href: "/followers", label: "Followers" },
+  ],
+  platform_admin: [
+    { href: "/admin/dashboard", label: "Dashboard" },
+    { href: "/admin/analytics", label: "Analytics" },
+    { href: "/admin/organizations", label: "Users" },
+    { href: "/admin/verification-review", label: "Verification Queue" },
+    { href: "/admin/fraud", label: "Fraud Detection" },
+    { href: "/admin/escrow", label: "Escrow" },
+    { href: "/admin/compliance", label: "Compliance" },
+    { href: "/admin/audit-logs", label: "Audit Logs" },
+    { href: "/admin/infrastructure", label: "System Health" },
+  ],
+};
+
+export default function Navbar({ onToggleFilters, onToggleSidebar, sidebarCollapsed }) {
+  const { user, profile, role, isAdmin, isCreator, isDonor } = useRole();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [avatarError, setAvatarError] = useState(false);
   const router = useRouter();
 
-  /* ---------------- LOAD USER ---------------- */
-  useEffect(() => {
-    async function loadUser() {
-      const { data } = await supabase.auth.getUser();
-      const u = data?.user || null;
-      setUser(u);
-
-      if (u) {
-        // Parallelize profile + unread queries (was sequential)
-        const [profResult, unreadCount] = await Promise.all([
-          supabase.from("profiles").select("*").eq("id", u.id).single(),
-          supabase
-            .from("dm_messages")
-            .select("id", { count: "exact", head: true })
-            .neq("sender_id", u.id)
-            .eq("read", false),
-        ]);
-
-        setProfile(profResult.data);
-        setUnreadCount(unreadCount.count || 0);
-      }
-    }
-
-    loadUser();
-
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        const u = session?.user || null;
-        setUser(u);
-
-        if (u) {
-          // Parallelize on auth change too
-          Promise.all([
-            supabase.from("profiles").select("*").eq("id", u.id).single(),
-            supabase
-              .from("dm_messages")
-              .select("id", { count: "exact", head: true })
-              .neq("sender_id", u.id)
-              .eq("read", false),
-          ]).then(([profResult, unreadResult]) => {
-            setProfile(profResult.data);
-            setUnreadCount(unreadResult.count || 0);
-          });
-        }
-      }
-    );
-
-    return () => listener?.subscription?.unsubscribe();
-  }, []);
-
-  /* ---------------- START PROJECT ---------------- */
-  const handleStartProject = () => {
-    if (!user) {
-      router.push("/login?redirect=/create");
-    } else {
-      router.push("/create");
-    }
-  };
-
   const avatarSrc =
-    profile?.avatar_url ||
-    `https://ui-avatars.com/api/?bold=true&background=8b5cf6&color=fff&name=${
-      profile?.full_name || user?.email || "User"
-    }`;
+    avatarError || !profile?.avatar_url
+      ? `https://ui-avatars.com/api/?bold=true&background=8b5cf6&color=fff&name=${
+          profile?.full_name || user?.email || "User"
+        }`
+      : profile.avatar_url;
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-surface-dim/80 backdrop-blur-xl shadow-[0_1px_0_rgba(255,255,255,0.04)]">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
 
         {/* LEFT */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button
-            onClick={onToggleFilters}
-            className="text-on-surface-variant hover:text-on-surface p-2 rounded-md hover:bg-surface-container-high/50"
-            aria-label="Open filters"
+            onClick={onToggleSidebar || onToggleFilters}
+            className="text-on-surface-variant hover:text-on-surface p-2 rounded-md hover:bg-surface-container-high/50 transition-colors"
+            aria-label={onToggleSidebar ? (sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar") : "Open filters"}
           >
             <MenuIcon size={22} />
           </button>
 
           <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="Fundora" className="h-10 w-auto" />
+            <Image src="/logo.png" alt="Fundora" width={41} height={40} className="h-10 w-auto" priority />
             <span className="text-xl font-semibold text-on-surface">Fundora</span>
           </Link>
         </div>
@@ -169,12 +162,16 @@ export default function Navbar({ onToggleFilters }) {
             Explore
           </Link>
 
-          <button
-            onClick={handleStartProject}
-            className="hover:text-primary transition-colors"
-          >
-            Start a project
-          </button>
+          {/* Start Project is a creator-only affordance (see lib/roles.js).
+              Guests are onboarded via /get-started; investors never see it. */}
+          {canStartProject({ role }) && (
+            <Link
+              href={startProjectHref({ role })}
+              className="hover:text-primary transition-colors"
+            >
+              Start a project
+            </Link>
+          )}
         </div>
 
         {/* RIGHT */}
@@ -199,29 +196,26 @@ export default function Navbar({ onToggleFilters }) {
 
           {user && (
             <>
-              {/* ANALYTICS BUTTON */}
-              <button
-                onClick={() => router.push("/creator/analytics")}
-                className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full
-                           bg-surface-container-high/50 text-on-surface-variant text-xs hover:bg-primary hover:text-on-primary transition-colors"
-              >
-                <ChartBarIcon size={14} />
-                Analytics
-              </button>
+              {/* ANALYTICS BUTTON — creator-area route, so only roles that can
+                  access /creator/* (creator, platform_admin) see it. */}
+              {canAccessArea(role, "creator") && (
+                <button
+                  onClick={() => router.push("/creator/analytics")}
+                  className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full
+                             bg-surface-container-high/50 text-on-surface-variant text-xs hover:bg-primary hover:text-on-primary transition-colors"
+                >
+                  <ChartBarIcon size={14} />
+                  Analytics
+                </button>
+              )}
 
               {/* MESSAGES */}
               <Link
                 href="/dm"
                 className="relative text-on-surface-variant hover:text-on-surface transition-colors"
-                aria-label={`Messages${unreadCount > 0 ? `, ${unreadCount} unread` : ""}`}
+                aria-label="Messages"
               >
                 <EnvelopeIcon size={18} />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-danger text-white
-                    text-[10px] w-5 h-5 rounded-full flex items-center justify-center" aria-hidden="true">
-                    {unreadCount}
-                  </span>
-                )}
               </Link>
 
               {/* AVATAR + MENU */}
@@ -231,12 +225,15 @@ export default function Navbar({ onToggleFilters }) {
                   aria-label="Account menu"
                   aria-expanded={menuOpen}
                   aria-haspopup="true"
-                  className="w-9 h-9 rounded-full cursor-pointer border border-white/[0.08] overflow-hidden"
+                  className="w-9 h-9 rounded-full cursor-pointer border border-white/[0.08] overflow-hidden relative"
                 >
-                  <img
+                  <Image
                     src={avatarSrc}
                     alt=""
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="36px"
+                    className="object-cover"
+                    onError={() => setAvatarError(true)}
                   />
                 </button>
 
@@ -248,38 +245,53 @@ export default function Navbar({ onToggleFilters }) {
                               shadow-glass-lg overflow-hidden z-50"
                   >
 
-                    {/* PROFILE HEADER */}
+                    {/* PROFILE HEADER + ROLE BADGE */}
                     <div className="px-4 py-3 border-b border-white/[0.06]">
-                      <p className="text-sm font-semibold text-on-surface truncate">
-                        {profile?.full_name || user?.email}
-                      </p>
-                      <p className="text-xs text-muted">
-                        Account menu
-                      </p>
+                      <div className="flex items-center gap-3 mb-2">
+                        <Image
+                          src={avatarSrc}
+                          alt=""
+                          width={40}
+                          height={40}
+                          className="w-10 h-10 rounded-full object-cover border border-white/[0.1]"
+                          onError={() => setAvatarError(true)}
+                        />
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-on-surface truncate">
+                            {profile?.full_name || user?.email}
+                          </p>
+                          <p className="text-xs text-muted truncate">
+                            {user?.email}
+                          </p>
+                        </div>
+                      </div>
+                      <span className={`inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded-full ${ROLE_BADGE[role]?.class || ROLE_BADGE.donor.class}`}>
+                        {ROLE_BADGE[role]?.label || "Investor"}
+                      </span>
                     </div>
 
-                    {/* ITEMS */}
-                    <div className="py-2">
-                      <MenuItem href={`/creator/${user.id}`} label="View Profile" />
-                      <MenuItem href="/creator/analytics" label="Analytics" />
-                      <MenuItem href="/creator/payments" label="Razorpay Setup" />
-                      <MenuItem href="/payments" label="My Payments" />
-                      <MenuItem href="/creator/profile" label="Edit Payment Portal" />
-                      <MenuItem href="/followers" label="Followers" />
+                    {/* ROLE-SPECIFIC MENU ITEMS */}
+                    <div className="py-1">
+                      {(ROLE_MENUS[role] || ROLE_MENUS.donor).map((item) => (
+                        <MenuItem key={item.href} href={item.href} label={item.label} />
+                      ))}
+                    </div>
 
-                      <div className="my-2 border-t border-white/[0.06]" />
+                    {/* COMMON ITEMS */}
+                    {/* Settings — required path /settings has no page; the
+                        existing account-settings page is /edit-profile. */}
+                    <div className="py-1 border-t border-white/[0.06]">
+                      <MenuItem href="/edit-profile" label="Settings" />
+                    </div>
 
-                      <MenuItem
-                        href="/account/delete"
-                        label="Delete Account"
-                        danger
-                      />
+                    <div className="py-1 border-t border-white/[0.06]">
+                      <MenuItem href="/account/delete" label="Delete Account" danger />
 
                       <button
                         onClick={async () => {
-                          await signOutUser();
                           setMenuOpen(false);
-                          setUser(null);
+                          await signOutUser();
+                          router.push("/");
                         }}
                         className="w-full text-left px-4 py-2.5 text-sm text-danger
                                    hover:bg-danger-muted hover:text-danger transition"

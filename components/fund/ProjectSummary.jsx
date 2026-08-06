@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { motion } from "framer-motion";
 
 /**
@@ -25,10 +26,12 @@ export default function ProjectSummary({ project, creator, onBack }) {
         {/* Thumbnail */}
         <div className="w-24 h-24 rounded-xl bg-surface-container-high overflow-hidden shrink-0 border border-white/[0.06]">
           {project?.thumbnail ? (
-            <img
+            <Image
               className="w-full h-full object-cover"
               src={project.thumbnail}
               alt={project.title || "Project"}
+              width={96}
+              height={96}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">

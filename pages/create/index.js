@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
+import { useState, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
@@ -14,7 +14,6 @@ import FundingStep from "../../components/create/FundingStep";
 import { saveDraft, loadDraft, clearDraft } from "../../components/create/DraftManager";
 import { supabase } from "../../lib/supabaseClient";
 import { uploadFileToProject } from "../../lib/storage";
-import { createProject } from "../../lib/projects";
 
 const TOTAL_STEPS = 4;
 
@@ -43,13 +42,12 @@ export default function CreateProject() {
   const [draftRestored, setDraftRestored] = useState(false);
   const [publishError, setPublishError] = useState("");
   const [user, setUser] = useState(null);
-
   /* ─── Auth Check ─── */
   useEffect(() => {
     async function checkAuth() {
       const { data } = await supabase.auth.getUser();
       if (!data?.user) {
-        router.replace("/login?redirect=/create");
+        router.push("/login?redirect=/create");
         return;
       }
       setUser(data.user);
@@ -57,23 +55,25 @@ export default function CreateProject() {
     checkAuth();
   }, [router]);
 
-  /* ─── Restore Draft on Mount ─── */
+  /* ─── Initialize State from Draft ─── */
   useEffect(() => {
-    const draft = loadDraft();
-    if (draft) {
-      setFormData((prev) => ({
-        ...prev,
-        title: draft.title || "",
-        short: draft.short || "",
-        description: draft.description || "",
-        categories: draft.categories || [],
-        goal: draft.goal || "",
-        deadline: draft.deadline || "",
-        duration: draft.duration || null,
-        prototypeUrl: draft.prototypeUrl || "",
-      }));
-      setTeam(draft.team || []);
-      setDraftRestored(true);
+    if (typeof window !== "undefined") {
+      const draft = loadDraft();
+      if (draft) {
+        queueMicrotask(() => setFormData({
+          ...initialFormData,
+          title: draft.title || "",
+          short: draft.short || "",
+          description: draft.description || "",
+          categories: draft.categories || [],
+          goal: draft.goal || "",
+          deadline: draft.deadline || "",
+          duration: draft.duration || null,
+          prototypeUrl: draft.prototypeUrl || "",
+        }));
+        queueMicrotask(() => setTeam(draft.team || []));
+        queueMicrotask(() => setDraftRestored(true));
+      }
     }
   }, []);
 
@@ -176,17 +176,52 @@ export default function CreateProject() {
         return;
       }
 
-      /* STEP 3: Create project FIRST */
-      const project = await createProject({
-        title: formData.title,
-        short: formData.short,
-        description: formData.description,
-        goal: Number(formData.goal),
-        deadline: formData.deadline,
-        prototypeUrl: formData.prototypeUrl,
-        owner_id: user.id,
-        categories: formData.categories,
+      /* STEP 3: Create project FIRST via the verified-only publish API */
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        setPublishError("Please login first to publish your project.");
+        setLoading(false);
+        return;
+      }
+
+      const publishRes = await fetch("/api/projects", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          title: formData.title,
+          short: formData.short,
+          description: formData.description,
+          goal: Number(formData.goal),
+          deadline: formData.deadline,
+          prototypeUrl: formData.prototypeUrl,
+          categories: formData.categories,
+        }),
       });
+
+      if (publishRes.status === 403) {
+        setPublishError(
+          "Creator verification is required before publishing. Please complete your verification first."
+        );
+        setLoading(false);
+        return;
+      }
+
+      if (!publishRes.ok) {
+        const publishErr = await publishRes.json().catch(() => ({}));
+        setPublishError(
+          publishErr?.error || "Something went wrong. Please try again."
+        );
+        setLoading(false);
+        return;
+      }
+
+      const { project } = await publishRes.json();
 
       /* STEP 4: Upload thumbnail */
       const uploadedThumb = await uploadFileToProject(
@@ -196,10 +231,14 @@ export default function CreateProject() {
       );
 
       /* STEP 5: Save thumbnail URL */
-      await supabase
+      const { error: thumbUpdateError } = await supabase
         .from("projects")
         .update({ thumbnail: uploadedThumb.url })
         .eq("id", project.id);
+
+      if (thumbUpdateError) {
+        throw new Error(`Failed to save thumbnail: ${thumbUpdateError.message}`);
+      }
 
       /* STEP 6: Upload media */
       const mediaRows = [];
@@ -242,7 +281,7 @@ export default function CreateProject() {
       clearDraft();
       router.push(`/projects/${project.id}`);
     } catch (err) {
-      console.error(err);
+      console.error("Publish error:", err);
       setPublishError(err?.message || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -265,6 +304,7 @@ export default function CreateProject() {
         return (
           <AIGeneratorStep
             key="step-2"
+            formData={formData}
             setDescription={(desc) =>
               setFormData((prev) => ({ ...prev, description: desc }))
             }
@@ -327,6 +367,7 @@ export default function CreateProject() {
                 <span
                   className="material-symbols-outlined text-primary text-[20px]"
                   style={{ fontVariationSettings: "'FILL' 1" }}
+                  aria-hidden="true"
                 >
                   restore
                 </span>
@@ -344,7 +385,7 @@ export default function CreateProject() {
                 className="text-on-surface-variant hover:text-on-surface transition-colors"
                 aria-label="Dismiss draft restored message"
               >
-                <span className="material-symbols-outlined text-[18px]">
+                <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
                   close
                 </span>
               </button>
@@ -366,7 +407,7 @@ export default function CreateProject() {
               role="alert"
             >
               <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-red-400 text-[20px]">
+                <span className="material-symbols-outlined text-red-400 text-[20px]" aria-hidden="true">
                   error
                 </span>
                 <p className="text-red-300 font-inter text-sm">
@@ -378,7 +419,7 @@ export default function CreateProject() {
                 className="text-red-400/60 hover:text-red-300 transition-colors"
                 aria-label="Dismiss error"
               >
-                <span className="material-symbols-outlined text-[18px]">
+                <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
                   close
                 </span>
               </button>

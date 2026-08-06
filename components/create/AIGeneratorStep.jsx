@@ -7,7 +7,7 @@ const CampaignAIGenerator = dynamic(
   { ssr: false }
 );
 
-export default function AIGeneratorStep({ setDescription }) {
+export default function AIGeneratorStep({ setDescription, formData }) {
   return (
     <motion.section
       initial={{ opacity: 0, x: 20 }}
@@ -24,7 +24,14 @@ export default function AIGeneratorStep({ setDescription }) {
       />
 
       <GlassCard padding="lg" className="relative overflow-hidden">
-        <CampaignAIGenerator setDescription={setDescription} />
+        <CampaignAIGenerator
+          setDescription={setDescription}
+          initialTitle={formData?.title || ""}
+          initialCategory={
+            formData?.categories?.length > 0 ? formData.categories[0] : ""
+          }
+          initialGoal={formData?.goal || ""}
+        />
       </GlassCard>
 
       {/* Info Note */}
@@ -32,6 +39,7 @@ export default function AIGeneratorStep({ setDescription }) {
         <span
           className="material-symbols-outlined text-primary mt-0.5 text-[20px]"
           style={{ fontVariationSettings: "'FILL' 1" }}
+          aria-hidden="true"
         >
           info
         </span>

@@ -1,0 +1,78 @@
+# Fundora — Ingress & Network Policy
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fundora-ingress
+  namespace: fundora
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+spec:
+  tls:
+    - hosts:
+        - fundora.app
+        - api.fundora.app
+      secretName: fundora-tls
+  rules:
+    - host: fundora.app
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fundora-app
+                port:
+                  number: 3000
+    - host: api.fundora.app
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fundora-app
+                port:
+                  number: 3000
+---
+# Network Policy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: fundora-network-policy
+  namespace: fundora
+spec:
+  podSelector:
+    matchLabels:
+      app: fundora
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - port: 3000
+          protocol: TCP
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+        - podSelector:
+            matchLabels:
+              app: fundora
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 443
+          protocol: TCP
+        - port: 80
+          protocol: TCP

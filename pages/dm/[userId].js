@@ -1,6 +1,7 @@
 // pages/dm/[userId].js
+import Image from "next/image";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../../components/Navbar";
 import { supabase } from "../../lib/supabaseClient";
@@ -27,18 +28,7 @@ export default function DMChat() {
   const cleanupTyping = useRef(null);
 
   /* ---------------- AUTH ---------------- */
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (!data?.user) router.push("/login");
-      else {
-        setCurrentUserId(data.user.id);
-        loadInbox(data.user.id);
-      }
-    });
-  }, []);
-
-  /* ---------------- LOAD INBOX (for left pane) ---------------- */
-  async function loadInbox(uid) {
+  const loadInbox = useCallback(async (uid) => {
     const userIdToUse = uid || currentUserId;
     if (!userIdToUse) return;
 
@@ -58,104 +48,117 @@ export default function DMChat() {
       .order("created_at", { ascending: false });
 
     setThreads(data || []);
-  }
+  }, [currentUserId]);
+
+  const initConversation = useCallback(async () => {
+    queueMicrotask(() => setLoading(true));
+    try {
+      async function loadMessages(id) {
+        const { data } = await supabase
+          .from("dm_messages")
+          .select("*")
+          .eq("conversation_id", id)
+          .order("created_at", { ascending: true });
+
+        setMessages(data || []);
+      }
+
+      function subscribeMessages(id) {
+        const ch = supabase
+          .channel(`dm-${id}`)
+          .on(
+            "postgres_changes",
+            {
+              event: "INSERT",
+              schema: "public",
+              table: "dm_messages",
+              filter: `conversation_id=eq.${id}`,
+            },
+            (payload) => {
+              setMessages((prev) => [...prev, payload.new]);
+            }
+          )
+          .subscribe();
+
+        return () => supabase.removeChannel(ch);
+      }
+
+      function subscribeTyping(id) {
+        const ch = supabase
+          .channel(`typing-${id}`)
+          .on(
+            "postgres_changes",
+            {
+              event: "*",
+              schema: "public",
+              table: "typing_status",
+              filter: `conversation_id=eq.${id}`,
+            },
+            (payload) => {
+              if (payload.new.user_id !== currentUserId) {
+                setTypingUser(payload.new.is_typing);
+              }
+            }
+          )
+          .subscribe();
+
+        return () => supabase.removeChannel(ch);
+      }
+
+      cleanupMessages.current?.();
+      cleanupTyping.current?.();
+      const u1 = [currentUserId, otherUserId].sort()[0];
+      const u2 = [currentUserId, otherUserId].sort()[1];
+
+      let { data: convo } = await supabase
+        .from("dm_conversations")
+        .select("*")
+        .eq("user1", u1)
+        .eq("user2", u2)
+        .maybeSingle();
+
+      if (!convo) {
+        const { data } = await supabase
+          .from("dm_conversations")
+          .insert({ user1: u1, user2: u2 })
+          .select()
+          .single();
+        convo = data;
+      }
+
+      setConversationId(convo.id);
+      await loadMessages(convo.id);
+      cleanupMessages.current = subscribeMessages(convo.id);
+      cleanupTyping.current = subscribeTyping(convo.id);
+    } finally {
+      queueMicrotask(() => setLoading(false));
+    }
+  }, [currentUserId, otherUserId]);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data?.user) router.push("/login");
+      else {
+        setCurrentUserId(data.user.id);
+        loadInbox(data.user.id);
+      }
+    });
+  }, [loadInbox, router]);
 
   /* ---------------- INIT CONVERSATION ---------------- */
   useEffect(() => {
-    if (currentUserId && otherUserId) initConversation();
+    if (currentUserId && otherUserId) {
+      initConversation();
+    }
 
     return () => {
       cleanupMessages.current?.();
       cleanupTyping.current?.();
       clearTimeout(typingTimeout.current);
     };
-  }, [currentUserId, otherUserId]);
+  }, [currentUserId, otherUserId, initConversation]);
 
-  async function initConversation() {
-    setLoading(true);
-    cleanupMessages.current?.();
-    cleanupTyping.current?.();
-    const u1 = [currentUserId, otherUserId].sort()[0];
-    const u2 = [currentUserId, otherUserId].sort()[1];
-
-    let { data: convo } = await supabase
-      .from("dm_conversations")
-      .select("*")
-      .eq("user1", u1)
-      .eq("user2", u2)
-      .maybeSingle();
-
-    if (!convo) {
-      const { data } = await supabase
-        .from("dm_conversations")
-        .insert({ user1: u1, user2: u2 })
-        .select()
-        .single();
-      convo = data;
-    }
-
-    setConversationId(convo.id);
-    await loadMessages(convo.id);
-    cleanupMessages.current = subscribeMessages(convo.id);
-    cleanupTyping.current = subscribeTyping(convo.id);
-    setLoading(false);
-  }
-
-  /* ---------------- LOAD MESSAGES ---------------- */
-  async function loadMessages(id) {
-    const { data } = await supabase
-      .from("dm_messages")
-      .select("*")
-      .eq("conversation_id", id)
-      .order("created_at", { ascending: true });
-
-    setMessages(data || []);
-  }
-
-  /* ---------------- REALTIME: MESSAGES ---------------- */
-  function subscribeMessages(id) {
-    const ch = supabase
-      .channel(`dm-${id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "dm_messages",
-          filter: `conversation_id=eq.${id}`,
-        },
-        (payload) => {
-          setMessages((prev) => [...prev, payload.new]);
-        }
-      )
-      .subscribe();
-
-    return () => supabase.removeChannel(ch);
-  }
-
-  /* ---------------- REALTIME: TYPING ---------------- */
-  function subscribeTyping(id) {
-    const ch = supabase
-      .channel(`typing-${id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "typing_status",
-          filter: `conversation_id=eq.${id}`,
-        },
-        (payload) => {
-          if (payload.new.user_id !== currentUserId) {
-            setTypingUser(payload.new.is_typing);
-          }
-        }
-      )
-      .subscribe();
-
-    return () => supabase.removeChannel(ch);
-  }
-
+  
   async function sendTyping(status) {
     if (!conversationId) return;
 
@@ -212,7 +215,7 @@ export default function DMChat() {
       .upload(path, file);
 
     if (uploadError) {
-      console.error(uploadError);
+      console.error("File upload error:", uploadError);
       return;
     }
 
@@ -321,17 +324,18 @@ export default function DMChat() {
                   whileTap={{ scale: 0.95 }}
                   className="w-8 h-8 rounded-lg bg-surface-variant/50 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors"
                 >
-                  <span className="material-symbols-outlined text-lg">edit_square</span>
+                  <span className="material-symbols-outlined text-lg" aria-hidden="true">edit_square</span>
                 </motion.button>
               </div>
               <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg" aria-hidden="true">
                   search
                 </span>
                 <input
                   className="w-full bg-surface-container border border-outline-variant rounded-xl pl-10 pr-4 py-2.5 focus:ring-1 focus:ring-primary focus:border-primary text-on-surface placeholder:text-on-surface-variant/50 font-inter text-sm outline-none transition-all"
                   placeholder="Search conversations..."
                   type="text"
+                  aria-label="Search conversations"
                 />
               </div>
             </div>
@@ -340,7 +344,7 @@ export default function DMChat() {
             <div className="flex-1 overflow-y-auto scrollbar-hide p-2">
               {threads.length === 0 ? (
                 <div className="text-center py-12">
-                  <span className="material-symbols-outlined text-4xl text-on-surface-variant/30 block mb-3">
+                  <span className="material-symbols-outlined text-4xl text-on-surface-variant/30 block mb-3" aria-hidden="true">
                     forum
                   </span>
                   <p className="text-on-surface-variant font-inter text-sm">
@@ -359,6 +363,9 @@ export default function DMChat() {
                         key={thread.id}
                         whileHover={{ x: 3 }}
                         onClick={() => openThread(thread)}
+                        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openThread(thread); } }}
+                        role="button"
+                        tabIndex={0}
                         className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all ${
                           isActive
                             ? "bg-primary-container/10 border-l-4 border-primary"
@@ -367,11 +374,11 @@ export default function DMChat() {
                       >
                         <div className="relative shrink-0">
                           <div className="w-12 h-12 rounded-full overflow-hidden border border-outline-variant bg-surface-container-high flex items-center justify-center">
-                            <span className="material-symbols-outlined text-on-surface-variant/50 text-xl">
+                            <span className="material-symbols-outlined text-on-surface-variant/50 text-xl" aria-hidden="true">
                               person
                             </span>
                           </div>
-                          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-surface-container rounded-full" />
+                          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-surface-container rounded-full" aria-hidden="true" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex justify-between items-center mb-0.5">
@@ -412,26 +419,27 @@ export default function DMChat() {
                 {/* Mobile back button */}
                 <motion.button
                   whileTap={{ scale: 0.9 }}
-                  onClick={() => router.push("/dm")}
+                  onClick={() => { router.push("/dm"); }}
                   className="md:hidden material-symbols-outlined text-on-surface-variant p-1"
+                  aria-label="Back to messages"
                 >
                   arrow_back
                 </motion.button>
 
                 <div className="relative">
                   <div className="w-11 h-11 rounded-full overflow-hidden border border-primary/20 bg-surface-container-high flex items-center justify-center">
-                    <span className="material-symbols-outlined text-on-surface-variant/50 text-xl">
+                    <span className="material-symbols-outlined text-on-surface-variant/50 text-xl" aria-hidden="true">
                       person
                     </span>
                   </div>
-                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-surface-container rounded-full" />
+                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-surface-container rounded-full" aria-hidden="true" />
                 </div>
                 <div>
                   <h3 className="font-geist text-[18px] leading-tight text-on-surface">
                     {otherUserId?.slice(0, 8)}...
                   </h3>
                   <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full" aria-hidden="true" />
                     <span className="text-[12px] text-on-surface-variant font-inter">
                       Active now
                     </span>
@@ -443,7 +451,7 @@ export default function DMChat() {
                 {/* AI/Human Toggle */}
                 <div className="hidden sm:flex items-center bg-surface-container p-1 rounded-full border border-outline-variant mr-2">
                   <button className="px-3 py-1.5 rounded-full text-[12px] font-medium bg-primary text-on-primary ai-glow transition-all flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-[16px]">smart_toy</span>
+                    <span className="material-symbols-outlined text-[16px]" aria-hidden="true">smart_toy</span>
                     AI Help
                   </button>
                   <button className="px-3 py-1.5 rounded-full text-[12px] font-medium text-on-surface-variant hover:text-on-surface transition-colors">
@@ -455,6 +463,7 @@ export default function DMChat() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="material-symbols-outlined p-2 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 rounded-lg transition-all"
+                  aria-label="Start video call"
                 >
                   videocam
                 </motion.button>
@@ -462,6 +471,7 @@ export default function DMChat() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="material-symbols-outlined p-2 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 rounded-lg transition-all"
+                  aria-label="Start voice call"
                 >
                   call
                 </motion.button>
@@ -470,6 +480,7 @@ export default function DMChat() {
                   whileTap={{ scale: 0.95 }}
                   onClick={muteUser}
                   className="material-symbols-outlined p-2 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 rounded-lg transition-all"
+                  aria-label="Mute user"
                 >
                   info
                 </motion.button>
@@ -517,7 +528,7 @@ export default function DMChat() {
                       <div className={`w-8 h-8 rounded-full overflow-hidden shrink-0 border ${
                         isMine ? "border-primary-container/50" : "border-outline-variant"
                       } bg-surface-container-high flex items-center justify-center`}>
-                        <span className="material-symbols-outlined text-on-surface-variant/40 text-sm">
+                        <span className="material-symbols-outlined text-on-surface-variant/40 text-sm" aria-hidden="true">
                           {isMine ? "person" : "person"}
                         </span>
                       </div>
@@ -531,11 +542,15 @@ export default function DMChat() {
                         }`}>
                           {m.attachment_url ? (
                             m.attachment_type === "image" ? (
-                              <img
-                                src={m.attachment_url}
-                                alt="Chat attachment"
-                                className="rounded-lg max-w-full max-h-64 object-cover"
-                              />
+                              <div className="relative w-full h-64 max-h-64">
+                                <Image
+                                  src={m.attachment_url}
+                                  alt="Chat attachment"
+                                  fill
+                                  sizes="(max-width: 768px) 100vw, 480px"
+                                  className="rounded-lg object-cover"
+                                />
+                              </div>
                             ) : (
                               <a
                                 href={m.attachment_url}
@@ -545,7 +560,7 @@ export default function DMChat() {
                                   isMine ? "text-white" : "text-primary"
                                 }`}
                               >
-                                <span className="material-symbols-outlined text-lg">attach_file</span>
+                                <span className="material-symbols-outlined text-lg" aria-hidden="true">attach_file</span>
                                 Download attachment
                               </a>
                             )
@@ -581,7 +596,7 @@ export default function DMChat() {
                     className="flex items-center gap-2"
                   >
                     <div className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center border border-outline-variant">
-                      <span className="material-symbols-outlined text-on-surface-variant/40 text-sm">person</span>
+                      <span className="material-symbols-outlined text-on-surface-variant/40 text-sm" aria-hidden="true">person</span>
                     </div>
                     <div className="message-bubble-in px-4 py-3 rounded-2xl">
                       <motion.div
@@ -604,7 +619,7 @@ export default function DMChat() {
             {/* ─── AI Suggested Replies ─── */}
             <div className="px-6 pb-2">
               <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
-                <span className="material-symbols-outlined text-primary text-lg shrink-0 mt-1">magic_button</span>
+                <span className="material-symbols-outlined text-primary text-lg shrink-0 mt-1" aria-hidden="true">magic_button</span>
                 {["Draft vesting contract", "Check audit status", "Send Q4 roadmap"].map(
                   (suggestion) => (
                     <motion.button
@@ -660,13 +675,15 @@ export default function DMChat() {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     className="material-symbols-outlined p-2 text-on-surface-variant hover:text-primary transition-colors"
+                    aria-label="Add attachment"
                   >
                     add_circle
                   </motion.button>
-                  <label className="cursor-pointer">
+                  <label className="cursor-pointer" aria-label="Upload image">
                     <motion.span
                       whileHover={{ scale: 1.1 }}
                       className="material-symbols-outlined p-2 text-on-surface-variant hover:text-primary transition-colors inline-block"
+                      aria-hidden="true"
                     >
                       image
                     </motion.span>
@@ -707,8 +724,9 @@ export default function DMChat() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.9 }}
                   className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-on-primary shadow-lg shadow-primary/20 transition-all"
+                  aria-label="Send message"
                 >
-                  <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">
                     send
                   </span>
                 </motion.button>
