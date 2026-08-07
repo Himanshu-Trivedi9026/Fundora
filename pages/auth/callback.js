@@ -3,19 +3,6 @@ import { supabase } from "../../lib/supabaseClient";
 import { parseSignupRole } from "../../lib/roles";
 import { useEffect, useState } from "react";
 
-/**
- * Auth callback — the landing page for every Supabase auth redirect:
- *   - email confirmation (signup)      → "?next=/"            (hash or PKCE code)
- *   - password recovery (reset)        → "?type=recovery"      (hash or PKCE code)
- *   - error responses                  → "?error=..." & "error_description=..."
- *
- * Responsibilities:
- *   1. Exchange the PKCE `?code=` for a session when present (the hash-based
- *      flow is handled automatically by the browser client on load).
- *   2. Ensure the user's public profile row exists.
- *   3. Route the user to the right destination: reset-password for recovery,
- *      the `next` target (or home) for normal confirmation.
- */
 export default function Callback() {
   const router = useRouter();
   const [message, setMessage] = useState("Finishing login...");
@@ -24,15 +11,26 @@ export default function Callback() {
     if (!router.isReady) return;
 
     async function handleCallback() {
+      console.log("========================================");
+      console.log("AUTH CALLBACK START");
+      console.log("========================================");
+
       const { code, error, error_description, next, role, type } = router.query;
 
-      // Role-first onboarding: sanitize the role carried over from the signup
-      // email link. Only "creator" maps to creator; everything else (including
-      // an attempted platform_admin) becomes the default investor role.
+      console.log("Router Query:", router.query);
+      console.log("Raw role from URL:", role);
+      console.log("Code:", code);
+      console.log("Next:", next);
+      console.log("Type:", type);
+
       const sanitizedRole = parseSignupRole(role);
 
-      // Auth provider / link errors (e.g. expired or invalid link)
+      console.log("Sanitized Role:", sanitizedRole);
+
       if (error) {
+        console.error("Supabase Error:", error);
+        console.error(error_description);
+
         if (type === "recovery") {
           setMessage("This reset link is invalid or has expired.");
           setTimeout(() => router.push("/forgot-password"), 1800);
@@ -46,67 +44,101 @@ export default function Callback() {
       let session = null;
 
       if (code) {
-        // PKCE flow — exchange the one-time code for a session
+        console.log("Using PKCE flow...");
+
         const { data, error: exchangeError } =
           await supabase.auth.exchangeCodeForSession(code);
+
         if (exchangeError) {
+          console.error("Exchange Error:", exchangeError);
+
           setMessage(exchangeError.message);
           setTimeout(() => router.push("/login"), 1800);
           return;
         }
+
         session = data.session;
       } else {
-        // Hash flow — the browser client already parsed #access_token
+        console.log("Using Hash flow...");
+
         const { data } = await supabase.auth.getSession();
         session = data.session;
       }
 
+      console.log("Session:", session);
+
       const user = session?.user;
 
-      // Recovery (password reset) — hand off to the reset-password page.
-      // The current session carries a limited token scoped to updateUser.
+      console.log("Logged User:", user);
+
       if (type === "recovery") {
         router.replace("/reset-password");
         return;
       }
 
       if (user) {
-        // Ensure the public profile row exists (mirrors the signup trigger)
-        const { data: profile } = await supabase
+        console.log("Checking profile...");
+
+        const { data: profile, error: profileError } = await supabase
           .from("profiles")
-          .select("id")
+          .select("*")
           .eq("id", user.id)
           .maybeSingle();
 
+        console.log("Profile Query Error:", profileError);
+        console.log("Existing Profile:", profile);
+
         if (!profile) {
-          // INSERT is the only path that can set the role at signup — the
-          // protect_user_role trigger (016) blocks UPDATEs of `role` for the
-          // client, but does not fire on INSERT.
-          try {
-            await supabase.from("profiles").insert({
+          console.log("Profile does not exist.");
+          console.log("Creating profile...");
+          console.log("Role being inserted:", sanitizedRole);
+
+          const { data: insertData, error: insertError } = await supabase
+            .from("profiles")
+            .insert({
               id: user.id,
               full_name:
-                user.user_metadata?.full_name || user.email?.split("@")[0],
+                user.user_metadata?.full_name ||
+                user.email?.split("@")[0],
               bio: "",
               website: "",
               avatar_url: "",
               role: sanitizedRole,
-            });
-          } catch (insertErr) {
-            // Ignore duplicate-key race when the verification link is double-fired.
-            if (insertErr?.code !== "23505") throw insertErr;
+            })
+            .select();
+
+          console.log("Insert Data:", insertData);
+          console.log("Insert Error:", insertError);
+
+          if (insertError) {
+            console.error("Profile Insert Failed:", insertError);
+          } else {
+            console.log("Profile Created Successfully.");
           }
+        } else {
+          console.log("Profile already exists.");
+          console.log("Existing Role:", profile.role);
         }
+      } else {
+        console.warn("No authenticated user found.");
       }
 
-      // Normal confirmation → go to `next` (defaults to home)
       const safeNext =
-        typeof next === "string" && next.startsWith("/") ? next : "/";
+        typeof next === "string" && next.startsWith("/")
+          ? next
+          : "/";
+
+      console.log("Redirecting to:", safeNext);
+
+      console.log("========================================");
+      console.log("AUTH CALLBACK END");
+      console.log("========================================");
+
       router.replace(safeNext);
     }
 
     handleCallback();
-  }, [router.isReady, router.query, router]);
+  }, [router.isReady]);
 
   return (
     <div
@@ -120,6 +152,7 @@ export default function Callback() {
         >
           progress_activity
         </span>
+
         <p className="font-inter text-sm">{message}</p>
       </div>
     </div>
