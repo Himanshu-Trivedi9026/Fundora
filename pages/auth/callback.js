@@ -98,8 +98,7 @@ export default function Callback() {
             .insert({
               id: user.id,
               full_name:
-                user.user_metadata?.full_name ||
-                user.email?.split("@")[0],
+                user.user_metadata?.full_name || user.email?.split("@")[0],
               bio: "",
               website: "",
               avatar_url: "",
@@ -124,9 +123,7 @@ export default function Callback() {
       }
 
       const safeNext =
-        typeof next === "string" && next.startsWith("/")
-          ? next
-          : "/";
+        typeof next === "string" && next.startsWith("/") ? next : "/";
 
       console.log("Redirecting to:", safeNext);
 

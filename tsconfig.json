@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "checkJs": false,
     "strict": false,
@@ -18,17 +14,11 @@
     "jsx": "react-jsx",
     "skipLibCheck": true,
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     },
     "incremental": true
   },
-  "include": [
-    "**/*.js",
-    "**/*.jsx",
-    "next-env.d.ts"
-  ],
+  "include": ["**/*.js", "**/*.jsx", "next-env.d.ts"],
   "exclude": [
     "node_modules",
     ".next",
