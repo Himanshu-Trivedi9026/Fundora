@@ -61,7 +61,13 @@ vi.mock("../lib/supabaseClient", () => ({
     },
     from: vi.fn().mockReturnThis(),
     select: vi.fn().mockReturnThis(),
-    insert: vi.fn().mockResolvedValue({ data: null, error: null }),
+    // `.insert({...})` and `.insert({...}).select()` must both work: return a
+    // thenable that also exposes `.select()`, mirroring the real builder chain.
+    insert: vi.fn(() => {
+      const result = Promise.resolve({ data: null, error: null });
+      result.select = vi.fn().mockResolvedValue({ data: null, error: null });
+      return result;
+    }),
     update: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
     order: vi.fn().mockReturnThis(),

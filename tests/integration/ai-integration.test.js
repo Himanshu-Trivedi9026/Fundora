@@ -23,6 +23,7 @@ vi.mock("../../lib/supabaseAdmin", () => ({
     delete: vi.fn().mockReturnThis(),
     upsert: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
+    neq: vi.fn().mockReturnThis(),
     gte: vi.fn().mockReturnThis(),
     lte: vi.fn().mockReturnThis(),
     lt: vi.fn().mockReturnThis(),
@@ -428,24 +429,35 @@ describe("AI Platform Integration", () => {
       error: null,
     });
 
-    // Mock metadata fetch for similar campaigns
-    const metadataChain = {
+    // Mock fetch of all active campaigns for feature-based scoring.
+    // Current production flow: from("campaigns").select().eq(status).neq(id).limit()
+    supabaseAdmin.from.mockImplementationOnce(() => ({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
-          single: vi.fn().mockResolvedValue({
-            data: {
-              title: "Similar Tech",
-              category: "technology",
-              status: "active",
-            },
-            error: null,
+          neq: vi.fn().mockReturnValue({
+            limit: vi.fn().mockResolvedValue({
+              data: [
+                {
+                  id: "campaign-sim-1",
+                  title: "Similar Tech",
+                  category: "technology",
+                  status: "active",
+                },
+                {
+                  id: "campaign-sim-2",
+                  title: "Another Tech",
+                  category: "technology",
+                  status: "active",
+                },
+              ],
+              error: null,
+            }),
           }),
         }),
       }),
-    };
-    supabaseAdmin.from.mockImplementationOnce(() => metadataChain);
+    }));
 
-    const result = await getSimilarCampaigns(campaignId, { limit: 5 });
+    const result = await getSimilarCampaigns({ campaignId, limit: 5 });
 
     expect(result.success).toBe(true);
     expect(result.data).toBeDefined();

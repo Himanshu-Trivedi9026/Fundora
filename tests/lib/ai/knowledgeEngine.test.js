@@ -80,9 +80,12 @@ function mockUpdateEq(data) {
 }
 
 function mockDeleteEq(data) {
+  // Production deletes embeddings with two filters: .delete().eq().eq()
   return {
     delete: vi.fn().mockReturnValue({
-      eq: vi.fn().mockResolvedValue(data),
+      eq: vi.fn().mockReturnValue({
+        eq: vi.fn().mockResolvedValue(data),
+      }),
     }),
   };
 }

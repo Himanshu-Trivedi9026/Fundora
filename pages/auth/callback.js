@@ -138,7 +138,7 @@ export default function Callback() {
     }
 
     handleCallback();
-  }, [router.isReady]);
+  }, [router.isReady, router]);
 
   return (
     <div
